@@ -27,6 +27,7 @@
 
 #include "extdll.h"
 #include "util.h"
+#include "cvardef.h"
 
 #include "Commandfunc.h"
 
@@ -37,6 +38,467 @@
 
 #include "NeuralNet.h"
 #include "som.h"
+
+int g_menu_waypoint;
+int g_menu_state = 0;
+
+char *show_menu_1;			// pointer to texts
+char *show_menu_2;
+char *show_menu_2a;
+char *show_menu_2am;
+char *show_menu_2b;
+char *show_menu_2c;
+char *show_menu_3;
+char *show_menu_4;
+char *show_menu_5;
+
+// // // /// // /// // /// /// // /// /// english joebot menu
+char *E_show_menu_1 ={"\\yJoeBOT Menu\n\n\
+\\w1. Waypoint stuff\n\
+2. Add bot\n\
+3. Kick a bot\n\
+4. End round\n\n\
+5. CANCEL\n\n\
+6. Language\n"};
+
+char *E_show_menu_2={"\\yWaypoint menu\n\n\
+\\w1. Waypoint on/off\n\
+2. Autowaypoint on/off\n\
+3. Autopath on/off\n\
+4. Add\n\
+5. Delete\n\
+6. Set flags\n\
+7. Load\n\
+8. Save\n\
+9. Pathwaypoint\n"};
+
+char *E_show_menu_2a={"\\yWaypoint flags\n\n\
+\\w1. Dont Avoid\n\
+2. Ladder\n\
+3. Visit\n\
+4. Crouch\n\
+5. Aiming\n\
+6. Sniper spot\n\
+7. Bomb target / hostages\n\
+8. Team specific\n\
+9. more ...\n"};
+
+char *E_show_menu_2am={"\\yWaypoint flags - 2\n\n\
+\\w1. Rescue zone\n\
+2. Dont avoid fall\n\
+3. Jump\n"};
+
+char *E_show_menu_2b={"\\yPathwaypoint menu\n\n\
+\\w1. create1\n\
+2. create2\n\
+3. remove1\n\
+4. remove2\n"};
+
+char *E_show_menu_2c={"\\ySelect a team :\n\n\
+\\w1. Counterterrorists\n\
+2. Terrorists\n\
+3. Not team specific\n"};
+
+char *E_show_menu_3={"\\yAdd JoeBOT(s)\n\n\
+\\w1. Add a TE\n\
+2. Add a CT\n\
+3. Add a ?\n\
+\nFill server ... \n\
+4. half with TE\n\
+5. half with CT\n\
+6. full with TE\n\
+7. full with CT\n\
+8. full\n"};
+
+char *E_show_menu_4={"\\yKick JoeBOT(s)\n\n\
+\\w1. kick a te\n\
+2. kick a ct\n\
+3. kick all te\n\
+4. kick all ct\n\
+5. kick all bots\n"};
+
+char *E_show_menu_5={"\\yChoose a language\n\n\
+\\w1. English\n\
+2. German / Deutsch\n\
+3. French / Francais\n"};
+
+// // // /// // /// // /// /// // /// /// deutsches joebot menu
+char *D_show_menu_1 ={"\\yJoeBOT Menue\n\n\
+\\w1. Menu fuer Wegpunkte\n\
+2. Hinzufuegen von JoeBOTs\n\
+3. Entfernen von JoeBOTs\n\
+4. Sofortiges Ende der Runde\n\n\
+5. Abbrechen\n\n\
+6. Sprache"};
+
+char *D_show_menu_2={"\\yWPmenue\n\n\
+\\w1. Wegpunkte (WP) an/aus\n\
+2. Autom. WP an/aus\n\
+3. Autom. Pfade an/aus\n\
+4. Fuege WP hinzu\n\
+5. Loesche WP\n\
+6. Setze WP Eigenschaften\n\
+7. Lade WP\n\
+8. Speichere WP\n\
+9. Pfade\n"};
+
+char *D_show_menu_2a={"\\yWegpunkt Eigenschaften\n\n\
+\\w1. Vermeide nichts\n\
+2. Leiter\n\
+3. Besuchspunkt\n\
+4. Ducken\n\
+5. Zielen\n\
+6. Sniper Spot\n\
+7. Bombe / Geiseln\n\
+8. Team spezifisch\n\
+9. mehr ...\n"};
+
+char *D_show_menu_2am={"\\yWaypoint Eigenschaften - 2\n\n\
+\\w1. Rettungs-Zone\n\
+2. Verhindere nicht zu fallen\n\
+3. Spring!\n"};
+
+char *D_show_menu_2b={"\\yPfad Menue\n\n\
+\\w1. Erstelle Start\n\
+2. Erstelle Ende\n\
+3. Entferne Start\n\
+4. Entferne Ende\n"};
+
+char *D_show_menu_2c={"\\yWaehle ein Team aus :\n\n\
+\\w1. Counterterrorists\n\
+2. Terrorists\n\
+3. Nicht Team spezifisch\n"};
+
+char *D_show_menu_3={"\\yHinzufuegen von JoeBOT(s)\n\n\
+\\w1. Fuege TE hinzu\n\
+2. Fuege CT hinzu\n\
+3. Fuege ? hinzu\n\
+\n'Fülle' Server ... \n\
+4. halb mit TE\n\
+5. halb mit CT\n\
+6. voll mit TE\n\
+7. voll mit CT\n\
+8. voll\n"};
+
+char *D_show_menu_4={"\\yEntfernen von JoeBOT(s)\n\n\
+\\w1. Entferne einen TE\n\
+2. Entferne einen CT\n\
+3. Entferne alle TEs\n\
+4. Entferne alle CTs\n\
+5. Entferne alle Bots\n"};
+
+char *D_show_menu_5={"\\yWaehlen sie eine Sprache : \n\n\
+\\w1. English / Englisch\n\
+2. Deutsch\n\
+3. Franzoesisch / Francais\n"};
+
+// // // /// // /// // /// /// // /// /// french joebot menu
+char *F_show_menu_1 ={"\\yJoeBOT Menu\n\n\
+\\w1. Utilitaires waypoints\n\
+2. Ajouter un/des bot(s)\n\
+3. Kicker un bot\n\
+4. Fin du round\n\n\
+5. ANNULER\n\n\
+6. Choisis une langue\n"};
+
+char *F_show_menu_2={"\\yWaypoint menu\n\n\
+\\w1. Waypoint on/off\n\
+2. Autowaypoint on/off\n\
+3. Autopath on/off\n\
+4. Ajouter\n\
+5. Effacer\n\
+6. Ajuster les attributs\n\
+7. Charger\n\
+8. Sauvegarder\n\
+9. Pathwaypoint\n"};
+
+char *F_show_menu_2a={"\\yAttributs des waypoints\n\n\
+\\w1. Ignorer obstacle\n\
+2. Echelle\n\
+3. Visite\n\
+4. Accroupi\n\
+5. Viser\n\
+6. Point de Snipe\n\
+7. Point de bombe / hostages\n\
+8. Specifique a une equipe\n\
+9. Plus ...\n"};
+
+char *F_show_menu_2am={"\\yAttributs des waypoints - 2\n\n\
+\\w1. Zone de sauvetage\n\
+2. Empecher de tomber\n\
+3. Sauter\n"};
+
+char *F_show_menu_2b={"\\yPathwaypoint menu\n\n\
+\\w1. Creer1\n\
+2. Creer2\n\
+3. Enlever1\n\
+4. Enlever2\n"};
+
+char *F_show_menu_2c={"\\yChoisir un team :\n\n\
+\\w1. Counter-terrorists\n\
+2. Terrorists\n\
+3. Au hasard\n"};
+
+char *F_show_menu_3={"\\yAjouter JoeBOT(s)\n\n\
+\\w1. Ajouter un terro\n\
+2. Ajouter un counter\n\
+3. Ajouter au hasard\n\
+\nCompleter le serveur avec \n\
+4. 1/2 TE\n\
+5. 1/2 CT\n\
+6. tous terros\n\
+7. tous counters\n\
+8. tous\n"};
+
+char *F_show_menu_4={"\\yKicker JoeBOT(s)\n\n\
+\\w1. kicker un terro\n\
+2. kicker un counter\n\
+3. kicker tous les terros\n\
+4. kicker tous les counters\n\
+5. kicker tous les bots\n"};
+
+char *F_show_menu_5={"\\yChosissez une langue : \n\n\
+\\w1. Anglais / English\n\
+2. Allemand / German\n\
+3. Francais\n"};
+
+cvar_t *jb_cstrike15;
+cvar_t *jb_mixnames;
+cvar_t *jb_msgwelcome;
+cvar_t *jb_prefixaggression;
+cvar_t *jb_suffixskill;
+cvar_t *jb_botsmin;
+cvar_t *jb_botsmax;
+cvar_t *jb_chat1337;
+cvar_t *jb_chat;
+cvar_t *jb_chati;
+cvar_t *jb_chatfreq;
+cvar_t *jb_msgradio;
+cvar_t *jb_aimmomentum;
+cvar_t *jb_aimspeed;
+cvar_t *jb_nnupdaterate;
+cvar_t *jb_campprobability;
+cvar_t *jb_msgenemydown;
+cvar_t *jb_shoot;
+cvar_t *jb_tkpunish;
+cvar_t *jb_language;
+cvar_t *jb_wp;
+cvar_t *jb_wpoffsetx;
+cvar_t *jb_wpoffsety;
+cvar_t *jb_wpoffsetz;
+cvar_t *jb_wpfilename;
+cvar_t *jb_wpsound;
+cvar_t *jb_wppath;
+cvar_t *jb_wpauto;
+cvar_t *jb_wpautopath;
+cvar_t *jb_wpautobots;
+cvar_t *jb_wpautojump;
+cvar_t *jb_wpautojumptest;
+cvar_t *jb_wpautoadvanced;
+cvar_t *jb_wpstats;
+cvar_t *jb_wprecalc;
+cvar_t *jb_prefixdefensive;
+cvar_t *jb_prefixnormal;
+cvar_t *jb_prefixaggressive;
+cvar_t *jb_pistolonly;
+cvar_t *jb_skillmin;
+cvar_t *jb_skillmax;
+cvar_t *jb_entergame;
+cvar_t *jb_jointeam;
+cvar_t *jb_spraypaint;
+cvar_t *jb_showen;
+cvar_t *jb_debugengine;
+
+cvar_t init_jb_cstrike15        = {"jb_cstrike15", "0", 0, 0};
+cvar_t init_jb_mixnames         = {"jb_mixnames", "1", 0, 1};
+cvar_t init_jb_msgwelcome       = {"jb_msgwelcome", "1", 0, 1};
+cvar_t init_jb_prefixaggression = {"jb_prefixaggression", "1", 0, 1};
+cvar_t init_jb_suffixskill      = {"jb_suffixskill", "1", 0, 1};
+cvar_t init_jb_botsmin          = {"jb_botsmin", "-1", 0, -1};
+cvar_t init_jb_botsmax          = {"jb_botsmax", "-1", 0, -1};
+cvar_t init_jb_chat1337         = {"jb_chat1337", "3", 0, 3};
+cvar_t init_jb_chat             = {"jb_chat", "1", 0, 1};
+cvar_t init_jb_chati            = {"jb_chati", "", 0, IC_ALL};
+cvar_t init_jb_chatfreq         = {"jb_chatfreq", "45", 0, 45};
+cvar_t init_jb_msgradio         = {"jb_msgradio", "1", 0, 1};
+cvar_t init_jb_aimmomentum      = {"jb_aimmomentum", "", 0, _DEFAULTAMOMENTUM};
+cvar_t init_jb_aimspeed         = {"jb_aimspeed", "", 0, _DEFAULTASPEED};
+cvar_t init_jb_nnupdaterate     = {"jb_nnupdaterate", "", 0, _DEFAULTNNUPDATE};
+cvar_t init_jb_campprobability  = {"jb_campprobability", "2", 0, 2};
+cvar_t init_jb_msgenemydown     = {"jb_msgenemydown", "1", 0, 1};
+cvar_t init_jb_shoot            = {"jb_shoot", "1", 0, 1};
+cvar_t init_jb_tkpunish         = {"jb_tkpunish", "0", 0, 0};
+cvar_t init_jb_language         = {"jb_language", "e", 0};
+cvar_t init_jb_wp               = {"jb_wp", "0", 0, 0};
+cvar_t init_jb_wpoffsetx        = {"jb_wpoffsetx", "0", 0, 0};
+cvar_t init_jb_wpoffsety        = {"jb_wpoffsety", "0", 0, 0};
+cvar_t init_jb_wpoffsetz        = {"jb_wpoffsetz", "0", 0, 0};
+cvar_t init_jb_wpfilename       = {"jb_wpfilename", "", 0, 0};
+cvar_t init_jb_wpsound          = {"jb_wpsound", "1", 0, 1};
+cvar_t init_jb_wppath           = {"jb_wppath", "0", 0, 0};
+cvar_t init_jb_wpauto           = {"jb_wpauto", "0", 0, 0};
+cvar_t init_jb_wpautopath       = {"jb_wpautopath", "1", 0, 1};
+cvar_t init_jb_wpautobots       = {"jb_wpautobots", "0", 0, 0};
+cvar_t init_jb_wpautojump       = {"jb_wpautojump", "1", 0, 1};
+cvar_t init_jb_wpautojumptest   = {"jb_wpautojumptest", "1", 0, 1};
+cvar_t init_jb_wpautoadvanced   = {"jb_wpautoadvanced", "1", 0, 1};
+cvar_t init_jb_wpstats          = {"jb_wpstats", "1", 0, 1};
+cvar_t init_jb_wprecalc         = {"jb_wprecalc", "1", 0, 1};
+cvar_t init_jb_prefixdefensive  = {"jb_prefixdefensive", "[J0E]", 0, 0};
+cvar_t init_jb_prefixnormal     = {"jb_prefixnormal", "[JoE]", 0, 0};
+cvar_t init_jb_prefixaggressive = {"jb_prefixaggressive", "[JOE]", 0, 0};
+cvar_t init_jb_pistolonly       = {"jb_pistolonly", "0", 0, 0};
+cvar_t init_jb_skillmin         = {"jb_skillmin", "", 0, _DEFAULTSKILL - 30};
+cvar_t init_jb_skillmax         = {"jb_skillmax", "", 0, _DEFAULTSKILL};
+cvar_t init_jb_entergame        = {"jb_entergame", "1", 0, 1};
+cvar_t init_jb_jointeam         = {"jb_jointeam", "1", 0, 1};
+cvar_t init_jb_spraypaint       = {"jb_spraypaint", "1", 0, 1};
+cvar_t init_jb_showen           = {"jb_showen", "0", 0, 0};
+cvar_t init_jb_debugengine      = {"jb_debugengine", "0", 0, 0};
+
+void JBRegCvars(void)
+{
+	static bool bRegDone = false;
+
+	if (bRegDone) return;
+
+	CVAR_REGISTER(&init_jb_cstrike15);
+	CVAR_REGISTER(&init_jb_mixnames);
+	CVAR_REGISTER(&init_jb_msgwelcome);
+	CVAR_REGISTER(&init_jb_prefixaggression);
+	CVAR_REGISTER(&init_jb_suffixskill);
+	CVAR_REGISTER(&init_jb_botsmin);
+	CVAR_REGISTER(&init_jb_botsmax);
+	CVAR_REGISTER(&init_jb_chat1337);
+	CVAR_REGISTER(&init_jb_chat);
+	CVAR_REGISTER(&init_jb_chati);
+	CVAR_REGISTER(&init_jb_chatfreq);
+	CVAR_REGISTER(&init_jb_msgradio);
+	CVAR_REGISTER(&init_jb_aimmomentum);
+	CVAR_REGISTER(&init_jb_aimspeed);
+	CVAR_REGISTER(&init_jb_nnupdaterate);
+	CVAR_REGISTER(&init_jb_campprobability);
+	CVAR_REGISTER(&init_jb_msgenemydown);
+	CVAR_REGISTER(&init_jb_shoot);
+	CVAR_REGISTER(&init_jb_tkpunish);
+	CVAR_REGISTER(&init_jb_language);
+	CVAR_REGISTER(&init_jb_wp);
+	CVAR_REGISTER(&init_jb_wpoffsetx);
+	CVAR_REGISTER(&init_jb_wpoffsety);
+	CVAR_REGISTER(&init_jb_wpoffsetz);
+	CVAR_REGISTER(&init_jb_wpfilename);
+	CVAR_REGISTER(&init_jb_wpsound);
+	CVAR_REGISTER(&init_jb_wppath);
+	CVAR_REGISTER(&init_jb_wpauto);
+	CVAR_REGISTER(&init_jb_wpautopath);
+	CVAR_REGISTER(&init_jb_wpautobots);
+	CVAR_REGISTER(&init_jb_wpautojump);
+	CVAR_REGISTER(&init_jb_wpautojumptest);
+	CVAR_REGISTER(&init_jb_wpautoadvanced);
+	CVAR_REGISTER(&init_jb_wpstats);
+	CVAR_REGISTER(&init_jb_wprecalc);
+	CVAR_REGISTER(&init_jb_prefixdefensive);
+	CVAR_REGISTER(&init_jb_prefixnormal);
+	CVAR_REGISTER(&init_jb_prefixaggressive);
+	CVAR_REGISTER(&init_jb_pistolonly);
+	CVAR_REGISTER(&init_jb_skillmin);
+	CVAR_REGISTER(&init_jb_skillmax);
+	CVAR_REGISTER(&init_jb_entergame);
+	CVAR_REGISTER(&init_jb_jointeam);
+	CVAR_REGISTER(&init_jb_spraypaint);
+	CVAR_REGISTER(&init_jb_showen);
+	CVAR_REGISTER(&init_jb_debugengine);
+
+	jb_cstrike15        = CVAR_GET_POINTER("jb_cstrike15");
+	jb_mixnames         = CVAR_GET_POINTER("jb_mixnames");
+	jb_msgwelcome       = CVAR_GET_POINTER("jb_msgwelcome");
+	jb_prefixaggression = CVAR_GET_POINTER("jb_prefixaggression");
+	jb_suffixskill      = CVAR_GET_POINTER("jb_suffixskill");
+	jb_botsmin          = CVAR_GET_POINTER("jb_botsmin");
+	jb_botsmax          = CVAR_GET_POINTER("jb_botsmax");
+	jb_chat1337         = CVAR_GET_POINTER("jb_chat1337");
+	jb_chat             = CVAR_GET_POINTER("jb_chat");
+	jb_chati            = CVAR_GET_POINTER("jb_chati");
+	jb_chatfreq         = CVAR_GET_POINTER("jb_chatfreq");
+	jb_msgradio         = CVAR_GET_POINTER("jb_msgradio");
+	jb_aimmomentum      = CVAR_GET_POINTER("jb_aimmomentum");
+	jb_aimspeed         = CVAR_GET_POINTER("jb_aimspeed");
+	jb_nnupdaterate     = CVAR_GET_POINTER("jb_nnupdaterate");
+	jb_campprobability  = CVAR_GET_POINTER("jb_campprobability");
+	jb_msgenemydown     = CVAR_GET_POINTER("jb_msgenemydown");
+	jb_shoot            = CVAR_GET_POINTER("jb_shoot");
+	jb_tkpunish         = CVAR_GET_POINTER("jb_tkpunish");
+	jb_language         = CVAR_GET_POINTER("jb_language");
+	jb_wp               = CVAR_GET_POINTER("jb_wp");
+	jb_wpoffsetx        = CVAR_GET_POINTER("jb_wpoffsetx");
+	jb_wpoffsety        = CVAR_GET_POINTER("jb_wpoffsety");
+	jb_wpoffsetz        = CVAR_GET_POINTER("jb_wpoffsetz");
+	jb_wpfilename       = CVAR_GET_POINTER("jb_wpfilename");
+	jb_wpsound          = CVAR_GET_POINTER("jb_wpsound");
+	jb_wppath           = CVAR_GET_POINTER("jb_wppath");
+	jb_wpauto           = CVAR_GET_POINTER("jb_wpauto");
+	jb_wpautopath       = CVAR_GET_POINTER("jb_wpautopath");
+	jb_wpautobots       = CVAR_GET_POINTER("jb_wpautobots");
+	jb_wpautojump       = CVAR_GET_POINTER("jb_wpautojump");
+	jb_wpautojumptest   = CVAR_GET_POINTER("jb_wpautojumptest");
+	jb_wpautoadvanced   = CVAR_GET_POINTER("jb_wpautoadvanced");
+	jb_wpstats          = CVAR_GET_POINTER("jb_wpstats");
+	jb_wprecalc         = CVAR_GET_POINTER("jb_wprecalc");
+	jb_prefixdefensive  = CVAR_GET_POINTER("jb_prefixdefensive");
+	jb_prefixnormal     = CVAR_GET_POINTER("jb_prefixnormal");
+	jb_prefixaggressive = CVAR_GET_POINTER("jb_prefixaggressive");
+	jb_pistolonly       = CVAR_GET_POINTER("jb_pistolonly");
+	jb_skillmin         = CVAR_GET_POINTER("jb_skillmin");
+	jb_skillmax         = CVAR_GET_POINTER("jb_skillmax");
+	jb_entergame        = CVAR_GET_POINTER("jb_entergame");
+	jb_jointeam         = CVAR_GET_POINTER("jb_jointeam");
+	jb_spraypaint       = CVAR_GET_POINTER("jb_spraypaint");
+	jb_showen           = CVAR_GET_POINTER("jb_showen");
+	jb_debugengine      = CVAR_GET_POINTER("jb_debugengine");
+
+	bRegDone = true;
+}
+
+void UpdateLanguage(void)
+{
+	switch(int(jb_language->value))
+	{
+		case LANG_DE:
+			show_menu_1		= D_show_menu_1;
+			show_menu_2		= D_show_menu_2;
+			show_menu_2a	= D_show_menu_2a;
+			show_menu_2am	= D_show_menu_2am;
+			show_menu_2b	= D_show_menu_2b;
+			show_menu_2c	= D_show_menu_2c;
+			show_menu_3		= D_show_menu_3;
+			show_menu_4		= D_show_menu_4;
+			show_menu_5		= D_show_menu_5;
+			break;
+		case LANG_FR:
+			show_menu_1		= F_show_menu_1;
+			show_menu_2		= F_show_menu_2;
+			show_menu_2a	= F_show_menu_2a;
+			show_menu_2am	= F_show_menu_2am;
+			show_menu_2b	= F_show_menu_2b;
+			show_menu_2c	= F_show_menu_2c;
+			show_menu_3		= F_show_menu_3;
+			show_menu_4		= F_show_menu_4;
+			show_menu_5		= F_show_menu_5;
+			break;
+		case LANG_E:
+		default:
+			show_menu_1		= E_show_menu_1;
+			show_menu_2		= E_show_menu_2;
+			show_menu_2a	= E_show_menu_2a;
+			show_menu_2am	= E_show_menu_2am;
+			show_menu_2b	= E_show_menu_2b;
+			show_menu_2c	= E_show_menu_2c;
+			show_menu_3		= E_show_menu_3;
+			show_menu_4		= E_show_menu_4;
+			show_menu_5		= E_show_menu_5;
+			break;
+	}
+}
 
 void ClientPrintEx( entvars_t *client, int msg_dest, const char *msg_name, const char *param1, const char *param2, const char *param3, const char *param4 )
 {
@@ -75,13 +537,13 @@ bool bc_addbot(edict_t *pEntity,int iType,const char *arg1,const char *arg2,cons
 bool bc_mix_names(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	if (FStrEq(arg1, "on")){
 		if (IS_DEDICATED_SERVER())printf("Note that this command has only effect before adding bots\n");
-		g_bMixNames = true;
+		CVAR_SET_FLOAT("jb_mixnames", 1);
 	}
 	else if (FStrEq(arg1, "off")){
 		if (IS_DEDICATED_SERVER())printf("Note that this command has only effect before adding bots\n");
-		g_bMixNames = false;
+		CVAR_SET_FLOAT("jb_mixnames", 0);
 	}
-	if ( g_bMixNames ){
+	if ( bool(jb_mixnames->value) ){
 		if (IS_DEDICATED_SERVER())printf("Bot names are random\n");
 	}
 	else{
@@ -92,12 +554,12 @@ bool bc_mix_names(edict_t *pEntity,int iType,const char *arg1,const char *arg2,c
 
 bool bc_welcome(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	if (FStrEq(arg1, "on")){
-		bCheckWelcome = true;
+		CVAR_SET_FLOAT("jb_msgwelcome", 1);
 	}
 	else if (FStrEq(arg1, "off")){
-		bCheckWelcome = false;
+		CVAR_SET_FLOAT("jb_msgwelcome", 0);
 	}
-	if(bCheckWelcome){
+	if(bool(jb_msgwelcome->value)){
 		if(IS_DEDICATED_SERVER()){
 			cout << "JoeBOT: Welcome messages are ON" << endl;
 		}
@@ -118,16 +580,16 @@ bool bc_endround(edict_t *pEntity,int iType,const char *arg1,const char *arg2,co
 
 bool bc_extjoe(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	if (FStrEq(arg1, "on")){
-		b_addjoe = true;
+		CVAR_SET_FLOAT("jb_prefixaggression", 1);
 	}
 	else if (FStrEq(arg1, "off")){
-		b_addjoe = false;
+		CVAR_SET_FLOAT("jb_prefixaggression", 0);
 	}
-	if(b_addjoe){
-		sprintf(szTemp,"JoeBOT: Names are extended by : %s:%s,%s\n",szPrefixAgg,szPrefixNor,szPrefixDef);
+	if(bool(jb_prefixaggression->value)){
+		sprintf(szTemp,"JoeBOT: Names are extended by : %s:%s,%s\n",jb_prefixaggressive->string,jb_prefixnormal->string,jb_prefixdefensive->string);
 	}
 	else{
-		sprintf(szTemp,"JoeBOT: Names are not extended by : %s:%s,%s\n",szPrefixAgg,szPrefixNor,szPrefixDef);
+		sprintf(szTemp,"JoeBOT: Names are not extended by : %s:%s,%s\n",jb_prefixaggressive->string,jb_prefixnormal->string,jb_prefixdefensive->string);
 	}
 	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
 	return true;
@@ -135,12 +597,12 @@ bool bc_extjoe(edict_t *pEntity,int iType,const char *arg1,const char *arg2,cons
 
 bool bc_extskill(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	if (FStrEq(arg1, "on")){
-		b_addskill = true;
+		CVAR_SET_FLOAT("jb_suffixskill", 1);
 	}
 	else if (FStrEq(arg1, "off")){
-		b_addskill = false;
+		CVAR_SET_FLOAT("jb_suffixskill", 0);
 	}
-	if(b_addskill){
+	if(bool(jb_suffixskill->value)){
 		sprintf(szTemp,"JoeBOT: Names are extended by (skill)\n");
 	}
 	else{
@@ -151,22 +613,24 @@ bool bc_extskill(edict_t *pEntity,int iType,const char *arg1,const char *arg2,co
 }
 
 bool bc_min_bots(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
-	min_bots = atoi( arg1 );
+	int min_bots = atoi( arg1 );
 	
 	if ((min_bots < 0) || (min_bots > 31))
 		min_bots = 0;
 	
+	CVAR_SET_FLOAT("jb_botsmin", min_bots);
 	sprintf(szTemp, "JoeBOT: min_bots set to %d\n", min_bots);
 	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
 	return true;
 }
 
 bool bc_max_bots(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
-	max_bots = atoi( arg1 );
+	int max_bots = atoi( arg1 );
 	
 	if ((max_bots < 0) || (max_bots > 31)) 
 		max_bots = 0;
 	
+	CVAR_SET_FLOAT("jb_botsmax", max_bots);
 	sprintf(szTemp, "JoeBOT: max_bots set to %d\n", max_bots);
 	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
 	return true;
@@ -203,27 +667,29 @@ bool bc_kickbot(edict_t *pEntity,int iType,const char *arg1,const char *arg2,con
 }
 
 bool bc_leetposs(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
-	g_ileetposs = atoi(arg1);
-	sprintf(szTemp,"JoeBOT: possibility for leet is @ %i\nJoeBOT: note that this has only an effect for bots which will be added later.\n",g_ileetposs);
+	int leetposs = atof(arg1);
+	CVAR_SET_FLOAT("jb_chat1337", leetposs);
+	sprintf(szTemp,"JoeBOT: possibility for leet is @ %f\nJoeBOT: note that this has only an effect for bots which will be added later.\n",leetposs);
 	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
 	return true;
 }
 
 bool bc_botchat(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	if (FStrEq(arg1, "on")){
-		g_bChat = true;
+		CVAR_SET_FLOAT("jb_chat", 1);
 	}
 	else if (FStrEq(arg1, "off")){
-		g_bChat = false;
+		CVAR_SET_FLOAT("jb_chat", 0);
 	}
 	else{
-		g_CHATFREQ = atof (arg1);
-		if(g_CHATFREQ < 1)
-			g_CHATFREQ = 10;
-		g_bChat = true;
+		float chatfreq = atof(arg1);
+		if (chatfreq < 1)
+			chatfreq = 10;
+		CVAR_SET_FLOAT("jb_chatfreq", chatfreq);
+		CVAR_SET_FLOAT("jb_chat", 1);
 	}
-	if(g_bChat){
-		sprintf(szTemp,"JoeBOT: Bots are chatting @ %fs\n",g_CHATFREQ);
+	if(bool(jb_chat->value)){
+		sprintf(szTemp,"JoeBOT: Bots are chatting @ %fs\n",jb_chatfreq->value);
 		/*if(listenserver_edict);
 			(*g_engfuncs.pfnClientCommand)(listenserver_edict,"speak \"talk system is on\"\n");*/
 	}
@@ -238,22 +704,22 @@ bool bc_botchat(edict_t *pEntity,int iType,const char *arg1,const char *arg2,con
 
 bool bc_botichat(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	if (FStrEq(arg1, "off")){
-		g_iIChat = IC_NONE;
+		CVAR_SET_FLOAT("jb_chati", IC_NONE);
 	}
 	else if (FStrEq(arg1, "dead")){
-		g_iIChat = IC_DEAD;
+		CVAR_SET_FLOAT("jb_chati", IC_DEAD);
 	}
 	else if (FStrEq(arg1, "alive")){
-		g_iIChat = IC_ALIVE;
+		CVAR_SET_FLOAT("jb_chati", IC_ALIVE);
 	}
 	else if (FStrEq(arg1, "all")){
-		g_iIChat = IC_ALL;
+		CVAR_SET_FLOAT("jb_chati", IC_ALL);
 	}
 	else{
 		sprintf(szTemp,"bot_ichat usage is : bot_ichat [off/dead/alive/all]\n");
 		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
 	}
-	switch(g_iIChat){
+	switch(int(jb_chati->value)){
 	case IC_NONE:
 		sprintf(szTemp,"JoeBOT: The interactive chat won't be used.\n");
 		break;
@@ -276,12 +742,12 @@ bool bc_botichat(edict_t *pEntity,int iType,const char *arg1,const char *arg2,co
 
 bool bc_botuseradio(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	if (FStrEq(arg1, "on")){
-		g_bUseRadio = true;
+		CVAR_SET_FLOAT("jb_msgradio", 1);
 	}
 	else if (FStrEq(arg1, "off")){
-		g_bUseRadio = false;
+		CVAR_SET_FLOAT("jb_msgradio", 0);
 	}
-	if(g_bUseRadio){
+	if(bool(jb_msgradio->value)){
 		sprintf(szTemp,"Bots are using the radio\n");
 	}
 	else{
@@ -293,12 +759,12 @@ bool bc_botuseradio(edict_t *pEntity,int iType,const char *arg1,const char *arg2
 
 bool bc_botmomentum(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	if (FStrEq(arg1, "default")){
-		g_fBaseAMomentum = 1.0-(atof (arg2)/100.0);
-		sprintf(szTemp,"Default view momentum is set to %f - for bots already added, there has been no change !\n",100.0-g_fBaseAMomentum*100);
+		CVAR_SET_FLOAT("jb_aimmomentum", 1.0 - ( atof(arg2) / 100.0 ));
+		sprintf(szTemp,"Default view momentum is set to %f - for bots already added, there has been no change !\n",100.0-jb_aimmomentum->value*100);
 		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
 	}
 	if (FStrEq(arg1, "getdefault")||FStrEq(arg1, "get")){
-		sprintf(szTemp,"Default view momentum is %f\n",100.0-g_fBaseAMomentum*100);
+		sprintf(szTemp,"Default view momentum is %f\n",100.0-jb_aimmomentum->value*100);
 		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
 	}
 	else if (FStrEq(arg1, "all")){
@@ -317,7 +783,7 @@ bool bc_botmomentum(edict_t *pEntity,int iType,const char *arg1,const char *arg2
 					bots[i]->f_AMomentum = 1.0-(f_AMomentum/100.0);
 				}
 			}
-			g_fBaseAMomentum = 1.0-(f_AMomentum/100.0);
+			CVAR_SET_FLOAT("jb_aimmomentum", 1.0 - ( f_AMomentum / 100.0 ));
 			sprintf(szTemp,"View Momentum is set to %f for all bots and the default.\n",f_AMomentum);
 			ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
 		}
@@ -363,12 +829,12 @@ bool bc_botmomentum(edict_t *pEntity,int iType,const char *arg1,const char *arg2
 
 bool bc_botvspeed(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	if (FStrEq(arg1, "default")){
-		g_fBaseASpeed = atof (arg2)/100.0;
-		sprintf(szTemp,"Default aiming speed is set to %f - for bots already added, there has been no change !\n",g_fBaseASpeed*100);
+		CVAR_SET_FLOAT("jb_aimspeed", atof(arg2) / 100.0);
+		sprintf(szTemp,"Default aiming speed is set to %f - for bots already added, there has been no change !\n",jb_aimspeed->value*100);
 		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
 	}
 	if (FStrEq(arg1, "getdefault")||FStrEq(arg1, "get")){
-		sprintf(szTemp,"Default aiming speed is %f\n",g_fBaseASpeed*100.0);
+		sprintf(szTemp,"Default aiming speed is %f\n",jb_aimspeed->value*100.0);
 		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
 	}
 	else if (FStrEq(arg1, "all")){
@@ -387,7 +853,7 @@ bool bc_botvspeed(edict_t *pEntity,int iType,const char *arg1,const char *arg2,c
 					bots[i]->f_ASpeed = f_ASpeed/100.0;
 				}
 			}
-			g_fBaseASpeed = f_ASpeed/100.0;
+			CVAR_SET_FLOAT("jb_aimspeed", f_ASpeed / 100.0);
 			sprintf(szTemp,"Aiming speed is set to %f for all bots and the default.\n",f_ASpeed);
 			ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
 		}
@@ -433,12 +899,12 @@ bool bc_botvspeed(edict_t *pEntity,int iType,const char *arg1,const char *arg2,c
 
 bool bc_botskill(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	if (FStrEq(arg1, "default")){
-		g_iBaseSkillMin = atoi (arg2);
-		sprintf(szTemp,"Default skill is set to %i - for bots already added, there has been no change !\n",g_iBaseSkillMin);
+		CVAR_SET_FLOAT("jb_skillmin", atof(arg2));
+		sprintf(szTemp,"Default skill is set to %i - for bots already added, there has been no change !\n",jb_skillmin->value);
 		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
 	}
 	if (FStrEq(arg1, "getdefault")||FStrEq(arg1, "get")){
-		sprintf(szTemp,"Default skill is %i\n",g_iBaseSkillMin);
+		sprintf(szTemp,"Default skill is %i\n",jb_skillmin->value);
 		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
 	}
 	else if (FStrEq(arg1, "all")){
@@ -452,7 +918,7 @@ bool bc_botskill(edict_t *pEntity,int iType,const char *arg1,const char *arg2,co
 					bots[i]->UpdateSkill();
 				}
 			}
-			g_iBaseSkillMin = i_Skill;
+			CVAR_SET_FLOAT("jb_skillmin", i_Skill);
 			sprintf(szTemp,"Skill is set to %i for all bots and the default.\n",i_Skill);
 			ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
 		}
@@ -501,12 +967,12 @@ bool bc_resetstat(edict_t *pEntity,int iType,const char *arg1,const char *arg2,c
 bool bc_nnupdate(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	float ftemp = atof (arg1);
 	if(ftemp < 1.0 || ftemp > 1000){
-		//gnn_update = _DEFAULTNNUPDATE;
+		//CVAR_SET_FLOAT("jb_nnupdaterate", _DEFAULTNNUPDATE);
 	}
 	else
-		gnn_update = ftemp;
+		CVAR_SET_FLOAT("jb_nnupdaterate", ftemp);
 	
-	sprintf(szTemp,"NNs are now running @ %f updates/s, if the framerate is high enough\n",gnn_update);
+	sprintf(szTemp,"NNs are now running @ %f updates/s, if the framerate is high enough\n",jb_nnupdaterate->value);
 	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
 	return true;
 }
@@ -514,12 +980,12 @@ bool bc_nnupdate(edict_t *pEntity,int iType,const char *arg1,const char *arg2,co
 bool bc_campposs(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	float ftemp = atof (arg1);
 	if(ftemp < 0.0 || ftemp > 100){
-		//gnn_update = _DEFAULTNNUPDATE;
+		//CVAR_SET_FLOAT("jb_nnupdaterate", 2);
 	}
 	else
-		g_fCampPoss = ftemp;
+		CVAR_SET_FLOAT("jb_campprobability", ftemp);
 	
-	sprintf(szTemp,"camping possibility is set to %f ( 100 -> very low; 0 -> all the time )\n",g_fCampPoss);
+	sprintf(szTemp,"camping possibility is set to %f ( 100 -> very low; 0 -> all the time )\n",jb_campprobability->value);
 	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
 	return true;
 }
@@ -555,12 +1021,12 @@ bool bc_nnstat(edict_t *pEntity,int iType,const char *arg1,const char *arg2,cons
 
 bool bc_edown(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	if (FStrEq(arg1, "on")){
-		g_bEDown = true;
+		CVAR_SET_FLOAT("jb_msgenemydown", 1);
 	}
 	else if (FStrEq(arg1, "off")){
-		g_bEDown = false;
+		CVAR_SET_FLOAT("jb_msgenemydown", 0);
 	}
-	if(g_bEDown){
+	if(bool(jb_msgenemydown->value)){
 		sprintf(szTemp,"Bots report \"Enemy down\"\n");
 	}
 	else{
@@ -650,20 +1116,20 @@ bool bc_savenn(edict_t *pEntity,int iType,const char *arg1,const char *arg2,cons
 bool bc_botshoot(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	if (FStrEq(arg1, "on"))
 	{
-		bBotsShoot = true;
+		CVAR_SET_FLOAT("jb_shoot", 1);
 		
 		sprintf(szTemp,"Bots shoot\n");
 		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
 	}
 	else if (FStrEq(arg1, "off"))
 	{
-		bBotsShoot = false;
+		CVAR_SET_FLOAT("jb_shoot", 0);
 		
 		sprintf(szTemp,"Bots don't like violence any more\n");
 		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
 	}
 	else{
-		if ( !bBotsShoot ){
+		if ( !bool(jb_shoot->value) ){
 			sprintf(szTemp,"Bots are friendly\n");
 		}
 		else{
@@ -678,13 +1144,13 @@ bool bc_botshoot(edict_t *pEntity,int iType,const char *arg1,const char *arg2,co
 bool bc_bottkpunish(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	if (FStrEq(arg1, "on"))
 	{
-		g_bTKPunish = true;
+		CVAR_SET_FLOAT("jb_tkpunish", 1);
 	}
 	else if (FStrEq(arg1, "off"))
 	{
-		g_bTKPunish = false;
+		CVAR_SET_FLOAT("jb_tkpunish", 0);
 	}
-	if ( g_bTKPunish ){
+	if (bool(jb_tkpunish->value)){
 		sprintf(szTemp,"They'll sometimes shoot at a teamm8 after a tk\n");
 	}
 	else{
@@ -700,10 +1166,10 @@ bool bc_showen(edict_t *pEntity,int iType,const char *arg1,const char *arg2,cons
 	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
 	
 	if (FStrEq(arg1, "on")){
-		g_bshowen = true;
+		CVAR_SET_FLOAT("jb_showen", 1);
 	}
 	else if (FStrEq(arg1, "off")){
-		g_bshowen = false;
+		CVAR_SET_FLOAT("jb_showen", 0);
 	}
 	
 	return true;
@@ -794,12 +1260,12 @@ bool bc_menuselect(edict_t *pEntity,int iType,const char *arg1,const char *arg2,
 		}
 		else if (g_menu_state == MENU_2)  // wp - menu
 		{
-			if (FStrEq(arg1, "1")){			// waypoint on/off
-				g_waypoint_on!=TRUE?g_waypoint_on=TRUE:g_waypoint_on=FALSE;
+			if (FStrEq(arg1, "1")){			// toggle waypoints on/off
+				CVAR_SET_FLOAT("jb_wp", bool(jb_wp->value) ? 0 : 1);
 			}
-			else if (FStrEq(arg1, "2")){	// autowaypoint on/off
-				g_auto_waypoint!=TRUE?g_auto_waypoint=TRUE:g_auto_waypoint=FALSE;
-				if(g_auto_waypoint){
+			else if (FStrEq(arg1, "2")){	// toggle auto waypoint on/off
+				CVAR_SET_FLOAT("jb_wpauto", bool(jb_wpauto->value) ? 0 : 1);
+				if(bool(jb_wpauto->value)){
 					if(listenserver_edict)
 						(*g_engfuncs.pfnClientCommand)(listenserver_edict,"speak \"automatic observation system engaged\"\n");
 				}
@@ -811,18 +1277,18 @@ bool bc_menuselect(edict_t *pEntity,int iType,const char *arg1,const char *arg2,
 					AWP_ED[i].iLastWP = -1;
 				}
 			}
-			else if (FStrEq(arg1, "3")){	// auto addpath
-				g_auto_addpath!=TRUE?g_auto_addpath=FALSE:g_auto_addpath=TRUE;
+			else if (FStrEq(arg1, "3")){	// toggle auto addpath on/off
+				CVAR_SET_FLOAT("jb_wpautopath", jb_wpautopath->value ? 0 : 1);
 			}
 			else if (FStrEq(arg1, "4")){
-				if (!g_waypoint_on)
-					g_waypoint_on = TRUE;  // turn waypoints on if off
+				if (!bool(jb_wp->value))
+					CVAR_SET_FLOAT("jb_wp", 1);  // turn waypoints on if off
 				
 				WaypointAdd(pEntity);
 			}
 			else if (FStrEq(arg1, "5")){
-				if (!g_waypoint_on)
-					g_waypoint_on = TRUE;  // turn waypoints on if off
+				if (!bool(jb_wp->value))
+					CVAR_SET_FLOAT("jb_wp", 1);  // turn waypoints on if off
 				
 				WaypointDelete(pEntity);
 			}
@@ -978,15 +1444,15 @@ bool bc_menuselect(edict_t *pEntity,int iType,const char *arg1,const char *arg2,
 		}
 		else if (g_menu_state == MENU_5){  // language
 			if (FStrEq(arg1, "1")){
-				g_iLanguage = LANG_E;
+				CVAR_SET_FLOAT("jb_language", LANG_E);
 				UpdateLanguage();
 			}
 			else if (FStrEq(arg1, "2")){
-				g_iLanguage = LANG_DE;
+				CVAR_SET_FLOAT("jb_language", LANG_DE);
 				UpdateLanguage();
 			}
 			else if (FStrEq(arg1, "3")){
-				g_iLanguage = LANG_FR;
+				CVAR_SET_FLOAT("jb_language", LANG_FR);
 				UpdateLanguage();
 			}
 		}
@@ -998,26 +1464,26 @@ bool bc_menuselect(edict_t *pEntity,int iType,const char *arg1,const char *arg2,
 bool bc_language(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	if (FStrEq(arg1, "fr"))
 	{
-		g_iLanguage = LANG_FR;
+		CVAR_SET_FLOAT("jb_language", LANG_FR);
 		
 		sprintf(szTemp,"JoeBOT: The Language of the BotMenu is FRENCH\n");
 	}
 	
 	else if (FStrEq(arg1, "de"))
 	{
-		g_iLanguage = LANG_DE;
+		CVAR_SET_FLOAT("jb_language", LANG_DE);
 		
 		sprintf(szTemp,"JoeBOT: The Language of the BotMenu is GERMAN\n");
 	}
 	else if (FStrEq(arg1, "e"))
 	{
-		g_iLanguage = LANG_E;
+		CVAR_SET_FLOAT("jb_language", LANG_E);
 		
 		sprintf(szTemp,"JoeBOT: The Language of the BotMenu is ENGLISH\n");
 	}
 	else
 	{
-		g_iLanguage = LANG_E;
+		CVAR_SET_FLOAT("jb_language", LANG_E);
 		
 		sprintf(szTemp,"JoeBOT: Unrecognized parameter : The Language of the BotMenu is ENGLISH\n");
 	}
@@ -1059,13 +1525,13 @@ bool bc_waypoint(edict_t *pEntity,int iType,const char *arg1,const char *arg2,co
 		  
 		  if (FStrEq(arg1, "on"))
 		  {
-			  g_waypoint_on = TRUE;
+			  CVAR_SET_FLOAT("jb_wp", 1);
 			  
 			  ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "waypoints are ON\n", NULL, NULL, NULL, NULL);
 		  }
 		  else if (FStrEq(arg1, "off"))
 		  {
-			  g_waypoint_on = FALSE;
+			  CVAR_SET_FLOAT("jb_wp", 0);
 			  
 			  ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "waypoints are OFF\n", NULL, NULL, NULL, NULL);
 		  }
@@ -1073,7 +1539,7 @@ bool bc_waypoint(edict_t *pEntity,int iType,const char *arg1,const char *arg2,co
 			  WaypointAddStuff();
 		  }
 		  else if (FStrEq(arg1, "showstat")){
-			  g_waypoint_stat = true;
+			  CVAR_SET_FLOAT("jb_wpstats", 1);
 		  }
 		  else if (FStrEq(arg1, "clean")){
 			  WaypointClean();
@@ -1111,15 +1577,15 @@ bool bc_waypoint(edict_t *pEntity,int iType,const char *arg1,const char *arg2,co
 		  }
 		  else if (FStrEq(arg1, "add"))
 		  {
-			  if (!g_waypoint_on)
-				  g_waypoint_on = TRUE;  // turn waypoints on if off
+			  if (!bool(jb_wp->value))
+				  CVAR_SET_FLOAT("jb_wp", 1);  // turn waypoints on if off
 			  
 			  WaypointAdd(pEntity);
 		  }
 		  else if (FStrEq(arg1, "delete"))
 		  {
-			  if (!g_waypoint_on)
-				  g_waypoint_on = TRUE;  // turn waypoints on if off
+			  if (!bool(jb_wp->value))
+				  CVAR_SET_FLOAT("jb_wp", 1);  // turn waypoints on if off
 			  
 			  WaypointDelete(pEntity);
 		  }
@@ -1252,23 +1718,23 @@ bool bc_waypoint(edict_t *pEntity,int iType,const char *arg1,const char *arg2,co
 		  }
 		  else if (FStrEq(arg1, "forcestatrecalc")){
 			  WPStat.InitWP(0);
-			  g_bForceNOStat = FALSE;
+			  CVAR_SET_FLOAT("jb_wprecalc", 1);
 		  }
 		  else if (FStrEq(arg1, "forcenostat")){
 			  if (FStrEq(arg2, "on"))
 			  {
-				  g_bForceNOStat = TRUE;
+				  CVAR_SET_FLOAT("jb_wprecalc", 0);
 				  
 				  ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "Statistics are NOT recalculated on changes\n", NULL, NULL, NULL, NULL);
 			  }
 			  else if (FStrEq(arg2, "off"))
 			  {
-				  g_bForceNOStat = FALSE;
+				  CVAR_SET_FLOAT("jb_wprecalc", 1);
 				  
 				  ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "Statistics are recalculated on changes\n", NULL, NULL, NULL, NULL);
 			  }
 			  else{
-				  if(g_bForceNOStat){
+				  if(!bool(jb_wprecalc->value)){
 					  ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "Statistics are NOT recalculated on changes\n", NULL, NULL, NULL, NULL);
 				  }
 				  else{
@@ -1279,18 +1745,18 @@ bool bc_waypoint(edict_t *pEntity,int iType,const char *arg1,const char *arg2,co
 		  else if (FStrEq(arg1, "sound")){
 			  if (FStrEq(arg2, "on"))
 			  {
-				  g_waypointsound = TRUE;
+				  CVAR_SET_FLOAT("jb_wpsound", 1);
 				  
 				  ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "Sound messages for waypointing are ON\n", NULL, NULL, NULL, NULL);
 			  }
 			  else if (FStrEq(arg2, "off"))
 			  {
-				  g_waypointsound = FALSE;
+				  CVAR_SET_FLOAT("jb_wpsound", 0);
 				  
 				  ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "Sound messages for waypointing are OFF\n", NULL, NULL, NULL, NULL);
 			  }
 			  else{
-				  if(g_waypointsound){
+				  if(bool(jb_wpsound->value)){
 					  ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "Sound messages for waypointing are ON\n", NULL, NULL, NULL, NULL);
 				  }
 				  else{
@@ -1311,8 +1777,8 @@ bool bc_waypoint(edict_t *pEntity,int iType,const char *arg1,const char *arg2,co
 bool bc_autowaypoint(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	if (FStrEq(arg1, "on"))
 	{
-		g_auto_waypoint = TRUE;
-		g_waypoint_on = TRUE;  // turn this on just in case
+		CVAR_SET_FLOAT("jb_wpauto", 1);
+		CVAR_SET_FLOAT("jb_wp", 1);
 		
 		for(int i=0;i<32;i++){
 			AWP_ED[i].iLastWP = -1;
@@ -1320,31 +1786,31 @@ bool bc_autowaypoint(edict_t *pEntity,int iType,const char *arg1,const char *arg
 	}
 	else if (FStrEq(arg1, "off"))
 	{
-		g_auto_waypoint = FALSE;
+		CVAR_SET_FLOAT("jb_wpauto", 0);
 	}
 	else if (FStrEq(arg1, "all"))
 	{
-		g_bAutowpHuman = false;
+		CVAR_SET_FLOAT("jb_wpautobots", 1);
 	}
 	else if (FStrEq(arg1, "human"))
 	{
-		g_bAutowpHuman = true;
+		CVAR_SET_FLOAT("jb_wpautobots", 0);
 	}
 	else if(FStrEq(arg1,"testjump")){
 		if (FStrEq(arg2, "on"))
 		{
-			g_bTestJump = TRUE;
+			CVAR_SET_FLOAT("jb_wpautojumptest", 1);
 			
 			ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "Testing Jump wp while autowaypoint is ON\n", NULL, NULL, NULL, NULL);
 		}
 		else if (FStrEq(arg2, "off"))
 		{
-			g_bTestJump = FALSE;
+			CVAR_SET_FLOAT("jb_wpautojumptest", 0);
 			
 			ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "Testing Jump wp while autowaypoint is OFF\n", NULL, NULL, NULL, NULL);
 		}
 		else{
-			if(g_bTestJump){
+			if(bool(jb_wpautojumptest->value)){
 				ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "Testing Jump wp while autowaypoint is ON\n", NULL, NULL, NULL, NULL);
 			}
 			else{
@@ -1352,22 +1818,22 @@ bool bc_autowaypoint(edict_t *pEntity,int iType,const char *arg1,const char *arg
 			}
 		}
 	}
-	if(g_bAutowpHuman){
-		if (g_auto_waypoint)
+	if(!bool(jb_wpautobots->value)){
+		if (bool(jb_wpauto->value))
 			sprintf(szTemp, "autowaypoint (by humans) is ON\n");
 		else
 			sprintf(szTemp, "autowaypoint (by humans) is OFF\n");
 	}
 	else{
-		if (g_auto_waypoint)
+		if (bool(jb_wpauto->value))
 			sprintf(szTemp, "autowaypoint (by players) is ON\n");
 		else
 			sprintf(szTemp, "autowaypoint (by players) is OFF\n");
 	}
 	
-	if(g_auto_waypoint){
+	if (bool(jb_wpauto->value)){
 		if(listenserver_edict)
-			if(g_bAutowpHuman){
+			if(!bool(jb_wpautobots->value)){
 				(*g_engfuncs.pfnClientCommand)(listenserver_edict,"speak \"automatic observation system engaged with one authorized inspector\"\n");
 			}else{
 				(*g_engfuncs.pfnClientCommand)(listenserver_edict,"speak \"automatic observation system engaged with all\"\n");
@@ -1386,14 +1852,14 @@ bool bc_autowaypoint(edict_t *pEntity,int iType,const char *arg1,const char *arg
 bool bc_autowaypointaddjump(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	if (FStrEq(arg1, "on"))
 	{
-		g_autowpjump = TRUE;  // turn this on just in case
+		CVAR_SET_FLOAT("jb_wpautojump", 1);  // turn this on just in case
 	}
 	else if (FStrEq(arg1, "off"))
 	{
-		g_autowpjump = FALSE;
+		CVAR_SET_FLOAT("jb_wpautojump", 0);
 	}
 	
-	if (g_autowpjump)
+	if (bool(jb_wpautojump->value))
 		sprintf(szTemp, "g_autowpjump is ON -> a jump waypoint is added while autowaypointing for human players\n");
 	else
 		sprintf(szTemp, "g_autowpjump is OFF  -> a jump waypoint is NOT added while autowaypointing for human players\n");
@@ -1406,14 +1872,14 @@ bool bc_autowaypointaddjump(edict_t *pEntity,int iType,const char *arg1,const ch
 bool bc_advancedmovements(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	if (FStrEq(arg1, "on"))
 	{
-		g_waypointadv = TRUE;  // turn this on just in case
+		CVAR_SET_FLOAT("jb_wpautoadvanced", 1);  // turn this on just in case
 	}
 	else if (FStrEq(arg1, "off"))
 	{
-		g_waypointadv = FALSE;
+		CVAR_SET_FLOAT("jb_wpautoadvanced", 0);
 	}
 	
-	if (g_waypointadv)
+	if (bool(jb_wpautoadvanced->value))
 		sprintf(szTemp, "g_waypointadv is ON -> advanced movement system is used\n");
 	else
 		sprintf(szTemp, "g_waypointadv is OFF  -> advanced movement system is NOT used\n");
@@ -1426,14 +1892,14 @@ bool bc_advancedmovements(edict_t *pEntity,int iType,const char *arg1,const char
 bool bc_autopath(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	if (FStrEq(arg1, "on"))
 	{
-		g_auto_addpath = TRUE;
+		CVAR_SET_FLOAT("jb_wpautopath", 1);
 	}
 	else if (FStrEq(arg1, "off"))
 	{
-		g_auto_addpath = FALSE;
+		CVAR_SET_FLOAT("jb_wpautopath", 0);
 	}
 	
-	if (g_auto_addpath)
+	if (bool(jb_wpautopath->value))
 		sprintf(szTemp, "g_auto_addpath is ON\n");
 	else
 		sprintf(szTemp, "g_auto_addpath is OFF\n");
@@ -1446,14 +1912,14 @@ bool bc_autopath(edict_t *pEntity,int iType,const char *arg1,const char *arg2,co
 bool bc_pathwaypoint(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	if (FStrEq(arg1, "on"))
 	{
-		g_path_waypoint = TRUE;
-		g_waypoint_on = TRUE;  // turn this on just in case
+		CVAR_SET_FLOAT("jb_wppath", 1);
+		CVAR_SET_FLOAT("jb_wp", 1);
 		
 		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "pathwaypoint is ON\n", NULL, NULL, NULL, NULL);
 	}
 	else if (FStrEq(arg1, "off"))
 	{
-		g_path_waypoint = FALSE;
+		CVAR_SET_FLOAT("jb_wppath", 0);
 		
 		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "pathwaypoint is OFF\n", NULL, NULL, NULL, NULL);
 	}
@@ -1479,36 +1945,36 @@ bool bc_pathwaypoint(edict_t *pEntity,int iType,const char *arg1,const char *arg
 
 bool bc_prefix(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	if(strlen(arg1)&&!FStrEq(arg1,"-")){
-		strcpy(szPrefixAgg,arg1);
+		CVAR_SET_STRING("jb_prefixaggressive", arg1);
 	}
 	else{
-		strcpy(szPrefixAgg,"[JOE]");
+		CVAR_SET_STRING("jb_prefixaggressive", "[JOE]");
 	}
 	if(strlen(arg2)&&!FStrEq(arg2,"-")){
-		strcpy(szPrefixNor,arg2);
+		CVAR_SET_STRING("jb_prefixnormal", arg2);
 	}
 	else{
-		strcpy(szPrefixNor,"[JoE]");
+		CVAR_SET_STRING("jb_prefixnormal", "[JoE]");
 	}
 	if(strlen(arg3)&&!FStrEq(arg3,"-")){
-		strcpy(szPrefixDef,arg3);
+		CVAR_SET_STRING("jb_prefixdefensive", arg3);
 	}
 	else{
-		strcpy(szPrefixDef,"[J0E]");
+		CVAR_SET_STRING("jb_prefixdefensive", "[J0E]");
 	}
-	sprintf(szTemp,"JoeBOT: Prefixes are now : agg:%s nor:%s def:%s\n",szPrefixAgg,szPrefixNor,szPrefixDef);
+	sprintf(szTemp,"JoeBOT: Prefixes are now : agg:%s nor:%s def:%s\n",jb_prefixaggressive->string,jb_prefixnormal->string,jb_prefixdefensive->string);
 	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
 	return true;
 }
 
 bool bc_pistolonly(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	if (FStrEq(arg1, "on")){
-		g_bOnlySec = true;
+		CVAR_SET_FLOAT("jb_pistolonly", 1);
 	}
 	else if (FStrEq(arg1, "off")){
-		g_bOnlySec = false;
+		CVAR_SET_FLOAT("jb_pistolonly", 0);
 	}
-	if(g_bOnlySec){
+	if(bool(jb_pistolonly->value)){
 		sprintf(szTemp,"JoeBOT: bots only buy pistols\n");
 		if(listenserver_edict)
 			(*g_engfuncs.pfnClientCommand)(listenserver_edict,"speak \"some weapon are locked\"\n");
@@ -1524,9 +1990,9 @@ bool bc_botskill_min(edict_t *pEntity,int iType,const char *arg1,const char *arg
 	int temp = atoi(arg1);
 	
 	if ((temp >= 0) && (temp <= 100))
-		g_iBaseSkillMin = atoi( arg1 );  // set default bot skill level
+		CVAR_SET_FLOAT("jb_skillmin", atoi(arg1));  // set default bot skill level
 	
-	cout << "JoeBOT: Minimum Skill is set to "<<g_iBaseSkillMin<<endl;
+	cout << "JoeBOT: Minimum Skill is set to "<<jb_skillmin->value<<endl;
 	
 	return true;
 }
@@ -1535,9 +2001,9 @@ bool bc_botskill_max(edict_t *pEntity,int iType,const char *arg1,const char *arg
 	int temp = atoi(arg1);
 	
 	if ((temp >= 0) && (temp <= 100))
-		g_iBaseSkillMax = atoi( arg1 );  // set default bot skill level
+		CVAR_SET_FLOAT("jb_skillmax", atoi(arg1));  // set default bot skill level
 	
-	cout << "JoeBOT: Maximum Skill is set to "<<g_iBaseSkillMax<<endl;
+	cout << "JoeBOT: Maximum Skill is set to "<<jb_skillmax->value<<endl;
 	
 	return true;
 }
@@ -1640,12 +2106,12 @@ bool bc_bot_spraying(edict_t *pEntity,int iType,const char *arg1,const char *arg
 		return true;
 	}
 	if(FStrEq(arg1,"on")){
-		g_bSpray = true;
+		CVAR_SET_FLOAT("jb_spraypaint", 1);
 	}
 	else if(FStrEq(arg1,"off")){
-		g_bSpray = false;
+		CVAR_SET_FLOAT("jb_spraypaint", 0);
 	}
-	if(g_bSpray){
+	if(bool(jb_spraypaint->value)){
 		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY,"JoeBOT: The bots use spraypaints\n", NULL, NULL, NULL, NULL);
 	}
 	else{
@@ -1660,16 +2126,16 @@ bool bc_joinwhumanmax(edict_t *pEntity,int iType,const char *arg1,const char *ar
 		return true;
 	}
 	if(FStrEq(arg1,"on")){
-		g_bJoinWHumanMAX = true;
+		CVAR_SET_FLOAT("jb_entergame", 0);
 	}
 	else if(FStrEq(arg1,"off")){
-		g_bJoinWHumanMAX = false;
+		CVAR_SET_FLOAT("jb_entergame", 1);
 	}
-	if(g_bJoinWHumanMAX){
-		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY,"JoeBOT: Bots will only join when a human is on the server ( max_bots )\n", NULL, NULL, NULL, NULL);
+	if(bool(jb_entergame->value)){
+		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY,"JoeBOT: Bots will join even if there are no human on the server ( max_bots )\n", NULL, NULL, NULL, NULL);
 	}
 	else{
-		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY,"JoeBOT: Bots will join even if there are no human on the server ( max_bots )\n", NULL, NULL, NULL, NULL);
+		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY,"JoeBOT: Bots will only join when a human is on the server ( max_bots )\n", NULL, NULL, NULL, NULL);
 	}
 	return true;
 }
@@ -1680,16 +2146,16 @@ bool bc_joinwhumanres(edict_t *pEntity,int iType,const char *arg1,const char *ar
 		return true;
 	}
 	if(FStrEq(arg1,"on")){
-		g_bJoinWHumanRES = true;
+		CVAR_SET_FLOAT("jb_jointeam", 0);
 	}
 	else if(FStrEq(arg1,"off")){
-		g_bJoinWHumanRES = false;
+		CVAR_SET_FLOAT("jb_jointeam", 1);
 	}
-	if(g_bJoinWHumanRES){
-		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY,"JoeBOT: Bots will only respawn when a human player is on the server\n", NULL, NULL, NULL, NULL);
+	if(bool(jb_jointeam->value)){
+		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY,"JoeBOT: Bots will respawn even if there are no human players on the server\n", NULL, NULL, NULL, NULL);
 	}
 	else{
-		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY,"JoeBOT: Bots will respawn even if there are no human players on the server\n", NULL, NULL, NULL, NULL);
+		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY,"JoeBOT: Bots will only respawn when a human player is on the server\n", NULL, NULL, NULL, NULL);
 	}
 	return true;
 }

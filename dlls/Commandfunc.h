@@ -21,7 +21,58 @@
 #ifndef __COMMANDFUNC_H
 #define __COMMANDFUNC_H
 
-void ClientPrintEx(entvars_t *client, int msg_dest, const char *msg_name, ...);
+#include "extdll.h"
+
+extern cvar_t *jb_cstrike15;
+extern cvar_t *jb_mixnames;
+extern cvar_t *jb_msgwelcome;
+extern cvar_t *jb_prefixaggression;
+extern cvar_t *jb_suffixskill;
+extern cvar_t *jb_botsmin;
+extern cvar_t *jb_botsmax;
+extern cvar_t *jb_chat1337;
+extern cvar_t *jb_chat;
+extern cvar_t *jb_chati;
+extern cvar_t *jb_chatfreq;
+extern cvar_t *jb_msgradio;
+extern cvar_t *jb_aimmomentum;
+extern cvar_t *jb_aimspeed;
+extern cvar_t *jb_nnupdaterate;
+extern cvar_t *jb_campprobability;
+extern cvar_t *jb_msgenemydown;
+extern cvar_t *jb_shoot;
+extern cvar_t *jb_tkpunish;
+extern cvar_t *jb_language;
+extern cvar_t *jb_wp;
+extern cvar_t *jb_wpoffsetx;
+extern cvar_t *jb_wpoffsety;
+extern cvar_t *jb_wpoffsetz;
+extern cvar_t *jb_wpfilename;
+extern cvar_t *jb_wpsound;
+extern cvar_t *jb_wppath;
+extern cvar_t *jb_wpauto;
+extern cvar_t *jb_wpautopath;
+extern cvar_t *jb_wpautobots;
+extern cvar_t *jb_wpautojump;
+extern cvar_t *jb_wpautojumptest;
+extern cvar_t *jb_wpautoadvanced;
+extern cvar_t *jb_wpstats;
+extern cvar_t *jb_wprecalc;
+extern cvar_t *jb_prefixdefensive;
+extern cvar_t *jb_prefixnormal;
+extern cvar_t *jb_prefixaggressive;
+extern cvar_t *jb_pistolonly;
+extern cvar_t *jb_skillmin;
+extern cvar_t *jb_skillmax;
+extern cvar_t *jb_entergame;
+extern cvar_t *jb_jointeam;
+extern cvar_t *jb_spraypaint;
+extern cvar_t *jb_showen;
+extern cvar_t *jb_debugengine;
+
+void JBRegCvars(void);
+void UpdateLanguage(void);
+void ClientPrintEx(entvars_t *client, int msg_dest, const char *msg_name, const char *param1, const char *param2, const char *param3, const char *param4);
 
 bool bc_addbot(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4);
 bool bc_mix_names(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4);
