@@ -551,6 +551,8 @@ float UTIL_WeaponTimeBase( void );
 *	Misc. non-Valve defines and prototypes below
 *
 ****/
+#define CVAR_BOOL(v) (v->value > 0)
+
 #define FIND_ENTITY_BY_VARS  (*g_engfuncs.pfnFindEntityByVars)
 #define CREATE_FAKE_CLIENT   (*g_engfuncs.pfnCreateFakeClient)
 #define RUN_PLAYER_MOVE      (*g_engfuncs.pfnRunPlayerMove)
@@ -628,9 +630,13 @@ void UTIL_strlwr(char *p);
 void UTIL_LogPrintf(const char *fmt, ...);
 void UTIL_LogMessage(const char *plid, const char *fmt, ...);
 void UTIL_ConsoleMessage(edict_t *pEdict, const char *fmt, ...);
+
 #ifndef USE_METAMOD
 #define PLID NULL
 #define LOG_MESSAGE UTIL_LogMessage
+#ifdef _WIN32
+#define vsnprintf _vsnprintf
+#endif
 #endif /* USE_METAMOD */
 
 #endif //__UTIL_H
