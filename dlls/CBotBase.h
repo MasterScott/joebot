@@ -57,9 +57,11 @@ typedef void (FAR *LINK_ENTITY_FUNC)(entvars_t *);
 
 typedef int BOOL;
 
+#ifndef USE_METAMOD
 typedef int (*GETENTITYAPI)(DLL_FUNCTIONS *, int);
 typedef int (*GETNEWDLLFUNCTIONS)(NEW_DLL_FUNCTIONS *, int *);
 typedef void (*GIVEFNPTRSTODLL)(enginefuncs_t *, globalvars_t *);
+#endif /* not USE_METAMOD */
 typedef void (*LINK_ENTITY_FUNC)(entvars_t *);
 
 #endif
