@@ -1712,7 +1712,7 @@ void CBotCS :: Think1(void){
 					float fMin = 1250 + RANDOM_FLOAT(0,500);
 					edict_t *pEdictBomb = 0;
 					
-					while(pEdictBomb = UTIL_FindEntityByClassname(pEdictBomb,"grenade")){
+					while(pEdictBomb = UTIL_FindEntityByClassname(pEdictBomb,"grenade")){	// let's cheat .. search the bomb
 						if(!strcmp(STRING(pEdictBomb->v.model),"models/w_c4.mdl")){
 							break;
 						}
@@ -1726,19 +1726,14 @@ void CBotCS :: Think1(void){
 							if(lFleeto != -1){
 								Task.AddTaskI(BT_FLEE,-1,lFleeto,0,0);
 								ResetWPlanning();
-								//FakeClientCommand(pEdict,"say","fleeing from bomb",0);
 							}
-							//else
-							//FakeClientCommand(pEdict,"say","no wp found",0);
 						}
 					}
-					//else
-					//FakeClientCommand(pEdict,"say","no bomb",0);
 				}
 			}
 		}
 		
-		// slthough it's never used, it should be updated some time
+		// although it's never used, it should be updated some time
 		if(bot_team == 5){
 			bot_team = UTIL_GetTeam(pEdict)+1;
 		}

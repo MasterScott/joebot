@@ -1723,8 +1723,12 @@ bool CBotCS :: DecideOnWay(void){
 					}
 				}
 				else if(bot_weapons & 1<<CS_WEAPON_C4					// if ya've c4 and U#ve already played some time ...
-					&& (RANDOM_LONG(0,100) < 50 || 
-					f_timesrs > 60.0f)){
+					&& RANDOM_LONG(0,100) < 50){
+					lDestination = WaypointFindRandomGoal(pEdict->v.origin,pEdict,100000,bot_teamnm,W_FL_FLAG);
+					iWantedDiv = 0;
+				}
+				else if(bot_weapons & 1<<CS_WEAPON_C4					// if ya've c4 and U#ve already played some time ...
+					&&f_timesrs > 60.0f){
 					lDestination = WaypointFindNearestGoal(pEdict->v.origin,pEdict,100000,bot_teamnm,W_FL_FLAG);
 					iWantedDiv = 0;
 				}
