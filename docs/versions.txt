@@ -21,6 +21,7 @@ Current Developer on Sourceforge/joebot
 -- This Bot is based on botman's HPB_bot - template code - http://planethalflife.com/botman --
 ----------------------------------------------------------------------------------------------
 
+- fixed : crash with too long waypoint file paths+names. thx to Watz
 - number of names in bot_names.txt is now unlimited.
 
 JoeBOT 1.6.2
