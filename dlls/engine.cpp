@@ -335,7 +335,7 @@ void pfnClientCommand(edict_t* pEdict, char* szFmt, ...)
 		char tempFmt[256];
 		va_list argp;
 		va_start(argp, szFmt);
-		vsprintf(tempFmt, szFmt, argp);
+		vsnprintf(tempFmt, sizeof(tempFmt), szFmt, argp);
 		(*g_engfuncs.pfnClientCommand)(pEdict, tempFmt);
 		va_end(argp);
 	}

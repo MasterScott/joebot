@@ -2161,22 +2161,22 @@ void CBotBase :: InstantTurn(void){
 void CBotBase :: MakeName(char *szName,const char *szBotName,int iSkill,float fAgg){
 	if(CVAR_BOOL(jb_prefixaggression)){
 		if(fAgg < -.5){
-			sprintf(szName,"%s%s",jb_prefixdefensive->string,szBotName);
+			snprintf(szName,sizeof(szName),"%s%s",jb_prefixdefensive->string,szBotName);
 		}
 		else if(fAgg > .5){
-			sprintf(szName,"%s%s",jb_prefixaggressive->string,szBotName);
+			snprintf(szName,sizeof(szName),"%s%s",jb_prefixaggressive->string,szBotName);
 		}
 		else{
-			sprintf(szName,"%s%s",jb_prefixnormal->string,szBotName);
+			snprintf(szName,sizeof(szName),"%s%s",jb_prefixnormal->string,szBotName);
 		}
 	}
 	else{
-		sprintf(szName,"%s",szBotName);
+		snprintf(szName,sizeof(szName),"%s",szBotName);
 	}
 	
 	if(CVAR_BOOL(jb_suffixskill)){
 		char szSkill[10];
-		sprintf(szSkill,"(%i)",iSkill);
+		snprintf(szSkill,sizeof(szSkill),"(%i)",iSkill);
 		strcat(szName,szSkill);
 	}
 }
@@ -2428,8 +2428,9 @@ bool CBotBase :: HandleNearWP(int iNearWP, bool &bReturn){
 					if(fDistance > 20){	// go near to wp
 						HeadToward(waypoints[iNearWP].origin);
 						VRunningTo = waypoints[iNearWP].origin;
-						if(!(pEdict->v.button&IN_DUCK))
+						if(!(pEdict->v.button&IN_DUCK)){
 							f_move_speed = f_max_speed / 1.5;
+						}
 						prev_speed = 0;		// ... to make other routines not to think, that bot is stuck
 						f_dont_avoid = gpGlobals->time + 1.0f;
 						return true;
@@ -2463,7 +2464,8 @@ bool CBotBase :: HandleNearWP(int iNearWP, bool &bReturn){
 			if(!iOnLadder){
 				if(!(pEdict->v.button&IN_DUCK)){
 					f_move_speed /= 1.5f;					// slow down, when not on ladder
-			}}
+				}
+			}
 			
 			lButton |= IN_FORWARD;
 			if(pEdict->v.origin.z > waypoints[i_CurrWP].origin.z){	// going down ladder

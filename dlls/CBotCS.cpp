@@ -1855,7 +1855,7 @@ void CBotCS :: Think(void){
 	}
 #ifdef __LOG
 	if(HasSecondary(pBot) && !HasPrimary(pBot) &&RANDOM_LONG(0,100) < 20){
-		sprintf(szBuffer,"%s\t%i\n\0",STRING(pEdict->v.netname),bot_money);
+		snprintf(szBuffer,sizeof(szBuffer),"%s\t%i\n\0",STRING(pEdict->v.netname),bot_money);
 		
 		FILE *fhd;
 		fhd=fopen("money.txt","a");
@@ -2418,8 +2418,9 @@ void CBotCS :: Think(void){
 	f_move_speed = 0;
 	}*/
 	
-	if (f_Pause > gpGlobals->time)  // is the bot "paused"? (faking intelligence and thinking time)
+	if (f_Pause > gpGlobals->time){  // is the bot "paused"? (faking intelligence and thinking time)
 		f_move_speed = 0;  // don't move while pausing
+	}
 	
 	HandleReplay();
 	

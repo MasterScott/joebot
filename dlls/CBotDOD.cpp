@@ -1921,7 +1921,7 @@ return;
 
 #ifdef __LOG
 if(HasSecondary() && !HasPrimary() &&RANDOM_LONG(0,100) < 20){
-sprintf(szBuffer,"%s\t%i\n\0",STRING(pEdict->v.netname),bot_money);
+snprintf(szBuffer,sizeof(szBuffer),"%s\t%i\n\0",STRING(pEdict->v.netname),bot_money);
 
 FILE *fhd;
 fhd=fopen("money.txt","a");
@@ -2468,7 +2468,7 @@ f_Dot = DotProduct(VRDiff,VLDiff);
 if(f_Dot > f_DotMin){
 Vector VCross = CrossProduct(VLDiff,VRDiff);
 
-//sprintf(szBuffer,"-| %f ; %f",f_move_speed,f_Dot);
+//snprintf(szBuffer,sizeof(szBuffer),"-| %f ; %f",f_move_speed,f_Dot);
 
 f_newspeed = f_Dot * f_move_speed;
 f_newstrafe = sqrt(f_move_speed*f_move_speed-f_newspeed*f_newspeed);

@@ -442,7 +442,7 @@ int CChat :: ProcessChatString(CBotBase *pBBot,char *szChatText){
 			strncat(szTemp,szChatText,szFound-szChatText);
 			// get time to end of round
 			char szTime[80];
-			sprintf(szTime,"%i seconds",int(CVAR_GET_FLOAT("mp_roundtime")*60.0 - f_timesrs));
+			snprintf(szTime,sizeof(szTime),"%i seconds",int(CVAR_GET_FLOAT("mp_roundtime")*60.0 - f_timesrs));
 			strcat(szTemp,szTime);
 			strcat(szTemp,szFound + strlen(szTIMERE));
 			strcpy(szChatText,szTemp);
