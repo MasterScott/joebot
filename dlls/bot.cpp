@@ -47,8 +47,6 @@
 #include "Commandfunc.h"
 #include "CSkill.h"
 
-char szTemp[200];
-
 // names ..
 CBotNames Names;
 

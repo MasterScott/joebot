@@ -225,7 +225,6 @@ void CWPStat :: AddTraffic(int iTeam,int iWP){
 }
 
 int CWPStat::Load(void){
-	char msg[256];
 	char filename[256];
 	char dirname[80];
 	char mapname[30];

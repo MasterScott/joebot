@@ -1415,7 +1415,6 @@ void StartFrame( void )
 		static float previous_time = -1.0;
 		static float client_update_time = 0.0;
 		clientdata_s cd;
-		char msg[256];
 		int count;
 		
 		// if a new map has started then (MUST BE FIRST IN StartFrame)...
@@ -2520,7 +2519,6 @@ void ProcessBotCfgFile(void)
 	int cmd_index;
 	static char server_cmd[256];
 	char *cmd, *arg1, *arg2, *arg3, *arg4,*arg5, *arg6;
-	//	char msg[80];
 	
 	if (bot_cfg_pause_time > gpGlobals->time)
 		return;
