@@ -88,8 +88,8 @@ CCommands ::CCommands(){
 	AddCommand("language",		"",			(void*)bc_language,CM_ALL);
 	AddCommand("debuggoal",		"",			(void*)bc_debuggoal,CM_ALL);
 	AddCommand("waypoint",		"wp",		(void*)bc_waypoint,CM_ALL);
-	AddCommand("autowaypoint",	"awp",		(void*)bc_autowaypoint,CM_ALL);
-	AddCommand("autowaypointaddjump","awpaj",(void*)bc_autowaypointaddjump,CM_ALL);
+	AddCommand("autowaypoint",	"autowp",		(void*)bc_autowaypoint,CM_ALL);
+	AddCommand("autowaypointaddjump","autowpaj",(void*)bc_autowaypointaddjump,CM_ALL);
 	AddCommand("advancedmovements","advm",	(void*)bc_advancedmovements,CM_ALL);
 	AddCommand("autopath",		"ap",		(void*)bc_autopath,CM_ALL);
 	AddCommand("pathwaypoint",	"pw",		(void*)bc_pathwaypoint,CM_CONSOLE);
