@@ -1651,7 +1651,7 @@ void StartFrame( void )
 										
 										char *szText,*szOut1,*szOut2;
 										char szFileName[128];
-										char mapname[128];
+										char szWpFileName[128];
 										
 										szText = new char[1000];
 										szOut1 = new char[1000];
@@ -1660,18 +1660,19 @@ void StartFrame( void )
 										*szOut1 = *szOut2 = '\0';
 										strcat (szOut2,"\n\n\n\n");
 										
-										snprintf(mapname, sizeof(mapname), "%s.wpj", STRING(gpGlobals->mapname));
+										snprintf(szWpFileName, sizeof(szWpFileName), "%s.wpj", STRING(gpGlobals->mapname));
 										
-										WaypointGetDir(mapname,szFileName);
+										WaypointGetDir(szWpFileName,szFileName);
 										
-										snprintf(szOut1,sizeof(szOut1),"JoeBOT %s using waypoint file:\n%s/%s\n",_JOEBOTVERSIONWOOS,szFileName,mapname);
+										snprintf(szOut1,1000,"JoeBOT %s using waypoint file:\n%s/%s\n",_JOEBOTVERSIONWOOS,szFileName,szWpFileName);
 										strcat(szOut1,UTIL_VarArgs("( %li waypoints / stat:%li/%li )",num_waypoints,WPStat.d.lKill,WPStat.lKillMax));
 										
-										strcpy(szFileName, UTIL_VarArgs("%s/%s.txt", szFileName, mapname));
+										strcpy(szFileName, UTIL_VarArgs("%s/%s.txt", szFileName, STRING(gpGlobals->mapname)));
 										
 										long lSize = CParser :: GetFileSize(szFileName);
 										FILE *fhd;
 										fhd = fopen ( szFileName,"r");
+
 										if(fhd && lSize<480){
 											memset(szText,0,1000*sizeof(char));
 											fread(szText,lSize,sizeof(char),fhd);
@@ -1715,6 +1716,7 @@ void StartFrame( void )
 										message_params.fxTime = .1;
 										message_params.channel = 2;
 										
+										szOut1[500] = 0;
 										UTIL_ShowText(pEnt,message_params,szOut1);
 										
 										message_params.x = -1;
@@ -1734,6 +1736,7 @@ void StartFrame( void )
 										message_params.fxTime = 3;
 										message_params.channel = 3;
 										
+										szOut2[500] = 0;
 										UTIL_ShowText(pEnt,message_params,szOut2);
 										delete [] szOut1,szOut2,szText;
 									}
