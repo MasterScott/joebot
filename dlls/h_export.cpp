@@ -56,9 +56,11 @@ enginefuncs_t g_engfuncs;
 globalvars_t  *gpGlobals;
 char *g_argv;
 
+#ifndef USE_METAMOD
 GETENTITYAPI other_GetEntityAPI = NULL;
 GETNEWDLLFUNCTIONS other_GetNewDLLFunctions = NULL;
 GIVEFNPTRSTODLL other_GiveFnptrsToDll = NULL;
+#endif /* not USE_METAMOD */
 
 extern int mod_id;
 
