@@ -598,12 +598,12 @@ edict_t	*UTIL_FindEntityByTargetname(edict_t *pStartEntity, const char *szName )
 edict_t	*UTIL_FindEntityGeneric(const char *szName, Vector &vecSrc, float flRadius );
 
 void UTIL_SayText(const char *pText, edict_t *pEdict);
-long UTIL_ClientIndex(edict_t *pEdict);
+int UTIL_ClientIndex(edict_t *pEdict);
 int UTIL_GetTeam(edict_t *pEntity);
 bool UTIL_IsVIP(edict_t *pEntity);
 int UTIL_GetBotIndex(const edict_t *pEdict);
 class CBotBase;
-CBotBase  *UTIL_GetBotPointer(edict_t *pEdict);
+CBotBase  *UTIL_GetBotPointer(const edict_t *pEdict);
 bool FInViewCone(Vector *pOrigin, edict_t *pEdict);
 bool TEq(float f1,float f2,float fD);
 int UTIL_ClientsInGame( void );
