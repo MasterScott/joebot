@@ -21,6 +21,7 @@
 #ifndef _CCOMMAND_H
 #define _CCOMMAND_H
 
+#include "extdll.h"
 #include "LListElem.h"
 
 #define CM_CONSOLE		(1<<0)
@@ -55,4 +56,4 @@ public:
 		//*last;
 };
 
-#endif//_CCOMMAND_H
+#endif //_CCOMMAND_H
