@@ -621,7 +621,7 @@ void pfnCVarSetString(const char *szVarName, const char *szValue)
 	//BOT_LOG("pfnCVarSetString", "");
 	(*g_engfuncs.pfnCVarSetString)(szVarName, szValue);
 }
-void* pfnPvAllocEntPrivateData(edict_t *pEdict, long cb)
+void* pfnPvAllocEntPrivateData(edict_t *pEdict, int32 cb)
 {
 	BOT_LOG("pfnPvAllocEntPrivateData", "");
 	return (*g_engfuncs.pfnPvAllocEntPrivateData)(pEdict, cb);
@@ -706,12 +706,12 @@ void pfnGetBonePosition(const edict_t* pEdict, int iBone, float *rgflOrigin, flo
 	//BOT_LOG("pfnGetBonePosition", "");
 	(*g_engfuncs.pfnGetBonePosition)(pEdict, iBone, rgflOrigin, rgflAngles);
 }
-unsigned long pfnFunctionFromName( const char *pName )
+uint32 pfnFunctionFromName( const char *pName )
 {
 	BOT_LOG("pfnFunctionFromName", "");
 	return (*g_engfuncs.pfnFunctionFromName)(pName);
 }
-const char *pfnNameForFunction( unsigned long function )
+const char *pfnNameForFunction( uint32 function )
 {
 	BOT_LOG("pfnNameForFunction", "");
 	return (*g_engfuncs.pfnNameForFunction)(function);
@@ -809,7 +809,7 @@ CRC32_t pfnCRC32_Final(CRC32_t pulCRC)
 	BOT_LOG("pfnCRC32_Final", "");
 	return (*g_engfuncs.pfnCRC32_Final)(pulCRC);
 }
-long pfnRandomLong(long lLow, long lHigh)
+int32 pfnRandomLong(int32 lLow, int32 lHigh)
 {
 	//BOT_LOG("pfnRandomLong", "lLow=%d, lHigh=%d", lLow, lHigh);
 	return (*g_engfuncs.pfnRandomLong)(lLow, lHigh);
