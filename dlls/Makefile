@@ -18,6 +18,10 @@ else
  OBJDIR = $(BASE_OBJDIR)/mm
 endif
 
+ifeq ($(OS),Windows_NT)
+ OBJDIR := $(OBJDIR)_mingw
+endif
+
 # build external source list
 include ../NNSim/som/Config.mk
 SRC_SOM := $(SRC:%.cpp=../NNSim/som/%.cpp)
@@ -73,37 +77,13 @@ endif
 # ---------------------------------------------------------------------------
 # Targets
 # ---------------------------------------------------------------------------
-ifeq ($(OPT),debug)
- EXTERNAL_BUILDS = debug_som debug_NNSim
-else
- EXTERNAL_BUILDS = release_som release_NNSim
-endif
+all: $(OBJDIR) som NNSim $(OBJDIR)/$(DLL)
 
-all: $(OBJDIR) $(EXTERNAL_BUILDS) $(OBJDIR)/$(DLL)
+som:
+	$(MAKE) -C ../NNSim/som OPT=$(OPT)
 
-debug_som:
-	$(MAKE) -C ../NNSim/som OPT=debug
-
-release_som:
-	$(MAKE) -C ../NNSim/som
-
-debug_NNSim:
-	$(MAKE) -C ../NNSim OPT=debug
-
-release_NNSim:
-	$(MAKE) -C ../NNSim
-
-debug_mm:
-	$(MAKE) OPT=debug
-
-debug_std:
-	$(MAKE) OPT=debug DLLTYPE=std
-
-release_mm:
-	$(MAKE)
-
-release_std:
-	$(MAKE) DLLTYPE=std
+NNSim:
+	$(MAKE) -C ../NNSim OPT=$(OPT)
 
 $(OBJDIR):
 	mkdir -p $(OBJDIR)
