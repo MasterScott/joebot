@@ -28,6 +28,11 @@
 #include "extdll.h"
 #include "util.h"
 
+#ifdef USE_METAMOD
+#define SDK_UTIL_H  // util.h already included
+#include "meta_api.h"
+#endif /* USE_METAMOD */
+
 #include "Chat.h"
 
 #include "bot_modid.h"
@@ -654,7 +659,7 @@ int CChat :: LoadFile(const char *szFileNameP){
 					}
 				}
 				else
-					cout << "JoeBOT: "<<szTags[lTag]<<":"<<szTeams[lTeam]<<" isnt existing" << endl;
+					LOG_MESSAGE(PLID, "%s:%s does not exists", szTags[lTag], szTeams[lTeam]);
 			}
 		}
 	}
@@ -706,7 +711,7 @@ int CChat :: LoadFile(const char *szFileNameP){
 				}
 				
 				if((szEnd-szAct)/sizeof(char) > MAXL_KEY){
-					cout << "JoeBOT : Maximum key length is " << MAXL_KEY << "chars"<<endl;
+					LOG_MESSAGE(PLID, "Maximum key length is %d", MAXL_KEY);
 				}
 				else{
 					memset(szKey,0,sizeof(char)*MAXL_KEY);
@@ -761,12 +766,12 @@ int CChat :: LoadFile(const char *szFileNameP){
 			
 			if(!pIElem->pTexts){
 				pIElem->AddText("There is a reply in the chat file with keys, but without texts");
-				cout << "JoeBOT: "<<"There is a reply in the chat file with keys, but without texts"<<endl;
+				LOG_MESSAGE(PLID, "There is a reply in the chat file with keys, but without texts");
 			}
 		}
 	}
 
-	cout << "JoeBOT: Loading chat file : " << szFileName << "; " << iCCount << " items/"<< iKCount << " Keys."<<endl;
+	LOG_MESSAGE(PLID, "Loading chat file: %s; %d items/%d Keys.", szFileName, iCCount, iKCount);
 	delete [] szFile;
 	bNeed2Init = false;
 	

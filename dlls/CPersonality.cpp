@@ -24,6 +24,11 @@
 #include "extdll.h"
 #include "util.h"
 
+#ifdef USE_METAMOD
+#define SDK_UTIL_H  // util.h already included
+#include "meta_api.h"
+#endif /* USE_METAMOD */
+
 #include "CPersonality.h"
 
 #include "bot_modid.h"
@@ -102,7 +107,7 @@ void CPersonality :: Load(char *szName){
 	else{
 		fclose(fhd);
 	}
-	//cout << "JoeBOT : Loading personality file for " << szName<< " : " <<szWFilename << endl;
+	//LOG_MESSAGE(PLID, "Loading personality file for %s : %s", szName, szWFilename);
 	
 	long lSize;
 	
@@ -167,7 +172,7 @@ void CPersonality :: Save(char *szName){
 	UTIL_BuildFileName(szWFilename,"joebot/per",szFilename);
 #endif
 	
-	cout << "JoeBOT : Saving personality file for " << szName<< " : " << szWFilename << endl;
+	LOG_MESSAGE(PLID, "Saving personality file for %s : %s", szName, szWFilename);
 	
 	if(!(fhd = fopen(szWFilename,"w")))
 		return;

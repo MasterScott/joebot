@@ -25,6 +25,11 @@
 #include "extdll.h"
 #include "util.h"
 
+#ifdef USE_METAMOD
+#define SDK_UTIL_H  // util.h already included
+#include "meta_api.h"
+#endif /* USE_METAMOD */
+
 #include "CSDecals.h"
 
 #include "bot_modid.h"
@@ -102,7 +107,7 @@ void CSDecals :: Load(void){
 		
 		if(fhd = fopen(szFileName,"r")){
 			lNum = 0;
-			cout << "JoeBOT : Loading spray decal data from "<<szFileName << endl;
+			LOG_MESSAGE(PLID, "Loading spray decal data from %s", szFileName);
 			
 			//fread(szFileContent,sizeof(char),lFileSize,fhd);
 			char *p = szFileContent;
@@ -141,5 +146,5 @@ void CSDecals :: Load(void){
 		delete [] szFileContent;
 	}
 	else
-		cout << "JoeBOT : The spray decal data file "<< szFileName <<  "couldn't be loaded. Using default spraypaints." << endl;
+		LOG_MESSAGE(PLID, "Spray decal data file %s couldn't be loaded. Using default spraypaints", szFileName);
 }

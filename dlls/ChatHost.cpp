@@ -27,6 +27,11 @@
 #include "extdll.h"
 #include "util.h"
 
+#ifdef USE_METAMOD
+#define SDK_UTIL_H  // util.h already included
+#include "meta_api.h"
+#endif /* USE_METAMOD */
+
 #include "ChatHost.h"
 
 //////////////////////////////////////////////////////////////////////
@@ -125,7 +130,7 @@ int CChatHost :: DisconnectChat(const char *szNameP){
 	if(pF){
 		pF->iUsed --;		// decrement the counter
 		if(!pF->iUsed){
-			cout << "JoeBOT : Unloading chat file : " << szName << endl;
+			LOG_MESSAGE(PLID, "Unloading chat file: %s", szName);
 			delete pF;
 			if(pF == pData)
 				pData = 0;

@@ -28,6 +28,11 @@
 #include "extdll.h"
 #include "util.h"
 
+#ifdef USE_METAMOD
+#define SDK_UTIL_H  // util.h already included
+#include "meta_api.h"
+#endif /* USE_METAMOD */
+
 #include "CSkill.h"
 
 CSkill :: CSkill(){
@@ -54,7 +59,7 @@ void CSkill :: Load(void){
 		memset(szFileContent,0,sizeof(char)*(lFileSize+2));
 		
 		if(fhd = fopen(szFileName,"r")){
-			cout << "JoeBOT: Loading skill file : "<<szFileName << endl;
+			LOG_MESSAGE(PLID, "Loading skill file: %s", szFileName);
 			
 			//fread(szFileContent,sizeof(char),lFileSize,fhd);
 			
@@ -160,16 +165,16 @@ void CSkill :: Load(void){
 				if(iCount < 9)
 					iCount++;
 				else
-					cout << "JoeBOT: WARNING loading skill file (2nd stage) : Too many elements"<< endl;
+					LOG_MESSAGE(PLID, "WARNING: loading skill file (2nd stage) - Too many elements");
 			}
 		}
 		else{
-			cout << "JoeBOT: ERROR loading skill file (2nd stage) : "<<szFileName << endl;
+			LOG_MESSAGE(PLID, "ERROR: loading skill file (2nd stage): %s", szFileName);
 		}
 		delete [] szFileContent;
 	}
 	else{
-		cout << "JoeBOT: ERROR loading skill file (1st stage) : "<<szFileName << endl;
+		LOG_MESSAGE(PLID, "ERROR: loading skill file (1st stage): %s", szFileName);
 	}
 }
 
