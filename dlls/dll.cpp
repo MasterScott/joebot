@@ -57,13 +57,13 @@
 #include "CSkill.h"
 #include "globalvars.h"
 #include "NNWeapon.h"
+#include "vers_info.h"
 #include "WorldGnome.h"
 
 #include "NeuralNet.h"
 
 CWorldGnome CWG;
 
-#define JOEBOT_VERSION "1.6.5"
 #define _MAXCFGLINESPERFRAME 5
 
 #ifndef USE_METAMOD
@@ -91,13 +91,13 @@ static META_FUNCTIONS gMetaFunctionTable = {
 // Description of plugin
 plugin_info_t Plugin_info = {
 	META_INTERFACE_VERSION,	// ifvers
-	"JoeBOT",	// name
-	JOEBOT_VERSION,	// version
-	"2001/04/01",	// date
-	"@$3.1415rin <as3.1415rin@bots-united.com>",	// author
-	"http://joebot.bots-united.com/",	// url
-	"JOEBOT",	// logtag
-	PT_STARTUP,	// (when) loadable
+	VNAME,			// name
+	VVERSION,		// version
+	VDATE,			// date
+	VAUTHOR,		// author
+	VURL,			// url
+	VLOGTAG,		// logtag
+	PT_STARTUP,		// (when) loadable
 	PT_ANYPAUSE,	// (when) unloadable
 };
 
@@ -284,7 +284,7 @@ CBotWPDir g_WPDir;
 
 char welcome_msg[200];
 char _JOEBOTVERSION[80];
-char _JOEBOTVERSIONWOOS[80]= JOEBOT_VERSION;
+char _JOEBOTVERSIONWOOS[80]= VVERSION;
 bool bDedicatedWelcome = false;
 int g_iTypeoM;
 
@@ -828,15 +828,13 @@ void ClientDisconnect( edict_t *pEntity )
 #endif /* USE_METAMOD */
 }
 
+#ifndef USE_METAMOD
 void ClientKill( edict_t *pEntity )
 {
 	BOT_LOG("ClientKill", ("pEntity=%x", pEntity));
-#ifdef USE_METAMOD
-	RETURN_META(MRES_IGNORED);
-#else /* not USE_METAMOD */
 	(*other_gFunctionTable.pfnClientKill)(pEntity);
-#endif /* USE_METAMOD */
 }
+#endif /* not USE_METAMOD */
 
 void ClientPutInServer( edict_t *pEntity )
 {
@@ -2223,7 +2221,7 @@ DLL_FUNCTIONS gFunctionTable =
 
 	ClientConnect,             //pfnClientConnect
 	ClientDisconnect,          //pfnClientDisconnect
-	ClientKill,                //pfnClientKill
+	NULL,                      //pfnClientKill
 	ClientPutInServer,         //pfnClientPutInServer
 	ClientCommand,             //pfnClientCommand
 	NULL,                      //pfnClientUserInfoChanged
