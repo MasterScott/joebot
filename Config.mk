@@ -4,13 +4,13 @@ OBJDIR_LINUX = obj.linux
 
 ifeq ($(OS),Windows_NT)
  SDKDIR = /u/netgames/install/hl/sdk/multiplayer
- JOEBOTDIR = /u/netgames/install/hl/bots/joebot
- MMDIR = /u/netgames/install/hl/server/metamod-1.17
+ JOEBOTDIR = /u/netgames/install/hl/bots/joebot/src
+ MMDIR = /u/netgames/install/hl/server/metamod/src/1.17
  OBJDIR = $(OBJDIR_WIN32)
 else
- SDKDIR = /home/netgames/install/hl/sdk/multiplayer/
- JOEBOTDIR = /home/netgames/install/hl/bots/joebot
- MMDIR = /home/netgames/install/hl/server/metamod-1.17
+ SDKDIR = /home/netgames/install/hl/sdk/multiplayer
+ JOEBOTDIR = /home/netgames/install/hl/bots/joebot/src
+ MMDIR = /home/netgames/install/hl/server/metamod/src/1.17
  OBJDIR = $(OBJDIR_LINUX)
 endif
 
