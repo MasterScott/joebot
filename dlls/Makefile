@@ -109,7 +109,7 @@ $(OBJDIR):
 	mkdir -p $(OBJDIR)
 	
 clean:
-	-$(RM) $(OBJDIR)/*.o
+	-$(RM) $(OBJDIR)/*.o $(OBJDIR)/$(DLL)
 
 spotless:
 	-$(RM) -r $(OBJDIR)
