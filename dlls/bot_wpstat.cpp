@@ -287,8 +287,6 @@ int CWPStat::Load(void){
 			else
 				ALERT(at_console, msg);
 
-			fclose(fhd);
-
 			return true;
 		}
 	}

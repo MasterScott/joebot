@@ -2412,7 +2412,8 @@ void CBotCS :: Think(void){
 	float fspeed;
 	Vector v_comp = (v_view * f_move_speed + v_perp * f_strafe);
 	fspeed = v_comp.Length();
-	v_comp = v_comp * (1.f/fspeed);
+	if(fspeed)
+		v_comp = v_comp * (1.f/fspeed);
 	
 	/* code for avoidance of obstables */
 	v_comp = v_comp + v_avoid * .7f;

@@ -1,22 +1,22 @@
 /******************************************************************************
 
-    JoeBOT - a bot for Counter-Strike
-    Copyright (C) 2000-2002  Johannes Lampel
-
+  JoeBOT - a bot for Counter-Strike
+  Copyright (C) 2000-2002  Johannes Lampel
+  
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
     any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
+	
+	  This program is distributed in the hope that it will be useful,
+	  but WITHOUT ANY WARRANTY; without even the implied warranty of
+	  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	  GNU General Public License for more details.
+	  
+		You should have received a copy of the GNU General Public License
+		along with this program; if not, write to the Free Software
+		Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+		
 ******************************************************************************/
 // JoeBot
 // by Johannes Lampel
@@ -30,12 +30,12 @@ float fDODFlagU;
 
 CBotDOD :: CBotDOD(){
 	fDODFlagU = 0;
-
+	
 	f_pronetill = 0;
 	f_changedprone = 0;
-
+	
 	bTNT = false;
-
+	
 	//Chat.Load(this);
 }
 
@@ -76,7 +76,7 @@ void CBotDOD :: HandleMenu( void )
 		
 		if (bot_class == -1)
 			bot_class = RANDOM_LONG(1,5);
-
+		
 		// select the class the bot wishes to use...
 		if (bot_class == 1 && bot_team == 1)
 			strcpy(c_class, "lightinf");
@@ -98,7 +98,7 @@ void CBotDOD :: HandleMenu( void )
 			strcpy(c_class, "heavyweaponsger");
 		else if (bot_class == 5 && bot_team == 2)
 			strcpy(c_class, "machinegunnerger");
-
+		
 		FakeClientCommand(pEdict, c_class, NULL,NULL);
 		//sprintf(c_class,"%i",bot_class);
 		//FakeClientCommand(pEdict, "menuselect", c_class, NULL);
@@ -107,7 +107,7 @@ void CBotDOD :: HandleMenu( void )
 		not_started = 0;
 		return;
 	}
-
+	
 	if (start_action == MSG_DOD_WPN_SELECT_SERGEANT)
 	{
 		if(RANDOM_LONG(0,100) < 50){
@@ -239,7 +239,7 @@ void CBotDOD :: SpawnInit(void)
 {
 	fDODFlagU = 0;
 	Task.Reset();
-
+	
 	v_prev_origin = Vector(9999.0, 9999.0, 9999.0);
 	
 	// init some global vars, they are nvtl recaluclated before next think
@@ -288,7 +288,7 @@ void CBotDOD :: UpdateSkill(void){
 	f_ProneInDistance	= temp.fProneInDistance;
 	f_ProneTPD			= temp.fProneTPD;
 	i_ITP				= temp.fITurnProb;
-
+	
 	char *infobuffer;
 	int clientIndex;
 	
@@ -343,7 +343,7 @@ long CBotDOD :: WeaponModel2ID(const char *szModel){
 		return DOD_WEAPON_AMERKNIFE;
 	if(!strcmpi(szModel,"models/p_30cal.mdl"))
 		return DOD_WEAPON_30CAL;
-
+	
 	if(!strcmpi(szModel,"models/p_mg42bu.mdl")
 		||!strcmpi(szModel,"models/p_mg42bd.mdl")
 		||!strcmpi(szModel,"models/p_mg42pr.mdl"))
@@ -352,17 +352,17 @@ long CBotDOD :: WeaponModel2ID(const char *szModel){
 		||!strcmpi(szModel,"models/p_mg34bd.mdl")
 		||!strcmpi(szModel,"models/p_mg34pr.mdl"))
 		return DOD_WEAPON_MG42;
-
+	
 	char nak[80];
 	strcpy(nak,szModel);
 	
 	if(listenserver_edict)FakeClientCommand(listenserver_edict,"say",nak,0);
-
+	
 	return -1;
 }
 
 edict_t *CBotDOD :: FindEnemy(){
-	/*
+/*
 #define FL_ES_DELAY_SG		(1<<0)
 #define FL_ES_DELAY_PRONE	(1<<1)
 #define FL_ES_DELAY_DUCK	(1<<2)
@@ -393,7 +393,7 @@ edict_t *CBotDOD :: FindEnemy(){
 		
 		// process short term memory ...
 		bSTM = STMem.Process(pEdict,bSeeThru);
-	
+		
 		// test if the bot is blinded
 		if(f_blinded_time < gpGlobals->time){
 			// search the world for players...
@@ -429,20 +429,20 @@ edict_t *CBotDOD :: FindEnemy(){
 						FVisible( vecEnd, pEdict ))
 					{
 						FFEP->pEdict = pPlayer;
-
+						
 						FFEP->fDistance= (pPlayer->v.origin - pEdict->v.origin).Length();
-
+						
 						/*bBehindSG = IsBehindSG(pPlayer);
 						if(bBehindSG == false
-							&& FFEP->bBehindSG == true){		// enemy is't anymore covered by SG
-							FFEP->fTime2seeit -= TI_ES_DELAY_SG;
+						&& FFEP->bBehindSG == true){		// enemy is't anymore covered by SG
+						FFEP->fTime2seeit -= TI_ES_DELAY_SG;
 						}
-
-						if(bBehindSG == true
-							&& FFEP->bBehindSG == false){
-							FFEP->fTime2seeit += 1.0;
-						}*/
-
+						
+						  if(bBehindSG == true
+						  && FFEP->bBehindSG == false){
+						  FFEP->fTime2seeit += 1.0;
+					}*/
+						
 						if(FFEP->pEdict->v.button & (IN_ATTACK|IN_ATTACK2)){
 							// bot's firing
 							if(FFEP->lFlags & FL_ES_DELAY_PRONE){
@@ -454,16 +454,16 @@ edict_t *CBotDOD :: FindEnemy(){
 								FFEP->lFlags &=~ FL_ES_DELAY_SG;
 							}
 						}
-
+						
 						FFEP->bBehindSG = bBehindSG;
-
+						
 						//if(pEdictPlayer&&FFEP->bBehindSG)WaypointDrawBeam(pEdictPlayer,pEdict->v.origin,pPlayer->v.origin,10,0,200,200,200,200,0);
-
+						
 						if(!edict_old){
 							// this is a new edict :=)
 							bNotNew = TEq(gpGlobals->time,FFEP->fRecogn,_ERSTime)
 								||TEq(gpGlobals->time,FFEP->fLastSeen,_ERSTime);
-
+							
 							FFEP->fRecogn = gpGlobals->time;
 							if(bNotNew){
 							}
@@ -488,9 +488,9 @@ edict_t *CBotDOD :: FindEnemy(){
 							else{
 								FFEP->lFlags|=FL_ES_DELAY_NFIRE;
 							}
-
+							
 							FFEP->fTime2seeit = 0.0;
-
+							
 							if(FFEP->fDistance < nearestdistance || bNotNew){
 							}
 							else{
@@ -504,7 +504,7 @@ edict_t *CBotDOD :: FindEnemy(){
 							if(FFEP->lFlags & FL_ES_DELAY_PRONE){
 								FFEP->fTime2seeit += (FFEP->fDistance - f_ProneInDistance)/1000.0 * f_ProneTPD / 1000.0;
 							}
-
+							
 							if(bNotNew){
 								FFEP->fTime2seeit /= 3.f;
 							}
@@ -518,9 +518,9 @@ edict_t *CBotDOD :: FindEnemy(){
 					}
 				}
 			}
-
+			
 			float fMin = 100000;
-
+			
 			for (i = gpGlobals->maxClients; i; i--){
 				FFEP = &FFE[i];
 				if(FFEP->pEdict){
@@ -565,7 +565,7 @@ bool CBotDOD :: IsProne(edict_t *pEdict){
 void CBotDOD :: Init (void){
 	fDODFlagU = 0;
 	UpdateFlags();
-
+	
 	//f_5th = RANDOM_FLOAT(0.0,0.5);
 	bBleeding = false;
 	bSlowed = false;
@@ -588,7 +588,7 @@ void CBotDOD :: Init (void){
 	f_LTSFIP = RANDOM_FLOAT(0.0f,5.0f) + gpGlobals->time ;
 	f_IOrigD = 200.0;
 	f_LookTo = 0;
-//	f_GoBack = 0;
+	//	f_GoBack = 0;
 	f_Camp = 0;
 	f_StrCamp = 0;
 	f_DefCamp = 0;
@@ -615,20 +615,20 @@ void CBotDOD :: Init (void){
 	f_bot_stuck = 0;
 	lStuckC = 0;
 	f_dont_avoid=0;
-//	f_avoid_strafe = 0;
+	//	f_avoid_strafe = 0;
 	f_RWKnife = gpGlobals->time + 120.0;	// just some time
 	f_blinded_time=0;
 	f_gotohostage = 0;
 	f_Bored = gpGlobals->time + RANDOM_LONG(-TIMETOBEBORED*2/3,TIMETOBEBORED/2);
-//	f_Hide = 0;
-//	pHidefrom = 0;
-//	f_GotoHidingPlace = 0;
+	//	f_Hide = 0;
+	//	pHidefrom = 0;
+	//	f_GotoHidingPlace = 0;
 	f_BoredTill = 0;
 	//CChat.f_LastChat = 0;
 	//l_ChatEvent = 0;
 	f_SuspRem = 0;
 	f_Aggressivity = 0;
-//	f_GotoHidingPlace = 0;	// don't start going to VHidingPlace
+	//	f_GotoHidingPlace = 0;	// don't start going to VHidingPlace
 	f_HidingTime = 5.0;
 	f_NNNUpdate = 0;			// begin next fight with nn update ...
 	pEKilled = NULL;
@@ -656,7 +656,7 @@ void CBotDOD :: Init (void){
 	LTMem.f_NUpdate = 0;
 	STMem.iCount = 0;
 	f_LastFight = gpGlobals->time;
-
+	
 	fViewSpeedYaw=0;		// speed of changing view yaw
 	fViewSpeedPitch=0;		// speed of changing view pitch
 	
@@ -750,7 +750,7 @@ bool CBotDOD :: HandleOrders(void){		// this fucntion is called every second
 		else if(CurrentTask->lType & BT_HOLDPOS){
 			if(CurrentTask->fLive2 < gpGlobals->time)
 				Task.NextTask();
-
+			
 			Task.AddTask(BT_CAMP, CurrentTask->fLive2,0,0,0);
 		}
 		else if(CurrentTask->lType & BT_WAIT4TM8){
@@ -772,33 +772,33 @@ bool CBotDOD :: HandleOrders(void){		// this fucntion is called every second
 			}
 			Task.AddTask(BT_CAMP,CurrentTask->fLive2,0,0,0);
 		}
-/*		else if(CurrentTask->lType & BT_PAUSE){
-			if(CurrentTask->lAdd == 0){
-				CurrentTask->lAdd = 1;
-				CurrentTask->fLive2 += gpGlobals->time;
-			}
-			else if(CurrentTask->lAdd == 1){
-				f_Pause = CurrentTask->fLive2;
-				if(CurrentTask->lType & BT_CROUCH){
-					f_ducktill = CurrentTask->fLive2;
-				}
-				if(CurrentTask->fLive2 < gpGlobals->time){
-					Task.NextTask();
-					
-					f_Pause = gpGlobals->time;
-				}
-			}
-			else
-				Task.NextTask();
+		/*		else if(CurrentTask->lType & BT_PAUSE){
+		if(CurrentTask->lAdd == 0){
+		CurrentTask->lAdd = 1;
+		CurrentTask->fLive2 += gpGlobals->time;
+		}
+		else if(CurrentTask->lAdd == 1){
+		f_Pause = CurrentTask->fLive2;
+		if(CurrentTask->lType & BT_CROUCH){
+		f_ducktill = CurrentTask->fLive2;
+		}
+		if(CurrentTask->fLive2 < gpGlobals->time){
+		Task.NextTask();
+		
+		  f_Pause = gpGlobals->time;
+		  }
+		  }
+		  else
+		  Task.NextTask();
 		}*/
 		else if(CurrentTask->lType & BT_RELOAD){				// reload weapon
 			if(CurrentTask->lAdd == 0){
 				CurrentTask->lAdd = 1;
 				CurrentTask->fLive2 = gpGlobals->time + 3.0;
 				f_DenyWChange = CurrentTask->fLive2;
-
+				
 				lButton |= IN_RELOAD;
-
+				
 				//Task.AddTask(BT_PAUSE,gpGlobals->time + 3.0,0,0,0);					// pause for some time	
 				f_Pause = gpGlobals->time + 2.0;
 			}
@@ -824,9 +824,346 @@ void CBotDOD :: PreprocessTasks(void){
 }
 
 void CBotDOD :: Think5th(void){
+	TraceResult tr2;
+
+	// see how far bot has moved since the previous position...
+	v_diff = v_prev_origin - pEdict->v.origin;
+	moved_distance = v_diff.Length();
+	v_diff_angles = UTIL_VecToAngles(v_diff);
+	
+	// save current position as previous
+	v_prev_origin = pEdict->v.origin;
+	i1C--;
+	
+	// look if there are tasks in the task system to be deleted
+	Task.CheckTLife();
+	
+	// process faked sound system
+	ReactOnSound();
+	
+	// intercepted radio command - handling
+	ReactOnRadio();
+	
+	// search for interesting locations
+	//if(f_LastFight<gpGlobals->time - 3.0){
+	if(!(Action.lAction&BA_FIGHT)){
+		SearchForIL();
+	}
+	
+	// do we want backup ???
+	if((HasSniper() )							// has sniper, but no aug or sg552
+		&&!(Ordered.lAction & BO_COVER)
+		&&!Task.Important()
+		&& f_UsedRadio < gpGlobals->time - 5.0f	// don't do that too often
+		&& f_LastRadio<gpGlobals->time - 4.0				// don't enerve others
+		&& f_noCamp < gpGlobals->time			// don't do that just after capming
+		&& f_timesrs > 3.0
+		&& RANDOM_LONG(0,100) < 50){						// not every time hackhack for double radio mess per frame
+		if(HasPrimary()){
+			if(!IsCWeaponPrimary()){
+				if(f_RWKnife>gpGlobals->time)
+					f_RWKnife = gpGlobals->time-.1f;
+				Change2Weapon(HasPrimary());
+			}
+			else{
+				float fMin;
+				GetNearestPlayer(pEdict,bot_teamnm,fMin);
+				if(fMin < 500 && g_bUseRadio){
+					SendRadioCommand(RADIO_COVER_ME);
+					Ordered.lAction |= BO_COVER;
+					
+					if(f_RWKnife>gpGlobals->time)
+						f_RWKnife = gpGlobals->time-.1f;
+				}
+				else{
+					f_noCamp = gpGlobals-> time + 1;	// to avoid to many tries
+				}
+			}
+		}
+	}
+	
+	// is susp location (where bot heard sth) visible ?
+	if(Action.lAction & BA_SUSPLOC){				
+		//Vector VTo = pEdict->v.origin+pEdict->v.view_ofs+1.0*pEdict->v.velocity;
+		//UTIL_TraceLine(VTo,VSuspEn,ignore_monsters,pEdict->v.pContainingEntity,&tr);
+		UTIL_TraceLine(pEdict->v.origin,VSuspEn,ignore_monsters,pEdict->v.pContainingEntity,&tr2);
+		
+		if(/*tr.flFraction == 1.0
+			&&*/ tr2.flFraction == 1.0){				// i.e. visible
+			VLookTo = VSuspEn;
+		f_LookTo = gpGlobals->time +1.0;
+		
+		if(FInViewCone(&VSuspEn,pEdict))
+			Action.lAction &= ~BA_SUSPLOC;			// del susploc flag
+		}
+	}
+	
+	// look for planted bomb message
+	if(long(g_bBombPlanted<<5) != (Action.lAction & BA_BOMBPL) && RANDOM_LONG(0,100) < 20){ // bomb planted changed
+		//b_BombPlanted = g_bBombPlanted;
+		g_bBombPlanted?Action.lAction|=BA_BOMBPL:Action.lAction&=~BA_BOMBPL;
+		
+		if(g_bBombPlanted){
+			//FakeClientCommand(pEdict,"say","noticed it",0);
+			Chat.l_ChatEvent |= E_BombPl;
+			Task.RemoveT(BT_CAMP);
+			ResetWPlanning();
+			Task.Reset();
+		}
+	}
+	
+	if(pLastGlobalKill){
+		if(UTIL_ClientIndex(pLastGlobalKill) != -1
+			&&UTIL_GetTeam(pLastGlobalKill) != bot_teamnm
+			&& FVisible(pLastGlobalKill->v.origin,pEdict)){
+			if(f_LastFight < gpGlobals->time - 1.0){
+				HeadToward(pLastGlobalKill->v.origin);
+				if(d_Manner < .1){
+					Task.AddTask(BT_CAMP,gpGlobals->time + RANDOM_FLOAT(1.5,4.5),0,0,0);
+					f_Aggressivity += 2.0;
+					sLookToChange = 1;
+					InitCamp();
+					f_CaLooktoWP = gpGlobals->time + 2.5f;
+					GoProne(true,10.0);
+				}
+			}
+		}
+		pLastGlobalKill = 0;
+	}
+	
+	// make enemy down message
+	if(pEKilled){
+		if(UTIL_GetTeam(pEKilled) != bot_teamnm){		// no tk
+			Chat.l_ChatEvent |= E_Kill;
+			
+			pELVictim = pEKilled;
+			//				f_GotoHidingPlace = 0;	// don't try to hide ...
+			Task.RemoveT(BT_HIDE);
+			ResetWPlanning();
+			f_Aggressivity += 1.0;		// be more agressive
+			
+			if(g_bEDown){	// flag's default is true
+				if(f_UsedRadio < gpGlobals->time - _RADIO_FREQ
+					&& g_bUseRadio){
+					SendRadioCommand(RADIO_ENEMY_DOWN);
+				}
+			}
+		}
+		else{														// tk
+			if(f_TKPunish < gpGlobals->time - 2.0){
+				strcpy(Chat.szChatText,"sorry");						// just say sorry
+				Chat.f_SayTime = gpGlobals->time + RANDOM_FLOAT(0,2.0);
+				Chat.f_LastChat = gpGlobals->time + RANDOM_FLOAT(15,15);
+			}
+		}
+		pEKilled = 0;
+	}
+	
+	// sometimes try to reload
+	// at least 5 sec after last fight
+	if(RANDOM_LONG(0,100) < 7
+		&&!(Action.lAction & BA_PLANT)
+		&& current_weapon.iId>=0&&current_weapon.iId<32
+		&& (IsCWeaponPrimary()|| IsCWeaponSecondary())
+		&& Task.SearchT(BT_RELOAD) == -1
+		&& f_LastFight + 2 < gpGlobals->time
+		&& current_weapon.iId>=0&&current_weapon.iId<32
+		&& float(current_weapon.iClip) / float(WeaponDefs.ipClipSize[DOD_DLL][current_weapon.iId]) < .3){
+		Task.AddTask(BT_RELOAD,gpGlobals->time + 3.0,0,0,0);
+		//cout << "reload" << endl;
+	}
+	
+	/*if(i_FOV != 90
+	&&f_LastFight + 1.f < gpGlobals->time){
+	lButton|=IN_ATTACK2;
+		}*/
+	
+	// lower aggresivity value
+	f_Aggressivity *= .985f;
+	
+	// lower offset
+	//v_Offset = v_Offset*.73;
+	v_Offset = pEdict->v.punchangle * (float(bot_skill)/100.0) * .3;
+	
+	if(!(Action.lAction & BA_FIGHT))
+		f_AimHead *= .8;
+	
+	if(Task.SearchT(BT_HIDE) != -1
+		&&!TEq(gpGlobals->time,f_StrCamp,10)
+		&&!(Task.current && Task.current->lType & BT_HOLDPOS)){
+		edict_t *pNearest;
+		int iTm8;
+		iTm8 = UTIL_FightingAgainst(pEdict,bot_teamnm==CT?TE:CT,&pNearest,true);		// only duckin bots
+		if(iTm8>1){
+			if(f_UsedRadio < gpGlobals->time - _RADIO_FREQ
+				&&g_bUseRadio
+				&&Task.SearchT(BT_HIDE) != -1){
+				SendRadioCommand(RADIO_GOGOGO);
+				//f_Hide = gpGlobals->time - .01f;
+			}
+		}
+	}
+	
+	HandleOrders();
+	
+	if(!i1C){				// every second one time	---------------------------------------------------------------------------------
+		Think1();
+	}
+	
 }
 
 void CBotDOD :: Think1(void){
+	edict_t *pent;
+
+
+	i1C = 5;
+	
+	UpdateFlags();
+	
+	AdaptAvoid();
+	
+	//			DistanceSight();
+	
+	if(bSlowed){
+		//FakeClientCommand(pEdict,"say","stamina prone",0);
+		GoProne(true,5);
+		Task.AddTask(BT_CAMP, gpGlobals->time + 2.0,0,0,0);
+		InitCamp();
+		bSlowed = false;
+	}
+	
+	if(bBleeding){
+		FakeClientCommand(pEdict,"stopbleed",0,0);
+		bBleeding = false;
+	}
+	
+	// is there something in the LTM ?
+	float fDistance;
+	for(long lschl = 0;lschl < _MAX_LTMEM;lschl++){
+		if(LTMem.FMItem[lschl].bUsed){
+			//FakeClientCommand(pEdict,"say","ltmprone",0);
+			if(LTMem.FMItem[lschl].lType == LTM_KILLED){
+				fDistance = (LTMem.FMItem[lschl].VAddI2 - pEdict->v.origin).Length();
+				if ( fDistance < 200 ){
+					GoProne(true,10);
+				}
+			}
+			else if(LTMem.FMItem[lschl].lType == LTM_KILL){
+				fDistance = (LTMem.FMItem[lschl].VAddI2 - pEdict->v.origin).Length();
+				if ( fDistance < 100 ){
+					GoProne(true,10);
+				}
+			}
+		}
+	}
+	
+	if(RANDOM_LONG(0,100) < 20){
+		edict_t *pToUse;
+		TestOnButtonWay(&pToUse);
+		
+		if(pToUse){
+			int iDest = WaypointFindNearest(VecBModelOrigin(VARS(pToUse)),pEdict,400,bot_teamnm);
+			if(iDest != -1&&Task.SearchT(BT_GOBUTTON) == -1){
+				Task.AddTask(BT_GOTO|BT_GOBUTTON,-1,iDest,pToUse,0);
+			}
+			//FakeClientCommand(pEdict,"say","wanting to go where pressing a button is needed",0);
+		}
+	}
+	
+	// check pronetill variable
+	if(f_pronetill > 0 && f_changedprone < gpGlobals->time - 2.0){
+		if( IsProne(pEdict) && f_pronetill < gpGlobals->time){
+			FakeClientCommand(pEdict,"prone",0,0);
+			f_changedprone = gpGlobals->time;
+			//FakeClientCommand(pEdict,"say","a prone +",0);
+		}
+		else if( !IsProne(pEdict) && f_pronetill > gpGlobals->time){
+			FakeClientCommand(pEdict,"prone",0,0);
+			f_changedprone = gpGlobals->time;
+			//FakeClientCommand(pEdict,"say","a prone -",0);
+		}
+	}
+	
+	// chat
+	if(g_bChat)
+		Chat.Talk(this);
+	
+	// handle ordered stuff
+	if(Ordered.lAction){		// bot got ordered
+		if(Ordered.pREdict){			// is an edict stored ?
+			if(!IsAlive(Ordered.pREdict)){		// player who got order is dead
+				Ordered.lAction = 0;				// erase order
+				Ordered.pREdict = 0;				// reset pointer
+			}
+		}
+	}
+	
+	// change the weapon not directly after en is away
+	if(f_LastFight + .3f < gpGlobals->time&&!(Action.lAction&BA_PLANT)){
+		if(IsCWeaponKnife()
+			&& HasSecondary()
+			&& m_rgAmmo[weapon_defs[HasSecondary()].iAmmo1]>1){
+			Change2Weapon(HasSecondary());
+		}
+		else if(IsCWeaponSecondary()
+			&& HasPrimary()
+			&&!GOrder.lTypeoG
+			&& m_rgAmmo[weapon_defs[HasPrimary()].iAmmo1]>1){
+			Change2Weapon(HasPrimary());
+		}
+	}
+	
+	// slthough it's never used, it should be updated some time
+	if(bot_team == 5){
+		bot_team = UTIL_GetTeam(pEdict)+1;
+	}
+	
+	// fix nonshooting after map change
+	if(f_PauseShoot > gpGlobals->time + 3.0f)
+		f_PauseShoot = 0.0;
+	
+	// is this place normally dangerous ?
+	int iNearWP = i_CurrWP;
+	
+	if(iNearWP != -1){
+		if(WPStat[iNearWP].lKill > WPStat.lKillMax/2){
+			if(f_RWKnife>gpGlobals->time){
+				f_RWKnife = gpGlobals->time - .01;
+			}
+			if(!Task.Important()
+				&& f_noCamp < gpGlobals->time - 5.0
+				&&((f_timesrs < 30.0&&f_timesrs > 10.0) || RANDOM_LONG(0,100) < 20)
+				&&d_Manner<0){
+				float fMin = 200;
+				pent = GetNearestPlayer(pEdict,bot_teamnm,fMin,false,false);
+				if(pent
+					&&(pent->v.origin-pEdict->v.origin).Length() < 600.0
+					&& pent->v.velocity.Length() > 100.0){
+					Task.AddTask(BT_WAIT4TM8,gpGlobals->time + 10.0,0,0,0);
+					//FakeClientCommand(pEdict,"say","dangerous area",0);
+				}
+			}
+		}
+	}
+	// avoid to get stuck trying to reach a waypoint
+	if((f_lastWP + MAXTIMEPERWP*((pEdict->v.button&IN_DUCK)?1:2)) < gpGlobals->time){
+		if(Task.SearchT(BT_CAMP) == -1
+			&&f_ducktill < gpGlobals->time
+			&&f_Pause<gpGlobals->time){
+			iGoal = -1;
+			iFarGoal = -1;
+			f_lastWP = gpGlobals -> time;
+			i_CurrWP = -1;
+			
+			Jump();		// if the bot is longer time blocked it should jump to get of fuckin ladders at least sometimes - although it may hurt :)
+			
+			//FakeClientCommand(pEdict,"say","resetting wpstuff",0);
+		}
+	}
+	
+	if(bNNInitError){
+		FakeClientCommand(pEdict,"say","NNs couldn't be loaded correctly, i.e. nn.br2 and/or nnc.br2",0);
+	}
 }
 
 void CBotDOD :: Think(void){
@@ -840,7 +1177,7 @@ void CBotDOD :: Think(void){
 	TraceResult tr;
 	TraceResult tr2;
 	bool found_waypoint;
-
+	
 	pEdict->v.flags |= FL_FAKECLIENT;
 	
 	/*if (name[0] == 0)  // name filled in yet?
@@ -866,7 +1203,7 @@ void CBotDOD :: Think(void){
 	HandleMenu();
 	
 	bot_teamnm = UTIL_GetTeam(pEdict);
-
+	
 	// if the bot is dead, randomly press fire to respawn...
 	if ((pEdict->v.health < 1) || (pEdict->v.deadflag != DEAD_NO))
 	{
@@ -884,7 +1221,7 @@ void CBotDOD :: Think(void){
 	
 	if(bRSInit){		// delete ways at and other vars at start of round
 		Init();
-
+		
 		iGlobalRSCount --;
 		
 		g_bBombPlanted = false;
@@ -906,350 +1243,7 @@ void CBotDOD :: Think(void){
 	f_move_speed = f_max_speed;
 	
 	if (g_b5th){								// this is every .2 s the case
-		// see how far bot has moved since the previous position...
-		v_diff = v_prev_origin - pEdict->v.origin;
-		moved_distance = v_diff.Length();
-		v_diff_angles = UTIL_VecToAngles(v_diff);
-		
-		// save current position as previous
-		v_prev_origin = pEdict->v.origin;
-		i1C--;
-		
-		// look if there are tasks in the task system to be deleted
-		Task.CheckTLife();
-		
-		// process faked sound system
-		ReactOnSound();
-		
-		// intercepted radio command - handling
-		ReactOnRadio();
-		
-		// search for interesting locations
-		//if(f_LastFight<gpGlobals->time - 3.0){
-		if(!(Action.lAction&BA_FIGHT)){
-			SearchForIL();
-		}
-		
-		// do we want backup ???
-		if((HasSniper() )							// has sniper, but no aug or sg552
-			&&!(Ordered.lAction & BO_COVER)
-			&&!Task.Important()
-			&& f_UsedRadio < gpGlobals->time - 5.0f	// don't do that too often
-			&& f_LastRadio<gpGlobals->time - 4.0				// don't enerve others
-			&& f_noCamp < gpGlobals->time			// don't do that just after capming
-			&& f_timesrs > 3.0
-			&& RANDOM_LONG(0,100) < 50){						// not every time hackhack for double radio mess per frame
-			if(HasPrimary()){
-				if(!IsCWeaponPrimary()){
-					if(f_RWKnife>gpGlobals->time)
-						f_RWKnife = gpGlobals->time-.1f;
-					Change2Weapon(HasPrimary());
-				}
-				else{
-					float fMin;
-					GetNearestPlayer(pEdict,bot_teamnm,fMin);
-					if(fMin < 500 && g_bUseRadio){
-						SendRadioCommand(RADIO_COVER_ME);
-						Ordered.lAction |= BO_COVER;
-
-						if(f_RWKnife>gpGlobals->time)
-							f_RWKnife = gpGlobals->time-.1f;
-					}
-					else{
-						f_noCamp = gpGlobals-> time + 1;	// to avoid to many tries
-					}
-				}
-			}
-		}
-		
-		// is susp location (where bot heard sth) visible ?
-		if(Action.lAction & BA_SUSPLOC){				
-			//Vector VTo = pEdict->v.origin+pEdict->v.view_ofs+1.0*pEdict->v.velocity;
-			//UTIL_TraceLine(VTo,VSuspEn,ignore_monsters,pEdict->v.pContainingEntity,&tr);
-			UTIL_TraceLine(pEdict->v.origin,VSuspEn,ignore_monsters,pEdict->v.pContainingEntity,&tr2);
-			
-			if(/*tr.flFraction == 1.0
-				&&*/ tr2.flFraction == 1.0){				// i.e. visible
-				VLookTo = VSuspEn;
-				f_LookTo = gpGlobals->time +1.0;
-				
-				if(FInViewCone(&VSuspEn,pEdict))
-					Action.lAction &= ~BA_SUSPLOC;			// del susploc flag
-			}
-		}
-	
-		// look for planted bomb message
-		if(long(g_bBombPlanted<<5) != (Action.lAction & BA_BOMBPL) && RANDOM_LONG(0,100) < 20){ // bomb planted changed
-			//b_BombPlanted = g_bBombPlanted;
-			g_bBombPlanted?Action.lAction|=BA_BOMBPL:Action.lAction&=~BA_BOMBPL;
-			
-			if(g_bBombPlanted){
-				//FakeClientCommand(pEdict,"say","noticed it",0);
-				Chat.l_ChatEvent |= E_BombPl;
-				Task.RemoveT(BT_CAMP);
-				ResetWPlanning();
-				Task.Reset();
-			}
-		}
-		
-		if(pLastGlobalKill){
-			if(UTIL_ClientIndex(pLastGlobalKill) != -1
-				&&UTIL_GetTeam(pLastGlobalKill) != bot_teamnm
-				&& FVisible(pLastGlobalKill->v.origin,pEdict)){
-				if(f_LastFight < gpGlobals->time - 1.0){
-					HeadToward(pLastGlobalKill->v.origin);
-					if(d_Manner < .1){
-						Task.AddTask(BT_CAMP,gpGlobals->time + RANDOM_FLOAT(1.5,4.5),0,0,0);
-						f_Aggressivity += 2.0;
-						sLookToChange = 1;
-						InitCamp();
-						f_CaLooktoWP = gpGlobals->time + 2.5f;
-						GoProne(true,10.0);
-					}
-				}
-			}
-			pLastGlobalKill = 0;
-		}
-		
-		// make enemy down message
-		if(pEKilled){
-			if(UTIL_GetTeam(pEKilled) != bot_teamnm){		// no tk
-				Chat.l_ChatEvent |= E_Kill;
-				
-				pELVictim = pEKilled;
-//				f_GotoHidingPlace = 0;	// don't try to hide ...
-				Task.RemoveT(BT_HIDE);
-				ResetWPlanning();
-				f_Aggressivity += 1.0;		// be more agressive
-				
-				if(g_bEDown){	// flag's default is true
-					if(f_UsedRadio < gpGlobals->time - _RADIO_FREQ
-						&& g_bUseRadio){
-						SendRadioCommand(RADIO_ENEMY_DOWN);
-					}
-				}
-			}
-			else{														// tk
-				if(f_TKPunish < gpGlobals->time - 2.0){
-					strcpy(Chat.szChatText,"sorry");						// just say sorry
-					Chat.f_SayTime = gpGlobals->time + RANDOM_FLOAT(0,2.0);
-					Chat.f_LastChat = gpGlobals->time + RANDOM_FLOAT(15,15);
-				}
-			}
-			pEKilled = 0;
-		}
-		
-		// sometimes try to reload
-		// at least 5 sec after last fight
-		if(RANDOM_LONG(0,100) < 7
-			&&!(Action.lAction & BA_PLANT)
-			&& current_weapon.iId>=0&&current_weapon.iId<32
-			&& (IsCWeaponPrimary()|| IsCWeaponSecondary())
-			&& Task.SearchT(BT_RELOAD) == -1
-			&& f_LastFight + 2 < gpGlobals->time
-			&& current_weapon.iId>=0&&current_weapon.iId<32
-			&& float(current_weapon.iClip) / float(WeaponDefs.ipClipSize[DOD_DLL][current_weapon.iId]) < .3){
-			Task.AddTask(BT_RELOAD,gpGlobals->time + 3.0,0,0,0);
-			//cout << "reload" << endl;
-		}
-
-		/*if(i_FOV != 90
-			&&f_LastFight + 1.f < gpGlobals->time){
-			lButton|=IN_ATTACK2;
-		}*/
-
-		// lower aggresivity value
-		f_Aggressivity *= .985f;
-		
-		// lower offset
-		//v_Offset = v_Offset*.73;
-		v_Offset = pEdict->v.punchangle * (float(bot_skill)/100.0) * .3;
-		
-		if(!(Action.lAction & BA_FIGHT))
-			f_AimHead *= .8;
-
-		if(Task.SearchT(BT_HIDE) != -1
-			&&!TEq(gpGlobals->time,f_StrCamp,10)
-			&&!(Task.current && Task.current->lType & BT_HOLDPOS)){
-			edict_t *pNearest;
-			int iTm8;
-			iTm8 = UTIL_FightingAgainst(pEdict,bot_teamnm==CT?TE:CT,&pNearest,true);		// only duckin bots
-			if(iTm8>1){
-				if(f_UsedRadio < gpGlobals->time - _RADIO_FREQ
-					&&g_bUseRadio
-					&&Task.SearchT(BT_HIDE) != -1){
-					SendRadioCommand(RADIO_GOGOGO);
-					//f_Hide = gpGlobals->time - .01f;
-				}
-			}
-		}
-
-		HandleOrders();
-		
-		if(!i1C){				// every second one time	---------------------------------------------------------------------------------
-			i1C = 5;
-
-			UpdateFlags();
-			
-			AdaptAvoid();
-
-//			DistanceSight();
-
-			if(bSlowed){
-				//FakeClientCommand(pEdict,"say","stamina prone",0);
-				GoProne(true,5);
-				Task.AddTask(BT_CAMP, gpGlobals->time + 2.0,0,0,0);
-				InitCamp();
-				bSlowed = false;
-			}
-			
-			if(bBleeding){
-				FakeClientCommand(pEdict,"stopbleed",0,0);
-				bBleeding = false;
-			}
-
-			// is there something in the LTM ?
-			float fDistance;
-			for(long lschl = 0;lschl < _MAX_LTMEM;lschl++){
-				if(LTMem.FMItem[lschl].bUsed){
-					//FakeClientCommand(pEdict,"say","ltmprone",0);
-					if(LTMem.FMItem[lschl].lType == LTM_KILLED){
-						fDistance = (LTMem.FMItem[lschl].VAddI2 - pEdict->v.origin).Length();
-						if ( fDistance < 200 ){
-							GoProne(true,10);
-						}
-					}
-					else if(LTMem.FMItem[lschl].lType == LTM_KILL){
-						fDistance = (LTMem.FMItem[lschl].VAddI2 - pEdict->v.origin).Length();
-						if ( fDistance < 100 ){
-							GoProne(true,10);
-						}
-					}
-				}
-			}
-
-			if(RANDOM_LONG(0,100) < 20){
-				edict_t *pToUse;
-				TestOnButtonWay(&pToUse);
-				
-				if(pToUse){
-					int iDest = WaypointFindNearest(VecBModelOrigin(VARS(pToUse)),pEdict,400,bot_teamnm);
-					if(iDest != -1&&Task.SearchT(BT_GOBUTTON) == -1){
-						Task.AddTask(BT_GOTO|BT_GOBUTTON,-1,iDest,pToUse,0);
-					}
-					//FakeClientCommand(pEdict,"say","wanting to go where pressing a button is needed",0);
-				}
-			}
-
-			// fix de_aztec bridge 'bug'
-			pent=0;			// fix de_aztec bug
-			bool bflag=false;
-			while (pent = UTIL_FindEntityInSphere( pent, pEdict->v.origin,85)){
-				if(!strcmp(STRING(pent->v.classname),"func_illusionary")){
-					bflag=true;
-					break;
-				}
-			}
-			if(bflag){
-				f_IgnoreFall = gpGlobals->time + 1.1f;
-			}
-			
-			// check pronetill variable
-			if(f_pronetill > 0 && f_changedprone < gpGlobals->time - 2.0){
-				if( IsProne(pEdict) && f_pronetill < gpGlobals->time){
-					FakeClientCommand(pEdict,"prone",0,0);
-					f_changedprone = gpGlobals->time;
-					//FakeClientCommand(pEdict,"say","a prone +",0);
-				}
-				else if( !IsProne(pEdict) && f_pronetill > gpGlobals->time){
-					FakeClientCommand(pEdict,"prone",0,0);
-					f_changedprone = gpGlobals->time;
-					//FakeClientCommand(pEdict,"say","a prone -",0);
-				}
-			}
-			
-			// chat
-			if(g_bChat)
-				Chat.Talk(this);
-			
-			// handle ordered stuff
-			if(Ordered.lAction){		// bot got ordered
-				if(Ordered.pREdict){			// is an edict stored ?
-					if(!IsAlive(Ordered.pREdict)){		// player who got order is dead
-						Ordered.lAction = 0;				// erase order
-						Ordered.pREdict = 0;				// reset pointer
-					}
-				}
-			}
-
-			// change the weapon not directly after en is away
-			if(f_LastFight + .3f < gpGlobals->time&&!(Action.lAction&BA_PLANT)){
-					if(IsCWeaponKnife()
-						&& HasSecondary()
-						&& m_rgAmmo[weapon_defs[HasSecondary()].iAmmo1]>1){
-						Change2Weapon(HasSecondary());
-					}
-					else if(IsCWeaponSecondary()
-						&& HasPrimary()
-						&&!GOrder.lTypeoG
-						&& m_rgAmmo[weapon_defs[HasPrimary()].iAmmo1]>1){
-						Change2Weapon(HasPrimary());
-					}
-			}
-			
-			// slthough it's never used, it should be updated some time
-			if(bot_team == 5){
-				bot_team = UTIL_GetTeam(pEdict)+1;
-			}
-
-			// fix nonshooting after map change
-			if(f_PauseShoot > gpGlobals->time + 3.0f)
-				f_PauseShoot = 0.0;
-			
-			// is this place normally dangerous ?
-			int iNearWP = i_CurrWP;
-
-			if(iNearWP != -1){
-				if(WPStat[iNearWP].lKill > WPStat.lKillMax/2){
-					if(f_RWKnife>gpGlobals->time){
-						f_RWKnife = gpGlobals->time - .01;
-					}
-					if(!Task.Important()
-						&& f_noCamp < gpGlobals->time - 5.0
-						&&((f_timesrs < 30.0&&f_timesrs > 10.0) || RANDOM_LONG(0,100) < 20)
-						&&d_Manner<0){
-						float fMin = 200;
-						pent = GetNearestPlayer(pEdict,bot_teamnm,fMin,false,false);
-						if(pent
-							&&(pent->v.origin-pEdict->v.origin).Length() < 600.0
-							&& pent->v.velocity.Length() > 100.0){
-							Task.AddTask(BT_WAIT4TM8,gpGlobals->time + 10.0,0,0,0);
-							//FakeClientCommand(pEdict,"say","dangerous area",0);
-						}
-					}
-				}
-			}
-			// avoid to get stuck trying to reach a waypoint
-			if((f_lastWP + MAXTIMEPERWP*((pEdict->v.button&IN_DUCK)?1:2)) < gpGlobals->time){
-				if(Task.SearchT(BT_CAMP) == -1
-					&&f_ducktill < gpGlobals->time
-					&&f_Pause<gpGlobals->time){
-					iGoal = -1;
-					iFarGoal = -1;
-					f_lastWP = gpGlobals -> time;
-					i_CurrWP = -1;
-
-					Jump();		// if the bot is longer time blocked it should jump to get of fuckin ladders at least sometimes - although it may hurt :)
-
-					//FakeClientCommand(pEdict,"say","resetting wpstuff",0);
-				}
-			}
-			
-			if(bNNInitError){
-				FakeClientCommand(pEdict,"say","NNs couldn't be loaded correctly, i.e. nn.br2 and/or nnc.br2",0);
-			}
-		}
-		
+		Think5th();
 	}
 	else{
 		//b5th=false;
@@ -1269,7 +1263,7 @@ void CBotDOD :: Think(void){
 		// turn towards ideal_pitch by pitch_speed degrees
 		lButton|=IN_FORWARD;
 	}
-
+	
 	// turn towards ideal_pitch by pitch_speed degrees
 	old_pitch_degrees = pitch_degrees;
 	pitch_degrees = ChangePitch();
@@ -1278,33 +1272,33 @@ void CBotDOD :: Think(void){
 	old_yaw_degrees = yaw_degrees;
 	yaw_degrees = ChangeYaw();
 	ChangeBodyYaw();
-
+	
 	PreprocessTasks();
-
+	
 	/*if(Task.current){
-		pBotOldEnemy = pBotEnemy;
-		pBotEnemy = FindEnemy();
-		
-		if (pBotEnemy != NULL){			// does an en exist ?
-			if(current_weapon.iId == CS_WEAPON_C4){		// dont try to attack with this
-				if(HasPrimary())			// change to primary
-					Change2Weapon(HasPrimary());
-				else							// or to secondary
-					Change2Weapon(HasSecondary());
-			}
-			LastEnemyOrigin = pBotEnemy->v.origin;	// store location of last en
-			Fight();										// ... and fight against it
-		}
-
+	pBotOldEnemy = pBotEnemy;
+	pBotEnemy = FindEnemy();
+	
+	  if (pBotEnemy != NULL){			// does an en exist ?
+	  if(current_weapon.iId == CS_WEAPON_C4){		// dont try to attack with this
+	  if(HasPrimary())			// change to primary
+	  Change2Weapon(HasPrimary());
+	  else							// or to secondary
+	  Change2Weapon(HasSecondary());
+	  }
+	  LastEnemyOrigin = pBotEnemy->v.origin;	// store location of last en
+	  Fight();										// ... and fight against it
+	  }
+	  
 		int iFarGoal=-1,iWaytedDiv=0;
 		if(Task.current->lType & BT_CAMP){
-			Camp();
+		Camp();
 		}
 		else if(Task.current->lType & BT_GOTO){
-			found_waypoint = HeadTowardWaypoint();
+		found_waypoint = HeadTowardWaypoint();
 		}
-	}
-	else{
+		}
+		else{
 	}*/
 	
 	if (false){
@@ -1323,7 +1317,7 @@ void CBotDOD :: Think(void){
 				}
 				LastEnemyOrigin = pBotEnemy->v.origin;	// store location of last en
 				Fight();										// ... and fight against it
-
+				
 				
 				
 				if(!iOnLadder){
@@ -1334,7 +1328,7 @@ void CBotDOD :: Think(void){
 					f_LookTo = gpGlobals->time + 2.0;
 					//f_GoBack =
 				}
-
+				
 				lButton &=~ (IN_DUCK|IN_JUMP);
 				f_move_speed = f_max_speed;
 				f_ducktill = 0;
@@ -1348,14 +1342,14 @@ void CBotDOD :: Think(void){
 				Fight();										// ... and fight against it
 			}
 		}
-
+		
 		if (pBotEnemy == NULL || (Task.current&&(Task.current->lType&BT_IGNOREENEMY)))
 		{	// no enemy or blinded ...
 			// if blinded slow down
 			if(f_blinded_time > gpGlobals->time){
 				f_move_speed /= 3.0f;		// slow down
 				f_shootbox = f_blinded_time;
-
+				
 				if(RANDOM_LONG(0,100) > 99){
 					Jump();
 				}
@@ -1364,68 +1358,68 @@ void CBotDOD :: Think(void){
 			
 			// (defensive) bot went out of view of enemy and succeeded
 			if(Task.current){
-				/*if(Task.current -> lType & BT_HIDE){
-					//float fThisHide;
-					//f_GotoHidingPlace = 0;		// reset time to go to hiding place
-					Task.NextTask();
-					InitCamp();					// init camping
+			/*if(Task.current -> lType & BT_HIDE){
+			//float fThisHide;
+			//f_GotoHidingPlace = 0;		// reset time to go to hiding place
+			Task.NextTask();
+			InitCamp();					// init camping
+			
+			  if(f_Hide < gpGlobals->time - 5.0f){
+			  Task.AddTask(BT_CAMP,gpGlobals->time + f_HidingTime,0,0,0);	// camp for _HIDECAMPTIME s
+			  f_Hide = gpGlobals->time + f_HidingTime;	// duck all that time ...
+			  }
+			  if(RANDOM_LONG(0,100) < 6
+			  && !(Action.lAction & BA_TKAVOID)){
+			  if(f_UsedRadio < gpGlobals->time - _RADIO_FREQ
+			  &&g_bUseRadio){
+			  SendRadioCommand(NEED_ASSISTANCE);
+			  }
+			  }
+			  Action.lAction &=~ BA_TKAVOID;			// in case it was a TKAVOID, delete the flag
+			  // search for a wp out of sight of the fuckin enemy
+			  
+				int index=-1,i;
+				float distance;
+				long lEnt = -1; 
+				if(Task.current)
+				lEnt = UTIL_ClientIndex(Task.current->p);
+				
+				  for (i=0; i < num_waypoints; i++)
+				  {
+				  if ((waypoints[i].flags & W_FL_DELETED) == W_FL_DELETED)
+				  continue;  // skip any deleted waypoints
+				  
+					if (waypoints[i].flags & W_FL_AIMING)
+					continue;  // skip any aiming waypoints
 					
-					if(f_Hide < gpGlobals->time - 5.0f){
-						Task.AddTask(BT_CAMP,gpGlobals->time + f_HidingTime,0,0,0);	// camp for _HIDECAMPTIME s
-						f_Hide = gpGlobals->time + f_HidingTime;	// duck all that time ...
-					}
-					if(RANDOM_LONG(0,100) < 6
-						&& !(Action.lAction & BA_TKAVOID)){
-						if(f_UsedRadio < gpGlobals->time - _RADIO_FREQ
-							&&g_bUseRadio){
-							SendRadioCommand(NEED_ASSISTANCE);
-						}
-					}
-					Action.lAction &=~ BA_TKAVOID;			// in case it was a TKAVOID, delete the flag
-					// search for a wp out of sight of the fuckin enemy
-					
-					int index=-1,i;
-					float distance;
-					long lEnt = -1; 
-					if(Task.current)
-						lEnt = UTIL_ClientIndex(Task.current->p);
-
-					for (i=0; i < num_waypoints; i++)
-					{
-						if ((waypoints[i].flags & W_FL_DELETED) == W_FL_DELETED)
-							continue;  // skip any deleted waypoints
-						
-						if (waypoints[i].flags & W_FL_AIMING)
-							continue;  // skip any aiming waypoints
-						
-						if(!FVisible(waypoints[i].origin,pEdict))		// skip if not visible ...
-							continue;
-						
+					  if(!FVisible(waypoints[i].origin,pEdict))		// skip if not visible ...
+					  continue;
+					  
 						if(lEnt!=-1
-							&&Task.current->p){		// is always BT_HIDE
-							if(FVisible(waypoints[i].origin,Task.current->p)){
-								continue;
-							}
+						&&Task.current->p){		// is always BT_HIDE
+						if(FVisible(waypoints[i].origin,Task.current->p)){
+						continue;
+						}
 						}
 						
-						// skip this waypoint if it's team specific and teams don't match...
-						if ((waypoints[i].flags & W_FL_TEAM_SPECIFIC) &&
-							((waypoints[i].flags & W_FL_TEAM) != bot_teamnm))
+						  // skip this waypoint if it's team specific and teams don't match...
+						  if ((waypoints[i].flags & W_FL_TEAM_SPECIFIC) &&
+						  ((waypoints[i].flags & W_FL_TEAM) != bot_teamnm))
+						  continue;
+						  
+							distance = (waypoints[i].origin - pEdict->v.origin).Length();
+							if(distance > 150)
 							continue;
-						
-						distance = (waypoints[i].origin - pEdict->v.origin).Length();
-						if(distance > 150)
-							continue;
-						
-						index = i;
-						break;
-					}
-					if(index != -1){		// that is found waypoint which is in view of pEdict but not in view of enemy
-						i_CurrWP = index;
-						f_Hide = gpGlobals->time;
-						Task.RemoveT(BT_CAMP);
-					}
-				}*/
+							
+							  index = i;
+							  break;
+							  }
+							  if(index != -1){		// that is found waypoint which is in view of pEdict but not in view of enemy
+							  i_CurrWP = index;
+							  f_Hide = gpGlobals->time;
+							  Task.RemoveT(BT_CAMP);
+							  }
+			}*/
 			}
 			if(STMem.iCount
 				&& dCombatNNIn[IAmmo] > 0.0
@@ -1443,7 +1437,7 @@ void CBotDOD :: Think(void){
 			if(Action.lAction & BA_FIGHT
 				&& (Task.current&&!(Task.current->lType&BT_IGNOREENEMY))){			// was last time a fight ??
 				Action.lAction &=~ BA_FIGHT;			// del flag
-
+				
 				//f_noWP = gpGlobals->time + RANDOM_FLOAT(.5,1);
 				
 				if(((d_Manner >= 0
@@ -1469,13 +1463,13 @@ void CBotDOD :: Think(void){
 					Action.lAction|=BA_SUSPLOC;
 				}
 			}
-		
+			
 			if(STMem.iCount
 				&& (Task.current && !(Task.current->lType&BT_IGNOREENEMY))
 				&& f_shootbox > gpGlobals->time 
 				&& !STMem[0].bSolid){
 #ifdef DEBUGMESSAGES
-	WaypointDrawBeam(listenserver_edict,pEdict->v.origin,pEdict->v.origin + Vector(0,50,0),10,0,0,000,200,200,10);
+				WaypointDrawBeam(listenserver_edict,pEdict->v.origin,pEdict->v.origin + Vector(0,50,0),10,0,0,000,200,200,10);
 #endif
 				VATurnTo(STMem[0].VCalcedOrigin - pEdict->v.origin);
 				
@@ -1522,7 +1516,7 @@ void CBotDOD :: Think(void){
 			
 			pEdict->v.v_angle.z = 0;  // reset roll to 0 (straight up and down)
 			pEdict->v.angles.z = 0;
-						
+			
 			// search for important ents (c4, hostages ...)
 			if(!GoToSpEnt()){		// if there are no special ents
 				if(!Bored()){		// if bots not bored ...
@@ -1542,7 +1536,7 @@ void CBotDOD :: Think(void){
 						
 						// go handle the ladder movement
 						OnLadder();
-
+						
 						f_LookTo = 0 ;
 						
 						f_dont_avoid = gpGlobals->time + 1.0;
@@ -1585,7 +1579,7 @@ void CBotDOD :: Think(void){
 	}
 	
 	HandleGOrder();
-
+	
 	if(!bReplay && 
 		f_LookTo + .3 > gpGlobals->time){		// f_LookTo code
 		float f_newspeed;
@@ -1595,7 +1589,7 @@ void CBotDOD :: Think(void){
 		Vector VLDiff,VRDiff;
 		
 		//if(f_GoBack>gpGlobals->time){
-			f_DotMin = -1.1f;
+		f_DotMin = -1.1f;
 		//}
 		
 		//VLDiff = Vector(cos(pEdict->v.v_angle.y * M_PI / 180.0),sin(pEdict->v.v_angle.y * M_PI / 180.0),0);
@@ -1607,7 +1601,7 @@ void CBotDOD :: Think(void){
 		VRDiff = VRunningTo - pEdict->v.origin;
 		VRDiff.z = 0.0;
 		VRDiff = VRDiff.Normalize();
-
+		
 		f_Dot = DotProduct(VRDiff,VLDiff);
 		if(f_Dot > f_DotMin){
 			Vector VCross = CrossProduct(VLDiff,VRDiff);
@@ -1618,7 +1612,7 @@ void CBotDOD :: Think(void){
 				f_newstrafe = sqrt(fTemp);
 			else
 				f_newstrafe = 0;
-
+			
 			if(VCross.z>0.0)
 				f_newstrafe = -f_newstrafe;
 			
@@ -1636,29 +1630,43 @@ void CBotDOD :: Think(void){
 			f_LookTo = gpGlobals->time;
 		}
 	}
-	/* 'anti fall code' */
+	/* ---------------------------------- 'anti fall code' ---------------------------------- */
+	// just add the movement vector to the bot's origin and look down, how deep it is
+	// this first stuff is always calculated, even if the bots hasn't to check falling
+	// because it is also used for the avoidance code
+	
+	UTIL_MakeVectors(pEdict->v.v_angle);
+	Vector v_view = gpGlobals->v_forward;
+	//Vector v_view = Vector(cos(pEdict->v.v_angle.y * M_PI / 180.0),sin(pEdict->v.v_angle.y * M_PI / 180.0),0);
+	//v_view.Normalize();
+	Vector v_perp = gpGlobals->v_right;
+	
+	v_perp.z = 0;		/// why  ??? z isn't apparently 0 sometimes
+	
+	v_perp = v_perp.Normalize();		// vector to the right
+	float fspeed;
+	Vector v_comp = (v_view * f_move_speed + v_perp * f_strafe);
+	fspeed = v_comp.Length();
+	if(fspeed)
+		v_comp = v_comp * (1.f/fspeed);
+	
+	/* code for avoidance of obstables */
+	v_comp = v_comp + v_avoid * .7f;
+	v_comp = v_comp.Normalize();
+	
+	f_strafe = CrossProduct(v_comp,v_view).z * fspeed;
+	f_move_speed =(DotProduct(v_comp,v_view)>0?1:-1)*sqrt(fspeed*fspeed-f_strafe*f_strafe);
+	/* end code for avoidance of obstables */
+	
 	if(f_IgnoreFall < gpGlobals->time
 		&& !bReplay
 		&& iOnLadder == 0){			// don't have fear in front of ladders
-		//float flast_height;
+		
 		float fDistTC = _DSTDOWN;
 		
 		if(lButton & IN_JUMP){			// check longer dist when jumping
 			fDistTC = 130.0;
-		}
-		
-		// just add the movement vector to the bot's origin and look down, how deep it is
-		
-		UTIL_MakeVectors(pEdict->v.v_angle);
-		Vector v_view = gpGlobals->v_forward;
-		//Vector v_view = Vector(cos(pEdict->v.v_angle.y * M_PI / 180.0),sin(pEdict->v.v_angle.y * M_PI / 180.0),0);
-		v_view.Normalize();
-		Vector v_perp = CrossProduct(v_view,Vector(0,0,1));
-		
-		v_perp.z = 0;		/// why  ??? z isn't apparently 0 sometimes
-		
-		v_perp = v_perp.Normalize();		// vector to the right
-		Vector v_comp = (v_view * f_move_speed + v_perp * f_strafe).Normalize();
+		}	
 		Vector v_check = pEdict->v.origin + v_comp * fDistTC;
 		/*Vector v_check = pEdict->v.origin + pEdict->v.velocity.Normalize() * fDistTC;*/
 		Vector v_down = v_check - Vector( 0,0, 300);		// straight down 1000 units
@@ -1673,16 +1681,18 @@ void CBotDOD :: Think(void){
 			}
 			else{
 				if(RANDOM_LONG(0,100) < 25)
-					lButton |= IN_JUMP;	// jump
+					Jump();	// jump
 			}
 		}
+	}
+	else{
 	}
 	/* end anti fall code*/
 	
 	if(f_ducktill > gpGlobals->time){	// ducktill -> useful, cause the bots need a time to duck
 		lButton |= IN_DUCK;
 	}
-		
+	
 	if (f_Pause > gpGlobals->time)  // is the bot "paused"? (faking intelligence and thinking time)
 		f_move_speed = 0;  // don't move while pausing
 	
@@ -1705,767 +1715,767 @@ void CBotDOD :: Think(void){
 
 /*void CBotDOD :: Think(void)
 {
-	edict_t *pent=0;
-	static char item_name[200];
-	int index = 0;
-	Vector v_diff;             // vector from previous to current location
-	//Vector v_diff_angles;
-	//float yaw_degrees,pitch_degrees;
-	TraceResult tr;
-	TraceResult tr2;
-	bool found_waypoint;
-	
-	pEdict->v.flags |= FL_FAKECLIENT;
-	
-	if(bNNInitError){
-		FakeClientCommand(pEdict,"say","NNs couldn't be loaded correctly, i.e. nn.br2 and/or nnc.br2",0);
-	}
-	
-	// TheFatal - START from Advanced Bot Framework (Thanks Rich!)
-	
-	// adjust the millisecond delay based on the frame rate interval...
-	if (msecdel <= gpGlobals->time)
-	{
-		msecdel = gpGlobals->time + 0.5;
-		if (msecnum > 0)
-			msecval = 450.0/msecnum;
-		msecnum = 0;
-	}
-	else
-		msecnum++;
-	
-	if (msecval < 5)    // don't allow msec to be less than 5...
-		msecval = 5;
-	
-	if (msecval > 100)  // ...or greater than 100
-		msecval = 100;
-	
-	// TheFatal - END
-	
-	//pEdict->v.button = 0;
-	lButton = 0;
-	f_strafe = 0.0f;		// reset strafing to 0.0
-	//f_move_speed = 0.0f;
-	bot_teamnm = UTIL_GetTeam(pEdict);
-	
-	// if the bot hasn't selected stuff to start the game yet, go do that...
-	if (not_started)
-	{
-		HandleMenu();
-		
-		g_engfuncs.pfnRunPlayerMove( pEdict, pEdict->v.v_angle, 0.0,
-			0, 0, pEdict->v.button, 0, msecval);
-		
-		FixIdealYaw();				// this fixes a bug, which does onl occurr in de_dust, cs_gamma_assault etc.
-		
-		return;
-	}
-	
-	HandleMenu();
-	
-	// if the bot is dead, randomly press fire to respawn...
-	if ((pEdict->v.health < 1) || (pEdict->v.deadflag != DEAD_NO))
-	{
-		if(g_bChat)
-			Chat.Talk(this);
-		
-		if (need_to_initialize)
-			SpawnInit();
-		
-		if (RANDOM_LONG(1, 100) > 50)
-			lButton = IN_ATTACK;
-		
-		g_engfuncs.pfnRunPlayerMove( pEdict, pEdict->v.v_angle, f_move_speed,
-			0, 0, lButton, 0, msecval);
-		
-		return;
-	}
-	// search ents
-	
+edict_t *pent=0;
+static char item_name[200];
+int index = 0;
+Vector v_diff;             // vector from previous to current location
+//Vector v_diff_angles;
+//float yaw_degrees,pitch_degrees;
+TraceResult tr;
+TraceResult tr2;
+bool found_waypoint;
+
+pEdict->v.flags |= FL_FAKECLIENT;
+
+if(bNNInitError){
+FakeClientCommand(pEdict,"say","NNs couldn't be loaded correctly, i.e. nn.br2 and/or nnc.br2",0);
+}
+
+// TheFatal - START from Advanced Bot Framework (Thanks Rich!)
+
+// adjust the millisecond delay based on the frame rate interval...
+if (msecdel <= gpGlobals->time)
+{
+msecdel = gpGlobals->time + 0.5;
+if (msecnum > 0)
+msecval = 450.0/msecnum;
+msecnum = 0;
+}
+else
+msecnum++;
+
+if (msecval < 5)    // don't allow msec to be less than 5...
+msecval = 5;
+
+if (msecval > 100)  // ...or greater than 100
+msecval = 100;
+
+// TheFatal - END
+
+//pEdict->v.button = 0;
+lButton = 0;
+f_strafe = 0.0f;		// reset strafing to 0.0
+//f_move_speed = 0.0f;
+bot_teamnm = UTIL_GetTeam(pEdict);
+
+// if the bot hasn't selected stuff to start the game yet, go do that...
+if (not_started)
+{
+HandleMenu();
+
+g_engfuncs.pfnRunPlayerMove( pEdict, pEdict->v.v_angle, 0.0,
+0, 0, pEdict->v.button, 0, msecval);
+
+FixIdealYaw();				// this fixes a bug, which does onl occurr in de_dust, cs_gamma_assault etc.
+
+return;
+}
+
+HandleMenu();
+
+// if the bot is dead, randomly press fire to respawn...
+if ((pEdict->v.health < 1) || (pEdict->v.deadflag != DEAD_NO))
+{
+if(g_bChat)
+Chat.Talk(this);
+
+if (need_to_initialize)
+SpawnInit();
+
+if (RANDOM_LONG(1, 100) > 50)
+lButton = IN_ATTACK;
+
+g_engfuncs.pfnRunPlayerMove( pEdict, pEdict->v.v_angle, f_move_speed,
+0, 0, lButton, 0, msecval);
+
+return;
+}
+// search ents
+
 #ifdef __LOG
-	if(HasSecondary() && !HasPrimary() &&RANDOM_LONG(0,100) < 20){
-		sprintf(szBuffer,"%s\t%i\n\0",STRING(pEdict->v.netname),bot_money);
-		
-		FILE *fhd;
-		fhd=fopen("money.txt","a");
-		if(fhd){
-		fprintf(fhd,"%s",szBuffer);
-		fclose(fhd);
-		}
-	}
+if(HasSecondary() && !HasPrimary() &&RANDOM_LONG(0,100) < 20){
+sprintf(szBuffer,"%s\t%i\n\0",STRING(pEdict->v.netname),bot_money);
+
+FILE *fhd;
+fhd=fopen("money.txt","a");
+if(fhd){
+fprintf(fhd,"%s",szBuffer);
+fclose(fhd);
+}
+}
 #endif
-	
-	if(bRSInit){		// delete ways at and other vars at start of round
-		Init();
-		
-		iGoal = -1;
-		iFarGoal = -1;
-		// don't forget the freezetime !! -> freezetime is done by setmaxspeed
-		//f_pause_time  = gpGlobals->time + CVAR_GET_FLOAT("mp_freezetime");
-		
-		//FakeClientCommand(pEdict,"say","inited",0);
-		bRSInit = false;		// don't process this a second time this round
-		
-		for(int i = 0;i < 32;i++){
-			f_ES[i] = gpGlobals->time;
-		}
-	}
-	
-	// set this for the next time the bot dies so it will initialize stuff
-	need_to_initialize = TRUE;
-	
-	f_move_speed = f_max_speed;
-	
-	if (g_b5th){								// this is every .2 s the case
-		
-			
-		// see how far bot has moved since the previous position...
-		v_diff = v_prev_origin - pEdict->v.origin;
-		moved_distance = v_diff.Length();
-		if(moved_distance>300){
-			Init();
-		}
-		v_diff_angles = UTIL_VecToAngles(v_diff);
-		
-		// save current position as previous
-		v_prev_origin = pEdict->v.origin;
-		i1C--;
-		
-		// process faked sound system
-		ReactOnSound();
-		
-		// intercepted radio command - handling
-		ReactOnRadio();
-		
-		// search for interesting locations
-		if(f_LastFight<gpGlobals->time - 3.0){
-			SearchForIL();
-		}
-		
-		if(pLastGlobalKill){
-			if(UTIL_GetTeam(pLastGlobalKill) == bot_teamnm
-				&& FVisible(pLastGlobalKill->v.origin,pEdict)){
-				if(f_LastFight < gpGlobals->time - 1.0){
-					HeadToward(pLastGlobalKill->v.origin);
-					if(d_Manner < .1){
-						Task.AddTask(BT_CAMP, gpGlobals->time + RANDOM_FLOAT(1.5,4.5),0,0,0);
-						f_Aggressivity += 2.0;
-						sLookToChange = 1;
-						InitCamp();
-						f_CaLooktoWP = gpGlobals->time + 2.5f;
-						GoProne(true,10.0);
-					}
-				}
-			}
-			pLastGlobalKill = 0;
-		}
-		
-		// check pronetill variable
-		if(f_pronetill > 0 && f_changedprone < gpGlobals->time - 2.0){
-			if( IsProne(pEdict) && f_pronetill < gpGlobals->time){
-				FakeClientCommand(pEdict,"prone",0,0);
-				f_changedprone = gpGlobals->time;
-				//FakeClientCommand(pEdict,"say","a prone +",0);
-			}
-			else if( !IsProne(pEdict) && f_pronetill > gpGlobals->time){
-				FakeClientCommand(pEdict,"prone",0,0);
-				f_changedprone = gpGlobals->time;
-				//FakeClientCommand(pEdict,"say","a prone -",0);
-			}
-		}
-		
-		// change the weapon not directly after en is away
-		if(f_LastFight + 1.0f < gpGlobals->time){
-			if(current_weapon.iId == DOD_WEAPON_KNIFE
-				&& HasSecondary()
-				&& m_rgAmmo[weapon_defs[HasSecondary()].iAmmo1]>0){
-				Change2Weapon(HasSecondary());
-			}
-			if(IsCWeaponSecondary()
-				&& HasPrimary()
-				&&!GOrder.lTypeoG
-				&& m_rgAmmo[weapon_defs[HasPrimary()].iAmmo1]>0){
-				Change2Weapon(HasPrimary());
-			}
-		}
-		// sometimes try to reload
-		// at least 5 sec after last fight
-		if(RANDOM_LONG(0,100) < 7
-			&&!(Action.lAction & BA_PLANT)
-			&& f_LastFight + 4 < gpGlobals->time
-			&& float(current_weapon.iClip) / float(weapon_defs[current_weapon.iId].iAmmoClip) < .3)
-			lButton |= IN_RELOAD;
-		
-		// lower aggresivity value
-		f_Aggressivity *= .98;
-		
-		// lower offset
-		//v_Offset = v_Offset*.73;
-		v_Offset = pEdict->v.punchangle * float(bot_skill)/100.0;
-		
-		if(!(Action.lAction & BA_FIGHT))
-			f_AimHead *= .8;
-		
-		if(f_Hide>gpGlobals->time
-			&&!TEq(gpGlobals->time,f_StrCamp,10)
-			&&!Task.Important()){
-			edict_t *pNearest;
-			int iTm8;
-			iTm8 = UTIL_FightingAgainst(pEdict,bot_teamnm==CT?TE:CT,&pNearest,true);		// only duckin bots
-			if(iTm8>1){
-				if(f_UsedRadio < gpGlobals->time - _RADIO_FREQ
-					&&g_bUseRadio
-					&&Task.SearchT(BT_HIDE) != -1){
-				
-				}
-			}
-		}
-		
-		if(!i1C){				// every second one time	---------------------------------------------------------------------------------
-			i1C = 5;
-			
-			UpdateFlags();
-			
-			HandleOrders();
-			
-			AdaptAvoid();
-			
-			// chat
-			if(g_bChat)
-				Chat.Talk(this);
-			
-			// handle ordered stuff
-			if(Ordered.lAction){		// bot got ordered
-				if(Ordered.pREdict){			// is an edict stored ?
-					if(!IsAlive(Ordered.pREdict)){		// player who got order is dead
-						Ordered.lAction = 0;				// erase order
-						Ordered.pREdict = 0;				// reset pointer
-					}
-				}
-			}
-			
-			if(bSlowed){
-				//FakeClientCommand(pEdict,"say","stamina prone",0);
-				GoProne(true,5);
-				Task.AddTask(BT_CAMP, gpGlobals->time + 2.0,0,0,0);
-				InitCamp();
-				bSlowed = false;
-			}
-			
-			if(bBleeding){
-				FakeClientCommand(pEdict,"stopbleed",0,0);
-				bBleeding = false;
-			}
-			
-			// slthough it's never used, it should be updated some time
-			if(bot_team == 5){
-				bot_team = UTIL_GetTeam(pEdict)+1;
-			}
-			// fix nonshooting after map change
-			if(f_PauseShoot > gpGlobals->time + 2.0f)
-				f_PauseShoot = 0.0;
-			
-			// is there something in the LTM ?
-			float fDistance;
-			for(long lschl = 0;lschl < _MAX_LTMEM;lschl++){
-				if(LTMem.FMItem[lschl].bUsed){
-					//FakeClientCommand(pEdict,"say","ltmprone",0);
-					if(LTMem.FMItem[lschl].lType == LTM_KILLED){
-						fDistance = (LTMem.FMItem[lschl].VAddI2 - pEdict->v.origin).Length();
-						if ( fDistance < 200 ){
-							GoProne(true,10);
-						}
-					}
-					else if(LTMem.FMItem[lschl].lType == LTM_KILL){
-						fDistance = (LTMem.FMItem[lschl].VAddI2 - pEdict->v.origin).Length();
-						if ( fDistance < 100 ){
-							GoProne(true,10);
-						}
-					}
-				}
-			}
-			
-			// is this place normally dangerous ?
-			int iNearWP = WaypointFindNearest(pEdict,1000,bot_teamnm);
-			if(iNearWP != -1){
-				if(WPStat[iNearWP].lKill > WPStat.lKillMax*3/2){
-					if(f_pronetill<gpGlobals->time){
-						GoProne(true,10.0);
-					}
-				}
-			}
-			
-			// avoid to get stuck trying to reach a waypoint
-			if(f_lastWP + MAXTIMEPERWP < gpGlobals->time){
-				iGoal = -1;
-				//iFarGoal = -1;
-				f_lastWP = gpGlobals -> time;
-			}
-		}
-		
-	}
-	else{
-		//b5th=false;
-		moved_distance = 2.0;
-	}
-	
-	// save current position as previous
-	v_prev_origin = pEdict->v.origin;
-	
-	// see, if bot hears the steps of a running player, and react on it
 
-	
-	if ((pEdict->v.waterlevel == 2) ||
-		(pEdict->v.waterlevel == 3))
-	{
-		// turn towards ideal_pitch by pitch_speed degrees
-		lButton|=IN_FORWARD;
-	}
-	
-	// turn towards ideal_pitch by pitch_speed degrees
-	old_pitch_degrees = pitch_degrees;
-	pitch_degrees = ChangePitch();
-	ChangeBodyPitch();
-	// turn towards ideal_yaw by yaw_speed degrees
-	old_yaw_degrees = yaw_degrees;
-	yaw_degrees = ChangeYaw(  );
-	ChangeBodyYaw();
+if(bRSInit){		// delete ways at and other vars at start of round
+Init();
 
-	
-	if (0){
-	}
-	else	// else handle movement related actions...
-	{		// see if bot can find an enemy...
-		pBotOldEnemy = pBotEnemy;
-		pBotEnemy = FindEnemy();
-		
-		if (pBotEnemy != NULL){			// does an en exist ?
-			LastEnemyOrigin = pBotEnemy->v.origin;	// store location of last en
-			Fight();										// ... and fight against it
-		}
-		else{	// no enemy or blinded ...
-			// if blinded slow down
-			if(f_blinded_time > gpGlobals->time){
-				f_move_speed /= 3.0f;		// slow down
-				f_shootbox = f_blinded_time;
-				if(RANDOM_LONG(0,100) > 95){		// 'spack ab'
-					if(IsCWeaponGrenade()){
-						lButton |= IN_ATTACK;
-					}
-				}
-				if(RANDOM_LONG(0,100) > 99){
-					lButton |= IN_JUMP;
-				}
-			}
-			// no enemy, let's just wander around...
-			
-			// (defensive) bot went out of view of enemy and succeeded
-			if(Task.current&&Task.current->lType & BT_HIDE){
-				//float fThisHide;
-				//f_GotoHidingPlace = 0;		// reset time to go to hiding place
-				Task.RemoveT(BT_HIDE);
-				InitCamp();					// init camping
-				
-				if(f_Hide < gpGlobals->time - 5.0f){
-					Task.AddTask(BT_CAMP,  gpGlobals->time + f_HidingTime,0,0,0);	// camp for _HIDECAMPTIME s
-					f_Hide = gpGlobals->time + f_HidingTime;	// duck all that time ...
-				}
-				if(RANDOM_LONG(0,100) < 6
-					&& !(Action.lAction & BA_TKAVOID)){
-					if(f_UsedRadio < gpGlobals->time - _RADIO_FREQ
-						&&g_bUseRadio){
-						
-					}
-				}
-				Action.lAction &=~ BA_TKAVOID;			// in case it was a TKAVOID, delete the flag
-				// search for a wp out of sight of the fuckin enemy
-				if(Task.current&&Task.current->lType & BT_HIDE){
-					int index=-1,i;
-					float distance;
-					for (i=0; i < num_waypoints; i++)
-					{
-						if ((waypoints[i].flags & W_FL_DELETED) == W_FL_DELETED)
-							continue;  // skip any deleted waypoints
-						
-						if (waypoints[i].flags & W_FL_AIMING)
-							continue;  // skip any aiming waypoints
-						
-						if(!FVisible(waypoints[i].origin,pEdict))		// skip if not visible ...
-							continue;
+iGoal = -1;
+iFarGoal = -1;
+// don't forget the freezetime !! -> freezetime is done by setmaxspeed
+//f_pause_time  = gpGlobals->time + CVAR_GET_FLOAT("mp_freezetime");
 
-						if(Task.current->p)			// all the time bt_hide
-							if(FVisible(waypoints[i].origin,Task.current->p))
-								continue;
-						
-						// skip this waypoint if it's team specific and teams don't match...
-						if ((waypoints[i].flags & W_FL_TEAM_SPECIFIC) &&
-							((waypoints[i].flags & W_FL_TEAM) != bot_teamnm))
-							continue;
-						
-						distance = (waypoints[i].origin - pEdict->v.origin).Length();
-						if(distance > 150)
-							continue;
-						
-						index = i;
-						break;
-					}
-					if(index != -1){		// that is found waypoint which is in view of pEdict but not in view of enemy
-						i_CurrWP = index;
-						f_Hide = gpGlobals->time;
-						Task.RemoveT(BT_CAMP);
-					}
-				}
-			}
-			
-			if(STMem.iCount
-				&& dCombatNNIn[IAmmo] > 0.0
-				&& f_shootbox < gpGlobals->time - 5.0f
-				&&((IsCWeaponPrimary() == CS_WEAPON_M249) || 
-				IsCWeaponRifle() || 
-				IsCWeaponSniper()) ){
-				if(IsCWeaponPrimary() == CS_WEAPON_M249){
-					f_shootbox = gpGlobals->time + 4.0;
-				}
-				else
-					f_shootbox = gpGlobals->time + 1.5;
-			}
-			
-			if(Action.lAction & BA_FIGHT){			// was last time a fight ??
-				Action.lAction &=~ BA_FIGHT;			// del flag
-				
-				// don't use WP for some time
-				f_noWP = gpGlobals->time + 1.0;
-				i_CurrWP = -1;
-				Action.lAction &=~ BA_SUSPLOC;	// forget susp loc
-				
-			}
-			
-			if(STMem.iCount&&!(Action.lAction&BA_SUSPLOC)){
-				if((STMem[0].VCalcedOrigin-pEdict->v.origin).Length()<500.0f){
-					VSuspEn = STMem[0].VCalcedOrigin;
-					f_SuspRem = gpGlobals->time;
-					Action.lAction|=BA_SUSPLOC;
-				}
-			}
-			
-			if(STMem.iCount
-				&& f_shootbox > gpGlobals->time 
-				&& !STMem[0].bSolid){
-				VATurnTo(STMem[0].VCalcedOrigin - pEdict->v.origin);
-				
-				UTIL_TraceLine(pEdict->v.origin+pEdict->v.view_ofs,STMem[0].VCalcedOrigin,dont_ignore_monsters,pEdict,&tr);
-				if(// tr.flFraction < .9
-					//UTIL_ClientIndex(tr.p9Hit) != -1
-					ENTINDEX(tr.pHit) != 0			// hits a teamm8
-					&& tr.pHit != pBotEnemy){// line is probably fract by enemy
-					f_strafe = 50;
-				}
-				else{
-					FireWeapon(STMem[0].VCalcedOrigin);
-					f_noWP = gpGlobals->time + .2;
-					//FakeClientCommand(pEdict,"say","shooting throught",0);
-				}
-			}
-			
-		
-			// reset angles
-			if ((pEdict->v.waterlevel != 2) &&  // is bot NOT under water?
-				(pEdict->v.waterlevel != 3))
-			{
-				// reset pitch to 0 (level horizontally)
-				pEdict->v.idealpitch = 1;
-				//pEdict->v.v_angle.x = 1;
-				fIdealAnglePitch = 1;
-				fIdealAnglePitch = -pEdict->v.v_angle.x/3;
-				fIdealAngleYaw = pEdict->v.v_angle.y;
-			}
-			else{
-				fIdealAnglePitch = -pEdict->v.v_angle.x;
-				fIdealAngleYaw = pEdict->v.v_angle.y;
-				lButton |= IN_FORWARD;
-			}
-			
-			pEdict->v.v_angle.z = 0;  // reset roll to 0 (straight up and down)
-			pEdict->v.angles.z = 0;
-			
-			//fIdealAnglePitch = pEdict->v.v_angle.x;
-			
-			
-			
-			// is susp location (where bot heard sth) visible ?
-			if(Action.lAction & BA_SUSPLOC){				
-				Vector VTo = pEdict->v.origin+pEdict->v.view_ofs+1.0*pEdict->v.velocity;
-				UTIL_TraceLine(VTo,VSuspEn,ignore_monsters,pEdict->v.pContainingEntity,&tr);
-				UTIL_TraceLine(pEdict->v.origin,VTo,ignore_monsters,pEdict->v.pContainingEntity,&tr2);
-				//HeadToward(pEdict,VSuspEn);
-				if(tr.flFraction == 1.0
-					&& tr2.flFraction == 1.0){				// i.e. visible
-					VLookTo = VSuspEn;
-					f_LookTo = gpGlobals->time +1.0;
-					//FakeClientCommand(pEdict,"say","susp",0);
-					//FakeClientCommand(pEdict,"say","looking to susp look",0);
-					if(FInViewCone(&VSuspEn,pEdict))
-						//bSawSuspLoc = true;
-						Action.lAction &= ~BA_SUSPLOC;			// del susploc flag
-				}
-			}
-			// search for important ents (c4, hostages ...)
-			if(!GoToSpEnt()){		// if there are no special ents
-				if(!Bored()){		// if bots not bored ...
-					found_waypoint = HeadTowardWaypoint();
-					
-					// check if the bot is on a ladder ...
-					//(pEdict->vmovetype != FLY) && ((pEdict->vflags & FL_ONGROUND) != FL_ONGROUND)
-					//if (pEdict->v.movetype == MOVETYPE_FLY)
-					if ((pEdict->v.movetype == MOVETYPE_FLY)
-						)
-					{
-						lButton |= IN_FORWARD;
-						//f_move_speed /= 2.0;
-						// check if bot JUST got on the ladder...
-						if ((f_end_use_ladder_time + 1.0) < gpGlobals->time)
-							f_start_use_ladder_time = gpGlobals->time;
-						
-						// go handle the ladder movement
-						OnLadder();
-						
-						f_dont_avoid = gpGlobals->time + 1.0;
-						f_dont_check_stuck = gpGlobals->time + 1.0;
-						f_IgnoreFall = gpGlobals->time + 1.0;
-						f_end_use_ladder_time = gpGlobals->time;
-					}
-					else
-					{
-						// check if the bot JUST got off the ladder...
-						pELadder = 0;
-						if ((f_end_use_ladder_time + 1.0) > gpGlobals->time)
-						{
-							iOnLadder = 0;
-						}
-					}
-					
-					// if the bot isn't headed toward a waypoint...
-					if (found_waypoint == FALSE)
-					{	
-						// the next stuff just test if the bot runs against a wall
-						Vector v_diff_norm = v_diff.Normalize();		// normalized vector of the bot's last move
-						v_diff_norm.z=0;								// don't look at pitch - just make it 2D
-						Vector v_view_norm;
-						
-						double dAngle = pEdict->v.angles.y * M_PI / 180.0;
-						
-						v_view_norm.x = cos(dAngle);	// convert the view from angles to a normalized vector
-						v_view_norm.y = sin(dAngle);
-						v_view_norm.z = 0;
-						
-						if((moved_distance < 1.0)
-							&& (prev_speed > 1.5)// stopped, cause the speed was high last time
-							&& (f_dont_check_stuck < gpGlobals->time)
-							&& f_Pause < gpGlobals->time-.5){// running against wall etc.
-							//f_old_direction = (pEdict->v.angles.y - v_diff_angles.y - 8);
-							//FakeClientCommand(pEdict,"say","muh die kuh",0);
-							if(l_cState==0){		// crashed into wall for the first time ...
-								l_cState ++;
-								
-								if(RANDOM_LONG(0,100) < 80){		// .. so jump
-									//FakeClientCommand(pEdict,"say","no waypoint found and jumping cause of wall",0);
-									lButton |= IN_JUMP;
-									lButton |= IN_DUCK;
-								}
-							}
-							else if(l_cState == 1){			// ... or turn later
-															
-								pEdict->v.ideal_yaw = v_diff_angles.y;
-								
-								l_cState ++;
-							}
-							else{
-								l_cState = 0;
-							}
-							FixIdealYaw();
-						}
-						else
-							l_cState =0;
-					}
-					else{	// found waypoint and stuck ?? - This should be handled elsewhere
-					}
-				}// end bored
-			}// end no special ent found
-			
-			AvoidStuck();
-			
-			AvoidCollision();
-			
-			// should the bot pause for a while here? ( looks kind of intelligent )
-			if (!Task.Important()
-				&& RANDOM_LONG(1, 200) <= 2
-				&& f_Pause < gpGlobals->time-2.0)
-			{
-				// set the time that the bot will stop "pausing"
-				f_Pause = gpGlobals->time + 0.5;
-			}
-		}
-	}
-	if(!bReplay && f_LookTo + .3 > gpGlobals->time){
-		float f_newspeed;
-		float f_newstrafe;
-		float f_Dot;
-		float f_DotMin = -.5;
-		Vector VLDiff,VRDiff;
-		
-		if(f_GoBack>gpGlobals->time){
-			f_DotMin = -1.0f;
-		}
-		
-		//VLDiff = VLookTo - pEdict->v.origin;
-		VLDiff = Vector(cos(pEdict->v.v_angle.y * M_PI / 180.0)
-			,sin(pEdict->v.v_angle.y * M_PI / 180.0),0);
-		//VLDiff.z = 0.0;
-		//VLDiff = VLDiff.Normalize();
-		
-		VRDiff = VRunningTo - pEdict->v.origin;
-		VRDiff.z = 0.0;
-		VRDiff = VRDiff.Normalize();
-		
-		f_Dot = DotProduct(VRDiff,VLDiff);
-		if(f_Dot > f_DotMin){
-			Vector VCross = CrossProduct(VLDiff,VRDiff);
-			
-			//sprintf(szBuffer,"-| %f ; %f",f_move_speed,f_Dot);
-			
-			f_newspeed = f_Dot * f_move_speed;
-			f_newstrafe = sqrt(f_move_speed*f_move_speed-f_newspeed*f_newspeed);
-			if(VCross.z>0.0)
-				f_newstrafe = - f_newstrafe;
-			
-			f_strafe = f_newstrafe;
-			f_move_speed = f_newspeed;
-			
-			if(f_LookTo > gpGlobals->time){
-				HeadToward(VLookTo);
-			}
-			else{
-				HeadToward(VRunningTo);
-			}
-			
-			//sprintf(szBuffer,"-| %f ; %f",f_newspeed,f_newstrafe);
-			//FakeClientCommand(pEdict,"say",szBuffer,0);
-		}
-		else{
-			f_LookTo = gpGlobals->time;
-		}
-	}
-	if(f_IgnoreFall < gpGlobals->time
-		&& !bReplay
-		&& iOnLadder == 0){			// don't have fear in front of ladders
-		//float flast_height;
-		float fDistTC = _DSTDOWN;
-		bool bflag;
-		
-		if(lButton & IN_JUMP){			// check longer dist when jumping
-			fDistTC = 130.0;
-		}
-		
-		pent=0;			// fix de_aztec bug
-		bflag=false;
-		while (pent = UTIL_FindEntityInSphere( pent, pEdict->v.origin,80)){
-			if(!strcmp(STRING(pent->v.classname),"func_illusionary")){
-				bflag=true;
-				break;
-			}
-		}
-		if(!bflag){
-			// just add the movement vector to the bot's origin and look down, how deep it is
-			
-			Vector v_view = Vector(cos(pEdict->v.v_angle.y * M_PI / 180.0)
-				,sin(pEdict->v.v_angle.y * M_PI / 180.0),0);
-			v_view.Normalize();
-			Vector v_perp = CrossProduct(v_view,Vector(0,0,1));
-			
-			v_perp.z = 0;		/// why  ??? z isn't apparently 0 sometimes
-			
-			v_perp = v_perp.Normalize();		// vector to the right
-			Vector v_comp = (v_view * f_move_speed + v_perp * f_strafe).Normalize();
-			Vector v_check = pEdict->v.origin + v_comp * fDistTC;
+//FakeClientCommand(pEdict,"say","inited",0);
+bRSInit = false;		// don't process this a second time this round
 
-			Vector v_down = v_check - Vector( 0,0, 300);		// straight down 1000 units
-			
-			UTIL_TraceLine(pEdict->v.origin,v_check, ignore_monsters,pEdict->v.pContainingEntity, &tr);
-		}
-	}
+for(int i = 0;i < 32;i++){
+f_ES[i] = gpGlobals->time;
+}
+}
 
-	if(f_ducktill > gpGlobals->time){	// ducktill -> useful, cause the bots need a time to duck
-		lButton |= IN_DUCK;
-	}
-	
-	if(f_Hide > gpGlobals->time){	// Hide -> do everything to hide ...
-		lButton |= IN_DUCK;
-		f_move_speed = 0;
-	}
-	
-	if (f_Pause > gpGlobals->time)  // is the bot "paused"? (faking intelligence and thinking time)
-		f_move_speed = 0;  // don't move while pausing
-	
-	if(bReplay){
-		float fOffset = gpGlobals->time - fStartADVM;
-		int i = 0;
-		FILE *fhds;fhds=fopen("rec_move_a.txt","a");if(fhds){fprintf(fhds,"%f - %i\n",fOffset,pWPAMPlay->iNum);fclose(fhds);}
-		
-		while(i < pWPAMPlay->iNum){
-			if(pWPAMPlay->Rec[i].fTime > fOffset){		// i.e. that's the last recorded item
-				// copy stuff from recorded data to bot
-				if(pWPAMPlay->Rec[i].lButton&IN_DUCK){
-					FakeClientCommand(pEdict,"say","duckin from advm",0);
-				}
-				//FakeClientCommand(pEdict,"say","-",0);
-				lButton = pWPAMPlay->Rec[i].lButton;
-				pEdict->v.origin = pWPAMPlay->Rec[i].v_origin;
-				pEdict->v.angles = pWPAMPlay->Rec[i].v_angles;
-				pEdict->v.v_angle = pWPAMPlay->Rec[i].v_v_angle;
-				pEdict->v.velocity = pWPAMPlay->Rec[i].v_velocity;
-				f_move_speed = pWPAMPlay->Rec[i].v_velocity.Length();
-				
-				// set ideal values to this ones ( instant turn vice versa )
-				fIdealAngleYaw = pEdict->v.angles.y;
-				fIdealAnglePitch = pEdict->v.angles.x;
-				pEdict->v.ideal_yaw = pEdict->v.v_angle.y;
-				pEdict->v.idealpitch = pEdict->v.v_angle.x;
-				fViewSpeedYaw=0;
-				fViewSpeedPitch = 0;
-				fAngleSpeedPitch = 0;
-				fAngleSpeedYaw = 0;
-				
-				if(lButton & IN_MOVELEFT){
-					f_strafe = -150;
-				}
-				else if(lButton & IN_MOVERIGHT){
-					f_strafe = 150;
-				}
-				
-				FILE *fhds;fhds=fopen("rec_move.txt","a");if(fhds){fprintf(fhds,"%i - %f - %f\n",\
-					pWPAMPlay->iNum,fOffset,pWPAMPlay->Rec[i].fTime);fclose(fhds);}
-				break;
-			}
-			i++;
-		}
-		if(!(i < pWPAMPlay->iNum)){
-			FakeClientCommand(pEdict,"say","stoppin advm",0);
-			bReplay = false;
-		}
-	}
-	
-	// save the previous speed (for checking if stuck)
-	prev_speed = f_move_speed;
-	
-	// copying lButton from bot_t to pEdict->v.button
-	pEdict->v.button = lButton;			// copy the new pressed buttons to the right location
-	
-	g_engfuncs.pfnRunPlayerMove( pEdict, pEdict->v.v_angle, f_move_speed,
-		f_strafe, 0, pEdict->v.button, 0, msecval);
-	
-	//BotFixIdealYaw(pEdict);
-	
-	return;
+// set this for the next time the bot dies so it will initialize stuff
+need_to_initialize = TRUE;
+
+f_move_speed = f_max_speed;
+
+if (g_b5th){								// this is every .2 s the case
+
+
+// see how far bot has moved since the previous position...
+v_diff = v_prev_origin - pEdict->v.origin;
+moved_distance = v_diff.Length();
+if(moved_distance>300){
+Init();
+}
+v_diff_angles = UTIL_VecToAngles(v_diff);
+
+// save current position as previous
+v_prev_origin = pEdict->v.origin;
+i1C--;
+
+// process faked sound system
+ReactOnSound();
+
+// intercepted radio command - handling
+ReactOnRadio();
+
+// search for interesting locations
+if(f_LastFight<gpGlobals->time - 3.0){
+SearchForIL();
+}
+
+if(pLastGlobalKill){
+if(UTIL_GetTeam(pLastGlobalKill) == bot_teamnm
+&& FVisible(pLastGlobalKill->v.origin,pEdict)){
+if(f_LastFight < gpGlobals->time - 1.0){
+HeadToward(pLastGlobalKill->v.origin);
+if(d_Manner < .1){
+Task.AddTask(BT_CAMP, gpGlobals->time + RANDOM_FLOAT(1.5,4.5),0,0,0);
+f_Aggressivity += 2.0;
+sLookToChange = 1;
+InitCamp();
+f_CaLooktoWP = gpGlobals->time + 2.5f;
+GoProne(true,10.0);
+}
+}
+}
+pLastGlobalKill = 0;
+}
+
+// check pronetill variable
+if(f_pronetill > 0 && f_changedprone < gpGlobals->time - 2.0){
+if( IsProne(pEdict) && f_pronetill < gpGlobals->time){
+FakeClientCommand(pEdict,"prone",0,0);
+f_changedprone = gpGlobals->time;
+//FakeClientCommand(pEdict,"say","a prone +",0);
+}
+else if( !IsProne(pEdict) && f_pronetill > gpGlobals->time){
+FakeClientCommand(pEdict,"prone",0,0);
+f_changedprone = gpGlobals->time;
+//FakeClientCommand(pEdict,"say","a prone -",0);
+}
+}
+
+// change the weapon not directly after en is away
+if(f_LastFight + 1.0f < gpGlobals->time){
+if(current_weapon.iId == DOD_WEAPON_KNIFE
+&& HasSecondary()
+&& m_rgAmmo[weapon_defs[HasSecondary()].iAmmo1]>0){
+Change2Weapon(HasSecondary());
+}
+if(IsCWeaponSecondary()
+&& HasPrimary()
+&&!GOrder.lTypeoG
+&& m_rgAmmo[weapon_defs[HasPrimary()].iAmmo1]>0){
+Change2Weapon(HasPrimary());
+}
+}
+// sometimes try to reload
+// at least 5 sec after last fight
+if(RANDOM_LONG(0,100) < 7
+&&!(Action.lAction & BA_PLANT)
+&& f_LastFight + 4 < gpGlobals->time
+&& float(current_weapon.iClip) / float(weapon_defs[current_weapon.iId].iAmmoClip) < .3)
+lButton |= IN_RELOAD;
+
+// lower aggresivity value
+f_Aggressivity *= .98;
+
+// lower offset
+//v_Offset = v_Offset*.73;
+v_Offset = pEdict->v.punchangle * float(bot_skill)/100.0;
+
+if(!(Action.lAction & BA_FIGHT))
+f_AimHead *= .8;
+
+if(f_Hide>gpGlobals->time
+&&!TEq(gpGlobals->time,f_StrCamp,10)
+&&!Task.Important()){
+edict_t *pNearest;
+int iTm8;
+iTm8 = UTIL_FightingAgainst(pEdict,bot_teamnm==CT?TE:CT,&pNearest,true);		// only duckin bots
+if(iTm8>1){
+if(f_UsedRadio < gpGlobals->time - _RADIO_FREQ
+&&g_bUseRadio
+&&Task.SearchT(BT_HIDE) != -1){
+
+}
+}
+}
+
+if(!i1C){				// every second one time	---------------------------------------------------------------------------------
+i1C = 5;
+
+UpdateFlags();
+
+HandleOrders();
+
+AdaptAvoid();
+
+// chat
+if(g_bChat)
+Chat.Talk(this);
+
+// handle ordered stuff
+if(Ordered.lAction){		// bot got ordered
+if(Ordered.pREdict){			// is an edict stored ?
+if(!IsAlive(Ordered.pREdict)){		// player who got order is dead
+Ordered.lAction = 0;				// erase order
+Ordered.pREdict = 0;				// reset pointer
+}
+}
+}
+
+if(bSlowed){
+//FakeClientCommand(pEdict,"say","stamina prone",0);
+GoProne(true,5);
+Task.AddTask(BT_CAMP, gpGlobals->time + 2.0,0,0,0);
+InitCamp();
+bSlowed = false;
+}
+
+if(bBleeding){
+FakeClientCommand(pEdict,"stopbleed",0,0);
+bBleeding = false;
+}
+
+// slthough it's never used, it should be updated some time
+if(bot_team == 5){
+bot_team = UTIL_GetTeam(pEdict)+1;
+}
+// fix nonshooting after map change
+if(f_PauseShoot > gpGlobals->time + 2.0f)
+f_PauseShoot = 0.0;
+
+// is there something in the LTM ?
+float fDistance;
+for(long lschl = 0;lschl < _MAX_LTMEM;lschl++){
+if(LTMem.FMItem[lschl].bUsed){
+//FakeClientCommand(pEdict,"say","ltmprone",0);
+if(LTMem.FMItem[lschl].lType == LTM_KILLED){
+fDistance = (LTMem.FMItem[lschl].VAddI2 - pEdict->v.origin).Length();
+if ( fDistance < 200 ){
+GoProne(true,10);
+}
+}
+else if(LTMem.FMItem[lschl].lType == LTM_KILL){
+fDistance = (LTMem.FMItem[lschl].VAddI2 - pEdict->v.origin).Length();
+if ( fDistance < 100 ){
+GoProne(true,10);
+}
+}
+}
+}
+
+// is this place normally dangerous ?
+int iNearWP = WaypointFindNearest(pEdict,1000,bot_teamnm);
+if(iNearWP != -1){
+if(WPStat[iNearWP].lKill > WPStat.lKillMax*3/2){
+if(f_pronetill<gpGlobals->time){
+GoProne(true,10.0);
+}
+}
+}
+
+// avoid to get stuck trying to reach a waypoint
+if(f_lastWP + MAXTIMEPERWP < gpGlobals->time){
+iGoal = -1;
+//iFarGoal = -1;
+f_lastWP = gpGlobals -> time;
+}
+}
+
+}
+else{
+//b5th=false;
+moved_distance = 2.0;
+}
+
+// save current position as previous
+v_prev_origin = pEdict->v.origin;
+
+// see, if bot hears the steps of a running player, and react on it
+
+
+if ((pEdict->v.waterlevel == 2) ||
+(pEdict->v.waterlevel == 3))
+{
+// turn towards ideal_pitch by pitch_speed degrees
+lButton|=IN_FORWARD;
+}
+
+// turn towards ideal_pitch by pitch_speed degrees
+old_pitch_degrees = pitch_degrees;
+pitch_degrees = ChangePitch();
+ChangeBodyPitch();
+// turn towards ideal_yaw by yaw_speed degrees
+old_yaw_degrees = yaw_degrees;
+yaw_degrees = ChangeYaw(  );
+ChangeBodyYaw();
+
+
+if (0){
+}
+else	// else handle movement related actions...
+{		// see if bot can find an enemy...
+pBotOldEnemy = pBotEnemy;
+pBotEnemy = FindEnemy();
+
+if (pBotEnemy != NULL){			// does an en exist ?
+LastEnemyOrigin = pBotEnemy->v.origin;	// store location of last en
+Fight();										// ... and fight against it
+}
+else{	// no enemy or blinded ...
+// if blinded slow down
+if(f_blinded_time > gpGlobals->time){
+f_move_speed /= 3.0f;		// slow down
+f_shootbox = f_blinded_time;
+if(RANDOM_LONG(0,100) > 95){		// 'spack ab'
+if(IsCWeaponGrenade()){
+lButton |= IN_ATTACK;
+}
+}
+if(RANDOM_LONG(0,100) > 99){
+lButton |= IN_JUMP;
+}
+}
+// no enemy, let's just wander around...
+
+// (defensive) bot went out of view of enemy and succeeded
+if(Task.current&&Task.current->lType & BT_HIDE){
+//float fThisHide;
+//f_GotoHidingPlace = 0;		// reset time to go to hiding place
+Task.RemoveT(BT_HIDE);
+InitCamp();					// init camping
+
+if(f_Hide < gpGlobals->time - 5.0f){
+Task.AddTask(BT_CAMP,  gpGlobals->time + f_HidingTime,0,0,0);	// camp for _HIDECAMPTIME s
+f_Hide = gpGlobals->time + f_HidingTime;	// duck all that time ...
+}
+if(RANDOM_LONG(0,100) < 6
+&& !(Action.lAction & BA_TKAVOID)){
+if(f_UsedRadio < gpGlobals->time - _RADIO_FREQ
+&&g_bUseRadio){
+
+}
+}
+Action.lAction &=~ BA_TKAVOID;			// in case it was a TKAVOID, delete the flag
+// search for a wp out of sight of the fuckin enemy
+if(Task.current&&Task.current->lType & BT_HIDE){
+int index=-1,i;
+float distance;
+for (i=0; i < num_waypoints; i++)
+{
+if ((waypoints[i].flags & W_FL_DELETED) == W_FL_DELETED)
+continue;  // skip any deleted waypoints
+
+if (waypoints[i].flags & W_FL_AIMING)
+continue;  // skip any aiming waypoints
+
+if(!FVisible(waypoints[i].origin,pEdict))		// skip if not visible ...
+continue;
+
+if(Task.current->p)			// all the time bt_hide
+if(FVisible(waypoints[i].origin,Task.current->p))
+continue;
+
+// skip this waypoint if it's team specific and teams don't match...
+if ((waypoints[i].flags & W_FL_TEAM_SPECIFIC) &&
+((waypoints[i].flags & W_FL_TEAM) != bot_teamnm))
+continue;
+
+distance = (waypoints[i].origin - pEdict->v.origin).Length();
+if(distance > 150)
+continue;
+
+index = i;
+break;
+}
+if(index != -1){		// that is found waypoint which is in view of pEdict but not in view of enemy
+i_CurrWP = index;
+f_Hide = gpGlobals->time;
+Task.RemoveT(BT_CAMP);
+}
+}
+}
+
+if(STMem.iCount
+&& dCombatNNIn[IAmmo] > 0.0
+&& f_shootbox < gpGlobals->time - 5.0f
+&&((IsCWeaponPrimary() == CS_WEAPON_M249) || 
+IsCWeaponRifle() || 
+IsCWeaponSniper()) ){
+if(IsCWeaponPrimary() == CS_WEAPON_M249){
+f_shootbox = gpGlobals->time + 4.0;
+}
+else
+f_shootbox = gpGlobals->time + 1.5;
+}
+
+if(Action.lAction & BA_FIGHT){			// was last time a fight ??
+Action.lAction &=~ BA_FIGHT;			// del flag
+
+// don't use WP for some time
+f_noWP = gpGlobals->time + 1.0;
+i_CurrWP = -1;
+Action.lAction &=~ BA_SUSPLOC;	// forget susp loc
+
+}
+
+if(STMem.iCount&&!(Action.lAction&BA_SUSPLOC)){
+if((STMem[0].VCalcedOrigin-pEdict->v.origin).Length()<500.0f){
+VSuspEn = STMem[0].VCalcedOrigin;
+f_SuspRem = gpGlobals->time;
+Action.lAction|=BA_SUSPLOC;
+}
+}
+
+if(STMem.iCount
+&& f_shootbox > gpGlobals->time 
+&& !STMem[0].bSolid){
+VATurnTo(STMem[0].VCalcedOrigin - pEdict->v.origin);
+
+UTIL_TraceLine(pEdict->v.origin+pEdict->v.view_ofs,STMem[0].VCalcedOrigin,dont_ignore_monsters,pEdict,&tr);
+if(// tr.flFraction < .9
+//UTIL_ClientIndex(tr.p9Hit) != -1
+ENTINDEX(tr.pHit) != 0			// hits a teamm8
+&& tr.pHit != pBotEnemy){// line is probably fract by enemy
+f_strafe = 50;
+}
+else{
+FireWeapon(STMem[0].VCalcedOrigin);
+f_noWP = gpGlobals->time + .2;
+//FakeClientCommand(pEdict,"say","shooting throught",0);
+}
+}
+
+
+// reset angles
+if ((pEdict->v.waterlevel != 2) &&  // is bot NOT under water?
+(pEdict->v.waterlevel != 3))
+{
+// reset pitch to 0 (level horizontally)
+pEdict->v.idealpitch = 1;
+//pEdict->v.v_angle.x = 1;
+fIdealAnglePitch = 1;
+fIdealAnglePitch = -pEdict->v.v_angle.x/3;
+fIdealAngleYaw = pEdict->v.v_angle.y;
+}
+else{
+fIdealAnglePitch = -pEdict->v.v_angle.x;
+fIdealAngleYaw = pEdict->v.v_angle.y;
+lButton |= IN_FORWARD;
+}
+
+pEdict->v.v_angle.z = 0;  // reset roll to 0 (straight up and down)
+pEdict->v.angles.z = 0;
+
+//fIdealAnglePitch = pEdict->v.v_angle.x;
+
+
+
+// is susp location (where bot heard sth) visible ?
+if(Action.lAction & BA_SUSPLOC){				
+Vector VTo = pEdict->v.origin+pEdict->v.view_ofs+1.0*pEdict->v.velocity;
+UTIL_TraceLine(VTo,VSuspEn,ignore_monsters,pEdict->v.pContainingEntity,&tr);
+UTIL_TraceLine(pEdict->v.origin,VTo,ignore_monsters,pEdict->v.pContainingEntity,&tr2);
+//HeadToward(pEdict,VSuspEn);
+if(tr.flFraction == 1.0
+&& tr2.flFraction == 1.0){				// i.e. visible
+VLookTo = VSuspEn;
+f_LookTo = gpGlobals->time +1.0;
+//FakeClientCommand(pEdict,"say","susp",0);
+//FakeClientCommand(pEdict,"say","looking to susp look",0);
+if(FInViewCone(&VSuspEn,pEdict))
+//bSawSuspLoc = true;
+Action.lAction &= ~BA_SUSPLOC;			// del susploc flag
+}
+}
+// search for important ents (c4, hostages ...)
+if(!GoToSpEnt()){		// if there are no special ents
+if(!Bored()){		// if bots not bored ...
+found_waypoint = HeadTowardWaypoint();
+
+// check if the bot is on a ladder ...
+//(pEdict->vmovetype != FLY) && ((pEdict->vflags & FL_ONGROUND) != FL_ONGROUND)
+//if (pEdict->v.movetype == MOVETYPE_FLY)
+if ((pEdict->v.movetype == MOVETYPE_FLY)
+)
+{
+lButton |= IN_FORWARD;
+//f_move_speed /= 2.0;
+// check if bot JUST got on the ladder...
+if ((f_end_use_ladder_time + 1.0) < gpGlobals->time)
+f_start_use_ladder_time = gpGlobals->time;
+
+// go handle the ladder movement
+OnLadder();
+
+f_dont_avoid = gpGlobals->time + 1.0;
+f_dont_check_stuck = gpGlobals->time + 1.0;
+f_IgnoreFall = gpGlobals->time + 1.0;
+f_end_use_ladder_time = gpGlobals->time;
+}
+else
+{
+// check if the bot JUST got off the ladder...
+pELadder = 0;
+if ((f_end_use_ladder_time + 1.0) > gpGlobals->time)
+{
+iOnLadder = 0;
+}
+}
+
+// if the bot isn't headed toward a waypoint...
+if (found_waypoint == FALSE)
+{	
+// the next stuff just test if the bot runs against a wall
+Vector v_diff_norm = v_diff.Normalize();		// normalized vector of the bot's last move
+v_diff_norm.z=0;								// don't look at pitch - just make it 2D
+Vector v_view_norm;
+
+double dAngle = pEdict->v.angles.y * M_PI / 180.0;
+
+v_view_norm.x = cos(dAngle);	// convert the view from angles to a normalized vector
+v_view_norm.y = sin(dAngle);
+v_view_norm.z = 0;
+
+if((moved_distance < 1.0)
+&& (prev_speed > 1.5)// stopped, cause the speed was high last time
+&& (f_dont_check_stuck < gpGlobals->time)
+&& f_Pause < gpGlobals->time-.5){// running against wall etc.
+//f_old_direction = (pEdict->v.angles.y - v_diff_angles.y - 8);
+//FakeClientCommand(pEdict,"say","muh die kuh",0);
+if(l_cState==0){		// crashed into wall for the first time ...
+l_cState ++;
+
+if(RANDOM_LONG(0,100) < 80){		// .. so jump
+//FakeClientCommand(pEdict,"say","no waypoint found and jumping cause of wall",0);
+lButton |= IN_JUMP;
+lButton |= IN_DUCK;
+}
+}
+else if(l_cState == 1){			// ... or turn later
+
+pEdict->v.ideal_yaw = v_diff_angles.y;
+
+l_cState ++;
+}
+else{
+l_cState = 0;
+}
+FixIdealYaw();
+}
+else
+l_cState =0;
+}
+else{	// found waypoint and stuck ?? - This should be handled elsewhere
+}
+}// end bored
+}// end no special ent found
+
+AvoidStuck();
+
+AvoidCollision();
+
+// should the bot pause for a while here? ( looks kind of intelligent )
+if (!Task.Important()
+&& RANDOM_LONG(1, 200) <= 2
+&& f_Pause < gpGlobals->time-2.0)
+{
+// set the time that the bot will stop "pausing"
+f_Pause = gpGlobals->time + 0.5;
+}
+}
+}
+if(!bReplay && f_LookTo + .3 > gpGlobals->time){
+float f_newspeed;
+float f_newstrafe;
+float f_Dot;
+float f_DotMin = -.5;
+Vector VLDiff,VRDiff;
+
+if(f_GoBack>gpGlobals->time){
+f_DotMin = -1.0f;
+}
+
+//VLDiff = VLookTo - pEdict->v.origin;
+VLDiff = Vector(cos(pEdict->v.v_angle.y * M_PI / 180.0)
+,sin(pEdict->v.v_angle.y * M_PI / 180.0),0);
+//VLDiff.z = 0.0;
+//VLDiff = VLDiff.Normalize();
+
+VRDiff = VRunningTo - pEdict->v.origin;
+VRDiff.z = 0.0;
+VRDiff = VRDiff.Normalize();
+
+f_Dot = DotProduct(VRDiff,VLDiff);
+if(f_Dot > f_DotMin){
+Vector VCross = CrossProduct(VLDiff,VRDiff);
+
+//sprintf(szBuffer,"-| %f ; %f",f_move_speed,f_Dot);
+
+f_newspeed = f_Dot * f_move_speed;
+f_newstrafe = sqrt(f_move_speed*f_move_speed-f_newspeed*f_newspeed);
+if(VCross.z>0.0)
+f_newstrafe = - f_newstrafe;
+
+f_strafe = f_newstrafe;
+f_move_speed = f_newspeed;
+
+if(f_LookTo > gpGlobals->time){
+HeadToward(VLookTo);
+}
+else{
+HeadToward(VRunningTo);
+}
+
+//sprintf(szBuffer,"-| %f ; %f",f_newspeed,f_newstrafe);
+//FakeClientCommand(pEdict,"say",szBuffer,0);
+}
+else{
+f_LookTo = gpGlobals->time;
+}
+}
+if(f_IgnoreFall < gpGlobals->time
+&& !bReplay
+&& iOnLadder == 0){			// don't have fear in front of ladders
+//float flast_height;
+float fDistTC = _DSTDOWN;
+bool bflag;
+
+if(lButton & IN_JUMP){			// check longer dist when jumping
+fDistTC = 130.0;
+}
+
+pent=0;			// fix de_aztec bug
+bflag=false;
+while (pent = UTIL_FindEntityInSphere( pent, pEdict->v.origin,80)){
+if(!strcmp(STRING(pent->v.classname),"func_illusionary")){
+bflag=true;
+break;
+}
+}
+if(!bflag){
+// just add the movement vector to the bot's origin and look down, how deep it is
+
+Vector v_view = Vector(cos(pEdict->v.v_angle.y * M_PI / 180.0)
+,sin(pEdict->v.v_angle.y * M_PI / 180.0),0);
+v_view.Normalize();
+Vector v_perp = CrossProduct(v_view,Vector(0,0,1));
+
+v_perp.z = 0;		/// why  ??? z isn't apparently 0 sometimes
+
+v_perp = v_perp.Normalize();		// vector to the right
+Vector v_comp = (v_view * f_move_speed + v_perp * f_strafe).Normalize();
+Vector v_check = pEdict->v.origin + v_comp * fDistTC;
+
+Vector v_down = v_check - Vector( 0,0, 300);		// straight down 1000 units
+
+UTIL_TraceLine(pEdict->v.origin,v_check, ignore_monsters,pEdict->v.pContainingEntity, &tr);
+}
+}
+
+if(f_ducktill > gpGlobals->time){	// ducktill -> useful, cause the bots need a time to duck
+lButton |= IN_DUCK;
+}
+
+if(f_Hide > gpGlobals->time){	// Hide -> do everything to hide ...
+lButton |= IN_DUCK;
+f_move_speed = 0;
+}
+
+if (f_Pause > gpGlobals->time)  // is the bot "paused"? (faking intelligence and thinking time)
+f_move_speed = 0;  // don't move while pausing
+
+if(bReplay){
+float fOffset = gpGlobals->time - fStartADVM;
+int i = 0;
+FILE *fhds;fhds=fopen("rec_move_a.txt","a");if(fhds){fprintf(fhds,"%f - %i\n",fOffset,pWPAMPlay->iNum);fclose(fhds);}
+
+while(i < pWPAMPlay->iNum){
+if(pWPAMPlay->Rec[i].fTime > fOffset){		// i.e. that's the last recorded item
+// copy stuff from recorded data to bot
+if(pWPAMPlay->Rec[i].lButton&IN_DUCK){
+FakeClientCommand(pEdict,"say","duckin from advm",0);
+}
+//FakeClientCommand(pEdict,"say","-",0);
+lButton = pWPAMPlay->Rec[i].lButton;
+pEdict->v.origin = pWPAMPlay->Rec[i].v_origin;
+pEdict->v.angles = pWPAMPlay->Rec[i].v_angles;
+pEdict->v.v_angle = pWPAMPlay->Rec[i].v_v_angle;
+pEdict->v.velocity = pWPAMPlay->Rec[i].v_velocity;
+f_move_speed = pWPAMPlay->Rec[i].v_velocity.Length();
+
+// set ideal values to this ones ( instant turn vice versa )
+fIdealAngleYaw = pEdict->v.angles.y;
+fIdealAnglePitch = pEdict->v.angles.x;
+pEdict->v.ideal_yaw = pEdict->v.v_angle.y;
+pEdict->v.idealpitch = pEdict->v.v_angle.x;
+fViewSpeedYaw=0;
+fViewSpeedPitch = 0;
+fAngleSpeedPitch = 0;
+fAngleSpeedYaw = 0;
+
+if(lButton & IN_MOVELEFT){
+f_strafe = -150;
+}
+else if(lButton & IN_MOVERIGHT){
+f_strafe = 150;
+}
+
+FILE *fhds;fhds=fopen("rec_move.txt","a");if(fhds){fprintf(fhds,"%i - %f - %f\n",\
+pWPAMPlay->iNum,fOffset,pWPAMPlay->Rec[i].fTime);fclose(fhds);}
+break;
+}
+i++;
+}
+if(!(i < pWPAMPlay->iNum)){
+FakeClientCommand(pEdict,"say","stoppin advm",0);
+bReplay = false;
+}
+}
+
+// save the previous speed (for checking if stuck)
+prev_speed = f_move_speed;
+
+// copying lButton from bot_t to pEdict->v.button
+pEdict->v.button = lButton;			// copy the new pressed buttons to the right location
+
+g_engfuncs.pfnRunPlayerMove( pEdict, pEdict->v.v_angle, f_move_speed,
+f_strafe, 0, pEdict->v.button, 0, msecval);
+
+//BotFixIdealYaw(pEdict);
+
+return;
 }*/
 
 bool CBotDOD :: GoProne(bool bProne, float fTime){
@@ -2537,7 +2547,7 @@ bool CBotDOD :: ReactOnSound(void){
 						}
 					}
 					fMaxShootDistanceThis = fMaxShootDistance;
-
+					
 					if(fDistance < fMaxShootDistanceThis){				// do you hear sb shooting ??
 						if(pEnt->v.oldbuttons & (IN_ATTACK|IN_ATTACK2)&&fDistance < fVDist){		// attack2 to hear the zoom of awp, p. ex.
 							pVSoundSource = pEnt;
@@ -2556,7 +2566,7 @@ bool CBotDOD :: ReactOnSound(void){
 						}
 					}
 					fMaxShootDistanceThis = fMaxShootDistance;
-				
+					
 					if(fDistance < fMaxShootDistanceThis){				// do you hear sb shooting ??
 						if(pEnt->v.oldbuttons & (IN_ATTACK|IN_ATTACK2)&&fDistance < fSDist){		// attack2 to hear the zoom of awp, p. ex.
 							pSSoundSource = pEnt;
