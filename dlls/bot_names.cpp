@@ -27,7 +27,7 @@
 #include "bot_names.h"
 
 #include "extdll.h"
-#include "Util.h"
+#include "util.h"
 
 #include <iostream.h>
 
