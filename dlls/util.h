@@ -561,6 +561,14 @@ int BOT_LOG(const char *fnName, const char *fmt, ...);
 #define BOT_LOG /* */
 #endif
 
+#ifdef _WIN32
+#define STRIP_CR(s) /* */
+#else /* not _WIN32 */
+#define STRIP_CR(s) \
+if (s[strlen(s) - 1] == '\r') \
+	s[strlen(s) - 1] = '\0';
+#endif /* _WIN32 */
+
 void UTIL_TraceHull(const Vector &vecStart, const Vector &vecEnd, IGNORE_MONSTERS igmon, IGNORE_GLASS ignoreGlass,int hullNumber, edict_t *pentIgnore, TraceResult *ptr);
 
 void UTIL_HostSay( edict_t *pEntity, int teamonly, char *message );
