@@ -3,14 +3,10 @@
 //
 // namefunc.cpp
 //
+#ifdef _WIN32
 
 #include "extdll.h"
 #include "util.h"
-#include "enginecallback.h"
-#include "cbase.h"
-
-#include "bot.h"
-
 
 #define MAX_SYMBOLS 1000 /* max exported symbols */
 
@@ -274,7 +270,7 @@ void LoadSymbols(char *filename)
          return;
       }
 
-      if (strcmp((char *)section_header.Name, ".edata") == 0)
+      if (FStrEq((char *)section_header.Name, ".edata"))
       {
          edata_found = TRUE;
          break;
@@ -422,7 +418,7 @@ void LoadSymbols(char *filename)
 
    for (i=0; i < num_ordinals; i++)
    {
-      if (strcmp("GiveFnptrsToDll", p_FunctionNames[i]) == 0)
+      if (FStrEq("GiveFnptrsToDll", p_FunctionNames[i]))
       {
          index = p_Ordinals[i];
 
@@ -441,7 +437,7 @@ unsigned long FUNCTION_FROM_NAME(const char *pName)
 
    for (i=0; i < num_ordinals; i++)
    {
-      if (strcmp(pName, p_FunctionNames[i]) == 0)
+      if (FStrEq(pName, p_FunctionNames[i]))
       {
          index = p_Ordinals[i];
 
@@ -469,3 +465,5 @@ const char *NAME_FOR_FUNCTION(unsigned long function)
 
    return NULL;  // couldn't find the function address to return name
 }
+
+#endif //_WIN32
