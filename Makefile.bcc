@@ -3,7 +3,7 @@
 # ---------------------------------------------------------------------------
 #DLLNAME = joebot_mm
 DLLNAME = joebot
-DLL = $(DLLNAME).dll
+DLL = $(DLLNAME)_bcc.dll
 
 SDKDIR = U:\netgames\install\hl\sdk\multiplayer
 JOEBOTDIR = U:\netgames\install\hl\bots\joebot

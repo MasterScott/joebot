@@ -1,8 +1,13 @@
 # ---------------------------------------------------------------------------
 # Definitions
 # ---------------------------------------------------------------------------
-DLLNAME = joebot_mm
-#DLLNAME = joebot
+include Config.mk
+
+ifeq ($(DLLTYPE),std)
+ DLLNAME = joebot
+else
+ DLLNAME = joebot_mm
+endif
 
 ifeq ($(OS),Windows_NT)
  DLL = $(DLLNAME).dll
@@ -15,8 +20,6 @@ else
  LDFLAGS = -fPIC -shared
  LDLIBS = -lstdc++ -ldl
 endif
-
-include Config.mk
 
 # build source list
 include dlls/Config.mk
@@ -37,12 +40,33 @@ OBJ = $(OBJ_DLLS) $(OBJ_NNSIM) $(OBJ_SOM)
 # ---------------------------------------------------------------------------
 all: $(DLL)
 
+mmdll:
+	$(MAKE) clean
+	$(MAKE)
+
+stddll:
+	$(MAKE) clean DLLTYPE=std
+	$(MAKE) DLLTYPE=std
+
+mmdll15:
+	$(MAKE) clean CS=1_5
+	$(MAKE) CS=1_5
+
+stddll15:
+	$(MAKE) clean DLLTYPE=std CS=1_5
+	$(MAKE) DLLTYPE=std CS=1_5
+
 clean:
 	$(MAKE) -C dlls $@
 	$(MAKE) -C NNSim $@
 	$(MAKE) -C NNSim/som $@
 	-$(RM) $(DLL)
 	-$(RM) $(DLLNAME)_mingw.def
+
+spotless: clean
+	$(MAKE) -C dlls $@
+	$(MAKE) -C NNSim $@
+	$(MAKE) -C NNSim/som $@
 
 rebuild: clean all
 

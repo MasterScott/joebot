@@ -16,11 +16,13 @@ endif
 
 EXTRA_CFLAGS =
 
-# uncomment to compile metamod plugin
-EXTRA_CFLAGS += -DUSE_METAMOD
+ifneq ($(DLLTYPE),std)
+ EXTRA_CFLAGS += -DUSE_METAMOD
+endif
 
-# uncomment to compile for counter-strike 1.5
-#EXTRA_CFLAGS += -DCSTRIKE15
+ifeq ($(CS),1_5)
+ EXTRA_CFLAGS += -DCSTRIKE15
+endif
 
 # uncomment to compile debug code
 #EXTRA_CFLAGS += -g -D_DEBUG -DDEBUGENGINE
