@@ -100,9 +100,9 @@ void CWPStat :: Init(void){
 void CWPStat :: InitWP(long lWP){
 	long lWP1=0;
 	if(lWP>MAX_WAYPOINTS){
-		FILE *fp=fopen("bot.txt","a");
-		fprintf(fp,"WaypointStatDebug: ERROR!!!\n");
-		fclose(fp);
+#ifdef DEBUGENGINE
+		BOT_LOG("WaypointStatDebug", "ERROR!!!");
+#endif
 
 		*((long*)lWP1) = 0;
 	}
@@ -559,9 +559,7 @@ void CWPStat ::CalcSlice(void){
 		|| !lWPSlice)
 		&&bRecalcWPV){
 
-		/*FILE *fp=fopen("bot.txt","a");
-		fprintf(fp,"%p ::: ",pWPV);
-		fclose(fp);*/
+		//prev_pWPV = pWPV;
 
 		if(pWPV){
 			delete [] pWPV;
@@ -572,9 +570,7 @@ void CWPStat ::CalcSlice(void){
 		lNWPfWPV = num_waypoints;
 		pWPV = new long[lNWPfWPV*lNWPfWPV/16+16];
 
-		/*fp=fopen("bot.txt","a");
-		fprintf(fp,"%p\n",pWPV);
-		fclose(fp);*/
+		//BOT_LOG("CWPStat::CalcSlice", "%p ::: %p", prev_pWPV, pWPV);
 
 		//pWPV = (long*)malloc(lNWPfWPV*(lNWPfWPV/16) * sizeof(long));
 		//if(listenserver_edict)FakeClientCommand(listenserver_edict,"say %li",lNWPfWPV);
