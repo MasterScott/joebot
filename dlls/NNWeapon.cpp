@@ -23,6 +23,7 @@
 // Johannes.Lampel@gmx.de
 // http://joebot.counter-strike.de
 
+#include "bot_weapons.h"
 #include "NNWeapon.h"
 
 #include <memory.h>
