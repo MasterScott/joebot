@@ -13,8 +13,6 @@
 #include "BaseWeight.h"
 #include "BaseNeuron.h"
 
-#include "iostream.h"		// to remove
-
 #define _LTYPEI 32
 
 class CBaseNeuralNet  
