@@ -258,7 +258,7 @@ public:
 	bool need_to_initialize;
 	char name[BOT_NAME_LEN+1];
 	char skin[BOT_SKIN_LEN+1];	// useless in cs-> defined by model
-	int not_started;
+	bool not_started;
 	int start_action;
 	//float kick_time;
 	
