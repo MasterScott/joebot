@@ -177,4 +177,16 @@ qboolean pfnVoice_GetClientListening(int iReceiver, int iSender);
 qboolean pfnVoice_SetClientListening(int iReceiver, int iSender, qboolean bListen);
 const char *pfnGetPlayerAuthID(edict_t *e);
 
+void *pfnSequenceGet(const char* fileName, const char* entryName);
+void *pfnSequencePickSentence(const char* groupName, int pickMethod, int *picked);
+int pfnGetFileSize(char *filename);
+unsigned int pfnGetApproxWavePlayLen(const char *filepath);
+int pfnIsCareerMatch(void);
+int pfnGetLocalizedStringLength(const char *label);
+void pfnRegisterTutorMessageShown(int mid);
+int pfnGetTimesTutorMessageShown(int mid);
+void pfnProcessTutorMessageDecayBuffer(int *buffer, int bufferLength);
+void pfnConstructTutorMessageDecayBuffer(int *buffer, int bufferLength);
+void pfnResetTutorMessageDecayData(void);
+
 #endif //ENGINE_H

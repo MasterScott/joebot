@@ -1123,6 +1123,51 @@ const char *pfnGetPlayerAuthId(edict_t *e)
 {
 	return (*g_engfuncs.pfnGetPlayerAuthId)(e); 
 }
+// 2003/11/10
+void *pfnSequenceGet(const char* fileName, const char* entryName)
+{
+	return (*g_engfuncs.pfnSequenceGet)(fileName, entryName);
+}
+void *pfnSequencePickSentence(const char* groupName, int pickMethod, int *picked)
+{
+	return (*g_engfuncs.pfnSequencePickSentence)(groupName, pickMethod, picked);
+}
+int pfnGetFileSize(char *filename)
+{
+	return (*g_engfuncs.pfnGetFileSize)(filename);
+}
+unsigned int pfnGetApproxWavePlayLen(const char *filepath)
+{
+	return (*g_engfuncs.pfnGetApproxWavePlayLen)(filepath);
+}
+int pfnIsCareerMatch(void)
+{
+	return (*g_engfuncs.pfnIsCareerMatch)();
+}
+int pfnGetLocalizedStringLength(const char *label)
+{
+	return (*g_engfuncs.pfnGetLocalizedStringLength)(label);
+}
+void pfnRegisterTutorMessageShown(int mid)
+{
+	return (*g_engfuncs.pfnRegisterTutorMessageShown)(mid);
+}
+int pfnGetTimesTutorMessageShown(int mid)
+{
+	return (*g_engfuncs.pfnGetTimesTutorMessageShown)(mid);
+}
+void pfnProcessTutorMessageDecayBuffer(int *buffer, int bufferLength)
+{
+	return (*g_engfuncs.pfnProcessTutorMessageDecayBuffer)(buffer, bufferLength);
+}
+void pfnConstructTutorMessageDecayBuffer(int *buffer, int bufferLength)
+{
+	return (*g_engfuncs.pfnConstructTutorMessageDecayBuffer)(buffer, bufferLength);
+}
+void pfnResetTutorMessageDecayData(void)
+{
+	return (*g_engfuncs.pfnResetTutorMessageDecayData)();
+}
 #endif /* not USE_METAMOD */
 
 #ifdef USE_METAMOD
@@ -1309,6 +1354,22 @@ enginefuncs_t meta_engfuncs = {
 	NULL,			// pfnGetPlayerStats()
 
 	NULL,			// pfnAddServerCommand()
+
+	NULL,			// pfnVoice_GetClientListening()
+	NULL,			// pfnVoice_SetClientListening()
+	NULL,			// pfnGetPlayerAuthID()
+
+	NULL,			// pfnSequenceGet()
+	NULL,			// pfnSequencePickSentence()
+	NULL,			// pfnGetFileSize()
+	NULL,			// pfnGetApproxWavePlayLen()
+	NULL,			// pfnIsCareerMatch()
+	NULL,			// pfnGetLocalizedStringLength()
+	NULL,			// pfnRegisterTutorMessageShown()
+	NULL,			// pfnGetTimesTutorMessageShown()
+	NULL,			// pfnProcessTutorMessageDecayBuffer()
+	NULL,			// pfnConstructTutorMessageDecayBuffer()
+	NULL,			// pfnResetTutorMessageDecayData()
 };
 
 int GetEngineFunctions(enginefuncs_t *pengfuncsFromEngine, int *interfaceVersion ) 
