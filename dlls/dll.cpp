@@ -652,7 +652,7 @@ void GameDLLInit( void )
 	}
 
 	// prop nets  -  kind of precaching
-	cout << NNCombat << endl << NNColl << endl << endl;
+	//cout << NNCombat << endl << NNColl << endl << endl;
 	NNCombat->Propagate();
 	NNColl->Propagate();
 
@@ -865,7 +865,7 @@ BOOL ClientConnect( edict_t *pEntity, const char *pszName, const char *pszAddres
 			// don't try to add bots for 60 seconds, give client time to get added
 			//bot_check_time = gpGlobals->time + 60.0;
 			bot_check_time = gpGlobals->time + _PAUSE_TIME*2;
-			
+			/*
 			for (i=0; i < 32; i++)
 			{
 				if (bots[i])  // count the number of bots in use
@@ -885,7 +885,7 @@ BOOL ClientConnect( edict_t *pEntity, const char *pszName, const char *pszAddres
 						break;
 					}
 				}
-			}
+			}*/
 			int clientindex = UTIL_ClientIndex(pEntity);
 			if(clientindex != -1){
 				welcome_time[clientindex] = gpGlobals->time + 10.0f;		// set welcome time to some seconds in the future :D
@@ -976,6 +976,19 @@ void ClientPutInServer( edict_t *pEntity )
 	if (i < 32)
 		clients[i] = pEntity;  // store this clients edict in the clients array
 	
+	if (!FBitSet( pEntity->v.flags, FL_FAKECLIENT ))
+	{
+		for (i = 0; i < 32; i++)
+		{
+			if (bots[i])
+			{
+				sprintf(szTemp, "kick \"%s\"\n", STRING(bots[i]->pEdict->v.netname));
+				SERVER_COMMAND(szTemp);  // kick the bot using (kick "name")
+				break;
+			}
+		}
+	}
+
 	(*other_gFunctionTable.pfnClientPutInServer)(pEntity);
 }
 
