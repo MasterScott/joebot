@@ -3945,7 +3945,7 @@ void WaypointRouteInit(void)
 // return the next waypoint index for a path from the Floyd matrix when
 // going from a source waypoint index (src) to a destination waypoint
 // index (dest)...
-unsigned short WaypointRouteFromTo(int src, int dest, int team)
+int WaypointRouteFromTo(int src, int dest, int team)
 {
 	if((unsigned int)src < route_num_waypoints&&(unsigned int)dest < route_num_waypoints){
 		unsigned short *pFromTo;
