@@ -5,9 +5,9 @@ OBJDIR_DEBUG_LINUX = debug/linux
 OBJDIR_RELEASE_LINUX = release/linux
 
 ifeq ($(OS),Windows_NT)
- SDKDIR = /u/netgames/install/hl/sdk/multiplayer
- JOEBOTDIR = /u/netgames/install/hl/bots/joebot/src
- MMDIR = /u/netgames/install/hl/server/metamod/src/1.17
+ SDKDIR = /c/HLDev/sdk/multiplayer
+ JOEBOTDIR = /c/HLDev/bots/joebot/src
+ MMDIR = /c/HLDev/server/metamod/src/1.17
  OBJDIR_DEBUG = $(OBJDIR_DEBUG_WIN32)
  OBJDIR_RELEASE = $(OBJDIR_RELEASE_WIN32)
 else
@@ -18,15 +18,12 @@ else
  OBJDIR_RELEASE = $(OBJDIR_RELEASE_LINUX)
 endif
 
-SERVERDIR = /home/netgames/hlds_l/cstrike/joebot
+CSDIR = /c/Program\ Files/Steam/SteamApps/cruft@hotmail.com/counter-strike/cstrike/joebot
+SERVERDIR = /c/HLServer/cstrike/joebot
+SERVERDIR_CS15 = /c/Program\ Files/Half-Life/cstrike/joebot
 
 EXTRA_CFLAGS =
 
 ifneq ($(DLLTYPE),std)
  EXTRA_CFLAGS += -DUSE_METAMOD
 endif
-
-# uncomment to compile debug code
-#EXTRA_CFLAGS += -DDEBUGENGINE
-#EXTRA_CFLAGS += -DDEBUGMESSAGES
-#EXTRA_CFLAGS += -D_DEBUG
