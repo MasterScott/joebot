@@ -1,0 +1,325 @@
+######################################################################
+#
+#	joebot chat file
+#
+#	plz don't remove any 'tags', cause this would result in
+#	interchanging between categories.
+#
+#	(Max. 50 Sentences per category and team
+#
+#     copyright @$3.1415rin
+#	copyright 3NFORC3R
+#     copyright PainedFuture
+#
+#	(here u can add ur copyright if u'va added sth and have sent
+#	 it back to joebotchat@gmx.de)
+#
+# BOTNAME name of bot saying this stuff
+# TEAMMATEALIVE name of a teammate which is alive
+# ENEMYALIVE name of enemy which is alive
+# WEAPON name of own weapon
+# CHATTER name of the last player who chatted
+# ALIVE ...
+# DEAD ...
+# RANDOM ...
+# VICTIM ...
+# MAP ...
+#
+######################################################################
+
+##############################################
+# chat texts when the bomb is planted
+##############################################
+[bombplanted]
+<all>
+<te>
+	juchuuu
+	the bomb'll kill ya all !
+	let's camp ... the cts won't find it
+	ha ha, BOOM !!
+	you'll never defuse it in time
+	tick, tick, tick
+	this is my favorite part
+	LOL
+	come and get it wussies
+	let's see if ENEMYALIVE remembered to buy a defuser
+	the bomb ain't all that blows !
+	ur heading the wrong way ENEMYALIVE LOL!
+<ct>
+	TEAMMATEALIVE do u know where ?
+	shit
+	where is it TEAMMATEALIVE ?
+	It's the red wire right TEAMMATEALIVE ?
+	Do you have a defuser TEAMMATEALIVE ?
+	which site TEAMMATEALIVE ?
+	I wish I had bought a defuser
+	let's go, only 35 seconds !
+	This stinks
+	I'm gonna plant that bomb somewhere
+	This gets old
+	watch for guards
+	you got ur defuser TEAMMATEALIVE ?
+##############################################
+# chat texts when a hostage is killed
+##############################################
+[hostdown]
+<all>
+	trigger happy fools
+	the innocent always suffer
+	maybe if the hostages weren't so stupid...
+	stupid fucking hostages
+<te>
+	hehehe
+	ENEMYALIVE we'll do the same with u !!!
+	if ya've money, go on killing ... a dead hostage cannot be rescued by the cts ...
+	cool, more news coverage
+	hehe, the hostages are so stupid
+	that's not the last hostage to die either ENEMYALIVE
+	CNN loves a dead hostage
+	first the hostages, then the rescuers !
+	we didn't need that hostage anyway did we TEAMMATEALIVE ?
+	I was tired of guarding that hostage anyway
+<ct>
+	
+	what r ya doin, man ?
+	don't shoot at civilians !
+	objective destroyed - one less for lousy rescuing
+	poor hostage
+	protect the hostages !
+	Why ?
+	Well... a dead hostage means one less needed to win, doesn't it?
+	I often wonder if these hostages are worth saving
+	I hate trying to save hostages
+	civilian casaulties ! bad ENEMYALIVE bad !
+	way to go asshole, you killed the hostage!
+	who killed the hostage ?!
+	was that u that killed the hostage TEAMMATEALIVE ?
+	I think the hostages try to die
+##############################################
+# chat texts of currently killing bots
+##############################################
+[kill]
+<all>
+	got ya
+	got ya, bloody VICTIM
+	U should have known, VICTIM, my WEAPON is my best friend :)
+	How do the bullets from my WEAPON feel, VICTIM ?
+	Hey VICTIM, you should have taken a WEAPON, too :p
+	MUHAHAHAHAAAHAA
+	BOTNAME will kill ya all
+	My Name is BOTNAME, but u may call me god
+	And I told u : If u wanna think u can play cstrike, never fight against BOTNAME !!
+	And now I'll try to get ENEMYALIVE !
+	lol
+	that was easy
+	newbie
+	I like MAP
+	should have ducked VICTIM
+	u were never any good VICTIM
+	should have run when u had the chance VICTIM
+	that'll teach ya VICTIM !
+	Walk towards the light VICTIM
+	AAAAAAHHHHHH !!!
+	More newbies please !
+	Ouch, that had to hurt VICTIM
+	Kneel before me VICTIM
+	Try practicing against some bots VICTIM
+	Were you trying to die VICTIM ?
+	BOTNAME owns you
+	Run from BOTNAME !
+	You've got that death scene down pat VICTIM
+	You die well VICTIM
+	Try shooting back next time VICTIM
+	VICTIM stinks!
+	I think VICTIM was a noobie
+	owned u VICTIM
+	killed ya again VICTIM
+	I get tired of killing you VICTIM
+<te>
+	Haha, wannabe - policeman
+	Haha, wannabe - marine
+	some guys have to go before we'll be able to set up a new government
+	Are there still guys who think, that terrorists are not able to fight ?!
+	BOTNAME rules !!
+	ha ha, u died for the cause VICTIM !
+	thanx for helping my score VICTIM
+	See ya in Hell VICTIM !
+	Hope you had life insurance VICTIM
+	BOTNAME owns you
+	How's it feel to be a hero VICTIM ?
+	owned u VICTIM
+	I got one, now it's ur turn TEAMMATEALIVE
+<ct>
+	The good one is still the best one
+	I thought you guys had training camps ?!
+	I always feel a twinge of guilt
+	HA! and the government pays me for this
+	sorry VICTIM I had to do it
+	one less badguy in the world
+	I feel bad about that VICTIM
+	Ha, VICTIM, you're a martyr now !
+	we'll kill all you terrorists !
+	BOTNAME owns you
+	owned u VICTIM
+##############################################
+# chat texts of dead bots
+##############################################
+[dead]
+<all>
+	Are here any bots playin ??
+	Oh no, today is a bad day
+	I hate campers
+	did anyone play de_sandrush ? quite nice ...
+	I don't hate campers, but i hate u, DEAD!
+	Let's votemap 9 - I hate this map
+	Does anybody like this 'MAP' ?
+	I don't really know this map
+	Did u see the news yesterday ?? - really crazy
+	Did you already visit www.botepidemic.com/joebot ?
+	have u already seen www.fsg-preetz.de ?
+	oh, let's vote against ENEMYALIVE, he destroys the whole game
+	doesn't he see him ?
+	where are u from DEAD ?
+	Hi DEAD what's up?
+	ALIVE is playing really good
+	I'm sure, TEAMMATEALIVE will make it !
+	i think i've to clean up my NNs to make me play better
+	greetz to botman - the father of all bots
+	This is much better than the last version of JOEBot 
+	Hey! human, you stink
+	u're getting better
+	dumb bots
+	zzzzzz...
+	ENEMYALIVE is cheating !
+	don't these bots look like they're using a wallhack ?
+	lag kill
+	this is lame
+	you should stick with solitaire DEAD
+	time for a mapchange ain't it ?
+	I hate this game
+	ha ! newbie bots !
+	wake me DEAD when it's over
+	How about some back up ?
+	Backup, what's backup ?
+	what are they doin ?
+	Did you see that ?
+	Quit cheating DEAD
+	Yeah! Right
+	Pathetic
+	ENEMYALIVE is one dumb bot
+	Doh !!
+	This server stinks
+	Somedays it pays to be a bot
+	when they spin in circles, I get dizzy
+<te>
+	typical counter attack
+	t's rule
+	the ct's don't have a clue
+	TEAMMATEALIVE doesn't have a clue
+	ENEMYALIVE is cheating
+	I want a de map next
+	We could start planing our next attack awhile
+	Another good bot is FoxBot, for TFC
+	At least I'm a martyr now
+	I guess I'm in Hell now huh? That explains why I'm so hot
+	Whatever this job paid, it wasn't worth it !
+	Kill them all and start a new round
+	this waypoint file stinks
+	this is rediculous
+	did you guys ever hear of teamwork?
+	Try Botmixer 5000, I wanna kill some PODBots
+	I was born a bad bot
+	This MAP favors the ct's too much
+	u stupid ct's talk too much
+	do any of u guys know how to get this aimbot to work ?
+	damn! ENEMYALIVE is stupid
+	hey! where's all those virgins I was promised ?!
+	ENEMYALIVE needs to practice against bots or something
+	I think TEAMMATEALIVE is an uncover ct, he can't really suck that hard
+	don't tell me! another bot is stuck again right?
+	good plan there DEAD
+<ct>
+	typical terror attack ...
+	what motivates a terrorist ?
+	ct's rule
+	I think there's cheating going on
+	What map's next ?
+	One of our guys better call for reinforcements
+	ParaBot, for HL, is also a great bot !
+	Hey DEAD I can see all my dead relatives !
+	A dead ct is a hero, a dead t is just dead
+	ENEMYALIVE doesn't have a clue
+	TEAMMATEALIVE deserves a medal
+	What do you mean, I'm a bot ?!
+	Maybe we should try playing as a team ?
+	JoeBot is sweeeeeeet !
+	time to download some new maps
+	JoeBot is cool, needs more wpts thou
+	Botmixer 5000, it's awesome !
+	This MAP favors the te's too much
+	you damn terrorists talk too much
+	that's the last time we let TEAMMATEALIVE make the plan
+	hey DEAD weren't you banned for cheating ?
+##############################################
+# chat texts of bots remarking a team attack
+##############################################
+[teamattack]
+<all>
+	Be careful TKPLAYER
+	Are u crazy, TKPLAYER !?
+	Dumb, TKPLAYER, dumb
+	is mp_tkpunish on ?!
+	TKPLAYER is a teamkiller !!!
+	WTF !!! Hey, TEAMMATEALIVE let's get TKPLAYER
+	TKPLAYER, watch your six, dude !
+	Watch your back TKPLAYER !
+	You're supposed to shoot the other team TKPLAYER
+	why TKPLAYER ?
+	you'r an idiot TKPLAYER
+	forget what team you'r on TKPLAYER ?
+	somebody kick TKPLAYER
+	can't manage to shoot them so u turn on us, huh TKPLAYER
+	you know what they say about payback TKPLAYER
+	you'r the best guy on their team TKPLAYER
+	Don't let that happen again TKPLAYER
+	uuummm... what team are you on TKPLAYER ?
+	your a fuckin moron TKPLAYER
+	what comes around goes around TKPLAYER
+	hey TKPLAYER nice shot dumbass
+	turn friendlyfire off, TKPLAYER is at it again !
+	why doesn't the admin boot TKPLAYER ?
+	watch it TKPLAYER !
+	I'm on your side TKPLAYER
+<te>
+	TKPLAYER you jerk go to CTs if you like to shoot on terrorists !
+	Even though we're badguys, we don't shoot each other TKPLAYER
+	forget you were a terrorist TKPLAYER ?
+	do you know what a ct looks like TKPLAYER ?
+	hello! thats one of ours TKPLAYER
+	wait till we get back to base TKPLAYER u damn tk'er
+	u shoot me one more time TKPLAYER and i'm gonna kick ur ass
+<ct>
+	TKPLAYER you fool go to Ts if you like to shoot on counter-terrorists !
+	TKPLAYER, did u ever hear of goodguys shooting each other ?
+	Forget you'r a ct TKPLAYER ?
+	identify your target TKPLAYER !
+	TKPLAYER you moron, don't u know what a terrorist looks like ?!
+	check your fire TKPLAYER
+	you're going on report TKPLAYER
+	friendly fire is on TKPLAYER
+	ugh ! friendly fire from TKPLAYER again !
+	TKPLAYER is working for the t's !!
+
+[reply]
+
+@KEY AGAIN
+%s, things are always repeating - aren't they?
+And I'm sure it wasn't the last time...
+That's the way things go, hey...
+
+@KEY AIMBOT,WALLHACK
+%s, are you cheating ?
+Even PunkBuster fails to detect some of them...
+You can't be sure nowadays if someones's good at playing or cheats
+Aimbots are cool, shut up %s!
+Wallhacks are evil tools of the devil ;)
