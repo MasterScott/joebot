@@ -815,7 +815,7 @@ int WaypointFindNearestGoal(edict_t *pEntity, int src, int team, int flags,float
 int WaypointFindNearestGoal(Vector v_src, edict_t *pEntity, float range, int team, int flags,float fMin)
 {
 	int index, min_index;
-	int distance, min_distance;
+	float distance, min_distance;
 	
 	if (num_waypoints < 1)
 		return -1;
@@ -966,7 +966,7 @@ int WaypointFindNearestAiming(Vector v_origin)
 {
 	int index;
 	int min_index = -1;
-	int min_distance = 9999999.0;
+	float min_distance = 9999999.0;
 	float distance;
 	
 	if (num_waypoints < 1)
@@ -1631,7 +1631,7 @@ void WaypointDelete(edict_t *pEntity)
 	{
 		int i;
 		int min_index = -1;
-		int min_distance = 9999999.0;
+		float min_distance = 9999999.0;
 		float distance;
 		
 		// search for nearby aiming waypoint and delete it also...
