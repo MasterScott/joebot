@@ -28,6 +28,11 @@
 #include "extdll.h"
 #include "util.h"
 
+#ifdef USE_METAMOD
+#define SDK_UTIL_H  // util.h already included
+#include "meta_api.h"
+#endif /* USE_METAMOD */
+
 #include "bot_wpdir.h"
 
 CBotWPDir :: CBotWPDir(){
@@ -90,7 +95,7 @@ int CBotWPDir :: Load(const char *szFileName){			// load WPDir into ram ...
 					strcpy(szPDir[lNum].szDir,szName);
 					char szFilePath[256];
 					UTIL_BuildFileName(szFilePath,"joebot/wpjs",szName);
-					cout << "JoeBOT: adding wp-directory : " << szFilePath << endl;
+					LOG_MESSAGE(PLID, "Adding wp-directory: %s", szFilePath);
 					lNum++;
 				}
 				else{

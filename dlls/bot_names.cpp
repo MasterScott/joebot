@@ -28,6 +28,11 @@
 #include "extdll.h"
 #include "util.h"
 
+#ifdef USE_METAMOD
+#define SDK_UTIL_H  // util.h already included
+#include "meta_api.h"
+#endif /* USE_METAMOD */
+
 #include "bot_names.h"
 #include "Commandfunc.h"
 
@@ -82,7 +87,7 @@ bool CBotNames::load(const char *szFileName){
 		if(fhd = fopen(szFileName,"r")){
 			bInited = true;
 			if (IS_DEDICATED_SERVER())
-				printf("JoeBOT: Loading names from file : %s\n", szFileName);
+				LOG_MESSAGE(PLID, "Loading names from file: %s", szFileName);
 
 			//fread(szFileContent,sizeof(char),lFileSize,fhd);
 
