@@ -32,27 +32,19 @@
 #include "CCommand.h"
 #include "Commandfunc.h"
 
-CLListElem *CCommand :: AllocNewItem(void){
-	return new CCommand;
-}
-
 CCommand :: CCommand(){
 	*szName = 0;
 	*sz2Name = 0;
 	iType = 0;
 	pFunc = 0;
-	//prev = next = 0;
 }
 
 CCommand :: ~CCommand(){
-	this->CLListElem::~CLListElem();
 }
 
 // commands
 
 CCommands ::CCommands(){
-	LCom = 0;
-
 	AddCommand("addbot",		"ab",		(void*)bc_addbot,CM_ALL);
 	AddCommand("mix_names",		"mn",		(void*)bc_mix_names,CM_ALL);
 	AddCommand("welcome",		"welcome_message",(void*)bc_welcome,CM_ALL);
@@ -122,7 +114,7 @@ CCommands ::CCommands(){
 }
 
 CCommands ::~CCommands(){
-#ifndef __BORLANDC__
+/*#ifndef __BORLANDC__
 	CCommand *p,*pp;
 	p=LCom;
 	while(p){
@@ -134,28 +126,23 @@ CCommands ::~CCommands(){
 		pp = (CCommand*)pp->prev;
 		delete p;
 	}
-#endif /* __BORLANDC__ */
+#endif*/ /* __BORLANDC__ */
 }
 
 bool CCommands :: AddCommand(const char *n,const char *n2,void *p,int iT){
-	CCommand *last;
-	if(!LCom){
-		last = LCom = new CCommand;
-	}
-	else{
-		last = (CCommand*)LCom->NewItem();
-	}
-	last->iType = iT;
-	last->pFunc = ((bool (*)(edict_t *p,int iType,const char *arg1,const char *arg2,const char *arg3, const char *arg4))(p));
-	strcpy(last->szName,n);
-	strcpy(last->sz2Name,n2);
+	CCommand temp;
+	
+	temp.iType = iT;
+	temp.pFunc = ((bool (*)(edict_t *p,int iType,const char *arg1,const char *arg2,const char *arg3, const char *arg4))(p));
+	strcpy(temp.szName,n);
+	strcpy(temp.sz2Name,n2);
 
-	lNum++;
+	m_LCommands.push_back(temp);
 	return true;
 }
 
 bool CCommands ::Exec(edict_t *pEntity,int iType,const char *cmd,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
-	CCommand *p;
+	std::list<CCommand>::iterator iter;
 
 	if(!arg1)arg1="";
 	if(!arg2)arg2="";
@@ -164,18 +151,18 @@ bool CCommands ::Exec(edict_t *pEntity,int iType,const char *cmd,const char *arg
 
 	//cout << cmd <<" --- "<<arg1<<" --- "<<arg2<<" --- "<<arg3<<" --- "<<arg4<<endl;
 
-	p = LCom;
-	while(p){
-		//cout << p->szName << endl;
-		if((strlen(p->szName)
-				&&FStrEq(p->szName,cmd))
-			||(strlen(p->sz2Name)
-				&&FStrEq(p->sz2Name,cmd))){
-			if(p->iType & iType){
-				return p->pFunc(pEntity,iType,arg1,arg2,arg3,arg4);
+	iter = m_LCommands.begin();
+	while(iter != m_LCommands.end()){
+		//cout << (*iter).szName << endl;
+		if((strlen((*iter).szName)
+				&&FStrEq((*iter).szName,cmd))
+			||(strlen((*iter).sz2Name)
+				&&FStrEq((*iter).sz2Name,cmd))){
+			if((*iter).iType & iType){
+				return (*iter).pFunc(pEntity,iType,arg1,arg2,arg3,arg4);
 			}
 		}
-		p = (CCommand*)p->next;
+		iter ++;
 	}
 	return false;
 }

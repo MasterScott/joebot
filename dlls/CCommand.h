@@ -22,20 +22,25 @@
 #define _CCOMMAND_H
 
 #include "extdll.h"
-#include "LListElem.h"
+
+#ifdef __MINGW32__
+#include <list.h>
+#else
+#include <list>
+#endif
 
 #define CM_CONSOLE		(1<<0)
 #define CM_DEDICATED	(1<<1)
 #define CM_SCRIPT		(1<<2)
 #define CM_ALL			(1<<0)|(1<<1)|(1<<2)
 
-class CCommand : public CLListElem{
+class CCommand{
 	friend class CCommands;
 public:
 	CCommand();
 	~CCommand();
 
-	virtual CLListElem * AllocNewItem(void);
+	//virtual CLListElem * AllocNewItem(void);
 
 	bool (*pFunc) (edict_t *p,int iType,const char *arg1,const char *arg2,const char *arg3, const char *arg4);
 	char szName[32];
@@ -51,9 +56,7 @@ public:
 	bool Exec(edict_t*,int,const char*,const char *,const char *,const char *,const char *);
 	bool AddCommand(const char *,const char *,void *,int);
 
-	long lNum;
-	CCommand *LCom;
-		//*last;
+	std::list<CCommand> m_LCommands;
 };
 
 #endif //_CCOMMAND_H
