@@ -60,6 +60,7 @@ char *g_argv;
 GETENTITYAPI other_GetEntityAPI = NULL;
 GETNEWDLLFUNCTIONS other_GetNewDLLFunctions = NULL;
 GIVEFNPTRSTODLL other_GiveFnptrsToDll = NULL;
+SERVER_GETBLENDINGINTERFACE other_Server_GetBlendingInterface = NULL;
 #endif /* not USE_METAMOD */
 
 int mod_id = -1;
@@ -134,7 +135,7 @@ BOOL WINAPI DllMain(
 #if defined(__BORLANDC__) || defined(__MINGW32__)
 extern "C" DLLEXPORT void EXPORT GiveFnptrsToDll( enginefuncs_t* pengfuncsFromEngine, globalvars_t *pGlobals )
 #else
-extern "C" void DLLEXPORT GiveFnptrsToDll( enginefuncs_t* pengfuncsFromEngine, globalvars_t *pGlobals )
+void DLLEXPORT GiveFnptrsToDll( enginefuncs_t* pengfuncsFromEngine, globalvars_t *pGlobals )
 #endif
 #else
 extern "C" DLLEXPORT void GiveFnptrsToDll( enginefuncs_t* pengfuncsFromEngine, globalvars_t *pGlobals )
@@ -144,15 +145,19 @@ extern "C" DLLEXPORT void GiveFnptrsToDll( enginefuncs_t* pengfuncsFromEngine, g
    char game_name[32];
    char game_dll[256];
 
+   struct stat buf;
+   if (stat("valve/steam.inf", &buf) == 0 || stat("FileSystem_Steam.dll", &buf) == 0)
+      g_bIsSteam = true;
+
    // get the engine functions from the engine...
-   memcpy(&g_engfuncs, pengfuncsFromEngine, sizeof(enginefuncs_t));
+   if (g_bIsSteam)
+      memcpy(&g_engfuncs, pengfuncsFromEngine, sizeof(enginefuncs_t));
+   else
+      memcpy(&g_engfuncs, pengfuncsFromEngine, 144 * sizeof(uint32));
+  		 
    gpGlobals = pGlobals;
    
    // check if we're running under Steam
-   struct stat buf;
-   if (stat("valve/steam.inf", &buf) == 0)
-	   g_bIsSteam = true;
-
    // find the directory name of the currently running MOD...
    GET_GAME_DIR(game_dir);
    UTIL_normalize_pathname(game_dir);
@@ -220,6 +225,14 @@ extern "C" DLLEXPORT void GiveFnptrsToDll( enginefuncs_t* pengfuncsFromEngine, g
 		ALERT( at_error, "[JOEBOT] Can't get MOD's GiveFnptrsToDll!\n" );
    }
 
+   other_Server_GetBlendingInterface = (SERVER_GETBLENDINGINTERFACE)GetProcAddress(h_Library, "Server_GetBlendingInterface");
+
+   if (other_Server_GetBlendingInterface == NULL)
+   {
+      // Can't find Server_GetBlendingInterface!
+
+		ALERT( at_error, "[JOEBOT] Can't get MOD's Server_GetBlendingInterface!\n" );
+   }
 
 #ifdef _WIN32
    LoadSymbols(game_dll);  // Load exported symbol table
