@@ -21,6 +21,12 @@
 #ifndef __GLOBALVARS_H
 #define __GLOBALVARS_H
 
+#include "bot_names.h"
+#include "bot_wpdir.h"
+#include "bot_wpstat.h"
+#include "CSDecals.h"
+#include "CSkill.h"
+
 //#define _ROAMBEAM
 
 class CBotBase;
@@ -37,7 +43,7 @@ extern CBaseNeuralNetFF *NNCombat;
 extern CBaseNeuralNetFF *NNColl;
 class NNWeapon;
 extern NNWeapon WeaponDefs;
-extern void (*Buy[2][32])(CBotBase *);
+extern void (*Buy[32])(CBotBase *);
 
 /*extern edict_t *pSmokeG[_MAXGRENADEREC];
 extern bool bSmokeG[_MAXGRENADEREC];
@@ -151,6 +157,7 @@ extern bool		g_bAutowpHuman;
 extern long		lbeam;
 extern bool		g_bJoinWHumanMAX;
 extern bool		g_bJoinWHumanRES;
+extern bool		g_bIsSteam;
 
 extern char szTemp[200];
 
@@ -169,7 +176,6 @@ extern float f_timesrs;
 
 extern bool bBotsShoot;
 
-#include "bot_wpstat.h"
 extern CWPStat WPStat;
 
 extern AWP_EntLogItem AWP_ED[32];
@@ -210,4 +216,4 @@ extern bool bLoadedLPB;
 
 extern edict_t *listenserver_edict;
 
-#endif  __GLOBALVARS_H
+#endif //__GLOBALVARS_H
