@@ -22,7 +22,7 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#if !defined(__LLISTELEM_H)
+#ifndef __LLISTELEM_H
 #define __LLISTELEM_H
 
 class CLListElem  
@@ -38,4 +38,4 @@ public:
 protected :
 };
 
-#endif // !defined(__LLISTELEM_H)
+#endif //__LLISTELEM_H
