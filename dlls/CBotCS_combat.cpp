@@ -103,7 +103,7 @@ void CBotCS :: Fight( void ){
 		lEnWeapon = WeaponModel2ID(STRING(pBotEnemy->v.weaponmodel));
 		
 		/* Get Data for NN*/
-		dCombatNNIn[IWeapon]		= WeaponDefs.dpWeaV[mod_id][current_weapon.iId];
+		dCombatNNIn[IWeapon]		= WeaponDefs.dpWeaV[mod_id][current_weapon.iId];		// is this weapon more long or short range ?
 		dCombatNNIn[IHealth]		= double(bot_health)/50.0-1.0;
 		dCombatNNIn[IDistance]		= ConvertDistance(fEnemyDist);
 		dCombatNNIn[IEWeapon]		= WeaponDefs.dpWeaV[mod_id][lEnWeapon]/*bot_angles.x/180.0*/;
@@ -118,7 +118,7 @@ void CBotCS :: Fight( void ){
 		
 		NNCombat->SetInput(dCombatNNIn);
 		NNCombat->Propagate();
-		NNCombat->GetOutput(dCombatNNOut);	// copy the outputs of the output layers to this field
+		NNCombat->GetOutput(dCombatNNOut);	// copy the outputs of the output layer to this field
 		
 		f_NNNUpdate = gpGlobals->time + (1.0f / gnn_update);
 		// collect data for SOM

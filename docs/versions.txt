@@ -10,7 +10,7 @@
 
 Current Leading Developer on Sourceforge/joebot
 
-- @$3.1415rin
+- @$3.1415rin a.k.a. Johannes Lampel
 
 
 Current Developer on Sourceforge/joebot
@@ -20,6 +20,8 @@ Current Developer on Sourceforge/joebot
 ----------------------------------------------------------------------------------------------
 -- This Bot is based on botman's HPB_bot - template code - http://planethalflife.com/botman --
 ----------------------------------------------------------------------------------------------
+
+- number of names in bot_names.txt is now unlimited.
 
 JoeBOT 1.6.2
 - Windows Version is now botmixer compatible too
