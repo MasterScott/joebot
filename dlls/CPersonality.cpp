@@ -33,9 +33,9 @@
 
 #include "bot_modid.h"
 #include "bot_weapons.h"
+#include "globalvars.h"
 
 char *szDefaultChatFile = "texts.txt";
-extern int mod_id;
 
 CPersonality :: CPersonality(){
 	strcpy(szChatfile,szDefaultChatFile);
