@@ -1164,16 +1164,34 @@ bool CBotCS :: HandleOrders(void){		// this fucntion is called every second
 bool CBotCS :: IsBehindSG(edict_t *pPlayer){
 	long lschl;
 	Vector VB,VVG,VVP, VVB;
+	float fGDistance;
+	float fPDistance;
+	float fDotBorder;
 	
-	VVP = (pPlayer->v.origin - pEdict->v.origin).Normalize();
+	VVP = pPlayer->v.origin - pEdict->v.origin;
+	fPDistance = VVP.Length();
+	VVP = VVP * (1.f / fPDistance);		// normalize
 	
 	for(lschl=0;lschl < _MAXGRENADEREC;lschl++){
 		if(gSmoke[lschl].bUsed){
-			VVG = (gSmoke[lschl].VOrigin - pEdict->v.origin).Normalize();
-			VB = Vector(VVG.y,VVG.x,0)/*CrossProduct(VVG,Vector(0,0,1))).Normalize()*/ * _SMOKERADIUS + gSmoke[lschl].VOrigin;
-			VVB = (VB - pEdict->v.origin).Normalize();
+			VVG = gSmoke[lschl].VOrigin - pEdict->v.origin;
+			fGDistance = VVG.Length();
+			if(fGDistance > fPDistance + _SMOKERADIUS/2)		// if that player is a lot in front of the grenade ...
+				continue;
+
+			VVG = VVG * (1.f/fGDistance);		// normalize
+			//VB = Vector(VVG.y,VVG.x,0)/*CrossProduct(VVG,Vector(0,0,1))).Normalize()*/ * _SMOKERADIUS + gSmoke[lschl].VOrigin;
+			// ( what's anyway this replacement of the crossproduct ? did I do that ? holy shit !
+			// 
+			fDotBorder = fGDistance / sqrt(fGDistance * fGDistance + _SMOKERADIUS*_SMOKERADIUS);
+		
+			//VVB = (VB - pEdict->v.origin).Normalize();
 			
-			if(DotProduct(VVG,VVP) > DotProduct(VVG,VVB)){
+			// if the dotproduct of ( connection from here to smokegrenade and connection from here to origin to see )
+			// is bigger than dotproduct of ( connection from here to smokegrenade and connection from here to border of
+			// possible smoke area )
+
+			if(DotProduct(VVG,VVP) > fDotBorder /*DotProduct(VVG,VVB)*/){
 				return true;
 			}
 		}
