@@ -2161,17 +2161,17 @@ void CBotBase :: InstantTurn(void){
 void CBotBase :: MakeName(char *szName,const char *szBotName,int iSkill,float fAgg){
 	if(CVAR_BOOL(jb_prefixaggression)){
 		if(fAgg < -.5){
-			snprintf(szName,sizeof(szName),"%s%s",jb_prefixdefensive->string,szBotName);
+			sprintf(szName,"%s%s",jb_prefixdefensive->string,szBotName);
 		}
 		else if(fAgg > .5){
-			snprintf(szName,sizeof(szName),"%s%s",jb_prefixaggressive->string,szBotName);
+			sprintf(szName,"%s%s",jb_prefixaggressive->string,szBotName);
 		}
 		else{
-			snprintf(szName,sizeof(szName),"%s%s",jb_prefixnormal->string,szBotName);
+			sprintf(szName,"%s%s",jb_prefixnormal->string,szBotName);
 		}
 	}
 	else{
-		snprintf(szName,sizeof(szName),"%s",szBotName);
+		sprintf(szName,"%s",szBotName);
 	}
 	
 	if(CVAR_BOOL(jb_suffixskill)){
