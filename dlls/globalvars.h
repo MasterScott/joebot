@@ -116,6 +116,7 @@ extern float bot_check_time;
 extern bool		g_bBombPlanted;
 extern float	g_iBombExplode;
 extern bool		g_bBombDropped;
+extern bool		bNNInit;
 extern bool		bNNInitError;
 extern float	TIMETOBEBORED;
 extern float	TIMEBEINGBORED;
