@@ -151,6 +151,7 @@ extern float f_LastRadio;
 
 extern float f_timesrs;
 extern float f_round_start;
+extern float f_start_round;
 
 extern float gf_5th;
 extern bool g_b5th;

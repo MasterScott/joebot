@@ -1780,7 +1780,8 @@ void CBotCS :: Think1(void){
 				f_lastWP = gpGlobals -> time;
 				i_CurrWP = -1;
 				
-				Jump();		// if the bot is longer time blocked it should jump to get of fuckin ladders at least sometimes - although it may hurt :)
+				if (gpGlobals->time > f_start_round)	// don't jump during freeze time
+					Jump();		// if the bot is longer time blocked it should jump to get of fuckin ladders at least sometimes - although it may hurt :)
 				
 				//FakeClientCommand(pEdict,"say resetting wpstuff");
 			}

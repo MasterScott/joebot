@@ -172,6 +172,7 @@ edict_t* pfnFindEntityByString(edict_t *pEdictStartSearchAfter, const char *pszF
 		}
 		g_pVIP=0;
 		f_round_start = gpGlobals->time;
+		f_start_round = f_round_start + g_mp_freezetime->value;
 		g_bBombPlanted = false;
 		g_bBombDropped = false;
 		
