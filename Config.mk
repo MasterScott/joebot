@@ -18,6 +18,8 @@ else
  OBJDIR_RELEASE = $(OBJDIR_RELEASE_LINUX)
 endif
 
+SERVERDIR = /home/netgames/hlds_l/cstrike/joebot
+
 EXTRA_CFLAGS =
 
 ifneq ($(DLLTYPE),std)
