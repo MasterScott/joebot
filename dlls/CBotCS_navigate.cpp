@@ -1621,7 +1621,7 @@ bool CBotCS :: DecideOnWay(void){
 						else
 							lDestination = WaypointFindRandomGoal(pEdict->v.origin,pEdict,100000,bot_teamnm,W_FL_SNIPER);
 						if(lDestination != -1){
-							Task.AddTask(BT_GOTO|BT_CAMPATGOAL,0,lDestination,(void *) iWantedDiv,RANDOM_LONG(g_fmin_std_swp,g_fmax_std_swp));
+							Task.AddTask(BT_GOTO|BT_CAMPATGOAL,0,lDestination,(void *) iWantedDiv,RANDOM_LONG(long(g_fmin_std_swp),long(g_fmax_std_swp)));
 							return true;
 						}
 					}
@@ -1672,7 +1672,7 @@ bool CBotCS :: DecideOnWay(void){
 						else
 							lDestination = WaypointFindRandomGoal(pEdict->v.origin,pEdict,100000,bot_teamnm,W_FL_SNIPER);
 						if(lDestination != -1){
-							Task.AddTask(BT_GOTO|BT_CAMPATGOAL,0,lDestination,(void *) iWantedDiv,RANDOM_LONG(g_fmin_std_swp,g_fmax_std_swp));
+							Task.AddTask(BT_GOTO|BT_CAMPATGOAL,0,lDestination,(void *) iWantedDiv,RANDOM_LONG(long(g_fmin_std_swp),long(g_fmax_std_swp)));
 							return true;
 						}
 					}
@@ -1725,7 +1725,7 @@ bool CBotCS :: DecideOnWay(void){
 						else
 							lDestination = WaypointFindRandomGoal(pEdict->v.origin,pEdict,100000,bot_teamnm,W_FL_SNIPER);
 						if(lDestination != -1){
-						Task.AddTask(BT_GOTO|BT_CAMPATGOAL,0,lDestination,(void *) iWantedDiv,RANDOM_LONG(g_fmin_std_swp,g_fmax_std_swp));
+						Task.AddTask(BT_GOTO|BT_CAMPATGOAL,0,lDestination,(void *) iWantedDiv,RANDOM_LONG(long(g_fmin_std_swp),long(g_fmax_std_swp)));
 						return true;
 					}
 					}
@@ -1819,7 +1819,7 @@ bool CBotCS :: DecideOnWay(void){
 						else
 							lDestination = WaypointFindRandomGoal(pEdict->v.origin,pEdict,100000,bot_teamnm,W_FL_SNIPER);
 						if(lDestination != -1){
-						Task.AddTask(BT_GOTO|BT_CAMPATGOAL,0,lDestination,(void *) iWantedDiv,RANDOM_LONG(g_fmin_std_swp,g_fmax_std_swp));
+						Task.AddTask(BT_GOTO|BT_CAMPATGOAL,0,lDestination,(void *) iWantedDiv,RANDOM_LONG(long(g_fmin_std_swp),long(g_fmax_std_swp)));
 						return true;
 					}
 					}
@@ -1909,7 +1909,7 @@ bool CBotCS :: DecideOnWay(void){
 						iWantedDiv = 1;
 					}
 					if(lDestination != -1){
-						Task.AddTask(BT_GOTO|BT_CAMPATGOAL,0,lDestination,(void *) iWantedDiv,RANDOM_LONG(g_fmin_std_swp,g_fmax_std_swp));
+						Task.AddTask(BT_GOTO|BT_CAMPATGOAL,0,lDestination,(void *) iWantedDiv,RANDOM_LONG(long(g_fmin_std_swp),long(g_fmax_std_swp)));
 						return true;
 					}
 				}
@@ -1937,7 +1937,7 @@ bool CBotCS :: DecideOnWay(void){
 						lDestination = WaypointFindNearestGoal(pEdict->v.origin,pEdict,100000,bot_teamnm,W_FL_SNIPER);
 					}
 					if(lDestination != -1){
-						Task.AddTask(BT_GOTO|BT_CAMPATGOAL,0,lDestination,(void *) iWantedDiv,RANDOM_LONG(g_fmin_std_swp,g_fmax_std_swp));
+						Task.AddTask(BT_GOTO|BT_CAMPATGOAL,0,lDestination,(void *) iWantedDiv,RANDOM_LONG(long(g_fmin_std_swp),long(g_fmax_std_swp)));
 						return true;
 					}
 				}

@@ -416,7 +416,7 @@ void CBotDOD :: UpdateSkill(void){
 	f_TPD				= temp.fTPD;
 	f_ProneInDistance	= temp.fProneInDistance;
 	f_ProneTPD			= temp.fProneTPD;
-	i_ITP				= temp.fITurnProb;
+	i_ITP				= int(temp.fITurnProb);
 	f_MaxRecoil			= temp.fMaxRecoil;
 	
 	char *infobuffer;
@@ -746,7 +746,7 @@ void CBotDOD :: Init (void){
 	f_RWKnife = gpGlobals->time + 120.0;	// just some time
 	f_blinded_time=0;
 	f_gotohostage = 0;
-	f_Bored = gpGlobals->time + RANDOM_LONG(-TIMETOBEBORED*2/3,TIMETOBEBORED/2);
+	f_Bored = gpGlobals->time + RANDOM_LONG(long(-TIMETOBEBORED*2/3),long(TIMETOBEBORED/2));
 	//	f_Hide = 0;
 	//	pHidefrom = 0;
 	//	f_GotoHidingPlace = 0;
@@ -1320,7 +1320,7 @@ void CBotDOD :: Think(void){
 		HandleMenu();
 		
 		g_engfuncs.pfnRunPlayerMove( pEdict, pEdict->v.v_angle, 0.0,
-			0, 0, pEdict->v.button, 0, g_msecval);
+			0, 0, pEdict->v.button, 0, byte(g_msecval));
 		
 		FixIdealYaw();				// this fixes a bug, which does onl occurr in de_dust, cs_gamma_assault etc.
 		
@@ -1341,7 +1341,7 @@ void CBotDOD :: Think(void){
 			SpawnInit();
 		
 		g_engfuncs.pfnRunPlayerMove( pEdict, pEdict->v.v_angle, f_move_speed,
-			0, 0, lButton, 0, g_msecval);
+			0, 0, lButton, 0, byte(g_msecval));
 		
 		return;
 	}
@@ -1832,7 +1832,7 @@ void CBotDOD :: Think(void){
 	pEdict->v.button = lButton;			// copy the new pressed buttons to the right location
 	
 	g_engfuncs.pfnRunPlayerMove( pEdict, pEdict->v.v_angle, f_move_speed,
-		f_strafe, 0, pEdict->v.button, 0, g_msecval);
+		f_strafe, 0, pEdict->v.button, 0, byte(g_msecval));
 	
 	//BotFixIdealYaw(pEdict);
 	
