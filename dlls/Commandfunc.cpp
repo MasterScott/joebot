@@ -29,6 +29,11 @@
 #include "util.h"
 #include "cvardef.h"
 
+#ifdef USE_METAMOD
+#define SDK_UTIL_H  // util.h already included
+#include "meta_api.h"
+#endif /* USE_METAMOD */
+
 #include "Commandfunc.h"
 
 #include "bot_func.h"
@@ -297,6 +302,7 @@ cvar_t *jb_wpautojumptest;
 cvar_t *jb_wpautoadvanced;
 cvar_t *jb_wpstats;
 cvar_t *jb_wprecalc;
+cvar_t *jb_wploadrandom;
 cvar_t *jb_prefixdefensive;
 cvar_t *jb_prefixnormal;
 cvar_t *jb_prefixaggressive;
@@ -306,6 +312,7 @@ cvar_t *jb_skillmax;
 cvar_t *jb_entergame;
 cvar_t *jb_jointeam;
 cvar_t *jb_spraypaint;
+cvar_t *jb_buyprobfile;
 cvar_t *jb_showen;
 cvar_t *jb_debugengine;
 
@@ -344,6 +351,7 @@ cvar_t init_jb_wpautojumptest   = {"jb_wpautojumptest", "1", 0, 1};
 cvar_t init_jb_wpautoadvanced   = {"jb_wpautoadvanced", "1", 0, 1};
 cvar_t init_jb_wpstats          = {"jb_wpstats", "1", 0, 1};
 cvar_t init_jb_wprecalc         = {"jb_wprecalc", "1", 0, 1};
+cvar_t init_jb_wploadrandom     = {"jb_wploadrandom", "1", 0, 1};
 cvar_t init_jb_prefixdefensive  = {"jb_prefixdefensive", "[J0E]", 0, 0};
 cvar_t init_jb_prefixnormal     = {"jb_prefixnormal", "[JoE]", 0, 0};
 cvar_t init_jb_prefixaggressive = {"jb_prefixaggressive", "[JOE]", 0, 0};
@@ -353,10 +361,11 @@ cvar_t init_jb_skillmax         = {"jb_skillmax", "", 0, _DEFAULTSKILL};
 cvar_t init_jb_entergame        = {"jb_entergame", "1", 0, 1};
 cvar_t init_jb_jointeam         = {"jb_jointeam", "1", 0, 1};
 cvar_t init_jb_spraypaint       = {"jb_spraypaint", "1", 0, 1};
+cvar_t init_jb_buyprobfile      = {"jb_buyprobfile", "botbuyweapons.cfg", 0, 0};
 cvar_t init_jb_showen           = {"jb_showen", "0", 0, 0};
 cvar_t init_jb_debugengine      = {"jb_debugengine", "0", 0, 0};
 
-void JBRegCvars(void)
+void RegisterCvars(void)
 {
 	static bool bRegDone = false;
 
@@ -397,6 +406,7 @@ void JBRegCvars(void)
 	CVAR_REGISTER(&init_jb_wpautoadvanced);
 	CVAR_REGISTER(&init_jb_wpstats);
 	CVAR_REGISTER(&init_jb_wprecalc);
+	CVAR_REGISTER(&init_jb_wploadrandom);
 	CVAR_REGISTER(&init_jb_prefixdefensive);
 	CVAR_REGISTER(&init_jb_prefixnormal);
 	CVAR_REGISTER(&init_jb_prefixaggressive);
@@ -406,6 +416,7 @@ void JBRegCvars(void)
 	CVAR_REGISTER(&init_jb_entergame);
 	CVAR_REGISTER(&init_jb_jointeam);
 	CVAR_REGISTER(&init_jb_spraypaint);
+	CVAR_REGISTER(&init_jb_buyprobfile);
 	CVAR_REGISTER(&init_jb_showen);
 	CVAR_REGISTER(&init_jb_debugengine);
 
@@ -444,6 +455,7 @@ void JBRegCvars(void)
 	jb_wpautoadvanced   = CVAR_GET_POINTER("jb_wpautoadvanced");
 	jb_wpstats          = CVAR_GET_POINTER("jb_wpstats");
 	jb_wprecalc         = CVAR_GET_POINTER("jb_wprecalc");
+	jb_wploadrandom     = CVAR_GET_POINTER("jb_wploadrandom");
 	jb_prefixdefensive  = CVAR_GET_POINTER("jb_prefixdefensive");
 	jb_prefixnormal     = CVAR_GET_POINTER("jb_prefixnormal");
 	jb_prefixaggressive = CVAR_GET_POINTER("jb_prefixaggressive");
@@ -453,6 +465,7 @@ void JBRegCvars(void)
 	jb_entergame        = CVAR_GET_POINTER("jb_entergame");
 	jb_jointeam         = CVAR_GET_POINTER("jb_jointeam");
 	jb_spraypaint       = CVAR_GET_POINTER("jb_spraypaint");
+	jb_buyprobfile      = CVAR_GET_POINTER("jb_buyprobfile");
 	jb_showen           = CVAR_GET_POINTER("jb_showen");
 	jb_debugengine      = CVAR_GET_POINTER("jb_debugengine");
 
@@ -485,7 +498,7 @@ void UpdateLanguage(void)
 			show_menu_4		= F_show_menu_4;
 			show_menu_5		= F_show_menu_5;
 			break;
-		case LANG_E:
+		case LANG_EN:
 		default:
 			show_menu_1		= E_show_menu_1;
 			show_menu_2		= E_show_menu_2;
@@ -498,23 +511,6 @@ void UpdateLanguage(void)
 			show_menu_5		= E_show_menu_5;
 			break;
 	}
-}
-
-void ClientPrintEx( entvars_t *client, int msg_dest, const char *msg_name, const char *param1, const char *param2, const char *param3, const char *param4 )
-{
-	if(IS_DEDICATED_SERVER() && client == 0){
-		if(msg_name)	cout << msg_name;
-		if(param1)		cout << param1;
-		if(param2)		cout << param2;
-		if(param3)		cout << param3;
-		if(param4)		cout << param4;
-		cout.flush();
-	}
-	else
-		if(client)
-			ClientPrint(client,msg_dest,msg_name,param1,param2,param3,param4);
-		else if(listenserver_edict)
-			ClientPrint(VARS(listenserver_edict),msg_dest,msg_name,param1,param2,param3,param4);
 }
 
 /*
@@ -536,18 +532,18 @@ bool bc_addbot(edict_t *pEntity,int iType,const char *arg1,const char *arg2,cons
 
 bool bc_mix_names(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	if (FStrEq(arg1, "on")){
-		if (IS_DEDICATED_SERVER())printf("Note that this command has only effect before adding bots\n");
+		if (IS_DEDICATED_SERVER())UTIL_ConsoleMessage(pEntity, "NOTE: This command only takes effect before adding bots\n");
 		CVAR_SET_FLOAT("jb_mixnames", 1);
 	}
 	else if (FStrEq(arg1, "off")){
-		if (IS_DEDICATED_SERVER())printf("Note that this command has only effect before adding bots\n");
+		if (IS_DEDICATED_SERVER())UTIL_ConsoleMessage(pEntity, "NOTE: This command only takes effect before adding bots\n");
 		CVAR_SET_FLOAT("jb_mixnames", 0);
 	}
 	if ( bool(jb_mixnames->value) ){
-		if (IS_DEDICATED_SERVER())printf("Bot names are random\n");
+		if (IS_DEDICATED_SERVER())UTIL_ConsoleMessage(pEntity, "Bot names order is random\n");
 	}
 	else{
-		if (IS_DEDICATED_SERVER())printf("Bot names' order is like in bot_names.txt \n");
+		if (IS_DEDICATED_SERVER())UTIL_ConsoleMessage(pEntity, "Bot names follow order in bot_names.txt\n");
 	}
 	return true;
 }
@@ -561,20 +557,20 @@ bool bc_welcome(edict_t *pEntity,int iType,const char *arg1,const char *arg2,con
 	}
 	if(bool(jb_msgwelcome->value)){
 		if(IS_DEDICATED_SERVER()){
-			cout << "JoeBOT: Welcome messages are ON" << endl;
+			UTIL_ConsoleMessage(pEntity, "Welcome messages are ON\n");
 		}
 	}
 	else{
 		if(IS_DEDICATED_SERVER()){
-			cout << "JoeBOT: Welcome messages are OFF" << endl;
+			UTIL_ConsoleMessage(pEntity, "Welcome messages are OFF\n");
 		}
 	}
 	return true;
 }
 
 bool bc_endround(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
-	cout<< "JoeBOT: Endround"<<endl;
 	Endround();
+	UTIL_ConsoleMessage(pEntity, "Round ended\n");
 	return true;
 }
 
@@ -586,12 +582,11 @@ bool bc_extjoe(edict_t *pEntity,int iType,const char *arg1,const char *arg2,cons
 		CVAR_SET_FLOAT("jb_prefixaggression", 0);
 	}
 	if(bool(jb_prefixaggression->value)){
-		sprintf(szTemp,"JoeBOT: Names are extended by : %s:%s,%s\n",jb_prefixaggressive->string,jb_prefixnormal->string,jb_prefixdefensive->string);
+		UTIL_ConsoleMessage(pEntity, "Bot name aggression prefix is ON (%s, %s or %s)\n",jb_prefixaggressive->string,jb_prefixnormal->string,jb_prefixdefensive->string);
 	}
 	else{
-		sprintf(szTemp,"JoeBOT: Names are not extended by : %s:%s,%s\n",jb_prefixaggressive->string,jb_prefixnormal->string,jb_prefixdefensive->string);
+		UTIL_ConsoleMessage(pEntity, "Bot name aggression prefix is OFF\n");
 	}
-	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
 	return true;
 }
 
@@ -603,12 +598,11 @@ bool bc_extskill(edict_t *pEntity,int iType,const char *arg1,const char *arg2,co
 		CVAR_SET_FLOAT("jb_suffixskill", 0);
 	}
 	if(bool(jb_suffixskill->value)){
-		sprintf(szTemp,"JoeBOT: Names are extended by (skill)\n");
+		UTIL_ConsoleMessage(pEntity, "Bot name skill suffix is ON\n");
 	}
 	else{
-		sprintf(szTemp,"JoeBOT: Names are not extended by (skill)\n");
+		UTIL_ConsoleMessage(pEntity, "Bot name skill suffix is OFF\n");
 	}
-	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
 	return true;
 }
 
@@ -619,8 +613,7 @@ bool bc_min_bots(edict_t *pEntity,int iType,const char *arg1,const char *arg2,co
 		min_bots = 0;
 	
 	CVAR_SET_FLOAT("jb_botsmin", min_bots);
-	sprintf(szTemp, "JoeBOT: min_bots set to %d\n", min_bots);
-	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
+	UTIL_ConsoleMessage(pEntity,  "min_bots set to %d\n", min_bots);
 	return true;
 }
 
@@ -631,37 +624,34 @@ bool bc_max_bots(edict_t *pEntity,int iType,const char *arg1,const char *arg2,co
 		max_bots = 0;
 	
 	CVAR_SET_FLOAT("jb_botsmax", max_bots);
-	sprintf(szTemp, "JoeBOT: max_bots set to %d\n", max_bots);
-	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
+	UTIL_ConsoleMessage(pEntity,  "max_bots set to %d\n", max_bots);
 	return true;
 }
 
 bool bc_kickbots(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	if (FStrEq(arg1, "te")||FStrEq(arg1, "1")){
-		KickBots(pEntity,TE,1);
+		KickBots(pEntity,CS_TEAM_TE,1);
 	}
 	else if (FStrEq(arg1, "ct")||FStrEq(arg1, "2")){
-		KickBots(pEntity,CT,1);
+		KickBots(pEntity,CS_TEAM_CT,1);
 	}
 	else if (FStrEq(arg1, "all")||FStrEq(arg1, "5")){
 		KickBots(pEntity,-1,1);
 	}
 	else{
-		sprintf(szTemp,"Usage : kickbots [ct/te/all]\n");
-		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
+		UTIL_ConsoleMessage(pEntity, "Usage: kickbots [ct/te/all]\n");
 	}
 	return true;
 }
 bool bc_kickbot(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	if (arg1&&(FStrEq(arg1, "te")||FStrEq(arg1, "1"))){
-		KickBots(pEntity,TE,0);
+		KickBots(pEntity,CS_TEAM_TE,0);
 	}
 	else if (arg1&&(FStrEq(arg1, "ct")||FStrEq(arg1, "2"))){
-		KickBots(pEntity,CT,0);
+		KickBots(pEntity,CS_TEAM_CT,0);
 	}
 	else{
-		sprintf(szTemp,"Usage : kickbot [ct/te]\n");
-		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
+		UTIL_ConsoleMessage(pEntity, "Usage: kickbot [ct/te]\n");
 	}
 	return true;
 }
@@ -669,8 +659,7 @@ bool bc_kickbot(edict_t *pEntity,int iType,const char *arg1,const char *arg2,con
 bool bc_leetposs(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	float leetposs = atof(arg1);
 	CVAR_SET_FLOAT("jb_chat1337", leetposs);
-	sprintf(szTemp,"JoeBOT: possibility for leet is @ %f\nJoeBOT: note that this has only an effect for bots which will be added later.\n",leetposs);
-	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
+	UTIL_ConsoleMessage(pEntity, "Possibility for leet is @ %f\nNOTE: This takes effect only for bots added later\n",leetposs);
 	return true;
 }
 
@@ -689,16 +678,15 @@ bool bc_botchat(edict_t *pEntity,int iType,const char *arg1,const char *arg2,con
 		CVAR_SET_FLOAT("jb_chat", 1);
 	}
 	if(bool(jb_chat->value)){
-		sprintf(szTemp,"JoeBOT: Bots are chatting @ %fs\n",jb_chatfreq->value);
+		UTIL_ConsoleMessage(pEntity, "Bot chat frequenty set @ %fs\n",jb_chatfreq->value);
 		/*if(listenserver_edict);
 			CLIENT_COMMAND(listenserver_edict,"speak \"talk system is on\"\n");*/
 	}
 	else{
-		sprintf(szTemp,"JoeBOT: The bots are quiet\n");
+		UTIL_ConsoleMessage(pEntity, "Bots are quiet\n");
 		/*if(listenserver_edict);
 			CLIENT_COMMAND(listenserver_edict,"speak \"talk system is off\"\n");*/
 	}
-	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
 	return true;
 }
 
@@ -716,27 +704,25 @@ bool bc_botichat(edict_t *pEntity,int iType,const char *arg1,const char *arg2,co
 		CVAR_SET_FLOAT("jb_chati", IC_ALL);
 	}
 	else{
-		sprintf(szTemp,"bot_ichat usage is : bot_ichat [off/dead/alive/all]\n");
-		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
+		UTIL_ConsoleMessage(pEntity, "Usage: bot_ichat [off/dead/alive/all]\n");
 	}
 	switch(int(jb_chati->value)){
 	case IC_NONE:
-		sprintf(szTemp,"JoeBOT: The interactive chat won't be used.\n");
+		UTIL_ConsoleMessage(pEntity, "Interactive chat is OFF\n");
 		break;
 	case IC_DEAD:
-		sprintf(szTemp,"JoeBOT: The interactive chat will only be used by dead bots.\n");
+		UTIL_ConsoleMessage(pEntity, "Interactive chat is ON for bots that are dead\n");
 		break;
 	case IC_ALIVE:
-		sprintf(szTemp,"JoeBOT: The interactive chat will only be used by alive bots.\n");
+		UTIL_ConsoleMessage(pEntity, "Interactive chat is ON for bots that are alive\n");
 		break;
 	case IC_ALL:
-		sprintf(szTemp,"JoeBOT: The interactive chat will be used by all bots.\n");
+		UTIL_ConsoleMessage(pEntity, "Interactive chat is ON\n");
 		break;
 	default:
-		sprintf(szTemp,"JoeBOT: Internal error\n");
+		UTIL_ConsoleMessage(pEntity, "Internal error\n");
 		break;
 	}
-	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
 	return true;
 }
 
@@ -748,24 +734,21 @@ bool bc_botuseradio(edict_t *pEntity,int iType,const char *arg1,const char *arg2
 		CVAR_SET_FLOAT("jb_msgradio", 0);
 	}
 	if(bool(jb_msgradio->value)){
-		sprintf(szTemp,"Bots are using the radio\n");
+		UTIL_ConsoleMessage(pEntity, "Bots use radio commands\n");
 	}
 	else{
-		sprintf(szTemp,"Bots are quiet - no radio commands\n");
+		UTIL_ConsoleMessage(pEntity, "Bots don't use radio commands\n");
 	}
-	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
 	return true;
 }
 
 bool bc_botmomentum(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	if (FStrEq(arg1, "default")){
 		CVAR_SET_FLOAT("jb_aimmomentum", 1.0 - ( atof(arg2) / 100.0 ));
-		sprintf(szTemp,"Default view momentum is set to %f - for bots already added, there has been no change !\n",100.0-jb_aimmomentum->value*100);
-		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
+		UTIL_ConsoleMessage(pEntity, "Default view momentum is set to %f - for bots already added, there has been no change!\n",100.0-jb_aimmomentum->value*100);
 	}
 	if (FStrEq(arg1, "getdefault")||FStrEq(arg1, "get")){
-		sprintf(szTemp,"Default view momentum is %f\n",100.0-jb_aimmomentum->value*100);
-		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
+		UTIL_ConsoleMessage(pEntity, "Default view momentum is %f\n",100.0-jb_aimmomentum->value*100);
 	}
 	else if (FStrEq(arg1, "all")){
 		float f_AMomentum = atof (arg2);
@@ -784,12 +767,10 @@ bool bc_botmomentum(edict_t *pEntity,int iType,const char *arg1,const char *arg2
 				}
 			}
 			CVAR_SET_FLOAT("jb_aimmomentum", 1.0 - ( f_AMomentum / 100.0 ));
-			sprintf(szTemp,"View Momentum is set to %f for all bots and the default.\n",f_AMomentum);
-			ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
+			UTIL_ConsoleMessage(pEntity, "View Momentum is set to %f for all bots and the default.\n",f_AMomentum);
 		}
 		else{
-			sprintf(szTemp,"There has been no changes in terms of accuracy ... the value has to be between 0 and 100\n");
-			ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
+			UTIL_ConsoleMessage(pEntity, "There has been no changes in terms of accuracy ... the value has to be between 0 and 100\n");
 		}
 	}
 	else{		// arg1 can be a name of a bot ... let's search
@@ -807,20 +788,17 @@ bool bc_botmomentum(edict_t *pEntity,int iType,const char *arg1,const char *arg2
 								f_AMomentum = 99;
 							}
 							bots[i]->f_AMomentum = 1.0-f_AMomentum/100.0;
-							sprintf(szTemp,"View Momentum is set to %f for %s\n",f_AMomentum,STRING(bots[i]->pEdict->v.netname));
-							ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
+							UTIL_ConsoleMessage(pEntity, "View Momentum is set to %f for %s\n",f_AMomentum,STRING(bots[i]->pEdict->v.netname));
 							break;
 						}
 					}
 					else{
-						sprintf(szTemp,"There has been no changes in terms of accuracy ... the value has to be between 0 and 100\n");
-						ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
+						UTIL_ConsoleMessage(pEntity, "There has been no changes in terms of accuracy ... the value has to be between 0 and 100\n");
 					}
 				}
 			}
 			if(i==32){	// ... no bot found
-				sprintf(szTemp,"%s wasn't found ... is it a bot ?!\n",arg1);
-				ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
+				UTIL_ConsoleMessage(pEntity, "%s wasn't found ... is it a bot ?!\n",arg1);
 			}
 		}
 	}
@@ -830,12 +808,10 @@ bool bc_botmomentum(edict_t *pEntity,int iType,const char *arg1,const char *arg2
 bool bc_botvspeed(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	if (FStrEq(arg1, "default")){
 		CVAR_SET_FLOAT("jb_aimspeed", atof(arg2) / 100.0);
-		sprintf(szTemp,"Default aiming speed is set to %f - for bots already added, there has been no change !\n",jb_aimspeed->value*100);
-		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
+		UTIL_ConsoleMessage(pEntity, "Default aiming speed set to %f - for bots already added, there has been no change !\n",jb_aimspeed->value*100);
 	}
 	if (FStrEq(arg1, "getdefault")||FStrEq(arg1, "get")){
-		sprintf(szTemp,"Default aiming speed is %f\n",jb_aimspeed->value*100.0);
-		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
+		UTIL_ConsoleMessage(pEntity, "Default aiming speed is %f\n",jb_aimspeed->value*100.0);
 	}
 	else if (FStrEq(arg1, "all")){
 		float f_ASpeed = atof (arg2);
@@ -854,12 +830,10 @@ bool bc_botvspeed(edict_t *pEntity,int iType,const char *arg1,const char *arg2,c
 				}
 			}
 			CVAR_SET_FLOAT("jb_aimspeed", f_ASpeed / 100.0);
-			sprintf(szTemp,"Aiming speed is set to %f for all bots and the default.\n",f_ASpeed);
-			ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
+			UTIL_ConsoleMessage(pEntity, "Aiming speed set to %f for all bots and the default.\n",f_ASpeed);
 		}
 		else{
-			sprintf(szTemp,"There has been no changes in terms of view speed change ... the value has to be between 0 and 200\n");
-			ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
+			UTIL_ConsoleMessage(pEntity, "There has been no changes in terms of view speed change ... the value has to be between 0 and 200\n");
 		}
 	}
 	else{		// arg1 can be a name of a bot ... let's search
@@ -877,20 +851,17 @@ bool bc_botvspeed(edict_t *pEntity,int iType,const char *arg1,const char *arg2,c
 								f_AMomentum = 199;
 							}
 							bots[i]->f_ASpeed = 1.0-f_AMomentum/100.0;
-							sprintf(szTemp,"View change speed is set to %f for %s\n",f_AMomentum,STRING(bots[i]->pEdict->v.netname));
-							ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
+							UTIL_ConsoleMessage(pEntity, "View change speed set to %f for %s\n",f_AMomentum,STRING(bots[i]->pEdict->v.netname));
 							break;
 						}
 					}
 					else{
-						sprintf(szTemp,"There has been no changes in terms of accuracy ... the value has to be between 0 and 200\n");
-						ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
+						UTIL_ConsoleMessage(pEntity, "There has been no changes in terms of accuracy ... the value has to be between 0 and 200\n");
 					}
 				}
 			}
 			if(i==32){	// ... no bot found
-				sprintf(szTemp,"%s wasn't found ... is it a bot ?!\n",arg1);
-				ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
+				UTIL_ConsoleMessage(pEntity, "%s wasn't found ... is it a bot ?!\n",arg1);
 			}
 		}
 	}
@@ -900,12 +871,10 @@ bool bc_botvspeed(edict_t *pEntity,int iType,const char *arg1,const char *arg2,c
 bool bc_botskill(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	if (FStrEq(arg1, "default")){
 		CVAR_SET_FLOAT("jb_skillmin", atof(arg2));
-		sprintf(szTemp,"Default skill is set to %i - for bots already added, there has been no change !\n",jb_skillmin->value);
-		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
+		UTIL_ConsoleMessage(pEntity, "Default skill set to %i - for bots already added, there has been no change !\n",jb_skillmin->value);
 	}
 	if (FStrEq(arg1, "getdefault")||FStrEq(arg1, "get")){
-		sprintf(szTemp,"Default skill is %i\n",jb_skillmin->value);
-		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
+		UTIL_ConsoleMessage(pEntity, "Default skill is %i\n",jb_skillmin->value);
 	}
 	else if (FStrEq(arg1, "all")){
 		int i_Skill = atoi (arg2);
@@ -919,12 +888,10 @@ bool bc_botskill(edict_t *pEntity,int iType,const char *arg1,const char *arg2,co
 				}
 			}
 			CVAR_SET_FLOAT("jb_skillmin", i_Skill);
-			sprintf(szTemp,"Skill is set to %i for all bots and the default.\n",i_Skill);
-			ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
+			UTIL_ConsoleMessage(pEntity, "Skill is set to %i for all bots and the default\n",i_Skill);
 		}
 		else{
-			sprintf(szTemp,"There has been no changes in terms of accuracy ... the value has to be between 0 and 100\n");
-			ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
+			UTIL_ConsoleMessage(pEntity, "There has been no changes in terms of accuracy ... the value has to be between 0 and 100\n");
 		}
 	}
 	else{		// arg1 can be a name of a bot ... let's search
@@ -937,20 +904,17 @@ bool bc_botskill(edict_t *pEntity,int iType,const char *arg1,const char *arg2,co
 						if(f_AMomentum >= 0 && f_AMomentum <= 100){
 							bots[i]->bot_skill = int(f_AMomentum);
 							bots[i]->UpdateSkill();
-							sprintf(szTemp,"Skill set to %.0f for %s\n",f_AMomentum,STRING(bots[i]->pEdict->v.netname));
-							ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
+							UTIL_ConsoleMessage(pEntity, "Skill set to %.0f for %s\n",f_AMomentum,STRING(bots[i]->pEdict->v.netname));
 							break;
 						}
 					}
 					else{
-						printf(szTemp,"There has been no changes in terms of accuracy ... the value has to be between 0 and 100");
-						ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
+						UTIL_ConsoleMessage(pEntity, "There has been no changes in terms of accuracy ... the value has to be between 0 and 100\n");
 					}
 				}
 			}
 			if(i==32){	// ... no bot found
-				sprintf(szTemp,"%s wasn't found ... is it a bot ?!\n",arg1);
-				ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
+				UTIL_ConsoleMessage(pEntity, "%s wasn't found ... is it a bot ?!\n",arg1);
 			}
 		}
 	}
@@ -959,8 +923,7 @@ bool bc_botskill(edict_t *pEntity,int iType,const char *arg1,const char *arg2,co
 
 bool bc_resetstat(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	WPStat.Init();
-	sprintf(szTemp,"JoeBOT: Statistics have been resetted\n");
-	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
+	UTIL_ConsoleMessage(pEntity, "Statistics have been reset\n");
 	return true;
 }
 
@@ -972,8 +935,7 @@ bool bc_nnupdate(edict_t *pEntity,int iType,const char *arg1,const char *arg2,co
 	else
 		CVAR_SET_FLOAT("jb_nnupdaterate", ftemp);
 	
-	sprintf(szTemp,"NNs are now running @ %f updates/s, if the framerate is high enough\n",jb_nnupdaterate->value);
-	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
+	UTIL_ConsoleMessage(pEntity, "NNs now running @ %f updates/s, if the framerate is high enough\n",jb_nnupdaterate->value);
 	return true;
 }
 
@@ -985,37 +947,27 @@ bool bc_campposs(edict_t *pEntity,int iType,const char *arg1,const char *arg2,co
 	else
 		CVAR_SET_FLOAT("jb_campprobability", ftemp);
 	
-	sprintf(szTemp,"camping possibility is set to %f ( 100 -> very low; 0 -> all the time )\n",jb_campprobability->value);
-	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
+	UTIL_ConsoleMessage(pEntity, "Camping possibility is set to %f ( 100 -> very low; 0 -> all the time )\n",jb_campprobability->value);
 	return true;
 }
 
 bool bc_wps(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
-	sprintf(szTemp,"map    : %s\n",WPStat.wpsHeader.szMapname);
-	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY,szTemp, NULL, NULL, NULL, NULL);
-	sprintf(szTemp,"Kill   : %li\n",WPStat.d.lKill);
-	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY,szTemp, NULL, NULL, NULL, NULL);
-	sprintf(szTemp,"Killed : %li\n",WPStat.d.lKilled);
-	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY,szTemp, NULL, NULL, NULL, NULL);
+	UTIL_ConsoleMessage(pEntity, "Map   : %s\n",WPStat.wpsHeader.szMapname);
+	UTIL_ConsoleMessage(pEntity, "Kill  : %li\n",WPStat.d.lKill);
+	UTIL_ConsoleMessage(pEntity, "Killed: %li\n",WPStat.d.lKilled);
 	return true;
 }
 
 bool bc_nnstat(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	// combat net
-	sprintf(szTemp,"NNSim Version : %s\n",NNCombat->Version());
-	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY,szTemp, NULL, NULL, NULL, NULL);
-	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "------------ CombatNN :\n", NULL, NULL, NULL, NULL);
-	sprintf(szTemp,"Prop       : %li\n",NNCombat->m_lNumProp);
-	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY,szTemp, NULL, NULL, NULL, NULL);
-	sprintf(szTemp,"BProp      : %li\n",((CNeuralNetBProp *)NNCombat)->m_lNumBProp);
-	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY,szTemp, NULL, NULL, NULL, NULL);
+	UTIL_ConsoleMessage( pEntity,  "NNSim version: %s\n",NNCombat->Version());
+	UTIL_ConsoleMessage( pEntity,  "------------ CombatNN :\n");
+	UTIL_ConsoleMessage( pEntity,  "Prop : %li\n",NNCombat->m_lNumProp);
+	UTIL_ConsoleMessage( pEntity,  "BProp: %li\n",((CNeuralNetBProp *)NNCombat)->m_lNumBProp);
 	// collision net
-	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "------------ CollNN :\n", NULL, NULL, NULL, NULL);
-	sprintf(szTemp,"Prop       : %li\n",NNColl->m_lNumProp);
-	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY,szTemp, NULL, NULL, NULL, NULL);
-	sprintf(szTemp,"BProp      : %li\n",((CNeuralNetBProp *)NNColl)->m_lNumBProp);
-	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY,szTemp, NULL, NULL, NULL, NULL);
-	
+	UTIL_ConsoleMessage( pEntity,  "------------ CollNN :\n");
+	UTIL_ConsoleMessage( pEntity,  "Prop : %li\n",NNColl->m_lNumProp);
+	UTIL_ConsoleMessage( pEntity,  "BProp: %li\n",((CNeuralNetBProp *)NNColl)->m_lNumBProp);
 	return true;
 }
 
@@ -1027,12 +979,11 @@ bool bc_edown(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const
 		CVAR_SET_FLOAT("jb_msgenemydown", 0);
 	}
 	if(bool(jb_msgenemydown->value)){
-		sprintf(szTemp,"Bots report \"Enemy down\"\n");
+		UTIL_ConsoleMessage(pEntity, "Bots report \"Enemy down\"\n");
 	}
 	else{
-		sprintf(szTemp,"Bots don't report \"Enemy down\"\n");
+		UTIL_ConsoleMessage(pEntity, "Bots don't report \"Enemy down\"\n");
 	}
-	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
 	return true;
 }
 
@@ -1053,7 +1004,7 @@ bool bc_search(edict_t *pEntity,int iType,const char *arg1,const char *arg2,cons
 	fhd=fopen("logent  -  search.txt","a");
 	fprintf(fhd,"%s\n",item_name);
 	fclose(fhd);
-	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, item_name, NULL, NULL, NULL, NULL);
+	UTIL_ConsoleMessage( pEntity,  item_name);
 	while ((pent = UTIL_FindEntityInSphere( pent, pEntity->v.origin,300)) != NULL)
 	{
 		float fDistance = (pEntity->v.origin-pent->v.origin).Length();
@@ -1089,15 +1040,14 @@ bool bc_search(edict_t *pEntity,int iType,const char *arg1,const char *arg2,cons
 		fhd=fopen("logent  -  search.txt","a");
 		fprintf(fhd,"%s\n",item_name);
 		fclose(fhd);
-		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, item_name, NULL, NULL, NULL, NULL);
+		UTIL_ConsoleMessage( pEntity,  item_name);
 	};
 	return true;
 }
 
 bool bc_savesom(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	SP.Save("combat.spt");
-	sprintf(szTemp,"JoeBOT: som data saved\n");
-	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
+	UTIL_ConsoleMessage(pEntity, "som data saved\n");
 	return true;
 }
 
@@ -1117,25 +1067,16 @@ bool bc_botshoot(edict_t *pEntity,int iType,const char *arg1,const char *arg2,co
 	if (FStrEq(arg1, "on"))
 	{
 		CVAR_SET_FLOAT("jb_shoot", 1);
-		
-		sprintf(szTemp,"Bots shoot\n");
-		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
 	}
 	else if (FStrEq(arg1, "off"))
 	{
 		CVAR_SET_FLOAT("jb_shoot", 0);
-		
-		sprintf(szTemp,"Bots don't like violence any more\n");
-		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
+	}
+	if (bool(jb_shoot->value)){
+		UTIL_ConsoleMessage(pEntity, "Bots shoot is ON (they aren't friendly)\n");
 	}
 	else{
-		if ( !bool(jb_shoot->value) ){
-			sprintf(szTemp,"Bots are friendly\n");
-		}
-		else{
-			sprintf(szTemp,"Bots shoot\n");
-		}
-		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
+		UTIL_ConsoleMessage(pEntity, "Bots shoot is OFF (they don't like violence anymore)\n");
 	}
 	
 	return true;
@@ -1151,19 +1092,17 @@ bool bc_bottkpunish(edict_t *pEntity,int iType,const char *arg1,const char *arg2
 		CVAR_SET_FLOAT("jb_tkpunish", 0);
 	}
 	if (bool(jb_tkpunish->value)){
-		sprintf(szTemp,"They'll sometimes shoot at a teamm8 after a tk\n");
+		UTIL_ConsoleMessage(pEntity, "Bots tkpunish is ON (they sometimes shoot at a teamm8 after a tk)\n");
 	}
 	else{
-		sprintf(szTemp,"They won't shoot at teamm8 after tk\n");
+		UTIL_ConsoleMessage(pEntity, "Bots tkpunish is OFF (they don't shoot at teamm8 after tk)\n");
 	}
-	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
 	
 	return true;
 }
 
 bool bc_showen(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
-	sprintf(szTemp,"\"showen\" - This command is only to be used for debugging purposes by the author, %s !\n\0",STRING(pEntity->v.netname));
-	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
+	UTIL_ConsoleMessage(pEntity, "\"showen\" - This command is only to be used for debugging purposes by the author, %s !\n\0",STRING(pEntity->v.netname));
 	
 	if (FStrEq(arg1, "on")){
 		CVAR_SET_FLOAT("jb_showen", 1);
@@ -1178,15 +1117,14 @@ bool bc_showen(edict_t *pEntity,int iType,const char *arg1,const char *arg2,cons
 bool bc_debug_engine(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	debug_engine = 1;
 	
-	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "debug_engine enabled!\n", NULL, NULL, NULL, NULL);
+	UTIL_ConsoleMessage( pEntity,  "debug_engine enabled!\n");
 	
 	return true;
 }
 
 bool bc_getp(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
-	sprintf(szTemp,"%.0f,%.0f,%.0f\n",pEntity->v.origin.x,pEntity->v.origin.y,pEntity->v.origin.z);
+	UTIL_ConsoleMessage(pEntity, "%.0f, %.0f, %.0f\n",pEntity->v.origin.x,pEntity->v.origin.y,pEntity->v.origin.z);
 	
-	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
 	return true;
 }
 
@@ -1300,11 +1238,11 @@ bool bc_menuselect(edict_t *pEntity,int iType,const char *arg1,const char *arg2,
 			}
 			else if (FStrEq(arg1, "7")){
 				if(WaypointLoad(pEntity))
-					ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "waypoints loaded\n", NULL, NULL, NULL, NULL);
+					UTIL_ConsoleMessage( pEntity,  "waypoints loaded\n");
 			}
 			else if (FStrEq(arg1, "8")){
 				WaypointSave(pEntity);
-				ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "waypoints saved\n", NULL, NULL, NULL, NULL);
+				UTIL_ConsoleMessage( pEntity,  "waypoints saved\n");
 			}
 			else if (FStrEq(arg1, "9")){
 				g_menu_state = MENU_2b;  // display pathwp menu
@@ -1366,12 +1304,12 @@ bool bc_menuselect(edict_t *pEntity,int iType,const char *arg1,const char *arg2,
 			if (FStrEq(arg1, "1") && g_menu_waypoint!=-1){
 				waypoints[g_menu_waypoint].flags |= W_FL_TEAM_SPECIFIC;
 				waypoints[g_menu_waypoint].flags &= 0xfffffffc;	// del bits 0 and 1
-				waypoints[g_menu_waypoint].flags |= CT;
+				waypoints[g_menu_waypoint].flags |= CS_TEAM_CT;
 			}
 			else if (FStrEq(arg1, "2") && g_menu_waypoint!=-1){
 				waypoints[g_menu_waypoint].flags |= W_FL_TEAM_SPECIFIC;
 				waypoints[g_menu_waypoint].flags &= 0xfffffffc;	// del bits 0 and 1
-				waypoints[g_menu_waypoint].flags |= TE;
+				waypoints[g_menu_waypoint].flags |= CS_TEAM_TE;
 			}
 			else if (FStrEq(arg1, "3") && g_menu_waypoint!=-1){
 				waypoints[g_menu_waypoint].flags &= ~W_FL_TEAM_SPECIFIC;
@@ -1427,16 +1365,16 @@ bool bc_menuselect(edict_t *pEntity,int iType,const char *arg1,const char *arg2,
 		}
 		else if (g_menu_state == MENU_4){  // kick bot
 			if (FStrEq(arg1, "1")){
-				KickBots(pEntity,TE,0);
+				KickBots(pEntity,CS_TEAM_TE,0);
 			}
 			else if (FStrEq(arg1, "2")){
-				KickBots(pEntity,CT,0);
+				KickBots(pEntity,CS_TEAM_CT,0);
 			}
 			else if (FStrEq(arg1, "3")){
-				KickBots(pEntity,TE,1);
+				KickBots(pEntity,CS_TEAM_TE,1);
 			}
 			else if (FStrEq(arg1, "4")){
-				KickBots(pEntity,CT,1);
+				KickBots(pEntity,CS_TEAM_CT,1);
 			}
 			else if (FStrEq(arg1, "5")){
 				KickBots(pEntity,-1,1);
@@ -1444,7 +1382,7 @@ bool bc_menuselect(edict_t *pEntity,int iType,const char *arg1,const char *arg2,
 		}
 		else if (g_menu_state == MENU_5){  // language
 			if (FStrEq(arg1, "1")){
-				CVAR_SET_FLOAT("jb_language", LANG_E);
+				CVAR_SET_FLOAT("jb_language", LANG_EN);
 				UpdateLanguage();
 			}
 			else if (FStrEq(arg1, "2")){
@@ -1462,32 +1400,31 @@ bool bc_menuselect(edict_t *pEntity,int iType,const char *arg1,const char *arg2,
 }
 
 bool bc_language(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
-	if (FStrEq(arg1, "fr"))
-	{
+	if (FStrEq(arg1, "fr")) {
 		CVAR_SET_FLOAT("jb_language", LANG_FR);
-		
-		sprintf(szTemp,"JoeBOT: The Language of the BotMenu is FRENCH\n");
 	}
-	
-	else if (FStrEq(arg1, "de"))
-	{
+	else if (FStrEq(arg1, "de")) {
 		CVAR_SET_FLOAT("jb_language", LANG_DE);
-		
-		sprintf(szTemp,"JoeBOT: The Language of the BotMenu is GERMAN\n");
 	}
-	else if (FStrEq(arg1, "e"))
-	{
-		CVAR_SET_FLOAT("jb_language", LANG_E);
-		
-		sprintf(szTemp,"JoeBOT: The Language of the BotMenu is ENGLISH\n");
+	else if (FStrEq(arg1, "e")) {
+		CVAR_SET_FLOAT("jb_language", LANG_EN);
 	}
-	else
-	{
-		CVAR_SET_FLOAT("jb_language", LANG_E);
-		
-		sprintf(szTemp,"JoeBOT: Unrecognized parameter : The Language of the BotMenu is ENGLISH\n");
+	else {
+		UTIL_ConsoleMessage(pEntity, "Usage: language [fr/de/e]\n");
 	}
-	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
+	switch(int(jb_language->value)) {
+		case LANG_FR:
+			UTIL_ConsoleMessage(pEntity, "Bot menu language is FRENCH\n");
+			break;
+		case LANG_DE:
+			UTIL_ConsoleMessage(pEntity, "Bot menu language is GERMAN\n");
+			break;
+		case LANG_EN:
+			UTIL_ConsoleMessage(pEntity, "Bot menu language is ENGLISH\n");
+			break;
+		default:
+			;
+	}
 	UpdateLanguage();
 	return true;
 }
@@ -1502,7 +1439,7 @@ bool bc_debuggoal(edict_t *pEntity,int iType,const char *arg1,const char *arg2,c
 					  bots[ischl]->Task.AddTask(BT_GOTO,-1,iWP,(void*)atoi(arg2),0);
 				  }
 			  }
-			  ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "All bots got this WP as target to go to.\n", NULL, NULL, NULL, NULL);
+			  UTIL_ConsoleMessage( pEntity,  "All bots got this WP as target to go to.\n");
 		  }
 		  return true;
 }
@@ -1527,13 +1464,13 @@ bool bc_waypoint(edict_t *pEntity,int iType,const char *arg1,const char *arg2,co
 		  {
 			  CVAR_SET_FLOAT("jb_wp", 1);
 			  
-			  ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "waypoints are ON\n", NULL, NULL, NULL, NULL);
+			  UTIL_ConsoleMessage( pEntity,  "waypoints are ON\n");
 		  }
 		  else if (FStrEq(arg1, "off"))
 		  {
 			  CVAR_SET_FLOAT("jb_wp", 0);
 			  
-			  ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "waypoints are OFF\n", NULL, NULL, NULL, NULL);
+			  UTIL_ConsoleMessage( pEntity,  "waypoints are OFF\n");
 		  }
 		  else if (FStrEq(arg1, "addstuff")){
 			  WaypointAddStuff();
@@ -1572,8 +1509,7 @@ bool bc_waypoint(edict_t *pEntity,int iType,const char *arg1,const char *arg2,co
 		  else if (FStrEq(arg1, "creator"))
 		  {
 			  strcpy(szWPCreator,arg2);
-			  sprintf(szTemp,"The creator of the waypoints is named : %s\n",szWPCreator);
-			  ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
+			  UTIL_ConsoleMessage(pEntity, "The creator of the waypoints is named: %s\n",szWPCreator);
 		  }
 		  else if (FStrEq(arg1, "add"))
 		  {
@@ -1643,15 +1579,15 @@ bool bc_waypoint(edict_t *pEntity,int iType,const char *arg1,const char *arg2,co
 		  else if (FStrEq(arg1, "save"))
 		  {
 			  if(WaypointSave(pEntity,arg2)){
-				  ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "waypoints saved\n", NULL, NULL, NULL, NULL);
+				  UTIL_ConsoleMessage( pEntity,  "waypoints saved\n");
 			  }
 			  else{
-				  ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "Error while processing this directive\n", NULL, NULL, NULL, NULL);
+				  UTIL_ConsoleMessage( pEntity,  "Error while processing this directive\n");
 			  }
 		  }
 		  else if (FStrEq(arg1, "load")){
 			  if (WaypointLoad(pEntity))
-				  ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "waypoints loaded\n", NULL, NULL, NULL, NULL);
+				  UTIL_ConsoleMessage( pEntity,  "waypoints loaded\n");
 		  }
 		  else if (FStrEq(arg1, "info")){
 			  WaypointPrintInfo(pEntity);
@@ -1661,7 +1597,7 @@ bool bc_waypoint(edict_t *pEntity,int iType,const char *arg1,const char *arg2,co
 		  }
 		  else if (FStrEq(arg1, "makepaths")){
 			  //WaypointRouteInit();
-			  ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY,"sorry, this command cannot be used right now without saving the files.\n It'll save the files now and reload them. Then the paths will be remade\n\n\0", NULL, NULL, NULL, NULL);
+			  UTIL_ConsoleMessage( pEntity, "sorry, this command cannot be used right now without saving the files.\n It'll save the files now and reload them. Then the paths will be remade\n\n\0");
 			  WaypointSave(pEntity,"tmp");
 			  WaypointLoad(pEntity,"tmp");
 		  }
@@ -1671,10 +1607,10 @@ bool bc_waypoint(edict_t *pEntity,int iType,const char *arg1,const char *arg2,co
 			  if(i!=-1){
 				  waypoints[i].flags |= W_FL_TEAM_SPECIFIC;
 				  waypoints[i].flags &= 0xfffffffc;	// del bits 0 and 1
-				  waypoints[i].flags |= TE;
+				  waypoints[i].flags |= CS_TEAM_TE;
 			  }
 			  else
-				  ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "no near wp found\n", NULL, NULL, NULL, NULL);
+				  UTIL_ConsoleMessage( pEntity,  "no near wp found\n");
 		  }
 		  else if ((FStrEq(arg1, "ct")) || (FStrEq(arg1, "counter")))
 		  {
@@ -1682,10 +1618,10 @@ bool bc_waypoint(edict_t *pEntity,int iType,const char *arg1,const char *arg2,co
 			  if(i!=-1){
 				  waypoints[i].flags |= W_FL_TEAM_SPECIFIC;
 				  waypoints[i].flags &= 0xfffffffc;	// del bits 0 and 1
-				  waypoints[i].flags |= CT;
+				  waypoints[i].flags |= CS_TEAM_CT;
 			  }
 			  else
-				  ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "no near wp found\n", NULL, NULL, NULL, NULL);
+				  UTIL_ConsoleMessage( pEntity,  "no near wp found\n");
 		  }
 		  else if ((FStrEq(arg1, "nt")) || (FStrEq(arg1, "noteam")))
 		  {
@@ -1694,7 +1630,7 @@ bool bc_waypoint(edict_t *pEntity,int iType,const char *arg1,const char *arg2,co
 				  waypoints[i].flags &= ~W_FL_TEAM_SPECIFIC;		// clear W_FL_TEAM_SPECIFIC flag
 			  }
 			  else
-				  ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "no near wp found\n", NULL, NULL, NULL, NULL);
+				  UTIL_ConsoleMessage( pEntity,  "no near wp found\n");
 		  }
 		  else if (FStrEq(arg1, "addstdwp")){		// adding standard wp's
 			  WaypointAddStdWP(pEntity);
@@ -1702,18 +1638,18 @@ bool bc_waypoint(edict_t *pEntity,int iType,const char *arg1,const char *arg2,co
 		  else if (FStrEq(arg1,"show")){
 			  int iWp = atoi(arg2);
 			  if(iWp<0||iWp>num_waypoints){
-				  ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "Out of range\n", NULL, NULL, NULL, NULL);
+				  UTIL_ConsoleMessage( pEntity,  "Out of range\n");
 				  return true;
 			  }
 			  if(waypoints[iWp].flags & W_FL_DELETED){
-				  ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "WP is deleted\n", NULL, NULL, NULL, NULL);
+				  UTIL_ConsoleMessage( pEntity,  "WP is deleted\n");
 				  return true;
 			  }
 			  WaypointDrawBeam(pEntity,pEntity->v.origin,waypoints[iWp].origin,100,10,255,255,255,255,100);
 			  return true;
 		  }
 		  else if (FStrEq(arg1, "delall")){
-			  ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "All waypoints are deleted in memory, but you can still get the old waypoints as long as you don't save other\n", NULL, NULL, NULL, NULL);
+			  UTIL_ConsoleMessage( pEntity,  "All waypoints are deleted in memory, but you can still get the old waypoints as long as you don't save other\n");
 			  WaypointInit();
 		  }
 		  else if (FStrEq(arg1, "forcestatrecalc")){
@@ -1725,20 +1661,20 @@ bool bc_waypoint(edict_t *pEntity,int iType,const char *arg1,const char *arg2,co
 			  {
 				  CVAR_SET_FLOAT("jb_wprecalc", 0);
 				  
-				  ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "Statistics are NOT recalculated on changes\n", NULL, NULL, NULL, NULL);
+				  UTIL_ConsoleMessage( pEntity,  "Statistics are NOT recalculated on changes\n");
 			  }
 			  else if (FStrEq(arg2, "off"))
 			  {
 				  CVAR_SET_FLOAT("jb_wprecalc", 1);
 				  
-				  ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "Statistics are recalculated on changes\n", NULL, NULL, NULL, NULL);
+				  UTIL_ConsoleMessage( pEntity,  "Statistics are recalculated on changes\n");
 			  }
 			  else{
 				  if(!bool(jb_wprecalc->value)){
-					  ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "Statistics are NOT recalculated on changes\n", NULL, NULL, NULL, NULL);
+					  UTIL_ConsoleMessage( pEntity,  "Statistics are NOT recalculated on changes\n");
 				  }
 				  else{
-					  ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "Statistics are recalculated on changes\n", NULL, NULL, NULL, NULL);
+					  UTIL_ConsoleMessage( pEntity,  "Statistics are recalculated on changes\n");
 				  }
 			  }
 		  }
@@ -1747,28 +1683,27 @@ bool bc_waypoint(edict_t *pEntity,int iType,const char *arg1,const char *arg2,co
 			  {
 				  CVAR_SET_FLOAT("jb_wpsound", 1);
 				  
-				  ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "Sound messages for waypointing are ON\n", NULL, NULL, NULL, NULL);
+				  UTIL_ConsoleMessage( pEntity,  "Sound messages for waypointing are ON\n");
 			  }
 			  else if (FStrEq(arg2, "off"))
 			  {
 				  CVAR_SET_FLOAT("jb_wpsound", 0);
 				  
-				  ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "Sound messages for waypointing are OFF\n", NULL, NULL, NULL, NULL);
+				  UTIL_ConsoleMessage( pEntity,  "Sound messages for waypointing are OFF\n");
 			  }
 			  else{
 				  if(bool(jb_wpsound->value)){
-					  ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "Sound messages for waypointing are ON\n", NULL, NULL, NULL, NULL);
+					  UTIL_ConsoleMessage( pEntity,  "Sound messages for waypointing are ON\n");
 				  }
 				  else{
-					  ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "Sound messages for waypointing are OFF\n", NULL, NULL, NULL, NULL);
+					  UTIL_ConsoleMessage( pEntity,  "Sound messages for waypointing are OFF\n");
 				  }
 			  }
 		  }
 		  else
 		  {
 			  if(strlen(arg1)){   
-				  sprintf(szTemp,"Unrecognized parameter %s\n",arg1);   
-				  ClientPrintEx(VARS(pEntity),HUD_PRINTNOTIFY,szTemp, NULL, NULL, NULL, NULL);   
+				  UTIL_ConsoleMessage(pEntity, "Unrecognized parameter %s\n",arg1);
 			  } 
 		  }
 		  return true;
@@ -1801,34 +1736,34 @@ bool bc_autowaypoint(edict_t *pEntity,int iType,const char *arg1,const char *arg
 		{
 			CVAR_SET_FLOAT("jb_wpautojumptest", 1);
 			
-			ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "Testing Jump wp while autowaypoint is ON\n", NULL, NULL, NULL, NULL);
+			UTIL_ConsoleMessage( pEntity,  "Testing Jump wp while autowaypoint is ON\n");
 		}
 		else if (FStrEq(arg2, "off"))
 		{
 			CVAR_SET_FLOAT("jb_wpautojumptest", 0);
 			
-			ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "Testing Jump wp while autowaypoint is OFF\n", NULL, NULL, NULL, NULL);
+			UTIL_ConsoleMessage( pEntity,  "Testing Jump wp while autowaypoint is OFF\n");
 		}
 		else{
 			if(bool(jb_wpautojumptest->value)){
-				ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "Testing Jump wp while autowaypoint is ON\n", NULL, NULL, NULL, NULL);
+				UTIL_ConsoleMessage( pEntity,  "Testing Jump wp while autowaypoint is ON\n");
 			}
 			else{
-				ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "Testing Jump wp while autowaypoint is OFF\n", NULL, NULL, NULL, NULL);
+				UTIL_ConsoleMessage( pEntity,  "Testing Jump wp while autowaypoint is OFF\n");
 			}
 		}
 	}
 	if(!bool(jb_wpautobots->value)){
 		if (bool(jb_wpauto->value))
-			sprintf(szTemp, "autowaypoint (by humans) is ON\n");
+			UTIL_ConsoleMessage(pEntity,  "Autowaypoint (by humans) is ON\n");
 		else
-			sprintf(szTemp, "autowaypoint (by humans) is OFF\n");
+			UTIL_ConsoleMessage(pEntity,  "Autowaypoint (by humans) is OFF\n");
 	}
 	else{
 		if (bool(jb_wpauto->value))
-			sprintf(szTemp, "autowaypoint (by players) is ON\n");
+			UTIL_ConsoleMessage(pEntity,  "Autowaypoint (by players) is ON\n");
 		else
-			sprintf(szTemp, "autowaypoint (by players) is OFF\n");
+			UTIL_ConsoleMessage(pEntity,  "Autowaypoint (by players) is OFF\n");
 	}
 	
 	if (bool(jb_wpauto->value)){
@@ -1844,8 +1779,6 @@ bool bc_autowaypoint(edict_t *pEntity,int iType,const char *arg1,const char *arg
 			CLIENT_COMMAND(listenserver_edict,"speak \"automatic disengaged\"\n");
 	}
 	
-	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
-	
 	return true;
 }
 
@@ -1860,11 +1793,9 @@ bool bc_autowaypointaddjump(edict_t *pEntity,int iType,const char *arg1,const ch
 	}
 	
 	if (bool(jb_wpautojump->value))
-		sprintf(szTemp, "g_autowpjump is ON -> a jump waypoint is added while autowaypointing for human players\n");
+		UTIL_ConsoleMessage(pEntity,  "jb_wpautojump is ON -> a jump waypoint is added while autowaypointing for human players\n");
 	else
-		sprintf(szTemp, "g_autowpjump is OFF  -> a jump waypoint is NOT added while autowaypointing for human players\n");
-	
-	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
+		UTIL_ConsoleMessage(pEntity,  "jb_wpautojump is OFF -> a jump waypoint is NOT added while autowaypointing for human players\n");
 	
 	return true;
 }
@@ -1880,11 +1811,9 @@ bool bc_advancedmovements(edict_t *pEntity,int iType,const char *arg1,const char
 	}
 	
 	if (bool(jb_wpautoadvanced->value))
-		sprintf(szTemp, "g_waypointadv is ON -> advanced movement system is used\n");
+		UTIL_ConsoleMessage(pEntity,  "jb_wpautoadvanced is ON -> advanced movement system is used\n");
 	else
-		sprintf(szTemp, "g_waypointadv is OFF  -> advanced movement system is NOT used\n");
-	
-	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
+		UTIL_ConsoleMessage(pEntity,  "jb_wpautoadvanced is OFF -> advanced movement system is NOT used\n");
 	
 	return true;
 }
@@ -1900,11 +1829,9 @@ bool bc_autopath(edict_t *pEntity,int iType,const char *arg1,const char *arg2,co
 	}
 	
 	if (bool(jb_wpautopath->value))
-		sprintf(szTemp, "g_auto_addpath is ON\n");
+		UTIL_ConsoleMessage(pEntity,  "jb_wpautopath is ON\n");
 	else
-		sprintf(szTemp, "g_auto_addpath is OFF\n");
-	
-	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
+		UTIL_ConsoleMessage(pEntity,  "jb_wpautopath is OFF\n");
 	
 	return true;
 }
@@ -1915,13 +1842,13 @@ bool bc_pathwaypoint(edict_t *pEntity,int iType,const char *arg1,const char *arg
 		CVAR_SET_FLOAT("jb_wppath", 1);
 		CVAR_SET_FLOAT("jb_wp", 1);
 		
-		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "pathwaypoint is ON\n", NULL, NULL, NULL, NULL);
+		UTIL_ConsoleMessage( pEntity,  "pathwaypoint is ON\n");
 	}
 	else if (FStrEq(arg1, "off"))
 	{
 		CVAR_SET_FLOAT("jb_wppath", 0);
 		
-		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "pathwaypoint is OFF\n", NULL, NULL, NULL, NULL);
+		UTIL_ConsoleMessage( pEntity,  "pathwaypoint is OFF\n");
 	}
 	else if (FStrEq(arg1, "create1"))
 	{
@@ -1962,8 +1889,7 @@ bool bc_prefix(edict_t *pEntity,int iType,const char *arg1,const char *arg2,cons
 	else{
 		CVAR_SET_STRING("jb_prefixdefensive", "[J0E]");
 	}
-	sprintf(szTemp,"JoeBOT: Prefixes are now : agg:%s nor:%s def:%s\n",jb_prefixaggressive->string,jb_prefixnormal->string,jb_prefixdefensive->string);
-	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
+	UTIL_ConsoleMessage(pEntity, "Bot name prefixes set to agg:%s nor:%s def:%s\n",jb_prefixaggressive->string,jb_prefixnormal->string,jb_prefixdefensive->string);
 	return true;
 }
 
@@ -1975,14 +1901,13 @@ bool bc_pistolonly(edict_t *pEntity,int iType,const char *arg1,const char *arg2,
 		CVAR_SET_FLOAT("jb_pistolonly", 0);
 	}
 	if(bool(jb_pistolonly->value)){
-		sprintf(szTemp,"JoeBOT: bots only buy pistols\n");
+		UTIL_ConsoleMessage(pEntity, "Bots only buy pistols\n");
 		if(listenserver_edict)
 			CLIENT_COMMAND(listenserver_edict,"speak \"some weapon are locked\"\n");
 	}
 	else{
-		sprintf(szTemp,"bots buy everything\n");
+		UTIL_ConsoleMessage(pEntity, "Bots buy anything\n");
 	}
-	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
 	return true;
 }
 
@@ -1992,7 +1917,7 @@ bool bc_botskill_min(edict_t *pEntity,int iType,const char *arg1,const char *arg
 	if ((temp >= 0) && (temp <= 100))
 		CVAR_SET_FLOAT("jb_skillmin", atoi(arg1));  // set default bot skill level
 	
-	cout << "JoeBOT: Minimum Skill is set to "<<jb_skillmin->value<<endl;
+	UTIL_ConsoleMessage(pEntity, "Minimum skill set to %d\n", jb_skillmin->value);
 	
 	return true;
 }
@@ -2003,7 +1928,7 @@ bool bc_botskill_max(edict_t *pEntity,int iType,const char *arg1,const char *arg
 	if ((temp >= 0) && (temp <= 100))
 		CVAR_SET_FLOAT("jb_skillmax", atoi(arg1));  // set default bot skill level
 	
-	cout << "JoeBOT: Maximum Skill is set to "<<jb_skillmax->value<<endl;
+	UTIL_ConsoleMessage(pEntity, "Maximum skill set to %d\n", jb_skillmax->value);
 	
 	return true;
 }
@@ -2066,15 +1991,17 @@ bool bc_stopgnome(edict_t *pEntity,int iType,const char *arg1,const char *arg2,c
 }
 
 bool bc_loadbuyprob(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
-	strcpy(szLPBFile,arg1);
-	cout << "JoeBOT: Setting weapon buy probability file : "<< arg1<<endl;
-	bLoadedLPB = false;			// reload on creating next bot
+	if (strlen(arg1)){
+		CVAR_SET_STRING("jb_buyprobfile", arg1);
+		bLoadedLPB = false;			// reload on creating next bot
+	}
+	UTIL_ConsoleMessage(pEntity, "Using weapon buy probability file: %s\n", jb_buyprobfile->string);
 	return true;
 }
 
 bool bc_fillserver(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	if(!arg1||!*arg1||!arg2||!*arg2){
-		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY,"JoeBOT: The fillserver command needs at least one more additional argument. The syntax is fillserver [all/ct/te/0/1] [full/half]\n", NULL, NULL, NULL, NULL);		
+		UTIL_ConsoleMessage( pEntity, "The fillserver command needs at least one more additional argument. The syntax is fillserver [all/ct/te/0/1] [full/half]\n");
 		return true;
 	}
 	int iTeam,iMode;
@@ -2102,7 +2029,7 @@ bool bc_fillserver(edict_t *pEntity,int iType,const char *arg1,const char *arg2,
 
 bool bc_bot_spraying(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	if(!*arg1){
-		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY,"JoeBOT: The syntax is bot_spraying [on/off]\n", NULL, NULL, NULL, NULL);
+		UTIL_ConsoleMessage( pEntity, "Usage: bot_spraying [on/off]\n");
 		return true;
 	}
 	if(FStrEq(arg1,"on")){
@@ -2112,17 +2039,17 @@ bool bc_bot_spraying(edict_t *pEntity,int iType,const char *arg1,const char *arg
 		CVAR_SET_FLOAT("jb_spraypaint", 0);
 	}
 	if(bool(jb_spraypaint->value)){
-		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY,"JoeBOT: The bots use spraypaints\n", NULL, NULL, NULL, NULL);
+		UTIL_ConsoleMessage( pEntity, "Bots use spraypaints\n");
 	}
 	else{
-		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY,"JoeBOT: The bots don't use spraypaints\n", NULL, NULL, NULL, NULL);
+		UTIL_ConsoleMessage( pEntity, "Bots don't use spraypaints\n");
 	}
 	return true;
 }
 
 bool bc_joinwhumanmax(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	if(!*arg1){
-		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY,"JoeBOT: The syntax is joinwhuman_max [on/off]\n", NULL, NULL, NULL, NULL);
+		UTIL_ConsoleMessage( pEntity, "Usage: joinwhuman_max [on/off]\n");
 		return true;
 	}
 	if(FStrEq(arg1,"on")){
@@ -2132,17 +2059,17 @@ bool bc_joinwhumanmax(edict_t *pEntity,int iType,const char *arg1,const char *ar
 		CVAR_SET_FLOAT("jb_entergame", 1);
 	}
 	if(bool(jb_entergame->value)){
-		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY,"JoeBOT: Bots will join even if there are no human on the server ( max_bots )\n", NULL, NULL, NULL, NULL);
+		UTIL_ConsoleMessage( pEntity, "Bots will join even if there are no human on the server ( max_bots )\n");
 	}
 	else{
-		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY,"JoeBOT: Bots will only join when a human is on the server ( max_bots )\n", NULL, NULL, NULL, NULL);
+		UTIL_ConsoleMessage( pEntity, "Bots will only join when a human is on the server ( max_bots )\n");
 	}
 	return true;
 }
 
 bool bc_joinwhumanres(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	if(!*arg1){
-		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY,"JoeBOT: The syntax is joinwhuman_res [on/off]\n", NULL, NULL, NULL, NULL);
+		UTIL_ConsoleMessage( pEntity, "Usage: joinwhuman_res [on/off]\n");
 		return true;
 	}
 	if(FStrEq(arg1,"on")){
@@ -2152,20 +2079,40 @@ bool bc_joinwhumanres(edict_t *pEntity,int iType,const char *arg1,const char *ar
 		CVAR_SET_FLOAT("jb_jointeam", 1);
 	}
 	if(bool(jb_jointeam->value)){
-		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY,"JoeBOT: Bots will respawn even if there are no human players on the server\n", NULL, NULL, NULL, NULL);
+		UTIL_ConsoleMessage( pEntity, "Bots will respawn even if there are no human players on the server\n");
 	}
 	else{
-		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY,"JoeBOT: Bots will only respawn when a human player is on the server\n", NULL, NULL, NULL, NULL);
+		UTIL_ConsoleMessage( pEntity, "Bots will only respawn when a human player is on the server\n");
 	}
 	return true;
 }
 
 bool bc_randomwpload(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
-	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY,"JoeBOT: Mixing WPDirs ... the order of dir.txt is now of no importance\n", NULL, NULL, NULL, NULL);
-	WPStat.Save();
-	g_WPDir.MixIt();
-	WaypointLoad(pEntity);
-	WPStat.Load();
+	if(!*arg1){ // backward compatibility
+		CVAR_SET_FLOAT("jb_wploadrandom", 1);
+	}
+	else if(FStrEq(arg1,"on")){
+		CVAR_SET_FLOAT("jb_wploadrandom", 1);
+	}
+	else if(FStrEq(arg1,"off")){
+		CVAR_SET_FLOAT("jb_wploadrandom", 0);
+	}
+	if (bool(jb_wploadrandom->value))
+	{
+		WPStat.Save();
+		g_WPDir.MixIt();
+		WaypointLoad(pEntity);
+		WPStat.Load();
+		UTIL_ConsoleMessage( pEntity, "Mixing WPDirs ... the order of dir.txt is now of no importance\n");
+	}
+	else
+	{
+		WPStat.Save();
+		g_WPDir.Init();
+		WaypointLoad(pEntity);
+		WPStat.Load();
+		UTIL_ConsoleMessage( pEntity, "WPDirs follow order in dir.txt\n");
+	}
 	return true;
 }
 
