@@ -660,7 +660,7 @@ bool bc_kickbot(edict_t *pEntity,int iType,const char *arg1,const char *arg2,con
 		KickBots(pEntity,CT,0);
 	}
 	else{
-		sprintf(szTemp,"Usage : kickbot [ct/te/all]\n");
+		sprintf(szTemp,"Usage : kickbot [ct/te]\n");
 		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
 	}
 	return true;

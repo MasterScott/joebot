@@ -292,6 +292,7 @@ bool bDedicatedWelcome = false;
 int g_iTypeoM;
 
 float f_round_start;	// time of roundstart
+float f_start_round;	// when to start after freeze time
 float f_timesrs = 1000;		// time since round start	->	updated every frame by start frame
 
 extern bool bNNInit;
@@ -980,7 +981,7 @@ void KickBots(edict_t *pEntity,int iTeam,int iAll){
 		if(bots[i]){
 			sprintf(szName, "kick \"%s\"\n", STRING(bots[i]->pEdict->v.netname));
 			if(iTeam != -1){
-				if(UTIL_GetTeam(bots[i]->pEdict) == iTeam){
+				if((iTeam ? 2 : 1) == bots[i]->bot_team){
 					SERVER_COMMAND(szName);
 					if(!iAll)
 						return;
