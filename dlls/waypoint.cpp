@@ -2701,7 +2701,6 @@ void WaypointPrintInfo(edict_t *pEntity, char *szText)		// szText is max 1000
 }
 
 void WaypointPrintTest(edict_t *pEntity){
-	char msg[80];
 	int i;
 	
 	UTIL_ConsoleMessage(pEntity, "Running Joebot waypoint analysis ....\n");
