@@ -691,12 +691,12 @@ bool bc_botchat(edict_t *pEntity,int iType,const char *arg1,const char *arg2,con
 	if(bool(jb_chat->value)){
 		sprintf(szTemp,"JoeBOT: Bots are chatting @ %fs\n",jb_chatfreq->value);
 		/*if(listenserver_edict);
-			(*g_engfuncs.pfnClientCommand)(listenserver_edict,"speak \"talk system is on\"\n");*/
+			CLIENT_COMMAND(listenserver_edict,"speak \"talk system is on\"\n");*/
 	}
 	else{
 		sprintf(szTemp,"JoeBOT: The bots are quiet\n");
 		/*if(listenserver_edict);
-			(*g_engfuncs.pfnClientCommand)(listenserver_edict,"speak \"talk system is off\"\n");*/
+			CLIENT_COMMAND(listenserver_edict,"speak \"talk system is off\"\n");*/
 	}
 	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
 	return true;
@@ -1267,11 +1267,11 @@ bool bc_menuselect(edict_t *pEntity,int iType,const char *arg1,const char *arg2,
 				CVAR_SET_FLOAT("jb_wpauto", bool(jb_wpauto->value) ? 0 : 1);
 				if(bool(jb_wpauto->value)){
 					if(listenserver_edict)
-						(*g_engfuncs.pfnClientCommand)(listenserver_edict,"speak \"automatic observation system engaged\"\n");
+						CLIENT_COMMAND(listenserver_edict,"speak \"automatic observation system engaged\"\n");
 				}
 				else{
 					if(listenserver_edict)
-						(*g_engfuncs.pfnClientCommand)(listenserver_edict,"speak \"automatic observation system disengaged\"\n");
+						CLIENT_COMMAND(listenserver_edict,"speak \"automatic observation system disengaged\"\n");
 				}
 				for(int i=0;i<32;i++){
 					AWP_ED[i].iLastWP = -1;
@@ -1834,14 +1834,14 @@ bool bc_autowaypoint(edict_t *pEntity,int iType,const char *arg1,const char *arg
 	if (bool(jb_wpauto->value)){
 		if(listenserver_edict)
 			if(!bool(jb_wpautobots->value)){
-				(*g_engfuncs.pfnClientCommand)(listenserver_edict,"speak \"automatic observation system engaged with one authorized inspector\"\n");
+				CLIENT_COMMAND(listenserver_edict,"speak \"automatic observation system engaged with one authorized inspector\"\n");
 			}else{
-				(*g_engfuncs.pfnClientCommand)(listenserver_edict,"speak \"automatic observation system engaged with all\"\n");
+				CLIENT_COMMAND(listenserver_edict,"speak \"automatic observation system engaged with all\"\n");
 			}
 	}
 	else{
 		if(listenserver_edict)
-			(*g_engfuncs.pfnClientCommand)(listenserver_edict,"speak \"automatic disengaged\"\n");
+			CLIENT_COMMAND(listenserver_edict,"speak \"automatic disengaged\"\n");
 	}
 	
 	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
@@ -1977,7 +1977,7 @@ bool bc_pistolonly(edict_t *pEntity,int iType,const char *arg1,const char *arg2,
 	if(bool(jb_pistolonly->value)){
 		sprintf(szTemp,"JoeBOT: bots only buy pistols\n");
 		if(listenserver_edict)
-			(*g_engfuncs.pfnClientCommand)(listenserver_edict,"speak \"some weapon are locked\"\n");
+			CLIENT_COMMAND(listenserver_edict,"speak \"some weapon are locked\"\n");
 	}
 	else{
 		sprintf(szTemp,"bots buy everything\n");
