@@ -254,30 +254,17 @@ void CBotCS :: Init(void){
 		if(!TEq(fLastVIPScan,gpGlobals->time,2)){
 			fLastVIPScan = gpGlobals->time;
 			//cout << "searching for vip" << endl;
-			edict_t *pEnt;
-			int bot_index;
-			int i;
 			g_pVIP = 0;
-			for (i = gpGlobals->maxClients; i ; i--){
-				pEnt = INDEXENT(i);
+			for (int i = 0; i < gpGlobals->maxClients; i++){
+				edict_t *pEnt = INDEXENT(i + 1);
 				// skip invalid players
 				if ((pEnt) && (!pEnt->free)){
 					if(UTIL_IsVIP(pEnt)){
-						//FakeClientCommand(pEnt,"say i'm the fuckin VIP");
-						bot_index = UTIL_GetBotIndex(pEnt);
-						if(bot_index != -1
-							&&bots[bot_index]){
-							((CBotCS*)(bots[bot_index]))->bot_vip = true;
-							//cout << "found vip" << endl;
-						}
+						bot_vip = true;
 						g_pVIP = pEnt;
 					}
 					else{
-						bot_index = UTIL_GetBotIndex(pEnt);
-						if(bot_index != -1
-							&&bots[bot_index]){
-							((CBotCS*)(bots[bot_index]))->bot_vip = false;
-						}
+						bot_vip = false;
 					}
 				}
 			}
@@ -553,15 +540,15 @@ bool CBotCS :: BuyWeapon(void){
 			&&bot_teamnm == CS_TEAM_CT
 			&&RANDOM_LONG(0,100) < 30){
 			
-			BotBuy_CS_WEAPON_Defuse(this);
+			BotBuy_Defuse(this);
 		}
 		
 		if(bot_armor<50
 			&& RANDOM_LONG(0,100) < 50){
 			if (ibot_money > 1000)
-				BotBuy_CS_WEAPON_KevlarHelmet(this);
+				BotBuy_KevlarHelmet(this);
 			else
-				BotBuy_CS_WEAPON_Kevlar(this);
+				BotBuy_Kevlar(this);
 		}
 		return true;
 	}
@@ -771,8 +758,8 @@ void CBotCS :: ReactOnRadio(void){
 			f_Aggressivity += 3.0;		// be aggressive
 			fMin = 1000;
 			pEFound = 0;
-			for (i = gpGlobals->maxClients; i ; i--){
-				pEnt = INDEXENT(i);
+			for (i = 0; i < gpGlobals->maxClients; i++){
+				pEnt = INDEXENT(i + 1);
 				if ((pEnt) && (!pEnt->free) && (pEnt != pEdict)){
 					// skip this player if not alive (i.e. dead or dying)
 					if (!IsAlive(pEnt))
@@ -998,9 +985,9 @@ bool CBotCS :: HandleOrders(void){		// this fucntion is called every second
 					Task.RemoveT(BT_CAMP);
 					f_ducktill = gpGlobals->time;
 					if(Task.Important()){
-						long lN = UTIL_GetBotIndex(pN);
-						if(lN!=-1){					
-							if(bots[lN]->Task.SearchT(BT_COVER|BT_ROAMTEAM)==-1){		// don't cover another bot whic covers another player himself
+						CBotBase *pB = UTIL_GetBotPointer(pN);
+						if(pB){
+							if(pB->Task.SearchT(BT_COVER|BT_ROAMTEAM)==-1){		// don't cover another bot whic covers another player himself
 								Task.AddTask(BT_ROAMTEAM,gpGlobals->time + 260.0,0,pN,0);
 #ifdef DEBUGMESSAGES
 								FakeClientCommand(pEdict,"say wait4tm8 roamteam");
@@ -1107,9 +1094,9 @@ bool CBotCS :: HandleOrders(void){		// this fucntion is called every second
 					Task.RemoveT(BT_CAMP);
 					f_ducktill = gpGlobals->time;
 					if(Task.Important()){
-						long lN = UTIL_GetBotIndex(pN);
-						if(lN!=-1){					
-							if(!bots[lN]->Task.SearchT(BT_COVER|BT_ROAMTEAM) ){		// don't cover another bot whic covers another player himself
+						CBotBase *pB = UTIL_GetBotPointer(pN);
+						if(pB){
+							if(!pB->Task.SearchT(BT_COVER|BT_ROAMTEAM) ){		// don't cover another bot whic covers another player himself
 								Task.AddTask(BT_COVER,gpGlobals->time + 60.0,0,pN,0);
 							}
 						}
@@ -1237,11 +1224,10 @@ edict_t *CBotCS :: FindEnemy(){
 			// search the world for players...
 			is_team_play = 1.0;
 			
-			//for (i = 1; i <= gpGlobals->maxClients; i++)
-			for (i = gpGlobals->maxClients; i>=1; i--){
+			for (i = 0; i < gpGlobals->maxClients; i++){
 				FFEP = &FFE[i];
 				edict_old = FFEP->pEdict;
-				pPlayer = INDEXENT(i);
+				pPlayer = INDEXENT(i + 1);
 				FFEP->pEdict = 0;
 				
 				// skip invalid players and skip self (i.e. this bot)
@@ -1359,7 +1345,7 @@ edict_t *CBotCS :: FindEnemy(){
 			}
 			float fMin = 100000;
 			
-			for (i = gpGlobals->maxClients; i; i--){
+			for (i = 0; i < gpGlobals->maxClients; i++){
 				FFEP = &FFE[i];
 				if(FFEP->pEdict){
 					if (FFEP->fRecogn + FFEP->fTime2seeit <= gpGlobals->time){
@@ -2637,6 +2623,19 @@ long CBotCS :: IsKnifeWeapon(long lbit){
 	else return 0;
 }
 
+bool CBotCS :: HasShield(void){
+	// Adapted from Wei Mingzhi's YAPB
+	return (strncmp(STRING(pEdict->v.viewmodel), "models/shield/v_shield_", 23) == 0);
+}
+
+bool CBotCS :: IsShieldDrawn(void){
+	// Adapted from Wei Mingzhi's YAPB
+	if (!HasShield())
+		return FALSE;
+
+	return (pEdict->v.weaponanim == 6 || pEdict->v.weaponanim == 7);
+}
+
 long CBotCS :: WeaponModel2ID(const char *szModel){
 	if(!szModel||!*szModel)
 		return -1;
@@ -2751,8 +2750,8 @@ bool CBotCS :: ReactOnSound(void){
 	TraceResult tr;
 	Vector v_bot_view = pEdict->v.origin + pEdict->v.view_ofs;
 	
-	for (i = gpGlobals->maxClients; i ; i--){
-		pEnt = INDEXENT(i);
+	for (i = 0; i < gpGlobals->maxClients; i++){
+		pEnt = INDEXENT(i + 1);
 		
 		// skip invalid players and skip self (i.e. this bot)
 		if ((pEnt) && (!pEnt->free) && (pEnt != pEdict))
