@@ -33,16 +33,17 @@
 
 #include "extdll.h"
 #include "util.h"
-#include "cbase.h"
-#include "weaponinfo.h"
 
+#ifdef USE_METAMOD
+#define SDK_UTIL_H  // util.h already included
+#include "meta_api.h"
+#endif /* USE_METAMOD */
+
+#include "bot.h"
+
+#include "bot_names.h"
 #include "CBotCS.h"
 #include "CBotDOD.h"
-#include "bot.h"
-#include "bot_func.h"
-#include "waypoint.h"
-#include "bot_wpstat.h"
-#include "bot_weapons.h"
 #include "CSkill.h"
 
 char szTemp[200];
@@ -58,7 +59,7 @@ extern CSkill Skill;
 #include "som.h"
 
 // array for fnctions to buy weapons
-void (*Buy[2][32])(CBotBase *);
+void (*Buy[32])(CBotBase *);
 
 int iGlobalRSCount;		// setting to number of bots on roundstart. every init of bot result in decrementing this variable. if it is 0 and it hasn't been called this rs, a global init function is called :D
 float fLGlobalRSInit = -1000;
@@ -93,6 +94,7 @@ double dCollNNOut	[1];
 #include <sys/stat.h>
 
 extern bot_weapon_t weapon_defs[MAX_WEAPONS];
+extern edict_t *clients[32];
 extern int mod_id;
 extern WAYPOINT waypoints[MAX_WAYPOINTS];
 extern int num_waypoints;  // number of waypoints currently in use
@@ -101,8 +103,6 @@ extern bool b_addskill;
 edict_t *pEdictPlayer=0;
 bool g_bChat = true;
 bool g_bEDown = true;
-
-static FILE *fp;
 
 CBaseNeuralNetFF *NNCombat = 0;
 CBaseNeuralNetFF *NNColl = 0;
@@ -121,7 +121,7 @@ bool g_bBombPlanted;		// bomb has been planted
 float g_iBombExplode;
 bool g_bBombDropped;
 
-#ifndef __linux__
+#ifdef _WIN32
 extern HINSTANCE h_Library;
 #else
 extern void * h_Library;
@@ -319,7 +319,7 @@ void BotCreate( edict_t *pPlayer, const char *szTeam, const char *szClass,const 
 	
 	pBot = bots[index];
 	
-	if(!szName || strlen(szName)<2 || !strcmp(szName,"default")|| !strcmp(szName,"unnamed")){}
+	if(!szName || strlen(szName)<2 || FStrEq(szName,"default")|| FStrEq(szName,"unnamed")){}
 	else{
 		strcpy(szNameThis,szName);
 	}
@@ -346,7 +346,7 @@ void BotCreate( edict_t *pPlayer, const char *szTeam, const char *szClass,const 
 	else
 		pBot->bot_skill = iSkill;
 	
-	if(!szName || strlen(szName)<2 || !strcmp(szName,"default")|| !strcmp(szName,"unnamed")){// name is default or no specified, get it from bot_names.txt
+	if(!szName || strlen(szName)<2 || FStrEq(szName,"default")|| FStrEq(szName,"unnamed")){// name is default or no specified, get it from bot_names.txt
 		CBotBase :: MakeName(szTempName,pName->m_szName,pBot->bot_skill,bots[index]->d_Manner);
 	}
 	else{
@@ -356,7 +356,7 @@ void BotCreate( edict_t *pPlayer, const char *szTeam, const char *szClass,const 
 	}
 	
 	BotEnt = CREATE_FAKE_CLIENT( szTempName );
-	
+		
 	//strcpy(bots[index]->name,szTempName);
 	
 	if (FNullEnt( BotEnt )){
@@ -405,13 +405,24 @@ void BotCreate( edict_t *pPlayer, const char *szTeam, const char *szClass,const 
 			SET_CLIENT_KEY_VALUE( clientIndex, infobuffer, "ah", "1");
 		}
 		
+#ifdef USE_METAMOD
+		MDLL_ClientConnect( BotEnt, "joebot", "127.0.0.1", ptr );
+
+		int i = 0;
+		while ((i < 32) && (clients[i] != NULL))
+			i++;
+
+		if (i < 32)
+			clients[i] = BotEnt; // store this clients edict in the clients array
+
+		MDLL_ClientPutInServer( BotEnt );
+#else
 		ClientConnect( BotEnt, "joebot", "127.0.0.1", ptr );
+		ClientPutInServer( BotEnt ); // Pieter van Dijk - use instead of DispatchSpawn() - Hip Hip Hurray!
+#endif
 		
-		// Pieter van Dijk - use instead of DispatchSpawn() - Hip Hip Hurray!
-		ClientPutInServer( BotEnt );
-		
-		BotEnt->v.flags |= FL_FAKECLIENT;
-		
+		BotEnt->v.flags |= FL_THIRDPARTYBOT;
+
 		// initialize all the variables for this bot...
 		SBInfo[index].respawn_state = RESPAWN_IDLE;
 		SBInfo[index].kick_time  = 0;
