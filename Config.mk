@@ -17,11 +17,10 @@ endif
 EXTRA_CFLAGS =
 
 # uncomment to compile metamod plugin
-#EXTRA_CFLAGS += -DUSE_METAMOD
+EXTRA_CFLAGS += -DUSE_METAMOD
 
 # uncomment to compile for counter-strike 1.5
-EXTRA_CFLAGS += -DCSTRIKE15
+#EXTRA_CFLAGS += -DCSTRIKE15
 
 # uncomment to compile debug code
 #EXTRA_CFLAGS += -g -D_DEBUG -DDEBUGENGINE
-EXTRA_CFLAGS += -g -DDEBUGENGINE

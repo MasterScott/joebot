@@ -1,8 +1,8 @@
 # ---------------------------------------------------------------------------
 # Definitions
 # ---------------------------------------------------------------------------
-#DLLNAME = joebot_mm
-DLLNAME = joebot
+DLLNAME = joebot_mm
+#DLLNAME = joebot
 
 ifeq ($(OS),Windows_NT)
  DLL = $(DLLNAME).dll
