@@ -112,7 +112,7 @@ bool CBotCS :: HeadTowardSpEnt(void){
 			//fDistance = Vector(pEnt->v.origin - pEdict->v.origin).Length();
 			if(fDistance < 1500
 				&& FVisible(gFlash[lNumF].VOrigin,pEdict)){
-				if(Task.current&&Task.current->lType&(BT_HIDE|BT_LOCKED)!=(BT_HIDE|BT_LOCKED)){
+				if(Task.current&&(Task.current->lType&(BT_HIDE|BT_LOCKED))!=(BT_HIDE|BT_LOCKED)){
 					// it's near and visible
 					
 					Vector v_diff = pEdict->v.origin - gFlash[lNumF].VOrigin;
@@ -1028,6 +1028,8 @@ bool CBotCS :: HeadTowardWaypoint( void ){
 					
 					//if(pEdictPlayer)WaypointDrawBeam(pEdictPlayer,pEdict->v.origin,Vector(0,0,0),10,10,200,200,200,200,1);
 					
+					// search a waypoint where a kill was around this time in the ground. if we find one, let's stay
+					// there for some time, wait for the enemy and maybe throw a grenade
 					if(	  !g_bBombPlanted
 						&& fM[bot_teamnm]<0.0
 						&& f_timesrs < 60.0 && f_timesrs > 15.0
@@ -1121,6 +1123,7 @@ bool CBotCS :: HeadTowardWaypoint( void ){
 									f_CaLooktoWP = gpGlobals->time + 1.5f;
 									f_RWKnife = gpGlobals->time - 1.0;
 									if(RANDOM_LONG(0,100) <70){
+										// check if we can throw a grenade there
 									/*Change2Weapon(CS_WEAPON_HEGRENADE);
 										bThrowHEGrenade = true;*/
 										// todo find a location where an enemy can be exspected soon
