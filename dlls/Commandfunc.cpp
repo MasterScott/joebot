@@ -365,6 +365,9 @@ void RegisterCvars(void)
 
 	if (bRegDone) return;
 
+	if (!g_bIsSteam)
+		init_jb_cstrike15.value = 1;
+
 	CVAR_REGISTER(&init_jb_cstrike15);
 	CVAR_REGISTER(&init_jb_mixnames);
 	CVAR_REGISTER(&init_jb_msgwelcome);
@@ -949,7 +952,7 @@ bool bc_nnupdate(edict_t *pEntity,int iType,const char *arg1,const char *arg2,co
 bool bc_campposs(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	float ftemp = atof (arg1);
 	if(ftemp < 0.0 || ftemp > 100){
-		//CVAR_SET_FLOAT("jb_nnupdaterate", 2);
+		//CVAR_SET_FLOAT("jb_campprobability", 2);
 	}
 	else
 		CVAR_SET_FLOAT("jb_campprobability", ftemp);
@@ -2166,8 +2169,7 @@ bool bc_randomwpload(edict_t *pEntity,int iType,const char *arg1,const char *arg
 // little nice effect
 bool bc_botglow(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	if(FStrEq(arg1,"on")){
-		int i;
-		for(i = 0;i < 32 ; i++){
+		for(int i = 0;i < 32 ; i++){
 			if(bots[i]){
 				bots[i]->pEdict->v.rendermode = kRenderNormal;
 				bots[i]->pEdict->v.renderfx = kRenderFxGlowShell;
@@ -2179,8 +2181,7 @@ bool bc_botglow(edict_t *pEntity,int iType,const char *arg1,const char *arg2,con
 		}
 	}
 	else if(FStrEq(arg1,"off")){
-		int i;
-		for(i = 0;i < 32 ; i++){
+		for(int i = 0;i < 32 ; i++){
 			if(bots[i]){
 				bots[i]->pEdict->v.renderfx = kRenderFxNone;
 			}
