@@ -56,6 +56,9 @@ CBotNames::~CBotNames(){
 bool CBotNames::init(void){
 	char szfilename[80];
 
+	if (bInited)
+		return true;
+
 	UTIL_BuildFileName(szfilename, "joebot","bot_names.txt");
 	bool bSuccess = load(szfilename);
 	if (bool(jb_mixnames->value)) mixIt(); // randomize order?
