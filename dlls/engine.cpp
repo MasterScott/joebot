@@ -1136,11 +1136,24 @@ qboolean pfnVoice_SetClientListening(int iReceiver, int iSender, qboolean bListe
 {
 	return (*g_engfuncs.pfnVoice_SetClientListening)(iReceiver, iSender, bListen); 
 }
+#endif /* not USE_METAMOD */
 // hl1109
 const char *pfnGetPlayerAuthId(edict_t *e)
 {
+	if (e->v.flags & (FL_FAKECLIENT | FL_THIRDPARTYBOT))
+#ifdef USE_METAMOD
+		RETURN_META_VALUE(MRES_SUPERCEDE, "0");
+#else /* not USE_METAMOD */
+		return "0";
+#endif /* USE_METAMOD */
+
+#ifdef USE_METAMOD
+	RETURN_META_VALUE(MRES_IGNORED, NULL);
+#else /* not USE_METAMOD */
 	return (*g_engfuncs.pfnGetPlayerAuthId)(e); 
+#endif /* USE_METAMOD */
 }
+#ifndef USE_METAMOD
 // 2003/11/10
 void *pfnSequenceGet(const char* fileName, const char* entryName)
 {
@@ -1375,7 +1388,7 @@ enginefuncs_t meta_engfuncs = {
 
 	NULL,			// pfnVoice_GetClientListening()
 	NULL,			// pfnVoice_SetClientListening()
-	NULL,			// pfnGetPlayerAuthId()
+	pfnGetPlayerAuthId,	// pfnGetPlayerAuthId()
 
 	NULL,			// pfnSequenceGet()
 	NULL,			// pfnSequencePickSentence()
