@@ -806,7 +806,7 @@ bool CBotDOD :: Bored(void){
 		&& f_Bored < fbias){// only do 'boring attacks' every 30s
 		f_BoredTill = gpGlobals->time + TIMEBEINGBORED;
 		f_Bored = gpGlobals->time + RANDOM_FLOAT(-10.0,10.0);
-		i_BorA = RANDOM_FLOAT(0,4);
+		i_BorA = int(RANDOM_FLOAT(0,4));
 	}
 	
 	if(f_BoredTill > gpGlobals->time){// still bored ??
