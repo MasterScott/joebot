@@ -568,7 +568,8 @@ float UTIL_WeaponTimeBase( void );
 #define CS_TEAM_CT 1
 
 #ifdef DEBUGENGINE
-int BOT_LOG(const char *fnName, const char *fmt, ...);
+int UTIL_BotLog(const char *fnName, const char *fmt, ...);
+#define BOT_LOG(fnName, args) UTIL_BotLog(fnName, args)
 #else
 #define BOT_LOG(fnName, args) /* */
 #endif

@@ -1258,7 +1258,7 @@ qboolean UTIL_CallGameEntity( const char *entStr, entvars_t *pev)
 }
 
 #ifdef DEBUGENGINE
-int BOT_LOG(const char *fnName, const char *fmt, ...)
+int UTIL_BotLog(const char *fnName, const char *fmt, ...)
 {
 	static FILE *fp;
 	va_list argptr;
