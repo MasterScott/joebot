@@ -1271,6 +1271,12 @@ bool bc_waypoint(edict_t *pEntity,int iType,const char *arg1,const char *arg2,co
 		  }
 		  else
 		  {
+			  if(strlen(arg1)){   
+				  sprintf(szTemp,"parameter unknown : %s",arg1);   
+				  ClientPrintEx(VARS(pEntity),HUD_PRINTNOTIFY,szTemp);   
+			  } 
+
+
 			  if (g_waypoint_on)
 				  ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "waypoints are ON\n");
 			  else

@@ -793,11 +793,13 @@ int WaypointFindNearestGoal(edict_t *pEntity, int src, int team, int flags,int*i
 		
 		if ((waypoints[index].flags & flags) != flags)
 			continue;  // skip this waypoint if the flags don't match
-		
+
 		bAvoid=false;
-		for(i=0;i<iNumField;i++){
-			if(iField[i]==index)
-				bAvoid=true;
+		if(iField){
+			for(i=0;i<iNumField;i++){
+				if(iField[i]==index)
+					bAvoid=true;
+			}
 		}
 		if(bAvoid)
 			continue;
@@ -3620,14 +3622,14 @@ void WaypointRouteInit(void)
 	unsigned int a, b;
 	float distance;
 	unsigned short *pShortestPath, *pFromTo;
-	char msg[80];
+	char msg[256];
 	unsigned int num_items;
 	FILE *bfp;
 	char filename[256];
 	char filename2[256];
-	char mapname[64];
+	char mapname[256];
 	//	char dirname[32];
-	char szRoutes[100];
+	char szRoutes[256];
 	
 	clock_t ct_start_distances;
 	clock_t ct_end_distances;

@@ -38,11 +38,13 @@ CChatHost::~CChatHost()
 	CChatHostData *p;
 
 	p = pData;
+	if(p){
 	while(p->next){
 		delete p->next;
 	}
 	delete p;
 	pData = 0;
+	}
 
 /*	while(p){
 		p = p->prev;
@@ -51,7 +53,7 @@ CChatHost::~CChatHost()
 }
 
 CChat *CChatHost :: GetChat(const char *szNameP){
-	char szName[80];
+	char szName[256];
 
 #ifndef __linux__
 		UTIL_BuildFileName(szName,"joebot\\chat",szNameP);

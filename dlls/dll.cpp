@@ -560,7 +560,7 @@ void GameDLLInit( void )
 	
 	g_WPDir.Init();
 	Skill.Load();
-	Names.Init();
+	Names.init();
 	UpdateLanguage();
 	// precaching chat files - at least the standard file :)
 	g_ChatHost.GetChat("texts.txt");
@@ -2009,7 +2009,6 @@ void StartFrame( void )
 			if ((bots[bot_index]) &&  // is this slot used AND
 				(SBInfo[bot_index].respawn_state == RESPAWN_IDLE))  // not respawning
 			{
-				//try{
 				if (g_bJoinWHumanRES &&
 					bots[bot_index]->bot_team != 6 &&
 					bots[bot_index]->bot_team > 0 &&
@@ -2020,12 +2019,8 @@ void StartFrame( void )
 				}
 				else
 					bots[bot_index]->Think();
-				
+
 				count++;
-				/*}
-				catch(...){
-				FILE *fhd = fopen("scheisse.txt","a");fprintf(fhd,"scheisse in think\n");fclose(fhd);
-			}*/
 			}
 		}
 		
@@ -2204,7 +2199,7 @@ void StartFrame( void )
 					
 					// if there are currently less than the maximum number of "players"
 					// then add another bot using the default skill level...
-					if ((count < max_bots) && (max_bots != -1))
+					if ((count < max_bots) && (max_bots != -1)&& (count < gpGlobals->maxClients))
 					{
 						//cout << " ------------------- creating bot due to max_bots" << endl;
 						if(!g_bJoinWHumanMAX){
