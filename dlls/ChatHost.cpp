@@ -22,6 +22,11 @@
 //
 //////////////////////////////////////////////////////////////////////
 
+#include <iostream.h>
+
+#include "extdll.h"
+#include "util.h"
+
 #include "ChatHost.h"
 
 //////////////////////////////////////////////////////////////////////
@@ -55,7 +60,7 @@ CChatHost::~CChatHost()
 CChat *CChatHost :: GetChat(const char *szNameP){
 	char szName[256];
 
-#ifndef __linux__
+#ifdef _WIN32
 		UTIL_BuildFileName(szName,"joebot\\chat",szNameP);
 #else
 		UTIL_BuildFileName(szName,"joebot/chat",szNameP);
@@ -66,7 +71,7 @@ CChat *CChatHost :: GetChat(const char *szNameP){
 
 	p = pData;
 	while(p){
-		if(!strcmp(p->szFile,szName)){
+		if(FStrEq(p->szFile,szName)){
 			p->iUsed ++;
 			return p->pChat;
 		}
@@ -97,7 +102,7 @@ CChat *CChatHost :: GetChat(const char *szNameP){
 int CChatHost :: DisconnectChat(const char *szNameP){
 	char szName[80];
 
-#ifndef __linux__
+#ifdef _WIN32
 		UTIL_BuildFileName(szName,"joebot\\chat",szNameP);
 #else
 		UTIL_BuildFileName(szName,"joebot/chat",szNameP);
@@ -110,7 +115,7 @@ int CChatHost :: DisconnectChat(const char *szNameP){
 
 	p = pData;
 	while(p){
-		if(!strcmp(p->szFile,szName)){
+		if(FStrEq(p->szFile,szName)){
 			pF = p;
 			break;
 		}
