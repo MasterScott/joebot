@@ -392,9 +392,9 @@ void GameDLLInit( void )
 			SBInfo[i].bot_skill = 90;
 			SBInfo[i].bot_team = 5;
 			SBInfo[i].kick_time = 0;
-			*SBInfo[i].name = 0;
+			SBInfo[i].name[0] = '\0';
 			SBInfo[i].respawn_state = RESPAWN_IDLE;
-			*SBInfo[i].skin = 0;
+			SBInfo[i].skin[0] = '\0';
 		}
 		bInitInfo = false;
 	}
@@ -703,9 +703,6 @@ BOOL ClientConnect( edict_t *pEntity, const char *pszName, const char *pszAddres
 { 
 	if (gpGlobals->deathmatch)
 	{
-		int i;
-		int count = 0;
-		
 		BOT_LOG("ClientConnect", UTIL_VarArgs("pEntity=%x, pszName=%s", pEntity, pszName));
 		
 		// check if this client is the listen server client
@@ -720,36 +717,16 @@ BOOL ClientConnect( edict_t *pEntity, const char *pszName, const char *pszAddres
 		// check if this is NOT a bot joining the server...
 		if (!FStrEq(pszAddress, "127.0.0.1"))
 		{
-			// don't try to add bots for 60 seconds, give client time to get added
-			//bot_check_time = gpGlobals->time + 60.0;
+			// don't try to add bots for _PAUSE_TIME*2 seconds, give client time to get added
 			bot_check_time = gpGlobals->time + _PAUSE_TIME*2;
-			/*
-			for (i=0; i < 32; i++)
-			{
-				if (bots[i])  // count the number of bots in use
-					count++;
-			}
-			
-			// if there are currently more than the minimum number of bots running
-			// then kick one of the bots off the server...
-			if ((count > int(jb_botsmin->value)) && (int(jb_botsmin->value) != -1))
-			{
-				for (i=0; i < 32; i++){
-					if (bots[i]){  // is this slot used?
-						SERVER_COMMAND(UTIL_VarArgs("kick \"%s\"\n", STRING(bots[i]->pEdict->v.netname)));  // kick the bot using (kick "name")
-						break;
-					}
-				}
-			}*/
-			int clientindex = UTIL_ClientIndex(pEntity);
-			if(clientindex != -1){
-				welcome_time[clientindex] = gpGlobals->time + 10.0f;		// set welcome time to some seconds in the future :D
-				bWelcome[clientindex] = false;
-			}
+
+			int clientindex = ENTINDEX(pEntity) - 1;
+			welcome_time[clientindex] = gpGlobals->time + 10.0f;		// set welcome time to some seconds in the future :D
+			bWelcome[clientindex] = false;
 		}
 		pEdictLastJoined = pEntity;
-		long lProp = long(200.f / float(UTIL_ClientsInGame()));
-		for (i=0; i < 32; i++){
+		long lProp = long(200.f / float(UTIL_PlayerCount(COUNT_ALL)));
+		for (int i = 0; i < 32; i++){
 			if (bots[i]){
 				if(RANDOM_LONG(0,100) < lProp){
 					bots[i]->Chat.l_ChatEvent |= E_WELCOME;
@@ -823,21 +800,19 @@ void ClientPutInServer( edict_t *pEntity )
 	
 	if ( !(pEntity->v.flags & FL_FAKECLIENT) )
 	{
-		int count = 0;
-		for (i=0; i < 32; i++)
-		{
-			if (bots[i])  // count the number of bots in use
-				count++;
-		}
+		int count = UTIL_PlayerCount(COUNT_FAKE);
 		
 		// if there are currently more than the minimum number of bots running
 		// then kick one of the bots off the server...
 		if ((count > int(jb_botsmin->value)) && (int(jb_botsmin->value) != -1))
 		{
 			for (i=0; i < 32; i++){
-				if (bots[i]){  // is this slot used?
-					SERVER_COMMAND(UTIL_VarArgs("kick \"%s\"\n", STRING(bots[i]->pEdict->v.netname)));  // kick the bot using (kick "name")
-					break;
+				if (bots[i]){
+					edict_t *pBot = INDEXENT(i + 1);
+					if (bots[i]->pEdict == pBot){
+						SERVER_COMMAND(UTIL_VarArgs("kick \"%s\"\n", STRING(bots[i]->pEdict->v.netname)));  // kick the bot using (kick "name")
+						break;
+					}
 				}
 			}
 		}
@@ -861,12 +836,10 @@ FILL_FULL
 	int iP0 = 0,		// which players are there already ?
 		iP1 = 0,
 		iPAll = 0;
-	int iNeed2Fill,iFillTeam,ischl=0;
+	int iNeed2Fill,iFillTeam;
 	
-	int i;
-	edict_t *pEnt;
-	for (i = 0; i < gpGlobals->maxClients; i++){
-		pEnt = INDEXENT(i + 1);
+	for (int i = 0; i < gpGlobals->maxClients; i++){
+		edict_t *pEnt = INDEXENT(i + 1);
 		if (!FNullEnt(pEnt) && (!pEnt->free)){
 			if(!strncmp(STRING(pEnt->v.classname),"player",6)){
 				char *infobuffer; 
@@ -919,23 +892,18 @@ FILL_FULL
 	else 
 		iFillTeam = 4;			// later 1 is added
 	
-	ischl = 0;
 	//cout << iNeed2Fill<<"-"<<iPAll<<"-"<<gpGlobals->maxClients <<endl;
-	while(iNeed2Fill && ischl < 32){
+	for (int ischl = 0; iNeed2Fill && ischl < 32; ischl++, iNeed2Fill--){
 		if(!bots[ischl]){
-			iNeed2Fill --;
-			
-			*SBInfo[ischl].name = 0;
-			*SBInfo[ischl].skin = 0;
+			SBInfo[ischl].name[0] = '\0';
+			SBInfo[ischl].skin[0] = '\0';
 			SBInfo[ischl].bot_team = iFillTeam+1;
 			SBInfo[ischl].bot_skill = -1;
 			SBInfo[ischl].bot_class = -1;
 			SBInfo[ischl].respawn_state = RESPAWN_NEED_TO_RESPAWN;
 			SBInfo[ischl].kick_time = gpGlobals->time;
-			
 			//cout << "^";
 		}
-		ischl ++;
 	}
 	respawn_time = 0;
 }
@@ -965,66 +933,58 @@ void KickBots(edict_t *pEntity,int iTeam,int iAll){
 #define MAX_CTRIES 10
 
 void TrainNN(edict_t *pEntity){
-/*char szDir[80];
-if(mod_id == CSTRIKE_DLL){
-snprintf(szDir,sizeof(szDir),"cstrike/joebot/");
-}
-else if(mod_id == DOD_DLL){
-snprintf(szDir,sizeof(szDir),"dod/joebot/");
-}
-char szLoadText[80];
-char szSave[80];
-strcpy(szLoadText,szDir);
-strcat(szLoadText,"nntrain.pta");
-strcpy(szSave,szDir);
-strcat(szSave,"nntrain.ptt");
+#ifdef ENABLE_TRAINNN
+	UTIL_BuildFileName(szLoadText, sizeof(szLoadText), "joebot/nntrain.pta");
+	UTIL_BuildFileName(szSave, sizeof(szSave), "joebot/nntrain.ptt");
 
 	CPattern NNCPattern;
 	try{
-	NNCPattern.LoadText(szLoadText);
+		NNCPattern.LoadText(szLoadText);
 	}
 	catch(...){
-	UTIL_ConsoleMessage(pEntity, "Error loading %s\n",szLoadText);
-	return;
+		UTIL_ConsoleMessage(pEntity, "Error loading %s\n",szLoadText);
+		return;
 	}	
-	UTIL_ConsoleMessage(pEntity, "Sucessfully loading %s\n",szLoadText);
+
+	UTIL_ConsoleMessage(pEntity, "Sucessfully loaded %s\n",szLoadText);
 	NNCPattern.Save(szSave);
 	NNCPattern.SetNN(NNCombat);
-	
-	 NNCombat->InitConnections(-.3,.3);
-	 
-	  bool bflag=true;
-	  long lloop=0,lschl,lEpoch=0;
-	  double dError;
-	  while(bflag){
-	  lloop++;
-	  for(lschl=0;lschl < MAX_TRIES;lschl++){
-	  NNCPattern.LearnEpochMM();
-	  lEpoch++;
-	  //cout << lEpoch << " ";cout.flush();
-	  dError = NNCPattern.dMaxErrorMax;
-	  if(dError < _MAXERROR)
-	  break;
-	  }
-	  if(lschl >= MAX_TRIES){
-	  lEpoch = 0;
-	  NNCombat->InitConnections(-.3,.3);
-	  UTIL_ConsoleMessage(pEntity, "%i.after %i epochs the net could not be trained to a max error of %.2f, it's %.2f - resetting nn and trying again\n",lloop,MAX_TRIES, _MAXERROR,dError);
-	  }
-	  else{
-	  bflag = false;
-	  }
-	  if(lloop>10){
-	  UTIL_ConsoleMessage(pEntity, "%i. after %i epochs the net could be trained to a max error of %.2f - canceling training and reloading\n",lloop,MAX_TRIES, _MAXERROR);
-	  char filename[80];
-	  UTIL_BuildFileName(filename, sizeof(filename), "joebot/nn.br3");
-	  NNCombat->Save(filename);
-	  return;
-	  }
-	  }
-	  if(dError < _MAXERROR){
-	  UTIL_ConsoleMessage(pEntity, "after %i epochs the net could be trained to a max error of %.2f\nNow you can test the net and if u wish to save it, do 'savenn'\n",lloop, _MAXERROR);
-}*/
+		
+	NNCombat->InitConnections(-.3,.3);
+		 
+	bool bflag=true;
+	long lloop=0,lschl,lEpoch=0;
+	double dError;
+	while(bflag){
+		lloop++;
+		for(lschl=0;lschl < MAX_TRIES;lschl++){
+			NNCPattern.LearnEpochMM();
+			lEpoch++;
+			//cout << lEpoch << " ";cout.flush();
+			dError = NNCPattern.dMaxErrorMax;
+			if(dError < _MAXERROR)
+				break;
+		}
+		if(lschl >= MAX_TRIES){
+			lEpoch = 0;
+			NNCombat->InitConnections(-.3,.3);
+			UTIL_ConsoleMessage(pEntity, "%i.after %i epochs the net could not be trained to a max error of %.2f, it's %.2f - resetting nn and trying again\n",lloop,MAX_TRIES, _MAXERROR,dError);
+		}
+		else{
+			bflag = false;
+		}
+		if(lloop>10){
+			UTIL_ConsoleMessage(pEntity, "%i. after %i epochs the net could be trained to a max error of %.2f - canceling training and reloading\n",lloop,MAX_TRIES, _MAXERROR);
+			char filename[80];
+			UTIL_BuildFileName(filename, sizeof(filename), "joebot/nn.br3");
+			NNCombat->Save(filename);
+			return;
+		}
+	}
+	if(dError < _MAXERROR){
+		  UTIL_ConsoleMessage(pEntity, "after %i epochs the net could be trained to a max error of %.2f\nNow you can test the net and if u wish to save it, do 'savenn'\n",lloop, _MAXERROR);
+	}
+#endif /* ENABLE_TRAINNN */
 }
 
 void Endround(void){
@@ -1795,7 +1755,7 @@ void StartFrame( void )
 				if (!CVAR_BOOL(jb_jointeam) &&
 					bots[bot_index]->bot_team != 6 &&
 					bots[bot_index]->bot_team > 0 &&
-					!UTIL_HumansInGame())
+					!UTIL_PlayerCount(COUNT_HUMAN))
 				{
 					SERVER_COMMAND(UTIL_VarArgs("kick \"%s\"\n", STRING(bots[bot_index]->pEdict->v.netname)));
 				}
@@ -1920,10 +1880,11 @@ void StartFrame( void )
 				
 				if (index < 32)
 				{
-					if(CVAR_BOOL(jb_jointeam) || (!CVAR_BOOL(jb_jointeam) && UTIL_HumansInGame() != 0)){
+					if(CVAR_BOOL(jb_jointeam) || (!CVAR_BOOL(jb_jointeam) && UTIL_PlayerCount(COUNT_HUMAN) != 0)){
 						SBInfo[index].respawn_state = RESPAWN_IS_RESPAWNING;
-						if(bots[index]) delete bots[index];      // free up this slot
-						bots[index] = 0;
+						if(bots[index])
+							delete bots[index];      // free up this slot
+						bots[index] = NULL;
 						
 						// respawn 1 bot then wait a while (otherwise engine crashes)
 						if ((mod_id == VALVE_DLL) ||
@@ -1969,16 +1930,15 @@ void StartFrame( void )
 				// check if time to see if a bot needs to be created...
 				if (bot_check_time < gpGlobals->time)
 				{
-					int count = 0;
-					//int counthumans = UTIL_HumansInGame();
+					int count = UTIL_PlayerCount(COUNT_ALL);
 					
 					bot_check_time = gpGlobals->time + 1.5;		//hackhack
 					
-					for (i = 0; i < 32; i++)
+					/*for (i = 0; i < 32; i++)
 					{
 						if (clients[i] != NULL)
 							count++;
-					}
+					}*/
 					
 					// if there are currently less than the maximum number of "players"
 					// then add another bot using the default skill level...
@@ -1986,7 +1946,7 @@ void StartFrame( void )
 					{
 						//cout << " ------------------- creating bot due to max_bots" << endl;
 						// enter the game if jb_entergame is set or if humans are in the game
-						if(CVAR_BOOL(jb_entergame) || UTIL_HumansInGame()){
+						if(CVAR_BOOL(jb_entergame) || UTIL_PlayerCount(COUNT_HUMAN)){
 							BotCreate( NULL, NULL, NULL, NULL, NULL);
 						}
 					}
