@@ -1137,6 +1137,7 @@ const char *pfnGetPlayerAuthId(edict_t *e)
 #endif /* USE_METAMOD */
 }
 #ifndef USE_METAMOD
+#ifdef HLSDK_20031110
 // 2003/11/10
 void *pfnSequenceGet(const char* fileName, const char* entryName)
 {
@@ -1182,6 +1183,7 @@ void pfnResetTutorMessageDecayData(void)
 {
 	(*g_engfuncs.pfnResetTutorMessageDecayData)();
 }
+#endif /* HLSDK_20031110 */
 #endif /* not USE_METAMOD */
 
 #ifdef USE_METAMOD

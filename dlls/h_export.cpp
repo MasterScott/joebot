@@ -390,18 +390,20 @@ extern "C" DLLEXPORT void GiveFnptrsToDll( enginefuncs_t* pengfuncsFromEngine, g
    // hl1109
    pengfuncsFromEngine->pfnGetPlayerAuthId = pfnGetPlayerAuthId;
 
+#ifdef HLSDK_20031110
    // 2003/11/10
    pengfuncsFromEngine->pfnSequenceGet = pfnSequenceGet;
    pengfuncsFromEngine->pfnSequencePickSentence = pfnSequencePickSentence;
-//   pengfuncsFromEngine->pfnGetFileSize = pfnGetFileSize;
+   pengfuncsFromEngine->pfnGetFileSize = pfnGetFileSize;
    pengfuncsFromEngine->pfnGetApproxWavePlayLen = pfnGetApproxWavePlayLen;
-//   pengfuncsFromEngine->pfnIsCareerMatch = pfnIsCareerMatch;
+   pengfuncsFromEngine->pfnIsCareerMatch = pfnIsCareerMatch;
    pengfuncsFromEngine->pfnGetLocalizedStringLength = pfnGetLocalizedStringLength;
    pengfuncsFromEngine->pfnRegisterTutorMessageShown = pfnRegisterTutorMessageShown;
    pengfuncsFromEngine->pfnGetTimesTutorMessageShown = pfnGetTimesTutorMessageShown;
    pengfuncsFromEngine->pfnProcessTutorMessageDecayBuffer = pfnProcessTutorMessageDecayBuffer;
    pengfuncsFromEngine->pfnConstructTutorMessageDecayBuffer = pfnConstructTutorMessageDecayBuffer;
    pengfuncsFromEngine->pfnResetTutorMessageDecayData = pfnResetTutorMessageDecayData;
+#endif /* HLSDK_20031110 */
 
    // give the engine functions to the other DLL...
    (*other_GiveFnptrsToDll)(pengfuncsFromEngine, pGlobals);

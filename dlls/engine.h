@@ -177,6 +177,7 @@ qboolean pfnVoice_GetClientListening(int iReceiver, int iSender);
 qboolean pfnVoice_SetClientListening(int iReceiver, int iSender, qboolean bListen);
 const char *pfnGetPlayerAuthId(edict_t *e);
 
+#ifdef HLSDK_20031110
 void *pfnSequenceGet(const char* fileName, const char* entryName);
 void *pfnSequencePickSentence(const char* groupName, int pickMethod, int *picked);
 int pfnGetFileSize(char *filename);
@@ -188,5 +189,6 @@ int pfnGetTimesTutorMessageShown(int mid);
 void pfnProcessTutorMessageDecayBuffer(int *buffer, int bufferLength);
 void pfnConstructTutorMessageDecayBuffer(int *buffer, int bufferLength);
 void pfnResetTutorMessageDecayData(void);
+#endif /* HLSDK_20031110 */
 
 #endif //ENGINE_H
