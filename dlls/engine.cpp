@@ -143,55 +143,11 @@ void pfnChangePitch(edict_t* ent)
 	//BOT_LOG("pfnChangePitch", "");
 	(*g_engfuncs.pfnChangePitch)(ent);
 }
-#endif /* not USE_METAMOD */
 edict_t* pfnFindEntityByString(edict_t *pEdictStartSearchAfter, const char *pszField, const char *pszValue)
 {
-	if (FStrEq(pszValue, "info_map_parameters") && (mod_id == CSTRIKE_DLL)){
-		// set flag, that new round has started ....
-		iGlobalRSCount = 0;
-
-		//CalcDistances();
-		
-		for(int i=0;i<32;i++){
-			AWP_ED[i].iLastWP = -1;
-			bRec[i] = false;
-			bStopRec[i] = false;
-			if(bots[i]){
-				((CBotCS*)bots[i])->bRSInit = true;
-				((CBotCS*)bots[i])->bot_vip = false;
-				
-				iGlobalRSCount ++;
-			}
-		}
-		g_pVIP=0;
-		f_round_start = gpGlobals->time;
-		g_bBombPlanted = false;
-		g_bBombDropped = false;
-		
-		switch(g_iTypeoM){
-		case MT_AS:
-			fM[CS_TEAM_TE] = RANDOM_FLOAT(-1,jb_campprobability->value/1.5);
-			fM[CS_TEAM_CT] = RANDOM_FLOAT(-1,jb_campprobability->value);
-			break;
-		case MT_DE:
-			fM[CS_TEAM_TE] = RANDOM_FLOAT(-1,jb_campprobability->value);
-			fM[CS_TEAM_CT] = RANDOM_FLOAT(-1,jb_campprobability->value/1.2);
-			break;
-		case MT_CS:
-		default:
-			fM[CS_TEAM_TE] = RANDOM_FLOAT(-1,jb_campprobability->value/1.5);
-			fM[CS_TEAM_CT] = RANDOM_FLOAT(-1,jb_campprobability->value);
-		};
-	}
-	
 	//BOT_LOG("pfnFindEntityByString", UTIL_VarArgs("pszValue=%s", pszValue));
-#ifdef USE_METAMOD
-	RETURN_META_VALUE(MRES_IGNORED, NULL);
-#else /* not USE_METAMOD */
 	return (*g_engfuncs.pfnFindEntityByString)(pEdictStartSearchAfter, pszField, pszValue);
-#endif /* USE_METAMOD */
 }
-#ifndef USE_METAMOD
 int pfnGetEntityIllum(edict_t* pEnt)
 {
 	BOT_LOG("pfnGetEntityIllum", "");
@@ -613,18 +569,83 @@ void pfnCVarSetString(const char *szVarName, const char *szValue)
 	//BOT_LOG("pfnCVarSetString", "");
 	(*g_engfuncs.pfnCVarSetString)(szVarName, szValue);
 }
+#endif /* not USE_METAMOD */
+
 void pfnAlertMessage(ALERT_TYPE atype, char *szFmt, ...)
 {
 	BOT_LOG("pfnAlertMessage", "");
 	va_list		argptr;
 	static char		string[1024];
+	char *cp;
 
-	va_start ( argptr, szFmt );
-	vsnprintf ( string, sizeof(string), szFmt, argptr );
-	va_end   ( argptr );
+	if (atype == at_logged)
+	{
+		va_start ( argptr, szFmt );
+		vsnprintf ( string, sizeof(string), szFmt, argptr );
+		va_end   ( argptr );
 
+		cp = string;
+
+		// World triggered ...
+		if (cp && (cp[0] == 'W'))
+		{
+			// ... Round_Start
+			if (!strncmp(cp + 6, "triggered \"Round_Start\"", 23))
+			{
+			}
+			// ... Round_End
+			else if (!strncmp(cp + 6, "triggered \"Round_End\"", 21))
+			{
+				// set flag that new round will start ....
+				iGlobalRSCount = 0;
+
+				//CalcDistances();
+				
+				for(int i=0;i<32;i++){
+					AWP_ED[i].iLastWP = -1;
+					bRec[i] = false;
+					bStopRec[i] = false;
+					if(bots[i]){
+						((CBotCS*)bots[i])->bRSInit = true;
+						((CBotCS*)bots[i])->bot_vip = false;
+						
+						iGlobalRSCount ++;
+					}
+				}
+				g_pVIP=0;
+				f_round_start = gpGlobals->time;
+				g_bBombPlanted = false;
+				g_bBombDropped = false;
+				
+				switch(g_iTypeoM){
+				case MT_AS:
+					fM[CS_TEAM_TE] = RANDOM_FLOAT(-1,jb_campprobability->value/1.5);
+					fM[CS_TEAM_CT] = RANDOM_FLOAT(-1,jb_campprobability->value);
+					break;
+				case MT_DE:
+					fM[CS_TEAM_TE] = RANDOM_FLOAT(-1,jb_campprobability->value);
+					fM[CS_TEAM_CT] = RANDOM_FLOAT(-1,jb_campprobability->value/1.2);
+					break;
+				case MT_CS:
+				default:
+					fM[CS_TEAM_TE] = RANDOM_FLOAT(-1,jb_campprobability->value/1.5);
+					fM[CS_TEAM_CT] = RANDOM_FLOAT(-1,jb_campprobability->value);
+				};
+			}
+			// ... Game_Commencing
+			else if (!strncmp(cp + 6, "triggered \"Game_Commencing\"", 27))
+			{
+			}
+		}
+	}
+#ifdef USE_METAMOD
+	RETURN_META(MRES_IGNORED);
+#else /* not USE_METAMOD */
 	(*g_engfuncs.pfnAlertMessage)(atype, string);
+#endif /* USE_METAMOD */
 }
+
+#ifndef USE_METAMOD
 void pfnEngineFprintf(FILE *pfile, char *szFmt, ...)
 {
 	BOT_LOG("pfnEngineFprintf", "");
@@ -1218,7 +1239,7 @@ enginefuncs_t meta_engfuncs = {
 	NULL,			// pfnChangeYaw()
 	NULL,			// pfnChangePitch()
 
-	pfnFindEntityByString,	// pfnFindEntityByString()
+	NULL,			// pfnFindEntityByString()
 	NULL,			// pfnGetEntityIllum()
 	NULL,			// pfnFindEntityInSphere()
 	NULL,			// pfnFindClientInPVS()
@@ -1277,7 +1298,7 @@ enginefuncs_t meta_engfuncs = {
 	NULL,			// pfnCVarSetFloat()
 	NULL,			// pfnCVarSetString()
 
-	NULL,			// pfnAlertMessage()
+	pfnAlertMessage,	// pfnAlertMessage()
 	NULL,			// pfnEngineFprintf()
 
 	NULL,			// pfnPvAllocEntPrivateData()
