@@ -23,9 +23,11 @@
 // Johannes.Lampel@gmx.de
 // http://joebot.counter-strike.de
 
-#include "CParser.h"
+//#include <iostream.h>
+#include <stdio.h>
+#include <string.h>
 
-#include <iostream.h>
+#include "CParser.h"
 
 CParser :: CParser(){
 }
