@@ -2412,6 +2412,13 @@ void WaypointPrintInfo(edict_t *pEntity, char *szText)		// szText is max 1000
 	int index;
 	int flags;
 	long lNum=0;
+
+	if(FNullEnt(pEntity)){
+		snprintf(msg,sizeof(msg),"Invalid entity calling \"WaypointPrintInfo\"\n\nNOTE: this command isnt usable from the console\n");
+
+		UTIL_ConsoleMessage(pEntity, msg);
+		return;
+	}
 	
 	index = 0;
 	while (index < num_waypoints)
