@@ -1,18 +1,27 @@
 # setup directory paths
-OBJDIR_WIN32 = obj.win32
-OBJDIR_LINUX = obj.linux
+OBJDIR_DEBUG_WIN32 = debug/win32
+OBJDIR_RELEASE_WIN32 = release/win32
+OBJDIR_DEBUG_LINUX = debug/linux
+OBJDIR_RELEASE_LINUX = release/linux
 
 ifeq ($(OS),Windows_NT)
  SDKDIR = /u/netgames/install/hl/sdk/multiplayer
  JOEBOTDIR = /u/netgames/install/hl/bots/joebot/src
  MMDIR = /u/netgames/install/hl/server/metamod/src/1.17
- OBJDIR = $(OBJDIR_WIN32)
+ OBJDIR_DEBUG = $(OBJDIR_DEBUG_WIN32)
+ OBJDIR_RELEASE = $(OBJDIR_RELEASE_WIN32)
 else
  SDKDIR = /home/netgames/install/hl/sdk/multiplayer
  JOEBOTDIR = /home/netgames/install/hl/bots/joebot/src
  MMDIR = /home/netgames/install/hl/server/metamod/src/1.17
- OBJDIR = $(OBJDIR_LINUX)
+ OBJDIR_DEBUG = $(OBJDIR_DEBUG_LINUX)
+ OBJDIR_RELEASE = $(OBJDIR_RELEASE_LINUX)
 endif
+
+OBJDIR_DEBUG_STD = $(OBJDIR_DEBUG)/std
+OBJDIR_DEBUG_MM = $(OBJDIR_DEBUG)/mm
+OBJDIR_RELEASE_STD = $(OBJDIR_RELEASE)/std
+OBJDIR_RELEASE_MM = $(OBJDIR_RELEASE)/mm
 
 EXTRA_CFLAGS =
 
