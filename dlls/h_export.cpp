@@ -62,7 +62,8 @@ GETNEWDLLFUNCTIONS other_GetNewDLLFunctions = NULL;
 GIVEFNPTRSTODLL other_GiveFnptrsToDll = NULL;
 #endif /* not USE_METAMOD */
 
-extern int mod_id;
+int mod_id = -1;
+char mod_name[32];
 
 // Adapted from metamod game_support.cpp
 typedef struct game_modinfo_s {
