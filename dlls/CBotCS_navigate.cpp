@@ -104,7 +104,8 @@ bool CBotCS :: HeadTowardSpEnt(void){
 			//fDistance = Vector(pEnt->v.origin - pEdict->v.origin).Length();
 			if(fDistance < 1500
 				&& FVisible(gFlash[lNumF].VOrigin,pEdict)){
-				if(Task.current&&Task.current->lType&(BT_HIDE|BT_LOCKED)!=(BT_HIDE|BT_LOCKED)){
+				if(Task.current
+					&& ((Task.current->lType&(BT_HIDE|BT_LOCKED))!=(BT_HIDE|BT_LOCKED))){
 					// it's near and visible
 					
 					Vector v_diff = pEdict->v.origin - gFlash[lNumF].VOrigin;

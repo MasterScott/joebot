@@ -2291,11 +2291,8 @@ void CBotCS :: Think(void){
 		float f_DotMin = -.5;
 		Vector VLDiff,VRDiff;
 		
-		//if(1||f_GoBack>gpGlobals->time){
 		f_DotMin = -1.1f;
-		//}
 		
-		//VLDiff = Vector(cos(pEdict->v.v_angle.y * M_PI / 180.0),sin(pEdict->v.v_angle.y * M_PI / 180.0),0);
 		UTIL_MakeVectors(pEdict->v.v_angle);
 		VLDiff = gpGlobals->v_forward;
 		VLDiff.z = 0;
