@@ -45,13 +45,18 @@
 // util.cpp
 //
 
+#include <ctype.h>
+
 #include "extdll.h"
 #include "util.h"
+#include "engine.h"
 
 #include "bot.h"
 #include "bot_func.h"
-
-#include "engine.h"
+#include "bot_modid.h"
+#include "globalvars.h"
+#include "CBotBase.h"
+#include "CBotCS.h"
 
 extern int mod_id;
 
@@ -156,38 +161,19 @@ void ClientPrint( entvars_t *client, int msg_dest, const char *msg_name, const c
 		gmsgTextMsg = REG_USER_MSG( "TextMsg", -1 );
 	
 	MESSAGE_BEGIN( MSG_ONE, gmsgTextMsg, NULL, client );
+		WRITE_BYTE( msg_dest );
+		WRITE_STRING( msg_name );
 	
-	WRITE_BYTE( msg_dest );
-	WRITE_STRING( msg_name );
-	
-	if ( param1 )
-		WRITE_STRING( param1 );
-	if ( param2 )
-		WRITE_STRING( param2 );
-	if ( param3 )
-		WRITE_STRING( param3 );
-	if ( param4 )
-		WRITE_STRING( param4 );
+		if ( param1 )
+			WRITE_STRING( param1 );
+		if ( param2 )
+			WRITE_STRING( param2 );
+		if ( param3 )
+			WRITE_STRING( param3 );
+		if ( param4 )
+			WRITE_STRING( param4 );
 	
 	MESSAGE_END();
-}
-
-void ClientPrintEx( entvars_t *client, int msg_dest, const char *msg_name, const char *param1, const char *param2, const char *param3, const char *param4 )
-{
-	if(IS_DEDICATED_SERVER() && client == 0){
-		if(msg_name)	cout << msg_name;
-		if(param1)		cout << param1;
-		if(param2)		cout << param2;
-		if(param3)		cout << param3;
-		if(param4)		cout << param4;
-		cout.flush();
-	}
-	else
-		if(client)
-			ClientPrint(client,msg_dest,msg_name,param1,param2,param3,param4);
-		else if(listenserver_edict)
-			ClientPrint(VARS(listenserver_edict),msg_dest,msg_name,param1,param2,param3,param4);
-			
 }
 
 void UTIL_ClientPrintAll( int msg_dest, const char *msg_name, const char *param1, const char *param2, const char *param3, const char *param4 )
@@ -196,17 +182,17 @@ void UTIL_ClientPrintAll( int msg_dest, const char *msg_name, const char *param1
 		gmsgTextMsg = REG_USER_MSG( "TextMsg", -1 );
 	
 	MESSAGE_BEGIN( MSG_ALL, gmsgTextMsg );
-	WRITE_BYTE( msg_dest );
-	WRITE_STRING( msg_name );
+		WRITE_BYTE( msg_dest );
+		WRITE_STRING( msg_name );
 	
-	if ( param1 )
-		WRITE_STRING( param1 );
-	if ( param2 )
-		WRITE_STRING( param2 );
-	if ( param3 )
-		WRITE_STRING( param3 );
-	if ( param4 )
-		WRITE_STRING( param4 );
+		if ( param1 )
+			WRITE_STRING( param1 );
+		if ( param2 )
+			WRITE_STRING( param2 );
+		if ( param3 )
+			WRITE_STRING( param3 );
+		if ( param4 )
+			WRITE_STRING( param4 );
 	
 	MESSAGE_END();
 }
@@ -337,14 +323,10 @@ long UTIL_ClientIndex(edict_t *pEdict){
 	return lIndex;
 }
 
-bool UTIL_PlayerDecalTrace( TraceResult *pTrace, int playernum, int decalNumber, BOOL bIsCustom )
+void UTIL_PlayerDecalTrace( TraceResult *pTrace, int playernum, int decalNumber, BOOL bIsCustom )
 {
 	int index;
 
-	if(decalNumber == -1){
-		return false;
-	}
-	
 	/*if (!bIsCustom)
 	{
 		if ( decalNumber < 0 )
@@ -358,7 +340,7 @@ bool UTIL_PlayerDecalTrace( TraceResult *pTrace, int playernum, int decalNumber,
 		index = decalNumber;
 
 	if (pTrace->flFraction == 1.0)
-		return false;
+		return;
 
 	MESSAGE_BEGIN( MSG_BROADCAST, SVC_TEMPENTITY );
 		WRITE_BYTE( TE_PLAYERDECAL );
@@ -369,7 +351,6 @@ bool UTIL_PlayerDecalTrace( TraceResult *pTrace, int playernum, int decalNumber,
 		WRITE_SHORT( (short)ENTINDEX(pTrace->pHit) );
 		WRITE_BYTE( index );
 	MESSAGE_END();
-	return true ;
 }
 
 #ifdef	DEBUG
@@ -398,23 +379,41 @@ int UTIL_GetTeam(edict_t *pEntity)
 		infobuffer = (*g_engfuncs.pfnGetInfoKeyBuffer)( pEntity );
 		strcpy(model_name, (g_engfuncs.pfnInfoKeyValue(infobuffer, "model")));
 		
-		if ((strcmp(model_name, "terror") == 0) ||  // Phoenix Connektion
-			(strcmp(model_name, "arab") == 0) ||    // L337 Krew
-			(strcmp(model_name, "artic") == 0) ||   // Artic Avenger
-			(strcmp(model_name, "guerilla") == 0))  // Gorilla Warfare
+		/*if ((FStrEq(model_name, "terror")) ||  // Phoenix Connektion
+			(FStrEq(model_name, "arab")) ||    // L337 Krew
+			(FStrEq(model_name, "artic")) ||   // Artic Avenger
+			(FStrEq(model_name, "guerilla")))  // Gorilla Warfare
 		{
-			return 0;
+			return TE;
 		}
-		else if ((strcmp(model_name, "urban") == 0) ||  // Seal Team 6
-			(strcmp(model_name, "gsg9") == 0) ||   // German GSG-9
-			(strcmp(model_name, "sas") == 0) ||    // UK SAS
-			(strcmp(model_name, "gign") == 0) ||   // French GIGN
-			(strcmp(model_name, "vip") == 0))      // VIP
+		else */if ((FStrEq(model_name, "urban")) ||  // Seal Team 6
+			(FStrEq(model_name, "gsg9")) ||   // German GSG-9
+			(FStrEq(model_name, "sas")) ||    // UK SAS
+			(FStrEq(model_name, "gign")) ||   // French GIGN
+			(FStrEq(model_name, "vip")))      // VIP
 		{
-			return 1;
+			return CT;
 		}
+
+		/*if ( (*(int *)model_name == ('r'<<24+'r'<<16+'e'<<8+'t')) ||
+			(*(int *)model_name == ('b'<<24+'a'<<16+'r'<<8+'a')) ||
+			(*(int *)model_name == ('i'<<24+'t'<<16+'r'<<8+'a')) ||
+			(*(int *)model_name == ('r'<<24+'e'<<16+'u'<<8+'g')) )    
+			return 0;		// it's a terror
+		else
+			return CT;*/
+
+			/*
+
+			if ( (*(int *)model_name == ('r'<<24+'r'<<16+'e'<<8+'t')) ||
+			(*(int *)model_name == ('b'<<24+'a'<<16+'r'<<8+'a')) ||
+			(*(int *)model_name == ('i'<<24+'t'<<16+'r'<<8+'a')) ||
+			(*(int *)model_name == ('r'<<24+'e'<<16+'u'<<8+'g')) )    
+			return TE;		// it's a terror
+			
+			*/
 		
-		return 0;  // return zero if team is unknown
+		return TE;  // return TE otherwise
 	}
 	else
 	{
@@ -435,7 +434,7 @@ bool UTIL_IsVIP(edict_t *pEntity){
 		
 		infobuffer = (*g_engfuncs.pfnGetInfoKeyBuffer)( pEntity );
 		strcpy(model_name, (g_engfuncs.pfnInfoKeyValue(infobuffer, "model")));
-		return !strcmp(model_name, "vip");
+		return FStrEq(model_name, "vip");
 	}
 	else
 		return false;
@@ -616,7 +615,7 @@ int UTIL_HumansInGame( void )
         if ( FStrEq( STRING( pPlayer->v.netname ), "" ) )
             continue;
 
-        if ( FBitSet( pPlayer->v.flags, FL_FAKECLIENT ) )
+        if ( pPlayer->v.flags & (FL_FAKECLIENT | FL_THIRDPARTYBOT) )
             continue;
 
         iCount++;
@@ -798,7 +797,7 @@ Vector GetGunPosition(edict_t *pEdict)
 
 void UTIL_SelectItem(edict_t *pEdict, char *item_name)
 {
-	FakeClientCommand(pEdict, item_name, NULL, NULL);
+	FakeClientCommand(pEdict, "%s", item_name);
 }
 
 Vector VecBModelOrigin(edict_t *pEdict)
@@ -829,7 +828,7 @@ void UTIL_BuildFileName(char *filename, const char *arg1, const char *arg2)
 		return;
 	}
 
-	#ifndef __linux__
+#ifdef _WIN32
       strcat(filename, "\\");
 #else
       strcat(filename, "/");
@@ -839,7 +838,7 @@ void UTIL_BuildFileName(char *filename, const char *arg1, const char *arg2)
    {
       strcat(filename, arg1);
 
-#ifndef __linux__
+#ifdef _WIN32
       strcat(filename, "\\");
 #else
       strcat(filename, "/");
