@@ -222,16 +222,14 @@ int WaypointFindNearest(edict_t *pEntity, float range, int team, float fMin,bool
 
 void WaypointDebug(void)
 {
-#ifdef DEBUGENGINE
+#ifdef _DEBUG
 	int y = 1, x = 1;
 	
-	BOT_LOG("WaypointDebug", "LINKED LIST ERROR!!!");
+	LOG_DEBUG("WaypointDebug: LINKED LIST ERROR!!!");
 	
 	x = x - 1;  // x is zero
 	y = y / x;  // cause an divide by zero exception
 #endif
-	
-	return;
 }
 
 
@@ -436,7 +434,7 @@ void WaypointAddADV(short int origin_index, short int aim_index, ADV_WPRecMove *
 	}
 	else{
 		// there should already a path when adding a adv move, therefore just add one and call this function
-#ifdef DEBUGMESSAGES
+#ifdef _DEBUG
 		FILE *fhd = fopen("scheisse.txt","a");fprintf(fhd,"if this is often, there is an error in waypointaddadv ( recursive calls doesn't end )\n");fclose(fhd);
 #endif
 		WaypointAddPath(origin_index,aim_index);
@@ -903,7 +901,7 @@ int WaypointFindRandomGoal(edict_t *pEntity, int team, int flags)
 	if (count == 0)  // no matching waypoints found
 		return -1;
 	
-	index = RANDOM_LONG(1, count) - 1;
+	index = RANDOM_LONG(0, count - 1);
 	
 	return indexes[index];
 }
@@ -957,7 +955,7 @@ int WaypointFindRandomGoal(Vector v_src, edict_t *pEntity, float range, int team
 	if (count == 0)  // no matching waypoints found
 		return -1;
 	
-	index = RANDOM_LONG(1, count) - 1;
+	index = RANDOM_LONG(0, count - 1);
 	
 	return indexes[index];
 }
@@ -1974,9 +1972,8 @@ bool WaypointLoad(edict_t *pEntity, const char *szDir)
 		if (IS_DEDICATED_SERVER())
 			LOG_MESSAGE(PLID, "waypoint file %s not found!", filename);
 		
-#ifdef DEBUGENGINE
-		BOT_LOG("WaypointLoad", UTIL_VarArgs("joebot waypoint file \"%s\" not found", filename));
-#endif
+		LOG_DEBUG(UTIL_VarArgs("WaypointLoad: joebot waypoint file \"%s\" not found", filename));
+
 		return FALSE;
 	}
 	
@@ -2876,7 +2873,7 @@ void WaypointThink(edict_t *pEntity)
 						ADVL[i].Rec[ADVL[i].iNum].v_velocity	= pEnt->v.velocity;
 						
 						ADVL[i].iNum ++;
-#ifdef DEBUGMESSAGES
+#ifdef _DEBUG
 						FILE *fhds;fhds=fopen("rec.txt","a");
 						if(fhds)fprintf(fhds,"%i - %f - %f\n",ADVL[i].iNum,gpGlobals->time,ADVL[i].Rec[ADVL[i].iNum-1].fTime);
 						if(fhds)fclose(fhds);
@@ -3231,7 +3228,7 @@ void WaypointThink(edict_t *pEntity)
 							eend = waypoints[i].origin + Vector(0,0,22);
 							b1ND |= WaypointDrawBeam(pEntity, start, eend, iWidth, 2, 0,255,0, 250, 5);
 						}
-#ifdef DEBUGMESSAGES
+#ifdef _DEBUG
 						if(CVAR_BOOL(jb_wpstats)){
 							start = waypoints[i].origin + Vector(20,0,-20);
 							eend = waypoints[i].origin + Vector(20,0,0);
