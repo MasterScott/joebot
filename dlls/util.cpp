@@ -236,30 +236,30 @@ void UTIL_HostSay( edict_t *pEntity, int teamonly, char *message )
 	if(IsAlive(pEntity))
 		if ( teamonly )
 			if(mod_id != CSTRIKE_DLL)
-				sprintf( text, "%c(TEAM) %s : ", 2, STRING( pEntity->v.netname ) );
+				snprintf( text, sizeof(text), "%c(TEAM) %s : ", 2, STRING( pEntity->v.netname ) );
 			else{
 				if(UTIL_GetTeam(pEntity) == CS_TEAM_CT){
-					sprintf( text, "%c(Counter-Terrorist) %s : ", 2, STRING( pEntity->v.netname ) );
+					snprintf( text, sizeof(text), "%c(Counter-Terrorist) %s : ", 2, STRING( pEntity->v.netname ) );
 				}
 				else
-					sprintf( text, "%c(Terrorist) %s : ", 2, STRING( pEntity->v.netname ) );
+					snprintf( text, sizeof(text), "%c(Terrorist) %s : ", 2, STRING( pEntity->v.netname ) );
 			}
 		else
-			sprintf( text, "%c%s : ", 2, STRING( pEntity->v.netname ) );
+			snprintf( text, sizeof(text), "%c%s : ", 2, STRING( pEntity->v.netname ) );
 	else
 		if ( teamonly )
 			if(mod_id != CSTRIKE_DLL)
-				sprintf( text, "%c*DEAD* (TEAM) %s : ", 2, STRING( pEntity->v.netname ) );
+				snprintf( text, sizeof(text), "%c*DEAD* (TEAM) %s : ", 2, STRING( pEntity->v.netname ) );
 			else{
 				if(UTIL_GetTeam(pEntity) == CS_TEAM_CT){
-					sprintf( text, "%c*DEAD* (Counter-Terrorist) %s : ", 2, STRING( pEntity->v.netname ) );
+					snprintf( text, sizeof(text), "%c*DEAD* (Counter-Terrorist) %s : ", 2, STRING( pEntity->v.netname ) );
 				}
 				else{
-					sprintf( text, "%c*DEAD* (Terrorist) %s : ", 2, STRING( pEntity->v.netname ) );
+					snprintf( text, sizeof(text), "%c*DEAD* (Terrorist) %s : ", 2, STRING( pEntity->v.netname ) );
 				}
 			}
 		else
-			sprintf( text, "%c*DEAD* %s : ", 2, STRING( pEntity->v.netname ) );
+			snprintf( text, sizeof(text), "%c*DEAD* %s : ", 2, STRING( pEntity->v.netname ) );
 	
 	j = sizeof(text) - 2 - strlen(text);  // -2 for /n and null terminator
 	if ( (int)strlen(message) > j )
@@ -818,46 +818,15 @@ Vector VecBModelOrigin(entvars_s *v)
 	return v->absmin + (v->size * 0.5);
 }
 
-void UTIL_BuildFileName(char *filename, const char *arg1, const char *arg2)
+int UTIL_BuildFileName(char *str, size_t size, const char *format, ...)
 {
-	
-	if (mod_id == VALVE_DLL)
-		strcpy(filename, "valve");	
-	else if (mod_id == TFC_DLL)
-		strcpy(filename, "tfc");
-	else if (mod_id == CSTRIKE_DLL)
-		strcpy(filename, "cstrike");
-	else if (mod_id == DOD_DLL)
-		strcpy(filename, "dod");
-	else if (mod_id == GEARBOX_DLL)
-		strcpy(filename, "gearbox");	
-	else{
-		strcpy(filename, "");
-		return;
-	}
+	va_list		argptr;
 
-#ifdef _WIN32
-      strcat(filename, "\\");
-#else
-      strcat(filename, "/");
-#endif
-	
-	if ((arg1) && (*arg1) && (arg2) && (*arg2))
-   {
-      strcat(filename, arg1);
+	va_start ( argptr, format );
+	vsnprintf ( str, size, format, argptr );
+	va_end   ( argptr );
 
-#ifdef _WIN32
-      strcat(filename, "\\");
-#else
-      strcat(filename, "/");
-#endif
-
-      strcat(filename, arg2);
-   }
-   else if ((arg1) && (*arg1))
-   {
-      strcat(filename, arg1);
-   }
+	snprintf(str, size, UTIL_VarArgs("%s/%s", mod_name, str));
 }
 
 edict_t *GetNearestPlayer(edict_t *pEdict,int iTeam,float &fMin,bool bVisible,bool bIVC,float fMax){
