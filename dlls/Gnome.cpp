@@ -22,14 +22,19 @@
 //
 //////////////////////////////////////////////////////////////////////
 
+#include "extdll.h"
+#include "util.h"
+
 #include "Gnome.h"
+
+#include "globalvars.h"
+#include "waypoint.h"
 
 #define _GNOMESPEED 20
 #define _MAXGNOMES 1000
 #define _AVOIDLENGTH 50
 #define _NAVOIDLENGTH 80
 #define _CANGLEDIFF 45
-void FakeClientCommand(edict_t *pBot, char *arg1, char *arg2, char *arg3);
 long lGnomes = 0;
 long lGnomesTemp = 0;
 
