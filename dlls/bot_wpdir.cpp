@@ -23,6 +23,11 @@
 // Johannes.Lampel@gmx.de
 // http://joebot.counter-strike.de
 
+#include <iostream.h>
+
+#include "extdll.h"
+#include "util.h"
+
 #include "bot_wpdir.h"
 
 CBotWPDir :: CBotWPDir(){
@@ -32,7 +37,7 @@ CBotWPDir :: CBotWPDir(){
 
 int CBotWPDir :: Init(void){
 	char filename[80];
-#ifndef __linux__
+#ifdef _WIN32
 	UTIL_BuildFileName(filename,"joebot\\wpjs","dir.txt");
 	return Load(filename);
 #else
