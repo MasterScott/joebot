@@ -42,13 +42,12 @@
 
 #ifdef _WIN32
 
+#ifndef USE_METAMOD
 typedef int (FAR *GETENTITYAPI)(DLL_FUNCTIONS *, int);
 typedef int (FAR *GETNEWDLLFUNCTIONS)(NEW_DLL_FUNCTIONS *, int *);
-#ifdef USE_METAMOD
 typedef void (WINAPI *GIVEFNPTRSTODLL)(enginefuncs_t *, globalvars_t *);
-#else
 typedef void (DLLEXPORT *GIVEFNPTRSTODLL)(enginefuncs_t *, globalvars_t *);
-#endif /* USE_METAMOD */
+#endif /* not USE_METAMOD */
 typedef void (FAR *LINK_ENTITY_FUNC)(entvars_t *);
 
 #else
