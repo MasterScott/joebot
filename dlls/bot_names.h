@@ -50,14 +50,13 @@ public:
 	CBotNames();
 	virtual ~CBotNames();
 
-	int init(void);
-
-	bool load(const char *);
-	void mixIt(void);
+	bool init(void);
 	const CBotNamesItem *getName(void);
 
+private:
 	bool bInited;
-
+	bool load(const char *);
+	void mixIt(void);
 	std::list<CBotNamesItem> m_LNames;
 	std::list<CBotNamesItem>::iterator m_ICName;		// iterator for m_LNames, so you can go thru the names
 };

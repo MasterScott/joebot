@@ -37,8 +37,6 @@ CBotNamesItem g_DefaultName;
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
 
-CBotNames g_Names;
-
 CBotNamesItem::CBotNamesItem(){
 	*m_szName = 0;
 }
@@ -47,7 +45,6 @@ CBotNamesItem::~CBotNamesItem(){
 
 
 CBotNames::CBotNames(){
-	m_ICName = m_LNames.begin();
 	bInited = false;
 
 	strcpy(g_DefaultName.m_szName,"JoeBOT");
@@ -56,10 +53,15 @@ CBotNames::CBotNames(){
 CBotNames::~CBotNames(){
 }
 
-int CBotNames::init(void){
+bool CBotNames::init(void){
 	char szfilename[80];
+
 	UTIL_BuildFileName(szfilename, "joebot","bot_names.txt");
-	return load(szfilename);
+	bool bSuccess = load(szfilename);
+	if (bool(jb_mixnames->value)) mixIt(); // randomize order?
+	m_ICName = m_LNames.begin(); // set list iterator
+
+	return bSuccess;
 }
 
 bool CBotNames::load(const char *szFileName){
@@ -105,9 +107,7 @@ bool CBotNames::load(const char *szFileName){
 				if(!lToReadLength)
 					break;
 				strncpy(szName,szAct,sizeof(char) * lToReadLength);
-#ifdef __linux__
-				if (szName[strlen(szName) - 1] == '\r') szName[strlen(szName) - 1] = '\0';
-#endif
+				STRIP_CR(szName);
 				if(strlen(szName) < BN_MAXNAMELENGTH){
 					//strcpy(Names[lNum].szName,szName);
 					//cout << szAdd << endl;
@@ -129,10 +129,8 @@ bool CBotNames::load(const char *szFileName){
 		}
 		delete [] szFileContent;
 	}
-	
 	// if file wasn't filled up ... or file not found ...
-	if (bool(jb_mixnames->value)) mixIt();
-	
+
 	return true;
 }
 
