@@ -33,12 +33,10 @@ Compiling with Borland C++ 5.5.1:
 	type:
 
 		c:\path\to\borland\make.exe -f Makefile.bcc
+		- or -
+		c:\path\to\borland\make.exe -f Makefile.bcc release
 
-	By default, this will make a metamod plugin DLL. If you want to make a
-	standard DLL, type:
-
-		make release_std
-
+	By default, this will make a standard and metamod plugin DLL.
 
 Compiling with MSVC6
 
