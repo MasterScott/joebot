@@ -1840,40 +1840,15 @@ bool WaypointLoad(edict_t *pEntity, const char *szDir)
 	short int num;
 	short int path_index;
 	
-	strcpy(mapname, STRING(gpGlobals->mapname));
-	strcat(mapname, ".wpj");
-	
 	if(!szDir || !strlen(szDir)){
+		snprintf(mapname, sizeof(mapname), "%s.wpj", STRING(gpGlobals->mapname));
 		WaypointGetDir(mapname,dirname);
 	}
 	else{
-		if(mod_id == CSTRIKE_DLL){
-#ifdef _WIN32
-			strcpy(dirname, "cstrike\\joebot\\wpjs\\");
-#else
-			strcpy(dirname, "cstrike/joebot/wpjs/");
-#endif
-		}
-		else if(mod_id == DOD_DLL){
-#ifdef _WIN32
-			strcpy(dirname, "dod\\joebot\\wpjs\\");
-#else
-			strcpy(dirname, "dod/joebot/wpjs/");
-#endif
-		}
-		
-		strcat(dirname, szDir);
-		
-#ifdef _WIN32
-		strcat(dirname, "\\");
-#else
-		strcat(dirname, "/");
-#endif
+		UTIL_BuildFileName(dirname, sizeof(dirname), "joebot/wpjs/%s/", szDir);
 	}
 	
-	strcpy(filename, dirname);
-	strcat(filename, STRING(gpGlobals->mapname));
-	strcat(filename, ".wpj");
+	snprintf(filename, sizeof(filename), "%s/%s.wpj", dirname, STRING(gpGlobals->mapname));
 	
 	if (IS_DEDICATED_SERVER())
 		LOG_MESSAGE(PLID, "Loading waypoint file: %s", filename);
@@ -2035,40 +2010,15 @@ bool WaypointSave(edict_t *pEntity,const char *szDir)
 	strncpy(header.mapname, STRING(gpGlobals->mapname), 31);
 	header.mapname[31] = 0;
 	
-	strcpy(mapname, STRING(gpGlobals->mapname));
-	strcat(mapname, ".wpj");
-	
 	if(szDir && strlen(szDir)){
-		if(mod_id == CSTRIKE_DLL){
-#ifdef _WIN32
-			strcpy(dirname, "cstrike\\joebot\\wpjs\\");
-#else
-			strcpy(dirname, "cstrike/joebot/wpjs/");
-#endif
-		}
-		else if(mod_id == DOD_DLL){
-#ifdef _WIN32
-			strcpy(dirname, "dod\\joebot\\wpjs\\");
-#else
-			strcpy(dirname, "dod/joebot/wpjs/");
-#endif
-		}
-		
-		strcat(dirname, szDir);
-		
-#ifdef _WIN32
-		strcat(dirname, "\\");
-#else
-		strcat(dirname, "/");
-#endif
+		UTIL_BuildFileName(dirname, sizeof(dirname), "joebot/wpjs/%s/", szDir);
 	}
 	else{
+		snprintf(mapname, sizeof(mapname), "%s.wpj", STRING(gpGlobals->mapname));
 		WaypointGetDir(mapname,dirname);
 	}
 	
-	strcpy(filename, dirname);
-	strcat(filename, header.mapname);
-	strcat(filename, ".wpj");
+	snprintf(filename, sizeof(filename), "%s/%s.wpj", dirname, header.mapname);
 	
 	FILE *bfp = fopen(filename, "wb");
 	if(bfp){
@@ -2488,7 +2438,7 @@ void WaypointPrintInfo(edict_t *pEntity, char *szText)		// szText is max 1000
 	if (index == -1)
 		return;
 	
-	sprintf(msg,"Waypoint %d of %d total (%li)\n\n", index, num_waypoints,lNum);
+	snprintf(msg,sizeof(msg),"Waypoint %d of %d total (%li)\n\n", index, num_waypoints,lNum);
 	if(szText){
 		if(strlen(szText) + strlen(msg) < 1000){
 			strcat(szText,msg);
@@ -2521,7 +2471,7 @@ void WaypointPrintInfo(edict_t *pEntity, char *szText)		// szText is max 1000
 	}
 	
 	if (flags & W_FL_CROUCH){
-		sprintf(msg,"This is a crouch waypoint\n");
+		snprintf(msg,sizeof(msg),"This is a crouch waypoint\n");
 		if(szText){
 			if(strlen(szText) + strlen(msg) < 512){
 				strcat(szText,msg);
@@ -2531,7 +2481,7 @@ void WaypointPrintInfo(edict_t *pEntity, char *szText)		// szText is max 1000
 			UTIL_ConsoleMessage(pEntity, msg);
 	}
 	if (flags & W_FL_LIFT){
-		sprintf(msg,"Bot will wait for lift before approaching\n");
+		snprintf(msg,sizeof(msg),"Bot will wait for lift before approaching\n");
 		if(szText){
 			if(strlen(szText) + strlen(msg) < 512){
 				strcat(szText,msg);
@@ -2541,7 +2491,7 @@ void WaypointPrintInfo(edict_t *pEntity, char *szText)		// szText is max 1000
 			UTIL_ConsoleMessage(pEntity, msg);
 	}
 	if (flags & W_FL_LADDER){
-		sprintf(msg,"This waypoint is on a ladder\n");
+		snprintf(msg,sizeof(msg),"This waypoint is on a ladder\n");
 		if(szText){
 			if(strlen(szText) + strlen(msg) < 512){
 				strcat(szText,msg);
@@ -2551,7 +2501,7 @@ void WaypointPrintInfo(edict_t *pEntity, char *szText)		// szText is max 1000
 			UTIL_ConsoleMessage(pEntity, msg);
 	}
 	if (flags & W_FL_HEALTH){
-		sprintf(msg,"There is health near this waypoint\n");
+		snprintf(msg,sizeof(msg),"There is health near this waypoint\n");
 		if(szText){
 			if(strlen(szText) + strlen(msg) < 512){
 				strcat(szText,msg);
@@ -2561,7 +2511,7 @@ void WaypointPrintInfo(edict_t *pEntity, char *szText)		// szText is max 1000
 			UTIL_ConsoleMessage(pEntity, msg);
 	}
 	if (flags & W_FL_ARMOR){
-		sprintf(msg,"There is armor near this waypoint\n");
+		snprintf(msg,sizeof(msg),"There is armor near this waypoint\n");
 		if(szText){
 			if(strlen(szText) + strlen(msg) < 512){
 				strcat(szText,msg);
@@ -2571,7 +2521,7 @@ void WaypointPrintInfo(edict_t *pEntity, char *szText)		// szText is max 1000
 			UTIL_ConsoleMessage(pEntity, msg);
 	}
 	if (flags & W_FL_AMMO){
-		sprintf(msg,"There is ammo near this waypoint\n");
+		snprintf(msg,sizeof(msg),"There is ammo near this waypoint\n");
 		if(szText){
 			if(strlen(szText) + strlen(msg) < 512){
 				strcat(szText,msg);
@@ -2581,7 +2531,7 @@ void WaypointPrintInfo(edict_t *pEntity, char *szText)		// szText is max 1000
 			UTIL_ConsoleMessage(pEntity, msg);
 	}
 	if (flags & W_FL_SNIPER){
-		sprintf(msg,"This is a sniper waypoint\n");
+		snprintf(msg,sizeof(msg),"This is a sniper waypoint\n");
 		if(szText){
 			if(strlen(szText) + strlen(msg) < 512){
 				strcat(szText,msg);
@@ -2591,7 +2541,7 @@ void WaypointPrintInfo(edict_t *pEntity, char *szText)		// szText is max 1000
 			UTIL_ConsoleMessage(pEntity, msg);
 	}
 	if (flags & W_FL_FLAG){
-		sprintf(msg,"This is a hostage/bomb/viprescue waypoint\n");
+		snprintf(msg,sizeof(msg),"This is a hostage/bomb/viprescue waypoint\n");
 		if(szText){
 			if(strlen(szText) + strlen(msg) < 512){
 				strcat(szText,msg);
@@ -2601,7 +2551,7 @@ void WaypointPrintInfo(edict_t *pEntity, char *szText)		// szText is max 1000
 			UTIL_ConsoleMessage(pEntity, msg);
 	}
 	if (flags & W_FL_FLAG_GOAL){
-		sprintf(msg,"This is a hostage rescue waypoint\n");
+		snprintf(msg,sizeof(msg),"This is a hostage rescue waypoint\n");
 		if(szText){
 			if(strlen(szText) + strlen(msg) < 512){
 				strcat(szText,msg);
@@ -2611,7 +2561,7 @@ void WaypointPrintInfo(edict_t *pEntity, char *szText)		// szText is max 1000
 			UTIL_ConsoleMessage(pEntity, msg);
 	}
 	if (flags & W_FL_VISIT){
-		sprintf(msg,"This is a visit waypoint\n");
+		snprintf(msg,sizeof(msg),"This is a visit waypoint\n");
 		if(szText){
 			if(strlen(szText) + strlen(msg) < 512){
 				strcat(szText,msg);
@@ -2621,7 +2571,7 @@ void WaypointPrintInfo(edict_t *pEntity, char *szText)		// szText is max 1000
 			UTIL_ConsoleMessage(pEntity, msg);
 	}
 	if (flags & W_FL_DONTAVOID){
-		sprintf(msg,"This is a dontavoid waypoint\n");
+		snprintf(msg,sizeof(msg),"This is a dontavoid waypoint\n");
 		if(szText){
 			if(strlen(szText) + strlen(msg) < 512){
 				strcat(szText,msg);
@@ -2631,7 +2581,7 @@ void WaypointPrintInfo(edict_t *pEntity, char *szText)		// szText is max 1000
 			UTIL_ConsoleMessage(pEntity, msg);
 	}
 	if (flags & W_FL_RESET){
-		sprintf(msg,"This is a reset waypoint\n");
+		snprintf(msg,sizeof(msg),"This is a reset waypoint\n");
 		if(szText){
 			if(strlen(szText) + strlen(msg) < 512){
 				strcat(szText,msg);
@@ -2641,7 +2591,7 @@ void WaypointPrintInfo(edict_t *pEntity, char *szText)		// szText is max 1000
 			UTIL_ConsoleMessage(pEntity, msg);
 	}
 	if (flags & W_FL_AIMING){
-		sprintf(msg,"This is a aiming waypoint\n");
+		snprintf(msg,sizeof(msg),"This is a aiming waypoint\n");
 		if(szText){
 			if(strlen(szText) + strlen(msg) < 512){
 				strcat(szText,msg);
@@ -2651,7 +2601,7 @@ void WaypointPrintInfo(edict_t *pEntity, char *szText)		// szText is max 1000
 			UTIL_ConsoleMessage(pEntity, msg);
 	}
 	if (flags & W_FL_DAF){
-		sprintf(msg,"This is a dontavoidfall waypoint\n");
+		snprintf(msg,sizeof(msg),"This is a dontavoidfall waypoint\n");
 		if(szText){
 			if(strlen(szText) + strlen(msg) < 512){
 				strcat(szText,msg);
@@ -2661,7 +2611,7 @@ void WaypointPrintInfo(edict_t *pEntity, char *szText)		// szText is max 1000
 			UTIL_ConsoleMessage(pEntity, msg);
 	}
 	if (flags & W_FL_JUMP){
-		sprintf(msg,"This is a jump waypoint\n");
+		snprintf(msg,sizeof(msg),"This is a jump waypoint\n");
 		if(szText){
 			if(strlen(szText) + strlen(msg) < 512){
 				strcat(szText,msg);
@@ -2671,7 +2621,7 @@ void WaypointPrintInfo(edict_t *pEntity, char *szText)		// szText is max 1000
 			UTIL_ConsoleMessage(pEntity, msg);
 	}
 	if (flags & W_FL_BLOCKHOSTAGE){
-		sprintf(msg,"This is a blockhostage waypoint\n");
+		snprintf(msg,sizeof(msg),"This is a blockhostage waypoint\n");
 		if(szText){
 			if(strlen(szText) + strlen(msg) < 512){
 				strcat(szText,msg);
@@ -2681,7 +2631,7 @@ void WaypointPrintInfo(edict_t *pEntity, char *szText)		// szText is max 1000
 			UTIL_ConsoleMessage(pEntity, msg);
 	}
 	
-	sprintf(msg,"\nKill/Killed : %3li/%3li\n",WPStat.d.FItem[index].lKill,WPStat.d.FItem[index].lKilled);
+	snprintf(msg,sizeof(msg),"\nKill/Killed : %3li/%3li\n",WPStat.d.FItem[index].lKill,WPStat.d.FItem[index].lKilled);
 	if(szText){
 		if(strlen(szText) + strlen(msg) < 512){
 			strcat(szText,msg);
@@ -2690,7 +2640,7 @@ void WaypointPrintInfo(edict_t *pEntity, char *szText)		// szText is max 1000
 	else
 		UTIL_ConsoleMessage(pEntity, msg);
 	
-	sprintf(msg,"fADEn : %3.0f\n",WPStat.d.FItem[index].fADEn);
+	snprintf(msg,sizeof(msg),"fADEn : %3.0f\n",WPStat.d.FItem[index].fADEn);
 	if(szText){
 		if(strlen(szText) + strlen(msg) < 512){
 			strcat(szText,msg);
@@ -3516,54 +3466,22 @@ bool WaypointGetDir(char *szFile,char *szDest){
 	FILE *fhd;
 	*szDest=0;
 	
-	if (mod_id == CSTRIKE_DLL){
-#ifdef _WIN32
-		strcpy(szBaseDir, "cstrike\\joebot\\wpjs\\");
-#else
-		strcpy(szBaseDir, "cstrike/joebot/wpjs/");
-#endif
-	}
-	else if (mod_id == DOD_DLL){
-#ifdef _WIN32
-		strcpy(szBaseDir, "dod\\joebot\\wpjs\\");
-#else
-		strcpy(szBaseDir, "dod/joebot/wpjs/");
-#endif
-	}
-	else{
-#ifdef _WIN32
-		strcpy(szBaseDir, "valve\\maps\\");
-#else
-		strcpy(szBaseDir, "valve/maps/");
-#endif
-	}
+	UTIL_BuildFileName(szBaseDir, sizeof(szBaseDir), "joebot/wpjs");
 	
 	while(g_WPDir.szPDir[iDir].szDir[0]){
-		strcpy(szDir,szBaseDir);
-		strcat(szDir,g_WPDir.szPDir[iDir].szDir);
-#ifdef _WIN32
-		strcat(szDir, "\\");
-#else
-		strcat(szDir, "/");
-#endif
-		strcpy(szFilename,szDir);
-		strcat(szFilename,szFile);
-		fhd = fopen(szFilename,"r");
-		if(fhd){
-			fclose(fhd);
+		snprintf(szDir, sizeof(szDir), "%s/%s", szBaseDir, g_WPDir.szPDir[iDir].szDir);
+		snprintf(szFilename, sizeof(szFilename), "%s/%s", szDir, szFile);
+
+		struct stat buf;
+		if (stat(szFilename, &buf) == 0)
+		{
 			strcpy(szDest,szDir);
 			return true;
 		}
 		iDir ++;
 	}
-	strcpy(szDir,szBaseDir);
-	strcat(szDir,"std");
-#ifdef _WIN32
-	strcat(szDir, "\\");
-#else
-	strcat(szDir, "/");
-#endif
-	strcpy(szDest,szDir);
+
+	snprintf(szDest, sizeof(szDest), "%s/std", szBaseDir);
 	return false;
 }
 
@@ -3601,20 +3519,9 @@ void WaypointRouteInit(void)
 	// save number of current waypoints in case waypoints get added later
 	route_num_waypoints = num_waypoints;
 	
-	strcpy(mapname, STRING(gpGlobals->mapname));
-	strcat(mapname, ".wpj");
-	
+	snprintf(mapname, sizeof(mapname), "%s.wpj", STRING(gpGlobals->mapname));
 	WaypointGetDir(mapname,filename);
-	WaypointGetDir(mapname,szRoutes);
-	
-	strcat(szRoutes,"routes");
-#ifdef _WIN32
-	strcat(szRoutes, "\\");
-#else
-	strcat(szRoutes, "/");
-#endif
-	
-	/*strcpy(filename, dirname);*/
+	snprintf(szRoutes, sizeof(szRoutes), "%s/routes", filename);
 	strcat(filename, mapname);
 	
 	build_matrix[0] = TRUE;  // always build matrix 0 (non-team and team 1) and matrix 1 ( only for cs )
@@ -3644,18 +3551,10 @@ void WaypointRouteInit(void)
 	{
 		if (build_matrix[matrix])
 		{
-			char ext_str[5];  // ".wpX\0"
 			int file1, file2;
 			struct stat stat1, stat2;
 			
-			sprintf(ext_str, ".wp%d", matrix+1);
-			
-			strcpy(mapname, STRING(gpGlobals->mapname));
-			strcat(mapname, ext_str);
-			
-			//UTIL_BuildFileName(filename2, szRoutes , mapname);
-			strcpy(filename2,szRoutes);
-			strcat(filename2,mapname);
+			snprintf(filename2, sizeof(filename2), "%s/%s.wp%d", szRoutes, STRING(gpGlobals->mapname), matrix+1);
 			
 			if (access(filename2, 0) == 0)  // does the .wpX file exist?
 			{
