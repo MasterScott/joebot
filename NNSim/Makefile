@@ -38,7 +38,7 @@ clean:
 	-$(RM) $(OBJDIR)/*.o
 
 spotless:
-	-$(RM) -r $(OBJDIR)
+	-$(RM) -r $(OBJDIR_LINUX) $(OBJDIR_WIN32)
 
 rebuild: clean all
 

@@ -1,8 +1,8 @@
 # ---------------------------------------------------------------------------
 # Definitions
 # ---------------------------------------------------------------------------
-#DLLNAME = joebot_mm
-DLLNAME = joebot
+DLLNAME = joebot_mm
+#DLLNAME = joebot
 DLL = $(DLLNAME)_bcc.dll
 
 SDKDIR = U:\netgames\install\hl\sdk\multiplayer
@@ -13,15 +13,19 @@ BCCDIR = c:\tools\borland\bcc55
 LD = $(BCCDIR)\bin\ilink32
 CC = $(BCCDIR)\bin\bcc32
 RM = del
+CP = copy
 
 # includes
 BASECFLAGS = -I$(JOEBOTDIR)\engine -I$(JOEBOTDIR)\common\
  -I$(JOEBOTDIR)\pm_shared -I$(MMDIR)\metamod -I$(JOEBOTDIR)\NNSim\som\
  -I$(JOEBOTDIR)\NNSim -I$(JOEBOTDIR)\dlls -I$(BCCDIR)\Include
 
-#BASEFLAGS = -DUSE_METAMOD
-#BASEFLAGS += -DCSTRIKE15
-#BASEFLAGS += -g -D_DEBUG -DDEBUGENGINE
+BASEFLAGS = -DUSE_METAMOD
+
+# uncomment to compile debug code
+#EXTRA_CFLAGS += -DDEBUGENGINE
+#EXTRA_CFLAGS += -DDEBUGMESSAGES
+#EXTRA_CFLAGS += -D_DEBUG
 
 CFLAGS = -w- -4 $(BASECFLAGS)
 

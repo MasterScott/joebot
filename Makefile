@@ -48,14 +48,6 @@ stddll:
 	$(MAKE) clean DLLTYPE=std
 	$(MAKE) DLLTYPE=std
 
-mmdll15:
-	$(MAKE) clean CS=1_5
-	$(MAKE) CS=1_5
-
-stddll15:
-	$(MAKE) clean DLLTYPE=std CS=1_5
-	$(MAKE) DLLTYPE=std CS=1_5
-
 clean:
 	$(MAKE) -C dlls $@
 	$(MAKE) -C NNSim $@
@@ -67,6 +59,8 @@ spotless: clean
 	$(MAKE) -C dlls $@
 	$(MAKE) -C NNSim $@
 	$(MAKE) -C NNSim/som $@
+	-$(RM) *.so
+	-$(RM) *.dll
 
 rebuild: clean all
 

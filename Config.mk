@@ -20,9 +20,7 @@ ifneq ($(DLLTYPE),std)
  EXTRA_CFLAGS += -DUSE_METAMOD
 endif
 
-ifeq ($(CS),1_5)
- EXTRA_CFLAGS += -DCSTRIKE15
-endif
-
 # uncomment to compile debug code
-#EXTRA_CFLAGS += -g -D_DEBUG -DDEBUGENGINE
+#EXTRA_CFLAGS += -DDEBUGENGINE
+#EXTRA_CFLAGS += -DDEBUGMESSAGES
+#EXTRA_CFLAGS += -D_DEBUG
