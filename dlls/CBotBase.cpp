@@ -377,7 +377,6 @@ long CBotBase :: RoamteamFindWP(edict_t *pEdictTF){
 	float fMinFN = 0;
 	edict_t *pEdictNearest = GetNearestPlayer(pEdict,-1,fMinFN,false,false,10000);
 	float distance,sdistance;
-	TraceResult tr;
 
 	Vector2D vec2LOS,vec2M;
 	Vector VFOrigin;
@@ -1274,7 +1273,6 @@ void CBotBase :: TestOnButtonWay(CWay &pWay,edict_t **pToUse){
 	edict_t *pButton[10];
 	int iCount,iOCount;
 	int distance[10];
-	Vector entity_origin;
 	int iNWP;
 	//char szClassname[100];
 	
@@ -1510,7 +1508,6 @@ bool CBotBase :: BoolTestOnButtonWay(CWay &pWay,int iNearWP,int iGoal){
 	int i,is;
 	edict_t *pEnt;
 	TraceResult tr;
-	Vector entity_origin;
 	//char szClassname[100];
 	
 	for(i=0,is=1;is < pWay.iNum;i++,is++){
@@ -1754,7 +1751,6 @@ bool CBotBase :: SearchHidingPlace(edict_t *pEnemy){
 	
 	Vector VLeRi;	// a vector to left or right ( crossproduct of view_angles and (0,0,1) )
 	Vector VBotView;
-	Vector VTestV;
 	Vector VHide1,VHide2;
 	bool bHideFound1 = false,bHideFound2=false;
 	TraceResult tr1,tr2,trdown;
@@ -2018,7 +2014,7 @@ float CBotBase :: ChangeYaw( void ){
 #endif*/
 	
 	// find the difference in the current and ideal angle
-	fADiff = fabsf(current - ideal);
+	fADiff = fabs(current - ideal);
 	
 	if(fADiff>180.0f){
 		if(ideal > 0){
@@ -2030,7 +2026,7 @@ float CBotBase :: ChangeYaw( void ){
 	}
 	float a=f_AMomentum,idealSpeed,c=1,aNow;
 	
-	fADiff = fabsf(current - ideal);
+	fADiff = fabs(current - ideal);
 	
 	idealSpeed = (ideal - current);
 	idealSpeed = idealSpeed*c;
@@ -2081,7 +2077,7 @@ float CBotBase :: ChangeBodyYaw( void ){
 #endif*/
 	
 	// find the difference in the current and ideal angle
-	fADiff = fabsf(current - ideal);
+	fADiff = fabs(current - ideal);
 	
 	if(fADiff>180.0f){
 		if(ideal > 0){
@@ -2094,7 +2090,7 @@ float CBotBase :: ChangeBodyYaw( void ){
 	
 	float a=f_AMomentum,idealSpeed,c=f_ASpeed,aNow;
 	
-	fADiff = fabsf(current - ideal);
+	fADiff = fabs(current - ideal);
 	
 	idealSpeed = (ideal - current);
 	idealSpeed = idealSpeed*c;
