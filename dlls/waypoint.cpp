@@ -184,10 +184,12 @@ int WaypointFindNearest(edict_t *pEntity, float range, int team, float fMin,bool
 	// find the nearest waypoint...
 	
 	min_index = -1;
-	min_distance = 9999999.0;
+	//min_distance = 9999999.0;
 
 	fMin = fMin * fMin;
 	range = range * range;
+
+	min_distance = range;
 	
 	for (i=0; i < num_waypoints; i++)
 	{
@@ -197,21 +199,6 @@ int WaypointFindNearest(edict_t *pEntity, float range, int team, float fMin,bool
 		if (waypoints[i].flags & W_FL_AIMING)
 			continue;  // skip any aiming waypoints
 		
-		if(bVisib&&pEntity){
-			if(!FVisible(waypoints[i].origin,pEntity))		// skip if not visible ...
-				continue;
-		}
-		
-		if(bIVC&&pEntity){
-			if(!FInViewCone(&waypoints[i].origin,pEntity))
-				continue;
-		}
-		if(bReachable&&pEntity){
-			if(!WaypointReachable(pEntity->v.origin,waypoints[i].origin,pEntity)){
-				continue;
-			}
-		}
-		
 		// skip this waypoint if it's team specific and teams don't match...
 		if ((team != -1) && (waypoints[i].flags & W_FL_TEAM_SPECIFIC) &&
 			((waypoints[i].flags & W_FL_TEAM) != team))
@@ -219,17 +206,25 @@ int WaypointFindNearest(edict_t *pEntity, float range, int team, float fMin,bool
 		
 		distance = (waypoints[i].origin - pEntity->v.origin).LengthSq();
 		
-		if ((distance < min_distance) && (distance < range)&&(distance>fMin))
+		if ((distance < min_distance) &&(distance>fMin))
 		{
-			// if waypoint is visible from current position (even behind head)...
-			/*UTIL_TraceLine( pEntity->v.origin + pEntity->v.view_ofs, waypoints[i].origin,
-			ignore_monsters, pEntity->v.pContainingEntity, &tr );
+			if(bVisib&&pEntity){
+				if(!FVisible(waypoints[i].origin,pEntity))		// skip if not visible ...
+					continue;
+			}
 			
-			  if (tr.flFraction >= 1.0)
-			{*/
+			if(bIVC&&pEntity){
+				if(!FInViewCone(&waypoints[i].origin,pEntity))
+					continue;
+			}
+			if(bReachable&&pEntity){
+				if(!WaypointReachable(pEntity->v.origin,waypoints[i].origin,pEntity)){
+					continue;
+				}
+			}
+			
 			min_index = i;
 			min_distance = distance;
-			//}
 		}
 	}
 	
