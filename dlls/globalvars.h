@@ -154,6 +154,9 @@ extern float f_timesrs;
 extern float f_round_start;
 extern float f_end_freezetime;
 
+extern cvar_t *g_sv_maxspeed;		// sv_maxspeed cvar
+extern cvar_t *g_mp_freezetime;	// mp_freezetime cvar
+
 extern float gf_5th;
 extern bool g_b5th;
 
