@@ -552,7 +552,7 @@ bool CBotCS :: BuyWeapon(void){
 			&&bot_teamnm == CT
 			&&RANDOM_LONG(0,100) < 30){
 			
-			BotBuy_CS_DefKit(this);
+			BotBuy_CS_WEAPON_Defuse(this);
 		}
 		
 		if(bot_armor<50
