@@ -6,8 +6,10 @@ include ../Config.mk
 # build object paths
 ifeq ($(OPT), debug)
  BASE_OBJDIR = $(OBJDIR_DEBUG)
+ EXT_OBJDIR = $(OBJDIR_DEBUG)
 else
  BASE_OBJDIR = $(OBJDIR_RELEASE)
+ EXT_OBJDIR = $(OBJDIR_RELEASE)
 endif
 
 ifeq ($(DLLTYPE),std)
@@ -20,15 +22,16 @@ endif
 
 ifeq ($(OS),Windows_NT)
  OBJDIR := $(OBJDIR)_mingw
+ EXT_OBJDIR := $(EXT_OBJDIR)_mingw
 endif
 
 # build external source list
 include ../NNSim/som/Config.mk
 SRC_SOM := $(SRC:%.cpp=../NNSim/som/%.cpp)
-OBJ_SOM := $(SRC:%.cpp=../NNSim/som/$(BASE_OBJDIR)/%.o)
+OBJ_SOM := $(SRC:%.cpp=../NNSim/som/$(EXT_OBJDIR)/%.o)
 include ../NNSim/Config.mk
 SRC_NNSIM := $(SRC:%.cpp=../NNSim/%.cpp)
-OBJ_NNSIM := $(SRC:%.cpp=../NNSim/$(BASE_OBJDIR)/%.o)
+OBJ_NNSIM := $(SRC:%.cpp=../NNSim/$(EXT_OBJDIR)/%.o)
 
 # build source list
 include Config.mk
