@@ -281,44 +281,102 @@ void BotClient_DOD_AmmoX(void *p, int bot_index)
 
 void BotClient_Valve_SayText(void *p, int bot_index){
 	static short int index;
-	static char *szText;
+	static bool bAllMsg;
 	
-	if (msg_state == 0)
-		index = *(short *)p;
-	else if (msg_state == 1){
-		char *szDP;
-		szText = (char *)p;
-
-		char *szSayText;
-		edict_t *pSayEdict;
-
-		pSayEdict = INDEXENT(index);
-		if(pSayEdict && IsAlive(pSayEdict)){
-			szSayText = szLastSayText;
-			iLastSayClient = index;
+	if (g_bIsSteam) {
+		if (msg_state == 0){
+			index = *(short *)p;
+			bAllMsg = false;
+			LOG_DEBUG(UTIL_VarArgs("index = %d", index));
 		}
-		else{
-			szSayText = szDeadLastSayText;
-			iDeadLastSayClient = index;
+		else if (msg_state == 1) {
+			char *szFormat = (char *)p;
+			LOG_DEBUG(UTIL_VarArgs("szFormat = %s", szFormat));
+
+			// #Cstrike_
+			if (szFormat && (szFormat[1] == 'C')) {
+				// ... Chat_All[Dead,Spec]
+				if (!strncmp(szFormat + 9, "Chat_All", 8)) {
+					bAllMsg = true;
+				}
+				// ... Name_Change
+				else if (!strncmp(szFormat + 9, "Name_Change", 11)) {
+					return; // ignore message
+				}
+				// ... Chat_[CT,T,CT_Dead,T_Deac,Spec]
+				else {
+					return; // ignore messages
+				}
+			}
+			// #Game_radio
+			else if (szFormat && (szFormat[1] == 'G')) {
+					return; // ignore message
+			}
 		}
-
-		if(strstr(szText,"(Counter-Terrorist)")		// just ignore this message if it's team specific
-			||strstr(szText,"(Terrorist)")			// NOTE : This neednt be mod independant. This is just for cs/hldm
-			||strstr(szText,"(TEAM)")){
-			return;
+		else if (msg_state == 2) {
+			char *szName = (char *)p;
+			LOG_DEBUG(UTIL_VarArgs("szName = %s", szName));
 		}
+		else if (msg_state == 3) {
+			char *szText = (char *)p;
+			LOG_DEBUG(UTIL_VarArgs("szText = %s", szText));
 
-		strcpy(szSayText,szText);
+			char *szSayText;
+			edict_t *pSayEdict = INDEXENT(index);
 
-		szDP = strchr(szSayText,':');
+			if (pSayEdict && IsAlive(pSayEdict)) {
+				szSayText = szLastSayText;
+				iLastSayClient = index;
+			}
+			else {
+				szSayText = szDeadLastSayText;
+				iDeadLastSayClient = index;
+			}
 
-		if(szDP  < szSayText + sizeof(char) * 80 )
-			memset(szSayText,' ',szDP - szSayText);
+			if (bAllMsg) {
+				UTIL_strlwr(szSayText);
+			}
+			else {
+				return; // ignore team messages
+			}
+		}
+	}
+	else {
+		if (msg_state == 0)
+			index = *(short *)p;
+		else if (msg_state == 1) {
+			char *szText = (char *)p;
 
-		// make it lowercase;
-		UTIL_strlwr(szSayText);
-		
-		//cout << szSayText;
+			char *szSayText;
+			edict_t *pSayEdict = INDEXENT(index);
+
+			if(pSayEdict && IsAlive(pSayEdict)) {
+				szSayText = szLastSayText;
+				iLastSayClient = index;
+			}
+			else {
+				szSayText = szDeadLastSayText;
+				iDeadLastSayClient = index;
+			}
+
+			if(strstr(szText,"(Counter-Terrorist)")		// just ignore this message if it's team specific
+				||strstr(szText,"(Terrorist)")			// NOTE : This neednt be mod independant. This is just for cs/hldm
+				||strstr(szText,"(TEAM)")){
+				return;
+			}
+
+			strcpy(szSayText,szText);
+
+			char *szDP = strchr(szSayText,':');
+
+			if(szDP  < szSayText + sizeof(char) * 80 )
+				memset(szSayText,' ',szDP - szSayText);
+
+			// make it lowercase;
+			UTIL_strlwr(szSayText);
+
+			//cout << szSayText;
+		}
 	}
 }
 
