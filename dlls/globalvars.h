@@ -78,7 +78,7 @@ extern int debug_engine;
 extern float bot_cfg_pause_time;
 extern float g_fGameCommenced;
 
-extern float g_GRAVITYADJ;
+extern float g_fGravityAdj;
 
 extern char *show_menu_1,			// pointer to texts
 *show_menu_2,
@@ -105,7 +105,7 @@ class SOMPattern;
 extern SOMPattern SP;
 
 // type of map
-extern int g_iTypeoM;
+extern int g_iMapType;
 
 extern edict_t *pEdictPlayer;
 
@@ -114,7 +114,7 @@ extern float bot_check_time;
 
 // is the bomb planted ?
 extern bool		g_bBombPlanted;
-extern float	g_iBombExplode;
+extern float	g_fBombExplode;
 extern bool		g_bBombDropped;
 extern bool		bNNInit;
 extern bool		bNNInitError;
@@ -137,7 +137,7 @@ extern CBotWPDir g_WPDir;
 /*class CChat;
 extern CChat Chat;*/
 
-extern float f_timesrs;
+extern float g_fRoundTime;
 
 extern CWPStat WPStat;
 
@@ -151,11 +151,11 @@ extern float f_ES[32];
 // last time a radio command was used
 extern float f_LastRadio;
 
-extern float f_timesrs;
-extern float f_round_start;
-extern float f_end_freezetime;
+extern float g_fRoundTime;
+extern float g_fRoundStart;
+extern float g_fFreezeTimeEnd;
+extern float g_fFreezeTimeStart;
 
-extern cvar_t *g_sv_maxspeed;		// sv_maxspeed cvar
 extern cvar_t *g_mp_freezetime;	// mp_freezetime cvar
 
 extern float gf_5th;
@@ -163,8 +163,7 @@ extern bool g_b5th;
 
 extern char szWPCreator[80];
 
-extern int iGlobalRSCount;		// setting to number of bots on roundstart. every init of bot result in decrementing this variable. if it is 0 and it hasn't been called this rs, a global init function is called :D
-extern float fLGlobalRSInit;
+extern bool g_bInitRoundStart;
 
 extern bool bLoadedLPB;
 
