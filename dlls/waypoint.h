@@ -29,7 +29,8 @@
 #ifndef WAYPOINT_H
 #define WAYPOINT_H
 
-#include <limits.h>
+//#include <limits.h>
+#include "extdll.h"
 
 #define _MAXTEMPDIVPRE 200
 #define _MAXTEMPDIV 30
@@ -188,7 +189,7 @@ int WaypointFindNearest(edict_t *pEntity, float range, int team=-1, float fMin =
 int  WaypointFindNearest(Vector v_src, edict_t *pEntity, float range, int team,bool bVisible = true);
 int  WaypointFindNearestGoal(edict_t *pEntity, int src, int team, int flags);
 int  WaypointFindNearestGoal(Vector v_src, edict_t *pEntity, float range, int team, int flags,float fMin = -1);
-int  WaypointFindNearestGoal(edict_t *pEntity, int src, int team, int flags,int*iField,int iNumField,float fMin = -1);
+int  WaypointFindNearestGoal(edict_t *pEntity, int src, int team, int flags,float fMin = -1,int*iField=0,int iNumField=1);
 int  WaypointFindRandomGoal(edict_t *pEntity, int team, int flags);
 int  WaypointFindRandomGoal(Vector v_src, edict_t *pEntity, float range, int team, int flags);
 int  WaypointFindNearestAiming(Vector v_origin);
@@ -256,5 +257,5 @@ int WaypointAddStuff(void);
 
 long WaypointClean(void);
 
-#endif // WAYPOINT_H
+#endif //WAYPOINT_H
 
