@@ -3621,14 +3621,14 @@ void WaypointRouteInit(void)
 	unsigned int a, b;
 	float distance;
 	unsigned short *pShortestPath, *pFromTo;
-	char msg[80];
+	char msg[256];				// thx to Watz for pointing out that 80 chars might be too little ... 256 should be enough though
 	unsigned int num_items;
 	FILE *bfp;
 	char filename[256];
 	char filename2[256];
-	char mapname[64];
+	char mapname[256];
 	//	char dirname[32];
-	char szRoutes[100];
+	char szRoutes[256];
 	
 	clock_t ct_start_distances;
 	clock_t ct_end_distances;
