@@ -308,8 +308,10 @@ void CBotBase :: KilledSO(edict_t *pEdictKilled,long lWeaponKiller){
 
 bool CBotBase :: Jump(void){
 
-	if (f_start_round > gpGlobals->time)	// don't jump during freeze time
+	if (f_end_freezetime > gpGlobals->time)	// don't jump during freeze time
+	{
 		return false;
+	}
 
 	if(f_NJumpTill < gpGlobals->time){
 		lButton |= IN_JUMP;
@@ -2136,12 +2138,12 @@ void CBotBase :: UpdateSkill(void){
 	char *infobuffer;
 	int clientIndex;
 	
-	infobuffer = GET_INFOBUFFER( pEdict );
+	infobuffer = GET_INFOKEYBUFFER( pEdict );
 	clientIndex = ENTINDEX( pEdict );
 	
 	MakeName(szName,name,bot_skill,d_Manner);
 	
-	SET_CLIENT_KEY_VALUE( clientIndex, infobuffer, "name", szName );
+	SET_CLIENT_KEYVALUE( clientIndex, infobuffer, "name", szName );
 }
 
 void CBotBase :: InstantTurn(void){
@@ -2864,7 +2866,7 @@ bool CBotBase :: Camp(void){
 		if (g_iTypeoM == MT_AS
 			&&g_pVIP){		// stop camping on as maps as CT when the VIP is far away or not visible
 			if(Task.current && Task.current->lType & BT_IGNOREENEMY){
-				if(bot_teamnm == CT){
+				if(bot_teamnm == CS_TEAM_CT){
 					if((g_pVIP->v.origin-pEdict->v.origin).Length() > 4000
 						&& !FVisible(g_pVIP->v.origin,pEdict)){
 						Task.RemoveT(BT_CAMP);		// stop camping
