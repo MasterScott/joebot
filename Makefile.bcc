@@ -1,38 +1,72 @@
 # ---------------------------------------------------------------------------
 # Definitions
 # ---------------------------------------------------------------------------
-DLLNAME = joebot_mm
-#DLLNAME = joebot
-DLL = $(DLLNAME).dll
+!if "$(CFG)" == ""
+ CFG = release_mm
+!endif
+
+!if "$(CFG)" == "release_mm"
+ DLLNAME = joebot_mm
+ OBJDIR = dlls\release\win32\mm_bcc
+!elif "$(CFG)" == "debug_mm"
+ DLLNAME = joebot_mm
+ OBJDIR = dlls\debug\win32\mm_bcc
+!elif "$(CFG)" == "release_std"
+ DLLNAME = joebot
+ OBJDIR = dlls\release\win32\std_bcc
+!elif "$(CFG)" == "debug_std"
+ DLLNAME = joebot
+ OBJDIR = dlls\debug\win32\std_bcc
+!endif
+
+DLL = $(OBJDIR)\$(DLLNAME).dll
 
 SDKDIR = U:\netgames\install\hl\sdk\multiplayer
 JOEBOTDIR = U:\netgames\install\hl\bots\joebot\src
 MMDIR = U:\netgames\install\hl\server\metamod\src\1.17
 
 BCCDIR = c:\tools\borland\bcc55
-LD = $(BCCDIR)\bin\ilink32
-CC = $(BCCDIR)\bin\bcc32
+BINDIR = $(BCCDIR)\bin
+INCDIR = $(BCCDIR)\Include
+LIBDIR = $(BCCDIR)\lib
+LIB = $(LIBDIR);$(LIBDIR)\psdk
+
+CC = $(BINDIR)\bcc32
+RC = $(BINDIR)\brcc32
+AS = $(BINDIR)\tasm32
+LD = $(BINDIR)\ilink32
 RM = del
 CP = copy
+MD = mkdir
 
 # includes
 BASECFLAGS = -I$(JOEBOTDIR)\engine -I$(JOEBOTDIR)\common\
  -I$(JOEBOTDIR)\pm_shared -I$(MMDIR)\metamod -I$(JOEBOTDIR)\NNSim\som\
- -I$(JOEBOTDIR)\NNSim -I$(JOEBOTDIR)\dlls -I$(BCCDIR)\Include
+ -I$(JOEBOTDIR)\NNSim -I$(JOEBOTDIR)\dlls -I$(INCDIR)
 
-# uncomment to compile metamod plugin
+!if "$(CFG)" == "release_mm" || "$(CFG)" == "debug_mm"
 EXTRA_CFLAGS = $(EXTRA_CFLAGS) -DUSE_METAMOD
+!endif
 
 # uncomment to compile debug code
 #EXTRA_CFLAGS = $(EXTRA_CFLAGS) -DDEBUGENGINE
 #EXTRA_CFLAGS = $(EXTRA_CFLAGS) -DDEBUGMESSAGES
 #EXTRA_CFLAGS = $(EXTRA_CFLAGS) -D_DEBUG
 
-CFLAGS = -4 $(BASECFLAGS) $(EXTRA_CFLAGS)
+!if "$(CFG)" == "debug_mm" || "$(CFG)" == "debug"
+CFLAGS = -v $(BASECFLAGS) $(EXTRA_CFLAGS)
+!else
+CFLAGS = -4 -O2 -v- $(BASECFLAGS) $(EXTRA_CFLAGS)
+!endif
 
-LIB = $(BCCDIR)\lib;$(BCCDIR)\lib\psdk
+RCFLAGS = -idlls
+!if "$(CFG)" == "release_mm" || "$(CFG)" == "debug_mm"
+RCFLAGS = $(RCFLAGS) -dUSE_METAMOD
+!endif
 
-SRC =\
+LDFLAGS = -c -aa -q -Gn -Tpd -m
+
+SRC_DLLS =\
  dlls\basemem.cpp\
  dlls\bot_client.cpp\
  dlls\bot_cs.cpp\
@@ -73,6 +107,8 @@ SRC =\
  dlls\waypoint_advdataimpl.cpp\
  dlls\waypoint.cpp\
  dlls\WorldGnome.cpp\
+
+SRC_NNSIM =\
  NNSim\Activations.cpp\
  NNSim\BaseLinkFF.cpp\
  NNSim\BaseLink.cpp\
@@ -97,39 +133,77 @@ SRC =\
  NNSim\PatternElemBProp.cpp\
  NNSim\WeightBPropM.cpp\
  NNSim\WeightBProp.cpp\
+
+SRC_SOM =\
  NNSim\som\CqSOM2d.cpp\
  NNSim\som\fNBorKernel.cpp\
  NNSim\som\nVec.cpp\
  NNSim\som\SOMPatternElem.cpp\
  NNSim\som\SOMPattern.cpp\
 
-OBJ = $(SRC:.cpp=.obj)
+TMPDIR = $(OBJDIR)\\
+TMP_DLLS = $(SRC_DLLS:dlls\=$(TMPDIR))
+TMP_NNSIM = $(SRC_NNSIM:NNSim\=$(TMPDIR))
+TMP_SOM = $(SRC_SOM:NNSim\som\=$(TMPDIR))
+
+OBJ_DLLS = $(TMP_DLLS:.cpp=.obj)
+OBJ_NNSIM = $(TMP_NNSIM:.cpp=.obj)
+OBJ_SOM = $(TMP_SOM:.cpp=.obj)
+
+OBJ = $(OBJ_DLLS) $(OBJ_NNSIM) $(OBJ_SOM)
 
 # ---------------------------------------------------------------------------
 # Targets
 # ---------------------------------------------------------------------------
 all: $(DLL)
  
+release: release_mm release_std
+
+debug: debug_mm debug_std
+
+release_mm:
+	$(BINDIR)\$(MAKE) -f Makefile.bcc "CFG=release_mm"
+
+release_std:
+	$(BINDIR)\$(MAKE) -f Makefile.bcc "CFG=release_std"
+
+debug_mm:
+	$(BINDIR)\$(MAKE) -f Makefile.bcc "CFG=debug_mm"
+
+debug_std:
+	$(BINDIR)\$(MAKE) -f Makefile.bcc "CFG=debug_std"
+
+release_clean:
+	$(BINDIR)\$(MAKE) -f Makefile.bcc "CFG=release_mm" clean
+	$(BINDIR)\$(MAKE) -f Makefile.bcc "CFG=release_std" clean
+
+debug_clean:
+	$(BINDIR)\$(MAKE) -f Makefile.bcc "CFG=debug_mm" clean
+	$(BINDIR)\$(MAKE) -f Makefile.bcc "CFG=debug_std" clean
+
 clean:
+	-$(RM) $(OBJDIR)\*.obj
+	-$(RM) $(OBJDIR)\*.res
+	-$(RM) $(OBJDIR)\$(DLLNAME).map
+	-$(RM) $(OBJDIR)\$(DLLNAME).tds
 	-$(RM) $(DLL)
-	-$(RM) $(DLLNAME).map
-	-$(RM) $(DLLNAME).tds
-	-$(RM) dlls\*.obj
-	-$(RM) NNSim\*.obj
-	-$(RM) NNSim\som\*.obj
 
 # ---------------------------------------------------------------------------
 # Rules
 # ---------------------------------------------------------------------------
-$(DLL): $(OBJ) dlls\linkfunc.obj
-	$(LD) -L$(LIB) -c -aa -q -Gn -Tpd -m c0d32.obj $(OBJ) dlls\linkfunc.obj,\
-	$@, $(DLLNAME).map, import32.lib cw32mt.lib, $(DLLNAME)_bcc.def
+$(DLL): $(OBJDIR) $(OBJ) $(OBJDIR)\linkfunc.obj $(OBJDIR)\$(DLLNAME).res
+	$(LD) -L$(LIB) $(LDFLAGS) c0d32.obj $(OBJ) $(OBJDIR)\linkfunc.obj, \
+	$@, $(OBJDIR)\$(DLLNAME).map, import32.lib cw32mt.lib, \
+	$(DLLNAME)_bcc.def, $(OBJDIR)\$(DLLNAME).res
 
-dlls\linkfunc.obj: dlls\linkfunc.cpp
+$(OBJDIR):
+	-$(MD) $(OBJDIR)
+
+$(OBJDIR)\linkfunc.obj: dlls\linkfunc.cpp
 	$(CC) $(CFLAGS) -u- -o$@ -c dlls\linkfunc.cpp
 
-.cpp.obj:
-	$(CC) $(CFLAGS) -o$@ -c $<
+$(OBJDIR)\$(DLLNAME).res: dlls\$(DLLNAME).rc
+	$(RC) $(RCFLAGS) -fo$@ dlls\$(DLLNAME).rc
 
-.c.obj:
+{dlls;NNSim;NNSim\som}.cpp{$(OBJDIR)}.obj:
 	$(CC) $(CFLAGS) -o$@ -c $<
