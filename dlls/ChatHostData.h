@@ -22,7 +22,7 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#if !defined(__CHATHOSTDATA_H)
+#ifndef __CHATHOSTDATA_H
 #define __CHATHOSTDATA_H
 
 #include "Chat.h"
@@ -41,4 +41,4 @@ public:
 	CChatHostData *next,*prev;
 };
 
-#endif // !defined(__CHATHOSTDATA_H)
+#endif //__CHATHOSTDATA_H
