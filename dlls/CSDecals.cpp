@@ -68,7 +68,7 @@ void CSDecals :: Init(void){
 }
 
 char * CSDecals ::GetRandomDecal(void){
-	return szSDecals[RANDOM_LONG(1,lNum)-1];
+	return szSDecals[RANDOM_LONG(0,lNum-1)];
 }
 
 void CSDecals :: AddDecal(const char *szP){
