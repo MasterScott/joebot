@@ -897,7 +897,7 @@ edict_t *GetNearestPlayer(edict_t *pEdict,int iTeam,float &fMin,bool bVisible,bo
 edict_t *UTIL_BestPlayer(void){
 	edict_t *pEnt = 0,
 			*pBestEdict=0;
-	int iFrag;
+	float iFrag;
 	int i;
 	
 	iFrag = -1;
