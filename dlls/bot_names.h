@@ -22,7 +22,11 @@
 #ifndef __NAMES_H
 #define __NAMES_H
 
+#ifdef __MINGW32__
+#include <list.h>
+#else
 #include <list>
+#endif
 
 #include "CParser.h"
 
