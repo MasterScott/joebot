@@ -31,7 +31,7 @@
 #endif
 #endif
 
-#define VVERSION "1.6.5.1"
+#define VVERSION "1.6.5.2"
 #define VDATE __DATE__
 #define VAUTHOR "@$3.1415rin <as3.1415rin@bots-united.com>"
 #define VCOMPANY "joebot.bots-united.com"
@@ -49,7 +49,7 @@
 #define VDLLTYPE "STD"
 #endif
 
-#define RC_VERSION 1,6,5,1
+#define RC_VERSION 1,6,5,2
 #ifdef USE_METAMOD
 #define RC_DESC "JOEBOT - Metamod Counter-Strike Bot"
 #define RC_INTERNAL "joebot_mm"
