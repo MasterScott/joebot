@@ -60,6 +60,8 @@ public:
 	bool Important(void);
 	bool CheckTLife(void);
 	CTaskItem *GetTask(long);
+	long Current(void);
+	bool IsCurrent(long);
 
 	CTaskItem *current;
 	CTaskItem *current_main;

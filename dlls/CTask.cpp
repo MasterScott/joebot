@@ -219,3 +219,14 @@ CTaskItem *CTask :: GetTask(long lGet){
 	else
 		return 0;
 }
+
+long CTask :: Current(void){
+	if (current)
+		return current->lType;
+	else
+		return 0;
+}
+
+bool CTask :: IsCurrent(long lTask){
+	return (Current() & lTask) ? true : false;
+}
