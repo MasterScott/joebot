@@ -16,9 +16,9 @@ include Config.mk
 BASECFLAGS += $(EXTRA_CFLAGS)
 
 ifeq ($(OPT),debug)
-CFLAGS = $(BASECFLAGS) -w -g
+CFLAGS = $(BASECFLAGS) -g
 else
-CFLAGS = $(BASECFLAGS) -w -O2 -march=i586 -O2 -ffast-math -funroll-loops\
+CFLAGS = $(BASECFLAGS) -O2 -march=i586 -O2 -ffast-math -funroll-loops\
  -fomit-frame-pointer -fexpensive-optimizations -malign-loops=2\
  -malign-jumps=2 -malign-functions=2
 endif
