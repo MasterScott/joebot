@@ -753,6 +753,7 @@ bool FVisibleMT( const Vector &vecOrigin,const Vector &VAim,float fSQ,edict_t *p
 }
 
 bool FVisibleEx(Vector v_start, Vector v_end, bool bignore_doors, bool bignore_breakables, bool bignore_monsters, bool bignore_glass,edict_t *pEdictIgnore){
+	// traces a line to see if something is visible, but this function ignores doors
 	TraceResult tr1,tr2;
 	char	szDoor[] = "func_door",
 			szBreakable[] = "func_breakable";
