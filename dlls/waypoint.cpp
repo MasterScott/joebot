@@ -32,10 +32,10 @@
 //
 
 #include <iostream.h>
+#include <time.h>
 
 #ifdef _WIN32
 #include <io.h>
-#include <time.h>
 #endif
 #include <fcntl.h>
 #include <sys/stat.h>
@@ -43,15 +43,20 @@
 #include <unistd.h>
 #endif
 
-#include "waypoint.h"
-
 #include "extdll.h"
 #include "util.h"
-#include "globalvars.h"
+
+#ifdef USE_METAMOD
+#define SDK_UTIL_H  // util.h already included
+#include "meta_api.h"
+#endif /* USE_METAMOD */
+
+#include "waypoint.h"
 
 #include "bot_modid.h"
 #include "CBotBase.h"
 #include "Commandfunc.h"
+#include "globalvars.h"
 
 extern int mod_id;
 extern int m_spriteTexture;
@@ -224,7 +229,7 @@ void WaypointDebug(void)
 #ifdef DEBUGENGINE
 	int y = 1, x = 1;
 	
-	BOT_LOG("WaypointDebug", "LINKED LIST ERROR!!!");
+	BOT_LOG("WaypointDebug", ("LINKED LIST ERROR!!!"));
 	
 	x = x - 1;  // x is zero
 	y = y / x;  // cause an divide by zero exception
@@ -487,7 +492,7 @@ void WaypointAddPath(short int add_index, short int path_index)
 	
 	if (p == NULL)
 	{
-		ALERT(at_error, "JoeBOT - Error allocating memory for path!");
+		ALERT(at_error, "[JOEBOT] Error allocating memory for path!");
 	}
 	
 	for(int ischl=0;ischl < MAX_PATH_INDEX;ischl++){
@@ -1413,15 +1418,15 @@ int WaypointAdd(edict_t *pEntity)
 		strcpy(item_name, STRING(pent->v.classname));
 		
 		if (FStrEq("hostage_entity", item_name)){							// hostages
-			ClientPrint(&pEntity->v, HUD_PRINTCONSOLE, "hostage_entity\n");
+			UTIL_ConsoleMessage(pEntity, "hostage_entity\n");
 			waypoints[index].flags |= W_FL_FLAG;
 		}
 		if (FStrEq("func_hostage_rescue", item_name)){						// rescue zone
-			ClientPrint(&pEntity->v, HUD_PRINTCONSOLE, "func_hostage_rescue\n");
+			UTIL_ConsoleMessage(pEntity, "func_hostage_rescue\n");
 			waypoints[index].flags |= W_FL_FLAG_GOAL;
 		}
 		if (FStrEq("func_bomb_target", item_name)){						// bomb target
-			ClientPrint(&pEntity->v, HUD_PRINTCONSOLE, "func_bomb_target\n");
+			UTIL_ConsoleMessage(pEntity, "func_bomb_target\n");
 			waypoints[index].flags |= W_FL_FLAG;
 		}
 	}
@@ -1488,35 +1493,35 @@ bool WaypointAddStdWP(edict_t *pEntity){
 	while(pent = UTIL_FindEntityByClassname(pent,"info_player_start")){			// ct start
 		if((waypoints[WaypointFindNearest(pent->v.origin,pEntity,1000,-1)].origin - pent->v.origin).Length() > _ADDSTDWPDIST){
 			WaypointAdd(pent->v.origin,0,true);
-			if(pEntity)ClientPrint( VARS(pEntity), HUD_PRINTNOTIFY, "Added wp on ct starting point\n");
+			if(pEntity)UTIL_ConsoleMessage( pEntity, "Added wp on ct starting point\n");
 		}
 	}
 	pent = 0;
 	while(pent = UTIL_FindEntityByClassname(pent,"info_player_deathmatch")){	// te start
 		if((waypoints[WaypointFindNearest(pent->v.origin,pEntity,1000,-1)].origin - pent->v.origin).Length() > _ADDSTDWPDIST){
 			WaypointAdd(pent->v.origin,0,true);
-			if(pEntity)ClientPrint( VARS(pEntity), HUD_PRINTNOTIFY, "Added wp on te starting point\n");
+			if(pEntity)UTIL_ConsoleMessage( pEntity, "Added wp on te starting point\n");
 		}
 	}
 	pent = 0;
 	while(pent = UTIL_FindEntityByClassname(pent,"hostage_entity")){
 		if((waypoints[WaypointFindNearest(pent->v.origin,pEntity,1000,-1)].origin - pent->v.origin).Length() > _ADDSTDWPDIST){
 			WaypointAdd(pent->v.origin,W_FL_FLAG,true);
-			if(pEntity)ClientPrint( VARS(pEntity), HUD_PRINTNOTIFY, "Added wp at hostages\n");
+			if(pEntity)UTIL_ConsoleMessage( pEntity, "Added wp at hostages\n");
 		}
 	}
 	/*pent = 0;
 	while(pent = UTIL_FindEntityByClassname(pent,"func_bomb_target")){
 	if((waypoints[WaypointFindNearest(pent->v.origin,pEntity,1000,-1)].origin - pent->v.origin).Length() > 200){
 	WaypointAdd(pent->v.origin,W_FL_FLAG);
-	ClientPrint( VARS(pEntity), HUD_PRINTNOTIFY, "Added wp bomb target\n");
+	UTIL_ConsoleMessage( pEntity, "Added wp bomb target\n");
 	}
 }*/
 	pent = 0;
 	while(pent = UTIL_FindEntityByClassname(pent,"func_hostage_rescue")){
 		if((waypoints[WaypointFindNearest(pent->v.origin,pEntity,1000,-1)].origin - pent->v.origin).Length() > _ADDSTDWPDIST){
 			WaypointAdd(pent->v.origin,W_FL_FLAG_GOAL,true);
-			if(pEntity)ClientPrint( VARS(pEntity), HUD_PRINTNOTIFY, "Added wp for rescue zone\n");
+			if(pEntity)UTIL_ConsoleMessage( pEntity, "Added wp for rescue zone\n");
 		}
 	}
 	return true;
@@ -1872,7 +1877,7 @@ bool WaypointLoad(edict_t *pEntity, const char *szDir)
 	strcat(filename, ".wpj");
 	
 	if (IS_DEDICATED_SERVER())
-		printf("JoeBOT: loading waypoint file: %s\n", filename);
+		LOG_MESSAGE(PLID, "Loading waypoint file: %s", filename);
 	
 	FILE *bfp = fopen(filename, "rb");
 	
@@ -1884,14 +1889,13 @@ bool WaypointLoad(edict_t *pEntity, const char *szDir)
 		header.filetype[7] = 0;
 		if (FStrEq(header.filetype, _WPFILEDESC))
 		{
-			sprintf(szTemp, "%s,v%d", filename, header.waypoint_file_version);
-			CVAR_SET_STRING("jb_wpfilename", szTemp);
+			CVAR_SET_STRING("jb_wpfilename", UTIL_VarArgs("%s,v%d", filename, header.waypoint_file_version));
 
 			if (header.waypoint_file_version == 1)
 			{
-				printf("JoeBOT: loading waypoint file type 1\n");
+				LOG_MESSAGE(PLID, "Loading waypoint file type 1");
 				/*if (pEntity)
-				ClientPrint(VARS(pEntity), HUD_PRINTNOTIFY, "Incompatible Joe bot waypoint file version!\nWaypoints not loaded!\n");
+				UTIL_ConsoleMessage(pEntity, "Incompatible Joe bot waypoint file version!\nWaypoints not loaded!\n");
 				
 				  fclose(bfp);
 				return FALSE;*/
@@ -1902,8 +1906,7 @@ bool WaypointLoad(edict_t *pEntity, const char *szDir)
 				{
 					if (pEntity)
 					{
-						sprintf(msg, "WARNING: %s Joebot waypoints are originally not for this map!\n", filename);
-						ClientPrint(VARS(pEntity), HUD_PRINTNOTIFY, msg);
+						UTIL_ConsoleMessage(pEntity, "WARNING: %s Joebot waypoints are originally not for this map!\n", filename);
 					}
 				}
 				WaypointInit();  // remove any existing waypoints
@@ -1941,8 +1944,7 @@ bool WaypointLoad(edict_t *pEntity, const char *szDir)
 				{
 					if (pEntity)
 					{
-						sprintf(msg, "WARNING: %s JoeBOT waypoints are not for this map!\n", filename);
-						ClientPrint(VARS(pEntity), HUD_PRINTNOTIFY, msg);
+						UTIL_ConsoleMessage(pEntity, "WARNING: %s JoeBOT waypoints are not for this map!\n", filename);
 					}
 				}
 				WaypointInit();  // remove any existing waypoints
@@ -1987,8 +1989,7 @@ bool WaypointLoad(edict_t *pEntity, const char *szDir)
 		{
 			if (pEntity)
 			{
-				sprintf(msg, "%s is not a JoeBOT waypoint file!\n", filename);
-				ClientPrint(VARS(pEntity), HUD_PRINTNOTIFY, msg);
+				UTIL_ConsoleMessage(pEntity, "%s is not a JoeBOT waypoint file!\n", filename);
 			}
 			
 			fclose(bfp);
@@ -2003,15 +2004,14 @@ bool WaypointLoad(edict_t *pEntity, const char *szDir)
 	{
 		if (pEntity)
 		{
-			sprintf(msg, "Waypoint file %s does not exist!\n", filename);
-			ClientPrint(VARS(pEntity), HUD_PRINTNOTIFY, msg);
+			UTIL_ConsoleMessage(pEntity, "Waypoint file %s does not exist!\n", filename);
 		}
 		
 		if (IS_DEDICATED_SERVER())
-			printf("waypoint file %s not found!\n", filename);
+			LOG_MESSAGE(PLID, "waypoint file %s not found!", filename);
 		
 #ifdef DEBUGENGINE
-		BOT_LOG("WaypointLoad", "joebot waypoint file \"%s\" not found", filename);
+		BOT_LOG("WaypointLoad", ("joebot waypoint file \"%s\" not found", filename));
 #endif
 		return FALSE;
 	}
@@ -2167,12 +2167,11 @@ bool WaypointSave(edict_t *pEntity,const char *szDir)
 		return true;
 	}
 	else{
-		sprintf(szTemp,"JoeBOT: Failed saving %s\n",filename);
-		if (IS_DEDICATED_SERVER()){
-			cout << szTemp;cout.flush();
+		if (IS_DEDICATED_SERVER())
+			LOG_MESSAGE(PLID, "Failed saving %s",filename);
+		else{
+			UTIL_ConsoleMessage(NULL, "Failed saving %s\n",filename);
 		}
-		else
-			ALERT(at_console, szTemp);
 		return false;
 	}
 }
@@ -2503,7 +2502,7 @@ void WaypointPrintInfo(edict_t *pEntity, char *szText)		// szText is max 1000
 		}
 	}
 	else
-		ClientPrint(VARS(pEntity), HUD_PRINTNOTIFY, msg);
+		UTIL_ConsoleMessage(pEntity, msg);
 	
 	
 	flags = waypoints[index].flags;
@@ -2525,7 +2524,7 @@ void WaypointPrintInfo(edict_t *pEntity, char *szText)		// szText is max 1000
 			}
 		}
 		else
-			ClientPrint(VARS(pEntity), HUD_PRINTNOTIFY, msg);
+			UTIL_ConsoleMessage(pEntity, msg);
 	}
 	
 	if (flags & W_FL_CROUCH){
@@ -2536,7 +2535,7 @@ void WaypointPrintInfo(edict_t *pEntity, char *szText)		// szText is max 1000
 			}
 		}
 		else
-			ClientPrint(VARS(pEntity), HUD_PRINTNOTIFY, msg);
+			UTIL_ConsoleMessage(pEntity, msg);
 	}
 	if (flags & W_FL_LIFT){
 		sprintf(msg,"Bot will wait for lift before approaching\n");
@@ -2546,7 +2545,7 @@ void WaypointPrintInfo(edict_t *pEntity, char *szText)		// szText is max 1000
 			}
 		}
 		else
-			ClientPrint(VARS(pEntity), HUD_PRINTNOTIFY, msg);
+			UTIL_ConsoleMessage(pEntity, msg);
 	}
 	if (flags & W_FL_LADDER){
 		sprintf(msg,"This waypoint is on a ladder\n");
@@ -2556,7 +2555,7 @@ void WaypointPrintInfo(edict_t *pEntity, char *szText)		// szText is max 1000
 			}
 		}
 		else
-			ClientPrint(VARS(pEntity), HUD_PRINTNOTIFY, msg);
+			UTIL_ConsoleMessage(pEntity, msg);
 	}
 	if (flags & W_FL_HEALTH){
 		sprintf(msg,"There is health near this waypoint\n");
@@ -2566,7 +2565,7 @@ void WaypointPrintInfo(edict_t *pEntity, char *szText)		// szText is max 1000
 			}
 		}
 		else
-			ClientPrint(VARS(pEntity), HUD_PRINTNOTIFY, msg);
+			UTIL_ConsoleMessage(pEntity, msg);
 	}
 	if (flags & W_FL_ARMOR){
 		sprintf(msg,"There is armor near this waypoint\n");
@@ -2576,7 +2575,7 @@ void WaypointPrintInfo(edict_t *pEntity, char *szText)		// szText is max 1000
 			}
 		}
 		else
-			ClientPrint(VARS(pEntity), HUD_PRINTNOTIFY, msg);
+			UTIL_ConsoleMessage(pEntity, msg);
 	}
 	if (flags & W_FL_AMMO){
 		sprintf(msg,"There is ammo near this waypoint\n");
@@ -2586,7 +2585,7 @@ void WaypointPrintInfo(edict_t *pEntity, char *szText)		// szText is max 1000
 			}
 		}
 		else
-			ClientPrint(VARS(pEntity), HUD_PRINTNOTIFY, msg);
+			UTIL_ConsoleMessage(pEntity, msg);
 	}
 	if (flags & W_FL_SNIPER){
 		sprintf(msg,"This is a sniper waypoint\n");
@@ -2596,7 +2595,7 @@ void WaypointPrintInfo(edict_t *pEntity, char *szText)		// szText is max 1000
 			}
 		}
 		else
-			ClientPrint(VARS(pEntity), HUD_PRINTNOTIFY, msg);
+			UTIL_ConsoleMessage(pEntity, msg);
 	}
 	if (flags & W_FL_FLAG){
 		sprintf(msg,"This is a hostage/bomb/viprescue waypoint\n");
@@ -2606,7 +2605,7 @@ void WaypointPrintInfo(edict_t *pEntity, char *szText)		// szText is max 1000
 			}
 		}
 		else
-			ClientPrint(VARS(pEntity), HUD_PRINTNOTIFY, msg);
+			UTIL_ConsoleMessage(pEntity, msg);
 	}
 	if (flags & W_FL_FLAG_GOAL){
 		sprintf(msg,"This is a hostage rescue waypoint\n");
@@ -2616,7 +2615,7 @@ void WaypointPrintInfo(edict_t *pEntity, char *szText)		// szText is max 1000
 			}
 		}
 		else
-			ClientPrint(VARS(pEntity), HUD_PRINTNOTIFY, msg);
+			UTIL_ConsoleMessage(pEntity, msg);
 	}
 	if (flags & W_FL_VISIT){
 		sprintf(msg,"This is a visit waypoint\n");
@@ -2626,7 +2625,7 @@ void WaypointPrintInfo(edict_t *pEntity, char *szText)		// szText is max 1000
 			}
 		}
 		else
-			ClientPrint(VARS(pEntity), HUD_PRINTNOTIFY, msg);
+			UTIL_ConsoleMessage(pEntity, msg);
 	}
 	if (flags & W_FL_DONTAVOID){
 		sprintf(msg,"This is a dontavoid waypoint\n");
@@ -2636,7 +2635,7 @@ void WaypointPrintInfo(edict_t *pEntity, char *szText)		// szText is max 1000
 			}
 		}
 		else
-			ClientPrint(VARS(pEntity), HUD_PRINTNOTIFY, msg);
+			UTIL_ConsoleMessage(pEntity, msg);
 	}
 	if (flags & W_FL_RESET){
 		sprintf(msg,"This is a reset waypoint\n");
@@ -2646,7 +2645,7 @@ void WaypointPrintInfo(edict_t *pEntity, char *szText)		// szText is max 1000
 			}
 		}
 		else
-			ClientPrint(VARS(pEntity), HUD_PRINTNOTIFY, msg);
+			UTIL_ConsoleMessage(pEntity, msg);
 	}
 	if (flags & W_FL_AIMING){
 		sprintf(msg,"This is a aiming waypoint\n");
@@ -2656,7 +2655,7 @@ void WaypointPrintInfo(edict_t *pEntity, char *szText)		// szText is max 1000
 			}
 		}
 		else
-			ClientPrint(VARS(pEntity), HUD_PRINTNOTIFY, msg);
+			UTIL_ConsoleMessage(pEntity, msg);
 	}
 	if (flags & W_FL_DAF){
 		sprintf(msg,"This is a dontavoidfall waypoint\n");
@@ -2666,7 +2665,7 @@ void WaypointPrintInfo(edict_t *pEntity, char *szText)		// szText is max 1000
 			}
 		}
 		else
-			ClientPrint(VARS(pEntity), HUD_PRINTNOTIFY, msg);
+			UTIL_ConsoleMessage(pEntity, msg);
 	}
 	if (flags & W_FL_JUMP){
 		sprintf(msg,"This is a jump waypoint\n");
@@ -2676,7 +2675,7 @@ void WaypointPrintInfo(edict_t *pEntity, char *szText)		// szText is max 1000
 			}
 		}
 		else
-			ClientPrint(VARS(pEntity), HUD_PRINTNOTIFY, msg);
+			UTIL_ConsoleMessage(pEntity, msg);
 	}
 	if (flags & W_FL_BLOCKHOSTAGE){
 		sprintf(msg,"This is a blockhostage waypoint\n");
@@ -2686,7 +2685,7 @@ void WaypointPrintInfo(edict_t *pEntity, char *szText)		// szText is max 1000
 			}
 		}
 		else
-			ClientPrint(VARS(pEntity), HUD_PRINTNOTIFY, msg);
+			UTIL_ConsoleMessage(pEntity, msg);
 	}
 	
 	sprintf(msg,"\nKill/Killed : %3li/%3li\n",WPStat.d.FItem[index].lKill,WPStat.d.FItem[index].lKilled);
@@ -2696,7 +2695,7 @@ void WaypointPrintInfo(edict_t *pEntity, char *szText)		// szText is max 1000
 		}
 	}
 	else
-		ClientPrint(VARS(pEntity), HUD_PRINTNOTIFY, msg);
+		UTIL_ConsoleMessage(pEntity, msg);
 	
 	sprintf(msg,"fADEn : %3.0f\n",WPStat.d.FItem[index].fADEn);
 	if(szText){
@@ -2705,17 +2704,15 @@ void WaypointPrintInfo(edict_t *pEntity, char *szText)		// szText is max 1000
 		}
 	}
 	else
-		ClientPrint(VARS(pEntity), HUD_PRINTNOTIFY, msg);
+		UTIL_ConsoleMessage(pEntity, msg);
 }
 
 void WaypointPrintTest(edict_t *pEntity){
 	char msg[80];
 	int i;
 	
-	sprintf(msg,"Running Joebot waypoint analysis ....\n");
-	ClientPrint(VARS(pEntity), HUD_PRINTNOTIFY, msg);
-	sprintf(msg,"Total of %i waypoints\n",num_waypoints);
-	ClientPrint(VARS(pEntity), HUD_PRINTNOTIFY, msg);
+	UTIL_ConsoleMessage(pEntity, "Running Joebot waypoint analysis ....\n");
+	UTIL_ConsoleMessage(pEntity, "Total of %i waypoints\n",num_waypoints);
 	
 	int iTeam = 2;
 	
@@ -2767,96 +2764,70 @@ void WaypointPrintTest(edict_t *pEntity){
 		}
 	}
 	
-	sprintf(msg,"Total of %i deleted waypoints\n",iDeleted);
-	ClientPrint(VARS(pEntity), HUD_PRINTNOTIFY, msg);
+	UTIL_ConsoleMessage(pEntity, "Total of %i deleted waypoints\n",iDeleted);
 	
 	for(i=0;i < 3;i++){
 		switch(i){
 		case 0:
-			sprintf(msg,"--- Team specific wps for terrors, %i\n",iWTeam[i]);
-			ClientPrint(VARS(pEntity), HUD_PRINTNOTIFY, msg);
+			UTIL_ConsoleMessage(pEntity, "--- Team specific wps for terrors, %i\n",iWTeam[i]);
 			break;
 		case 1:
-			sprintf(msg,"--- Team specific wps for counter terrorists, %i\n",iWTeam[i]);
-			ClientPrint(VARS(pEntity), HUD_PRINTNOTIFY, msg);
+			UTIL_ConsoleMessage(pEntity, "--- Team specific wps for counter terrorists, %i\n",iWTeam[i]);
 			break;
 		case 2:
-			sprintf(msg,"--- Non team specific waypoints, %i\n",iWTeam[i]);
-			ClientPrint(VARS(pEntity), HUD_PRINTNOTIFY, msg);
+			UTIL_ConsoleMessage(pEntity, "--- Non team specific waypoints, %i\n",iWTeam[i]);
 			break;
 		}
-		sprintf(msg,"%i Aiming waypoints\n",iAiming[i]);
-		ClientPrint(VARS(pEntity), HUD_PRINTNOTIFY, msg);
-		
-		sprintf(msg,"%i Flag waypoints (i.e. hostage, bomb, etc.)\n",iFlag[i]);
-		ClientPrint(VARS(pEntity), HUD_PRINTNOTIFY, msg);
-		
-		sprintf(msg,"%i Flag Goal waypoints (i.e. rescue zone )\n",iFlagGoal[i]);
-		ClientPrint(VARS(pEntity), HUD_PRINTNOTIFY, msg);
-		
-		sprintf(msg,"%i Visit waypoints\n",iVisit[i]);
-		ClientPrint(VARS(pEntity), HUD_PRINTNOTIFY, msg);
-		
-		sprintf(msg,"%i Sniper waypoints\n",iSniper[i]);
-		ClientPrint(VARS(pEntity), HUD_PRINTNOTIFY, msg);
-		
-		sprintf(msg,"%i Ladder waypoints\n",iLadder[i]);
-		ClientPrint(VARS(pEntity), HUD_PRINTNOTIFY, msg);
-		
-		sprintf(msg,"%i Crouch waypoints\n",iCrouch[i]);
-		ClientPrint(VARS(pEntity), HUD_PRINTNOTIFY, msg);
+		UTIL_ConsoleMessage(pEntity, "%i Aiming waypoints\n",iAiming[i]);
+		UTIL_ConsoleMessage(pEntity, "%i Flag waypoints (i.e. hostage, bomb, etc.)\n",iFlag[i]);
+		UTIL_ConsoleMessage(pEntity, "%i Flag Goal waypoints (i.e. rescue zone )\n",iFlagGoal[i]);
+		UTIL_ConsoleMessage(pEntity, "%i Visit waypoints\n",iVisit[i]);
+		UTIL_ConsoleMessage(pEntity, "%i Sniper waypoints\n",iSniper[i]);
+		UTIL_ConsoleMessage(pEntity, "%i Ladder waypoints\n",iLadder[i]);
+		UTIL_ConsoleMessage(pEntity, "%i Crouch waypoints\n",iCrouch[i]);
 	}
 	bool bComment = false;
 	
-	sprintf(msg,"--- Comments: \n");
-	ClientPrint(VARS(pEntity), HUD_PRINTNOTIFY, msg);
+	UTIL_ConsoleMessage(pEntity, "--- Comments: \n");
 	if(!strncmp(STRING(gpGlobals->mapname),"cs",sizeof(char) * 2)
 		&& iFlag[2] == 0){
-		sprintf(msg,"Is there no hostage to rescue ?\n");
-		ClientPrint(VARS(pEntity), HUD_PRINTNOTIFY, msg);
+		UTIL_ConsoleMessage(pEntity, "Is there no hostage to rescue ?\n");
 		bComment = true;
 	}
 	if(!strncmp(STRING(gpGlobals->mapname),"cs",sizeof(char) * 2)
 		&& iFlag[2] == 1){
-		sprintf(msg,"Are all hostages in one place ?\n");
-		ClientPrint(VARS(pEntity), HUD_PRINTNOTIFY, msg);
+		UTIL_ConsoleMessage(pEntity, "Are all hostages in one place ?\n");
 		bComment = true;
 	}
 	if(!strncmp(STRING(gpGlobals->mapname),"cs",sizeof(char) * 2)
 		&& iFlagGoal[2] == 0){
-		sprintf(msg,"Is there no rescue zone ?\n");
-		ClientPrint(VARS(pEntity), HUD_PRINTNOTIFY, msg);
+		UTIL_ConsoleMessage(pEntity, "Is there no rescue zone ?\n");
 		bComment = true;
 	}
 	if(!strncmp(STRING(gpGlobals->mapname),"de",sizeof(char) * 2)
 		&& iFlag[2] == 0){
-		sprintf(msg,"Are there no bomb targets ?\n");
-		ClientPrint(VARS(pEntity), HUD_PRINTNOTIFY, msg);
+		UTIL_ConsoleMessage(pEntity, "Are there no bomb targets ?\n");
 		bComment = true;
 	}
 	if(!strncmp(STRING(gpGlobals->mapname),"de",sizeof(char) * 2)
 		&& iFlag[2] == 0){
-		sprintf(msg,"Normally there are 2 bomb targets !\n");
-		ClientPrint(VARS(pEntity), HUD_PRINTNOTIFY, msg);
+		UTIL_ConsoleMessage(pEntity, "Normally there are 2 bomb targets !\n");
 		bComment = true;
 	}
 	if(!strncmp(STRING(gpGlobals->mapname),"as",sizeof(char) * 2)
 		&& iFlag[2]+iFlag[1]+iFlag[0] == 0){
-		sprintf(msg,"There has to be at least one rescue point !\n");
-		ClientPrint(VARS(pEntity), HUD_PRINTNOTIFY, msg);
+		UTIL_ConsoleMessage(pEntity, "There has to be at least one rescue point !\n");
 		bComment = true;
 	}
 	
 	if(strncmp(STRING(gpGlobals->mapname),"as",sizeof(char) * 2)
-		&& ((iSniper[CT] == 0 && iSniper[2] == 0) || (iSniper[TE] != 0 && iSniper[2] == 0))  ){
-		sprintf(msg,"It would be better if u would add some sniper spots for both teams.\n");
-		ClientPrint(VARS(pEntity), HUD_PRINTNOTIFY, msg);
+		&& ((iSniper[CS_TEAM_CT] == 0 && iSniper[2] == 0) || (iSniper[CS_TEAM_TE] != 0 && iSniper[2] == 0))  ){
+		UTIL_ConsoleMessage(pEntity, "It would be better if u would add some sniper spots for both teams.\n");
 		bComment = true;
 	}
 	
 	if(!bComment){
-		sprintf(msg,"none\n");
-		ClientPrint(VARS(pEntity), HUD_PRINTNOTIFY, msg);
+		UTIL_ConsoleMessage(pEntity, "none\n");
 	}
 }
 
@@ -3186,7 +3157,7 @@ void WaypointThink(edict_t *pEntity)
 					if ((wp_display_time[i] + 1.0) < gpGlobals->time)
 					{
 						if(waypoints[i].flags & W_FL_TEAM_SPECIFIC){
-							if ((waypoints[i].flags & W_FL_TEAM) == TE){
+							if ((waypoints[i].flags & W_FL_TEAM) == CS_TEAM_TE){
 								fTeamr = 255;
 								fTeamg = 0;
 							}
@@ -3708,24 +3679,22 @@ void WaypointRouteInit(void)
 				
 				if (stat1.st_mtime < stat2.st_mtime)  // is .wpt older than .wpX file?
 				{
-					//sprintf(msg, "loading Joe_bot waypoint paths for team %d\n", matrix+1);
-					//ALERT(at_console, msg);
-					sprintf(msg,"JoeBOT: loading waypoint route file: %s\n", filename2);
-					if (IS_DEDICATED_SERVER()){
-						cout << msg;cout.flush();
+					//UTIL_ConsoleMessage(NULL, "Loading JoeBOT waypoint paths for team %d\n", matrix+1);
+					if (IS_DEDICATED_SERVER())
+						LOG_MESSAGE(PLID, "Loading waypoint route file: %s", filename2);
+					else{
+						UTIL_ConsoleMessage(NULL, "Loading waypoint route file: %s\n", filename2);
 					}
-					else
-						ALERT(at_console, msg);
 					
 					shortest_path[matrix] = (unsigned short *)malloc(sizeof(unsigned short) * array_size);
 					
 					if (shortest_path[matrix] == NULL)
-						ALERT(at_error, "JoeBOT - Error allocating memory for shortest path!");
+						ALERT(at_error, "[JOEBOT] Error allocating memory for shortest path!");
 					
 					from_to[matrix] = (unsigned short *)malloc(sizeof(unsigned short) * array_size);
 					
 					if (from_to[matrix] == NULL)
-						ALERT(at_error, "JoeBOT - Error allocating memory for from to matrix!");
+						ALERT(at_error, "[JOEBOT] Error allocating memory for from to matrix!");
 					
 					bfp = fopen(filename2, "rb");
 					
@@ -3740,7 +3709,7 @@ void WaypointRouteInit(void)
 						{
 							// if couldn't read enough data, free memory to recalculate it
 							
-							ALERT(at_console, "error reading enough path items, recalculating...\n");
+							UTIL_ConsoleMessage(NULL, "Error reading enough path items, recalculating...\n");
 							
 							free(shortest_path[matrix]);
 							shortest_path[matrix] = NULL;
@@ -3756,7 +3725,7 @@ void WaypointRouteInit(void)
 							{
 								// if couldn't read enough data, free memory to recalculate it
 								
-								ALERT(at_console, "error reading enough path items, recalculating...\n");
+								ALERT(at_console, "Error reading enough path items, recalculating...\n");
 								
 								free(shortest_path[matrix]);
 								shortest_path[matrix] = NULL;
@@ -3768,7 +3737,7 @@ void WaypointRouteInit(void)
 					}
 					else
 					{
-						ALERT(at_console, "JoeBOT - Error reading waypoint paths!\n");
+						ALERT(at_console, "[JOEBOT] Error reading waypoint paths!\n");
 						
 						free(shortest_path[matrix]);
 						shortest_path[matrix] = NULL;
@@ -3783,21 +3752,20 @@ void WaypointRouteInit(void)
 			
 			if (shortest_path[matrix] == NULL)
 			{
-				//sprintf(msg, "calculating Joe_bot waypoint paths for team %d...\n", matrix+1);
-				//ALERT(at_console, msg);
+				//ALERT(at_console, UTIL_VarArgs("calculating Joe_bot waypoint paths for team %d...\n", matrix+1));
 				
 				if (IS_DEDICATED_SERVER())
-					printf("JoeBOT: creating waypoint route file: %s\n", filename2);
+					LOG_MESSAGE(PLID, "Creating waypoint route file: %s", filename2);
 				
 				shortest_path[matrix] = (unsigned short *)malloc(sizeof(unsigned short) * array_size);
 				
 				if (shortest_path[matrix] == NULL)
-					ALERT(at_error, "JoeBOT - Error allocating memory for shortest path!");
+					ALERT(at_error, "[JOEBOT] Error allocating memory for shortest path!");
 				
 				from_to[matrix] = (unsigned short *)malloc(sizeof(unsigned short) * array_size);
 				
 				if (from_to[matrix] == NULL)
-					ALERT(at_error, "JoeBOT - Error allocating memory for from to matrix!");
+					ALERT(at_error, "[JOEBOT] Error allocating memory for from to matrix!");
 				
 				pShortestPath = shortest_path[matrix];
 				pFromTo = from_to[matrix];
@@ -3841,8 +3809,7 @@ void WaypointRouteInit(void)
 										
 										if (distance > REACHABLE_RANGE)
 										{
-											sprintf(msg, "WARNING: Waypoint path distance > %4.1f at from %d to %d\n",float(REACHABLE_RANGE), row, index);
-											ALERT(at_console, msg);
+											ALERT(at_console, UTIL_VarArgs("WARNING: Waypoint path distance > %4.1f at from %d to %d\n",float(REACHABLE_RANGE), row, index));
 										}
 										offset = row * route_num_waypoints + index;
 										
@@ -3877,8 +3844,7 @@ void WaypointRouteInit(void)
 	
 				if (bfp != NULL)
 				{
-					sprintf(szTemp,"JoeBOT writing floyd table to %s\n",filename2);
-					ALERT(at_console, szTemp);
+					ALERT(at_console, UTIL_VarArgs("Writing floyd table to %s\n",filename2));
 
 					ROUTE_HDR route_hdr;
 					memset(&route_hdr,'\n',sizeof(ROUTE_HDR));
@@ -3909,21 +3875,17 @@ void WaypointRouteInit(void)
 				}
 				else
 				{
-					ALERT(at_console, "JoeBOT - Error writing waypoint paths!\n");
+					ALERT(at_console, "[JOEBOT] Error writing waypoint paths!\n");
 				}
 				ct_end_misc = clock();
 				
-				sprintf(msg, "time (dist,floyd,misc): %.2f,%.2f,%.2f\n",(ct_end_distances - ct_start_distances)/float(CLOCKS_PER_SEC),(ct_end_floyd - ct_start_floyd)/float(CLOCKS_PER_SEC),(ct_end_misc - ct_start_misc)/float(CLOCKS_PER_SEC));
-				
-				ALERT(at_console, msg);
+				ALERT( at_console, UTIL_VarArgs("Time (dist,floyd,misc): %.2f,%.2f,%.2f\n",(ct_end_distances - ct_start_distances)/float(CLOCKS_PER_SEC),(ct_end_floyd - ct_start_floyd)/float(CLOCKS_PER_SEC),(ct_end_misc - ct_start_misc)/float(CLOCKS_PER_SEC)) );
 				/*if(IS_DEDICATED_SERVER())
-					cout <<"JoeBOT : "<< msg;cout.flush();*/
+					LOG_MESSAGE(PLID, "Time (dist,floyd,misc): %.2f,%.2f,%.2f",(ct_end_distances - ct_start_distances)/float(CLOCKS_PER_SEC),(ct_end_floyd - ct_start_floyd)/float(CLOCKS_PER_SEC),(ct_end_misc - ct_start_misc)/float(CLOCKS_PER_SEC));*/
 				
-				sprintf(msg, "JoeBOT waypoint path calculations for team %d complete!\n",matrix+1);
-				
-				ALERT(at_console, msg);
+				ALERT( at_console, UTIL_VarArgs("Waypoint path calculations for team %d complete!\n",matrix+1) );
 				/*if(IS_DEDICATED_SERVER())
-					cout <<"JoeBOT : "<< msg;cout.flush();*/
+					LOG_MESSAGE(PLID, "Waypoint path calculations for team %d complete!",matrix+1);*/
          }
       }
    }  
