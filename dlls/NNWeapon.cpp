@@ -28,6 +28,8 @@
 #include <string.h>
 
 #include "bot_weapons.h"
+#include "Commandfunc.h"
+#include "globalvars.h"
 #include "NNWeapon.h"
 
 #include "BotNNDefs.h"
@@ -41,7 +43,7 @@ void UTIL_BuildFileName(char *filename, const char *arg1, const char *arg2);
 #define _DELAY_NONE .3
 
 NNWeapon :: NNWeapon(){
-	Init();
+//	Init();
 }
 
 void NNWeapon :: Init(void){
@@ -66,10 +68,8 @@ void NNWeapon :: Init(void){
 	dpWeaV[CSTRIKE_DLL][CS_WEAPON_FIVESEVEN]	= dr_weapon_fiveseven;
 	dpWeaV[CSTRIKE_DLL][CS_WEAPON_UMP45]		= dr_weapon_ump45;
 	dpWeaV[CSTRIKE_DLL][CS_WEAPON_SG550]		= dr_weapon_sg550;
-#ifndef CSTRIKE15
 	dpWeaV[CSTRIKE_DLL][CS_WEAPON_GALIL]		= dr_weapon_galil;
 	dpWeaV[CSTRIKE_DLL][CS_WEAPON_FAMAS]		= dr_weapon_famas;
-#endif /* CSTRIKE15 */
 	dpWeaV[CSTRIKE_DLL][CS_WEAPON_USP]			= dr_weapon_usp;
 	dpWeaV[CSTRIKE_DLL][CS_WEAPON_GLOCK18]		= dr_weapon_glock18;
 	dpWeaV[CSTRIKE_DLL][CS_WEAPON_AWP]			= dr_weapon_awp;
@@ -99,10 +99,8 @@ void NNWeapon :: Init(void){
 	dpWeaponPause[CSTRIKE_DLL][CS_WEAPON_FIVESEVEN]		= 5;
 	dpWeaponPause[CSTRIKE_DLL][CS_WEAPON_UMP45]			= 1;
 	dpWeaponPause[CSTRIKE_DLL][CS_WEAPON_SG550]			= 5;
-#ifndef CSTRIKE15
 	dpWeaponPause[CSTRIKE_DLL][CS_WEAPON_GALIL]			= 10;
 	dpWeaponPause[CSTRIKE_DLL][CS_WEAPON_FAMAS]			= 10;
-#endif /* CSTRIKE15 */
 	dpWeaponPause[CSTRIKE_DLL][CS_WEAPON_USP]			= 10;
 	dpWeaponPause[CSTRIKE_DLL][CS_WEAPON_GLOCK18]		= 10;
 	dpWeaponPause[CSTRIKE_DLL][CS_WEAPON_AWP]			= 0;
@@ -132,10 +130,8 @@ void NNWeapon :: Init(void){
 	dpWeaponPauseTime[CSTRIKE_DLL][CS_WEAPON_FIVESEVEN]		= .5;
 	dpWeaponPauseTime[CSTRIKE_DLL][CS_WEAPON_UMP45]			= .6;
 	dpWeaponPauseTime[CSTRIKE_DLL][CS_WEAPON_SG550]			= .5;
-#ifndef CSTRIKE15
 	dpWeaponPauseTime[CSTRIKE_DLL][CS_WEAPON_GALIL]			= .7;
 	dpWeaponPauseTime[CSTRIKE_DLL][CS_WEAPON_FAMAS]			= .7;
-#endif /* CSTRIKE15 */
 	dpWeaponPauseTime[CSTRIKE_DLL][CS_WEAPON_USP]			= .2;
 	dpWeaponPauseTime[CSTRIKE_DLL][CS_WEAPON_GLOCK18]		= .2;
 	dpWeaponPauseTime[CSTRIKE_DLL][CS_WEAPON_AWP]			= 0;
@@ -164,12 +160,10 @@ void NNWeapon :: Init(void){
 	dpWeaponDelay[CS_WEAPON_ELITE]			= _DELAY_NONE;
 	dpWeaponDelay[CS_WEAPON_FIVESEVEN]		= _DELAY_NONE;
 	dpWeaponDelay[CS_WEAPON_UMP45]			= _DELAY_NONE;
-	dpWeaponDelay[CS_WEAPON_SG550]			= .4;*/
-#ifndef CSTRIKE15
-	/*dpWeaponDelay[CS_WEAPON_GALIL]			= _DELAY_NONE;
-	dpWeaponDelay[CS_WEAPON_FAMAS]			= _DELAY_NONE;*/
-#endif /* CSTRIKE15 */
-	/*dpWeaponDelay[CS_WEAPON_USP]			= _DELAY_NONE;
+	dpWeaponDelay[CS_WEAPON_SG550]			= .4;
+	dpWeaponDelay[CS_WEAPON_GALIL]			= _DELAY_NONE;
+	dpWeaponDelay[CS_WEAPON_FAMAS]			= _DELAY_NONE;
+	dpWeaponDelay[CS_WEAPON_USP]			= _DELAY_NONE;
 	dpWeaponDelay[CS_WEAPON_GLOCK18]		= _DELAY_NONE;
 	dpWeaponDelay[CS_WEAPON_AWP]			= .5;
 	dpWeaponDelay[CS_WEAPON_MP5NAVY]		= _DELAY_NONE;
@@ -198,10 +192,8 @@ void NNWeapon :: Init(void){
 	ipClipSize[CSTRIKE_DLL][CS_WEAPON_FIVESEVEN]		= 20;
 	ipClipSize[CSTRIKE_DLL][CS_WEAPON_UMP45]			= 30;
 	ipClipSize[CSTRIKE_DLL][CS_WEAPON_SG550]			= 30;
-#ifndef CSTRIKE15
 	ipClipSize[CSTRIKE_DLL][CS_WEAPON_GALIL]			= 35;
 	ipClipSize[CSTRIKE_DLL][CS_WEAPON_FAMAS]			= 25;
-#endif /* CSTRIKE15 */
 	ipClipSize[CSTRIKE_DLL][CS_WEAPON_USP]				= 12;
 	ipClipSize[CSTRIKE_DLL][CS_WEAPON_GLOCK18]			= 20;
 	ipClipSize[CSTRIKE_DLL][CS_WEAPON_AWP]				= 10;
@@ -235,10 +227,8 @@ void NNWeapon :: Init(void){
 	iCost[CSTRIKE_DLL][CS_WEAPON_FIVESEVEN]			= 750;
 	iCost[CSTRIKE_DLL][CS_WEAPON_UMP45]				= 1700;
 	iCost[CSTRIKE_DLL][CS_WEAPON_SG550]				= 4200;
-#ifndef CSTRIKE15
 	iCost[CSTRIKE_DLL][CS_WEAPON_GALIL]				= 1700;
 	iCost[CSTRIKE_DLL][CS_WEAPON_FAMAS]				= 2250;
-#endif /* CSTRIKE15 */
 	iCost[CSTRIKE_DLL][CS_WEAPON_USP]				= 500;
 	iCost[CSTRIKE_DLL][CS_WEAPON_GLOCK18]			= 400;
 	iCost[CSTRIKE_DLL][CS_WEAPON_AWP]				= 4750;
@@ -257,56 +247,56 @@ void NNWeapon :: Init(void){
 	iTeam[CSTRIKE_DLL][CS_WEAPON_AUG]				= 1;		// ct=>1;te=>0
 	iTeam[CSTRIKE_DLL][CS_WEAPON_MAC10]				= 0;
 	iTeam[CSTRIKE_DLL][CS_WEAPON_SG550]				= 1;
-#ifndef CSTRIKE15
 	iTeam[CSTRIKE_DLL][CS_WEAPON_GALIL]				= 0;
 	iTeam[CSTRIKE_DLL][CS_WEAPON_FAMAS]				= 1;
-#endif /* CSTRIKE15 */
 	iTeam[CSTRIKE_DLL][CS_WEAPON_M4A1]				= 1;
 	iTeam[CSTRIKE_DLL][CS_WEAPON_TMP]				= 1;
 	iTeam[CSTRIKE_DLL][CS_WEAPON_SG552]				= 0;
 	iTeam[CSTRIKE_DLL][CS_WEAPON_AK47]				= 0;
 
-	fPBuyProb[CSTRIKE_DLL][CS_WEAPON_SCOUT]				= 5;
-	fPBuyProb[CSTRIKE_DLL][CS_WEAPON_XM1014]			= 5;
-	fPBuyProb[CSTRIKE_DLL][CS_WEAPON_MAC10]				= 5;
-	fPBuyProb[CSTRIKE_DLL][CS_WEAPON_AUG]				= 20;
-	fPBuyProb[CSTRIKE_DLL][CS_WEAPON_UMP45]				= 15;
-	fPBuyProb[CSTRIKE_DLL][CS_WEAPON_SG550]				= 5;
-#ifndef CSTRIKE15
-	fPBuyProb[CSTRIKE_DLL][CS_WEAPON_GALIL]				= 10;
-	fPBuyProb[CSTRIKE_DLL][CS_WEAPON_FAMAS]				= 10;
-#endif /* CSTRIKE15 */
-	fPBuyProb[CSTRIKE_DLL][CS_WEAPON_AWP]				= 8;
-	fPBuyProb[CSTRIKE_DLL][CS_WEAPON_MP5NAVY]			= 20;
-	fPBuyProb[CSTRIKE_DLL][CS_WEAPON_M249]				= 2;
-	fPBuyProb[CSTRIKE_DLL][CS_WEAPON_M3]				= 3;
-	fPBuyProb[CSTRIKE_DLL][CS_WEAPON_M4A1]				= 20;
-	fPBuyProb[CSTRIKE_DLL][CS_WEAPON_TMP]				= 5;
-	fPBuyProb[CSTRIKE_DLL][CS_WEAPON_G3SG1]				= 5;
-	fPBuyProb[CSTRIKE_DLL][CS_WEAPON_SG552]				= 20;
-	fPBuyProb[CSTRIKE_DLL][CS_WEAPON_AK47]				= 20;
-	fPBuyProb[CSTRIKE_DLL][CS_WEAPON_P90]				= 5;
+	fPBuyProb[CSTRIKE_DLL][CS_WEAPON_SCOUT]			= 5;
+	fPBuyProb[CSTRIKE_DLL][CS_WEAPON_XM1014]		= 5;
+	fPBuyProb[CSTRIKE_DLL][CS_WEAPON_MAC10]			= 5;
+	fPBuyProb[CSTRIKE_DLL][CS_WEAPON_AUG]			= 20;
+	fPBuyProb[CSTRIKE_DLL][CS_WEAPON_UMP45]			= 15;
+	fPBuyProb[CSTRIKE_DLL][CS_WEAPON_SG550]			= 5;
+	//if (!bool(jb_cstrike15->value))
+	//{
+		fPBuyProb[CSTRIKE_DLL][CS_WEAPON_GALIL]		= 10;
+		fPBuyProb[CSTRIKE_DLL][CS_WEAPON_FAMAS]		= 10;
+	//}
+	fPBuyProb[CSTRIKE_DLL][CS_WEAPON_AWP]			= 8;
+	fPBuyProb[CSTRIKE_DLL][CS_WEAPON_MP5NAVY]		= 20;
+	fPBuyProb[CSTRIKE_DLL][CS_WEAPON_M249]			= 2;
+	fPBuyProb[CSTRIKE_DLL][CS_WEAPON_M3]			= 3;
+	fPBuyProb[CSTRIKE_DLL][CS_WEAPON_M4A1]			= 20;
+	fPBuyProb[CSTRIKE_DLL][CS_WEAPON_TMP]			= 5;
+	fPBuyProb[CSTRIKE_DLL][CS_WEAPON_G3SG1]			= 5;
+	fPBuyProb[CSTRIKE_DLL][CS_WEAPON_SG552]			= 20;
+	fPBuyProb[CSTRIKE_DLL][CS_WEAPON_AK47]			= 20;
+	fPBuyProb[CSTRIKE_DLL][CS_WEAPON_P90]			= 5;
 
-	/*fPBuyProb[CSTRIKE_DLL][CS_WEAPON_SCOUT]				= 10;
-	fPBuyProb[CSTRIKE_DLL][CS_WEAPON_XM1014]			= 10;
-	fPBuyProb[CSTRIKE_DLL][CS_WEAPON_MAC10]				= 10;
-	fPBuyProb[CSTRIKE_DLL][CS_WEAPON_AUG]				= 10;
-	fPBuyProb[CSTRIKE_DLL][CS_WEAPON_UMP45]				= 10;
-	fPBuyProb[CSTRIKE_DLL][CS_WEAPON_SG550]				= 10;*/
-#ifndef CSTRIKE15
-	/*fPBuyProb[CSTRIKE_DLL][CS_WEAPON_GALIL]				= 10;
-	fPBuyProb[CSTRIKE_DLL][CS_WEAPON_FAMAS]				= 10;*/
-#endif /* CSTRIKE15 */
-	/*fPBuyProb[CSTRIKE_DLL][CS_WEAPON_AWP]				= 10;
-	fPBuyProb[CSTRIKE_DLL][CS_WEAPON_MP5NAVY]			= 10;
-	fPBuyProb[CSTRIKE_DLL][CS_WEAPON_M249]				= 10;
-	fPBuyProb[CSTRIKE_DLL][CS_WEAPON_M3]				= 10;
-	fPBuyProb[CSTRIKE_DLL][CS_WEAPON_M4A1]				= 10;
-	fPBuyProb[CSTRIKE_DLL][CS_WEAPON_TMP]				= 10;
-	fPBuyProb[CSTRIKE_DLL][CS_WEAPON_G3SG1]				= 10;
-	fPBuyProb[CSTRIKE_DLL][CS_WEAPON_SG552]				= 10;
-	fPBuyProb[CSTRIKE_DLL][CS_WEAPON_AK47]				= 10;
-	fPBuyProb[CSTRIKE_DLL][CS_WEAPON_P90]				= 10;*/
+	/*fPBuyProb[CSTRIKE_DLL][CS_WEAPON_SCOUT]			= 10;
+	fPBuyProb[CSTRIKE_DLL][CS_WEAPON_XM1014]		= 10;
+	fPBuyProb[CSTRIKE_DLL][CS_WEAPON_MAC10]			= 10;
+	fPBuyProb[CSTRIKE_DLL][CS_WEAPON_AUG]			= 10;
+	fPBuyProb[CSTRIKE_DLL][CS_WEAPON_UMP45]			= 10;
+	fPBuyProb[CSTRIKE_DLL][CS_WEAPON_SG550]			= 10;
+	if (!bool(jb_cstrike15->value))
+	{
+		fPBuyProb[CSTRIKE_DLL][CS_WEAPON_GALIL]		= 10;
+		fPBuyProb[CSTRIKE_DLL][CS_WEAPON_FAMAS]		= 10;
+	}
+	fPBuyProb[CSTRIKE_DLL][CS_WEAPON_AWP]			= 10;
+	fPBuyProb[CSTRIKE_DLL][CS_WEAPON_MP5NAVY]		= 10;
+	fPBuyProb[CSTRIKE_DLL][CS_WEAPON_M249]			= 10;
+	fPBuyProb[CSTRIKE_DLL][CS_WEAPON_M3]			= 10;
+	fPBuyProb[CSTRIKE_DLL][CS_WEAPON_M4A1]			= 10;
+	fPBuyProb[CSTRIKE_DLL][CS_WEAPON_TMP]			= 10;
+	fPBuyProb[CSTRIKE_DLL][CS_WEAPON_G3SG1]			= 10;
+	fPBuyProb[CSTRIKE_DLL][CS_WEAPON_SG552]			= 10;
+	fPBuyProb[CSTRIKE_DLL][CS_WEAPON_AK47]			= 10;
+	fPBuyProb[CSTRIKE_DLL][CS_WEAPON_P90]			= 10;*/
 
 	float fTemp[32];
 	memcpy(fTemp,fPBuyProb[CSTRIKE_DLL],sizeof(float) * 32);
@@ -344,9 +334,9 @@ void NNWeapon :: Init(void){
 	dpWeaV[DOD_DLL][DOD_WEAPON_STICKGRENADE]	= -.8;
 	dpWeaV[DOD_DLL][DOD_WEAPON_STICKGRENADE_EX]	= -.8;
 
-	dpWeaV[DOD_DLL][DOD_WEAPON_30CAL]		= -1.0;
-	dpWeaV[DOD_DLL][DOD_WEAPON_MG34]		= -1.0;
-	dpWeaV[DOD_DLL][DOD_WEAPON_MG42]		= -1.0;
+	dpWeaV[DOD_DLL][DOD_WEAPON_30CAL]			= -1.0;
+	dpWeaV[DOD_DLL][DOD_WEAPON_MG34]			= -1.0;
+	dpWeaV[DOD_DLL][DOD_WEAPON_MG42]			= -1.0;
 
 	/* copy stuff for csclassic */
 	memcpy(&(dpWeaV[CSCLASSIC_DLL]),&(dpWeaV[CSTRIKE_DLL]),sizeof(double)*32);
