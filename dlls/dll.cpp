@@ -393,7 +393,7 @@ CBotWPDir g_WPDir;
 
 char welcome_msg[200];
 char _JOEBOTVERSION[80];
-char _JOEBOTVERSIONWOOS[80]= "1.6a";
+char _JOEBOTVERSIONWOOS[80]= "1.6.1";
 bool bDedicatedWelcome = false;
 int g_iTypeoM;
 int g_iLanguage;
