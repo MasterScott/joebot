@@ -39,11 +39,11 @@
 #define _CLIENT_END		-1
 
 void BotClient_Valve_WeaponList(void *p, int bot_index,int iAdd);
-void BotClient_Valve_CurrentWeapon(void *p, int bot_index,int iAdd);
+void BotClient_Valve_CurWeapon(void *p, int bot_index,int iAdd);
 void BotClient_Valve_AmmoX(void *p, int bot_index,int iAdd);
 void BotClient_Valve_SayText(void *p, int bot_index,int iAdd);
 void BotClient_Valve_AmmoPickup(void *p, int bot_index,int iAdd);
-void BotClient_Valve_WeaponPickup(void *p, int bot_index,int iAdd);
+void BotClient_Valve_WeapPickup(void *p, int bot_index,int iAdd);
 void BotClient_Valve_ItemPickup(void *p, int bot_index,int iAdd);
 void BotClient_Valve_Health(void *p, int bot_index,int iAdd);
 void BotClient_Valve_Battery(void *p, int bot_index,int iAdd);
@@ -52,13 +52,13 @@ void BotClient_Valve_ScreenFade(void *p, int bot_index,int iAdd);
 void BotClient_Valve_DeathMsg(void *p, int bot_index,int iAdd);
 
 
-/*void BotClient_TFC_VGUI(void *p, int bot_index);
+/*void BotClient_TFC_VGUIMenu(void *p, int bot_index);
 void BotClient_TFC_WeaponList(void *p, int bot_index);
-void BotClient_TFC_CurrentWeapon(void *p, int bot_index);
+void BotClient_TFC_CurWeapon(void *p, int bot_index);
 void BotClient_TFC_AmmoX(void *p, int bot_index,int iAdd);
 void BotClient_TFC_SayText(void *p, int bot_index,int iAdd);
 void BotClient_TFC_AmmoPickup(void *p, int bot_index);
-void BotClient_TFC_WeaponPickup(void *p, int bot_index);
+void BotClient_TFC_WeapPickup(void *p, int bot_index);
 void BotClient_TFC_ItemPickup(void *p, int bot_index);
 void BotClient_TFC_Health(void *p, int bot_index);
 void BotClient_TFC_Battery(void *p, int bot_index);
@@ -67,13 +67,13 @@ void BotClient_TFC_ScreenFade(void *p, int bot_index);
 void BotClient_TFC_DeathMsg(void *p, int bot_index);*/
 
 
-void BotClient_CS_VGUI(void *p, int bot_index,int iAdd);
+void BotClient_CS_VGUIMenu(void *p, int bot_index,int iAdd);
 void BotClient_CS_WeaponList(void *p, int bot_index,int iAdd);
-void BotClient_CS_CurrentWeapon(void *p, int bot_index,int iAdd);
+void BotClient_CS_CurWeapon(void *p, int bot_index,int iAdd);
 void BotClient_CS_AmmoX(void *p, int bot_index,int iAdd);
 void BotClient_CS_SayText(void *p, int bot_index,int iAdd);
 void BotClient_CS_AmmoPickup(void *p, int bot_index,int iAdd);
-void BotClient_CS_WeaponPickup(void *p, int bot_index,int iAdd);
+void BotClient_CS_WeapPickup(void *p, int bot_index,int iAdd);
 void BotClient_CS_ItemPickup(void *p, int bot_index,int iAdd);
 void BotClient_CS_Health(void *p, int bot_index,int iAdd);
 void BotClient_CS_Battery(void *p, int bot_index,int iAdd);
@@ -83,32 +83,32 @@ void BotClient_CS_DeathMsg(void *p, int bot_index,int iAdd);
 // CS specific
 void BotClient_CS_Money(void *p, int bot_index,int iAdd);
 void BotClient_CS_ShowMenu(void *p, int bot_index,int iAdd);
-void BotClient_CS_StatusI(void *p, int bot_index,int iAdd);
+void BotClient_CS_StatusIcon(void *p, int bot_index,int iAdd);
 void BotClient_CS_Roundtime(void *p, int bot_index,int iAdd);
 void BotClient_CS_TextMsg(void *p, int bot_index,int iAdd);
-void BotClient_CS_StatusV(void *p, int bot_index,int iAdd);
+void BotClient_CS_StatusValue(void *p, int bot_index,int iAdd);
 void BotClient_CS_SetFOV(void *p, int bot_index,int iAdd);
 void BotClient_CS_Flashlight(void *p, int bot_index,int iAdd);
 
 
 /*void BotClient_Gearbox_WeaponList(void *p, int bot_index,int iAdd);
-void BotClient_Gearbox_CurrentWeapon(void *p, int bot_index,int iAdd);
+void BotClient_Gearbox_CurWeapon(void *p, int bot_index,int iAdd);
 void BotClient_Gearbox_AmmoX(void *p, int bot_index,int iAdd);
 void BotClient_Gearbox_SayText(void *p, int bot_index,int iAdd);
 void BotClient_Gearbox_AmmoPickup(void *p, int bot_index,int iAdd);
-void BotClient_Gearbox_WeaponPickup(void *p, int bot_index,int iAdd);
+void BotClient_Gearbox_WeapPickup(void *p, int bot_index,int iAdd);
 void BotClient_Gearbox_ItemPickup(void *p, int bot_index,int iAdd);
 void BotClient_Gearbox_Health(void *p, int bot_index,int iAdd);
 void BotClient_Gearbox_Battery(void *p, int bot_index,int iAdd);
 void BotClient_Gearbox_Damage(void *p, int bot_index,int iAdd);*/
 
 
-void BotClient_DOD_VGUI(void *p, int bot_index,int iAdd);
+void BotClient_DOD_VGUIMenu(void *p, int bot_index,int iAdd);
 void BotClient_DOD_WeaponList(void *p, int bot_index,int iAdd);
-void BotClient_DOD_CurrentWeapon(void *p, int bot_index,int iAdd);
+void BotClient_DOD_CurWeapon(void *p, int bot_index,int iAdd);
 void BotClient_DOD_AmmoX(void *p, int bot_index,int iAdd);
 void BotClient_DOD_AmmoPickup(void *p, int bot_index,int iAdd);
-void BotClient_DOD_WeaponPickup(void *p, int bot_index,int iAdd);
+void BotClient_DOD_WeapPickup(void *p, int bot_index,int iAdd);
 void BotClient_DOD_ItemPickup(void *p, int bot_index,int iAdd);
 void BotClient_DOD_Health(void *p, int bot_index,int iAdd);
 void BotClient_DOD_Battery(void *p, int bot_index,int iAdd);

@@ -73,7 +73,7 @@ int usermsgs_count = 0;
 int msg_state = 0;
 
 // This message is sent when the Counter-Strike VGUI menu is displayed.
-void BotClient_CS_VGUI(void *p, int bot_index,int iAdd){
+void BotClient_CS_VGUIMenu(void *p, int bot_index,int iAdd){
 	if(iAdd != _CLIENT_END){
 		if ((*(int *)p) == 2)  // is it a team select menu?
 			bots[bot_index]->start_action = MSG_CS_TEAM_SELECT;
@@ -84,7 +84,7 @@ void BotClient_CS_VGUI(void *p, int bot_index,int iAdd){
 	}
 }
 
-void BotClient_DOD_VGUI(void *p, int bot_index,int iAdd)
+void BotClient_DOD_VGUIMenu(void *p, int bot_index,int iAdd)
 {
 	if(iAdd != _CLIENT_END){
 		if ((*(int *)p) == 2)  // is it a team select menu?
@@ -267,7 +267,7 @@ void BotClient_Gearbox_WeaponList(void *p, int bot_index,int iAdd){
 
 // This message is sent when a weapon is selected (either by the bot chosing
 // a weapon or by the server auto assigning the bot a weapon).
-void BotClient_Valve_CurrentWeapon(void *p, int bot_index,int iAdd){
+void BotClient_Valve_CurWeapon(void *p, int bot_index,int iAdd){
 	static int state = 0;   // current state machine state
 	static int iState;
 	static int iId;
@@ -303,20 +303,20 @@ void BotClient_Valve_CurrentWeapon(void *p, int bot_index,int iAdd){
 	}
 }
 
-void BotClient_CS_CurrentWeapon(void *p, int bot_index,int iAdd){
+void BotClient_CS_CurWeapon(void *p, int bot_index,int iAdd){
 	// this is just like the Valve Current Weapon message
-	BotClient_Valve_CurrentWeapon(p, bot_index,iAdd);
+	BotClient_Valve_CurWeapon(p, bot_index,iAdd);
 }
 
-void BotClient_Gearbox_CurrentWeapon(void *p, int bot_index,int iAdd){
+void BotClient_Gearbox_CurWeapon(void *p, int bot_index,int iAdd){
 	// this is just like the Valve Current Weapon message
-	BotClient_Valve_CurrentWeapon(p, bot_index,iAdd);
+	BotClient_Valve_CurWeapon(p, bot_index,iAdd);
 }
 
-void BotClient_DOD_CurrentWeapon(void *p, int bot_index, int iAdd)
+void BotClient_DOD_CurWeapon(void *p, int bot_index, int iAdd)
 {
 	// this is just like the Valve Current Weapon message
-	BotClient_Valve_CurrentWeapon(p, bot_index,iAdd);
+	BotClient_Valve_CurWeapon(p, bot_index,iAdd);
 }
 
 // This message is sent whenever ammo ammounts are adjusted (up or down).
@@ -481,7 +481,7 @@ void BotClient_DOD_AmmoPickup(void *p, int bot_index,int iAdd)
 }
 
 // This message gets sent when the bot picks up a weapon.
-void BotClient_Valve_WeaponPickup(void *p, int bot_index,int iAdd){
+void BotClient_Valve_WeapPickup(void *p, int bot_index,int iAdd){
 	int index;
 	
 	if(iAdd != _CLIENT_END){
@@ -492,20 +492,20 @@ void BotClient_Valve_WeaponPickup(void *p, int bot_index,int iAdd){
 	}
 }
 
-void BotClient_CS_WeaponPickup(void *p, int bot_index,int iAdd){
+void BotClient_CS_WeapPickup(void *p, int bot_index,int iAdd){
 	// this is just like the Valve Weapon Pickup message
-	BotClient_Valve_WeaponPickup(p, bot_index,iAdd);
+	BotClient_Valve_WeapPickup(p, bot_index,iAdd);
 }
 
-void BotClient_Gearbox_WeaponPickup(void *p, int bot_index,int iAdd){
+void BotClient_Gearbox_WeapPickup(void *p, int bot_index,int iAdd){
 	// this is just like the Valve Weapon Pickup message
-	BotClient_Valve_WeaponPickup(p, bot_index,iAdd);
+	BotClient_Valve_WeapPickup(p, bot_index,iAdd);
 }
 
-void BotClient_DOD_WeaponPickup(void *p, int bot_index,int iAdd)
+void BotClient_DOD_WeapPickup(void *p, int bot_index,int iAdd)
 {
 	// this is just like the Valve Weapon Pickup message
-	BotClient_Valve_WeaponPickup(p, bot_index,iAdd);
+	BotClient_Valve_WeapPickup(p, bot_index,iAdd);
 }
 
 // This message gets sent when the bot picks up an item (like a battery
@@ -673,7 +673,7 @@ void BotClient_CS_Money(void *p, int bot_index,int iAdd)
 	}
 }
 
-void BotClient_CS_StatusI(void *p, int bot_index,int iAdd)
+void BotClient_CS_StatusIcon(void *p, int bot_index,int iAdd)
 {
 	static int state = 0;   // current state machine state
 	static bool btemp;
@@ -718,7 +718,7 @@ void BotClient_CS_Roundtime(void *p, int bot_index,int iAdd)
 	}
 }
 
-void BotClient_CS_StatusV(void *p, int bot_index,int iAdd)						// not yet impl
+void BotClient_CS_StatusValue(void *p, int bot_index,int iAdd)						// not yet impl
 {
 	static int state = 0;   // current state machine state
 	
@@ -1008,7 +1008,7 @@ void BotClient_Valve_DeathMsg(void *p, int bot_index,int iAdd)
 	static int iHeadShot;
 	static edict_t *victim_edict=0,
 		*killer_edict=0;
-	static int killer_bot_index,victim_bot_index,killer_team,victim_team;
+	static int killer_bot_index,victim_bot_index;
 	
 	if(iAdd != _CLIENT_END){
 		if (state == 0)
@@ -1327,10 +1327,10 @@ void JBRegMsgs(void)
 	{
 		case VALVE_DLL:
 			botmsgs[GET_USER_MSG_ID(PLID, "WeaponList", NULL)] = BotClient_Valve_WeaponList;
-			botmsgs[GET_USER_MSG_ID(PLID, "CurWeapon", NULL)] = BotClient_Valve_CurrentWeapon;
+			botmsgs[GET_USER_MSG_ID(PLID, "CurWeapon", NULL)] = BotClient_Valve_CurWeapon;
 			botmsgs[GET_USER_MSG_ID(PLID, "AmmoX", NULL)] = BotClient_Valve_AmmoX;
 			botmsgs[GET_USER_MSG_ID(PLID, "AmmoPickup", NULL)] = BotClient_Valve_AmmoPickup;
-			botmsgs[GET_USER_MSG_ID(PLID, "WeapPickup", NULL)] = BotClient_Valve_WeaponPickup;
+			botmsgs[GET_USER_MSG_ID(PLID, "WeapPickup", NULL)] = BotClient_Valve_WeapPickup;
 			botmsgs[GET_USER_MSG_ID(PLID, "ItemPickup", NULL)] = BotClient_Valve_ItemPickup;
 			botmsgs[GET_USER_MSG_ID(PLID, "Health", NULL)] = BotClient_Valve_Health;
 			botmsgs[GET_USER_MSG_ID(PLID, "Battery", NULL)] = BotClient_Valve_Battery;
@@ -1339,11 +1339,11 @@ void JBRegMsgs(void)
 
 		/*case TFC_DLL:
 			botmsgs[GET_USER_MSG_ID(PLID, "WeaponList", NULL)] = BotClient_TFC_WeaponList;
-			botmsgs[GET_USER_MSG_ID(PLID, "VGUIMenu", NULL)] = BotClient_TFC_VGUI;
-			botmsgs[GET_USER_MSG_ID(PLID, "CurWeapon", NULL)] = BotClient_TFC_CurrentWeapon;
+			botmsgs[GET_USER_MSG_ID(PLID, "VGUIMenu", NULL)] = BotClient_TFC_VGUIMenu;
+			botmsgs[GET_USER_MSG_ID(PLID, "CurWeapon", NULL)] = BotClient_TFC_CurWeapon;
 			botmsgs[GET_USER_MSG_ID(PLID, "AmmoX", NULL)] = BotClient_TFC_AmmoX;
 			botmsgs[GET_USER_MSG_ID(PLID, "AmmoPickup", NULL)] = BotClient_TFC_AmmoPickup;
-			botmsgs[GET_USER_MSG_ID(PLID, "WeapPickup", NULL)] = BotClient_TFC_WeaponPickup;
+			botmsgs[GET_USER_MSG_ID(PLID, "WeapPickup", NULL)] = BotClient_TFC_WeapPickup;
 			botmsgs[GET_USER_MSG_ID(PLID, "ItemPickup", NULL)] = BotClient_TFC_ItemPickup;
 			botmsgs[GET_USER_MSG_ID(PLID, "Health", NULL)] = BotClient_TFC_Health;
 			botmsgs[GET_USER_MSG_ID(PLID, "Battery", NULL)] = BotClient_TFC_Battery;
@@ -1352,34 +1352,34 @@ void JBRegMsgs(void)
 
 		case CSTRIKE_DLL:
 			botmsgs[GET_USER_MSG_ID(PLID, "WeaponList", NULL)] = BotClient_CS_WeaponList;
-			botmsgs[GET_USER_MSG_ID(PLID, "VGUIMenu", NULL)] = BotClient_CS_VGUI;
-			botmsgs[GET_USER_MSG_ID(PLID, "CurWeapon", NULL)] = BotClient_CS_CurrentWeapon;
+			botmsgs[GET_USER_MSG_ID(PLID, "VGUIMenu", NULL)] = BotClient_CS_VGUIMenu;
+			botmsgs[GET_USER_MSG_ID(PLID, "CurWeapon", NULL)] = BotClient_CS_CurWeapon;
 			botmsgs[GET_USER_MSG_ID(PLID, "AmmoX", NULL)] = BotClient_CS_AmmoX;
 			botmsgs[GET_USER_MSG_ID(PLID, "AmmoPickup", NULL)] = BotClient_CS_AmmoPickup;
-			botmsgs[GET_USER_MSG_ID(PLID, "WeapPickup", NULL)] = BotClient_CS_WeaponPickup;
+			botmsgs[GET_USER_MSG_ID(PLID, "WeapPickup", NULL)] = BotClient_CS_WeapPickup;
 			botmsgs[GET_USER_MSG_ID(PLID, "ItemPickup", NULL)] = BotClient_CS_ItemPickup;
 			botmsgs[GET_USER_MSG_ID(PLID, "Health", NULL)] = BotClient_CS_Health;
 			botmsgs[GET_USER_MSG_ID(PLID, "Battery", NULL)] = BotClient_CS_Battery;
 			botmsgs[GET_USER_MSG_ID(PLID, "Damage", NULL)] = BotClient_CS_Damage;
 			botmsgs[GET_USER_MSG_ID(PLID, "ShowMenu", NULL)] = BotClient_CS_ShowMenu;
 			botmsgs[GET_USER_MSG_ID(PLID, "Money", NULL)] = BotClient_CS_Money;
-			botmsgs[GET_USER_MSG_ID(PLID, "StatusIcon", NULL)] = BotClient_CS_StatusI;
+			botmsgs[GET_USER_MSG_ID(PLID, "StatusIcon", NULL)] = BotClient_CS_StatusIcon;
 			botmsgs[GET_USER_MSG_ID(PLID, "RoundTime", NULL)] = BotClient_CS_Roundtime;
 			botmsgs[GET_USER_MSG_ID(PLID, "SetFOV", NULL)] = BotClient_CS_SetFOV;
 			botmsgs[GET_USER_MSG_ID(PLID, "ScreenFade", NULL)] = BotClient_CS_ScreenFade;
 			botmsgs[GET_USER_MSG_ID(PLID, "TextMsg", NULL)] = BotClient_CS_TextMsg;
 			botmsgs[GET_USER_MSG_ID(PLID, "Flashlight", NULL)] = BotClient_CS_Flashlight;
 			botmsgs[GET_USER_MSG_ID(PLID, "SayText", NULL)] = BotClient_CS_SayText;
-			/*botmsgs[GET_USER_MSG_ID(PLID, "StatusValue", NULL)] = BotClient_CS_StatusV;*/
+			/*botmsgs[GET_USER_MSG_ID(PLID, "StatusValue", NULL)] = BotClient_CS_StatusValue;*/
 			break;
 
 		case DOD_DLL:
 			botmsgs[GET_USER_MSG_ID(PLID, "WeaponList", NULL)] = BotClient_DOD_WeaponList;
-			botmsgs[GET_USER_MSG_ID(PLID, "VGUIMenu", NULL)] = BotClient_DOD_VGUI;
-			botmsgs[GET_USER_MSG_ID(PLID, "CurWeapon", NULL)] = BotClient_DOD_CurrentWeapon;
+			botmsgs[GET_USER_MSG_ID(PLID, "VGUIMenu", NULL)] = BotClient_DOD_VGUIMenu;
+			botmsgs[GET_USER_MSG_ID(PLID, "CurWeapon", NULL)] = BotClient_DOD_CurWeapon;
 			botmsgs[GET_USER_MSG_ID(PLID, "AmmoX", NULL)] = BotClient_DOD_AmmoX;
 			botmsgs[GET_USER_MSG_ID(PLID, "AmmoPickup", NULL)] = BotClient_DOD_AmmoPickup;
-			botmsgs[GET_USER_MSG_ID(PLID, "WeapPickup", NULL)] = BotClient_DOD_WeaponPickup;
+			botmsgs[GET_USER_MSG_ID(PLID, "WeapPickup", NULL)] = BotClient_DOD_WeapPickup;
 			botmsgs[GET_USER_MSG_ID(PLID, "ItemPickup", NULL)] = BotClient_DOD_ItemPickup;
 			botmsgs[GET_USER_MSG_ID(PLID, "Health", NULL)] = BotClient_DOD_Health;
 			botmsgs[GET_USER_MSG_ID(PLID, "Battery", NULL)] = BotClient_DOD_Battery;
@@ -1394,10 +1394,10 @@ void JBRegMsgs(void)
 
 		/*case GEARBOX_DLL:
 			botmsgs[GET_USER_MSG_ID(PLID, "WeaponList", NULL)] = BotClient_Gearbox_WeaponList;
-			botmsgs[GET_USER_MSG_ID(PLID, "CurWeapon", NULL)] = BotClient_Gearbox_CurrentWeapon;
+			botmsgs[GET_USER_MSG_ID(PLID, "CurWeapon", NULL)] = BotClient_Gearbox_CurWeapon;
 			botmsgs[GET_USER_MSG_ID(PLID, "AmmoX", NULL)] = BotClient_Gearbox_AmmoX;
 			botmsgs[GET_USER_MSG_ID(PLID, "AmmoPickup", NULL)] = BotClient_Gearbox_AmmoPickup;
-			botmsgs[GET_USER_MSG_ID(PLID, "WeapPickup", NULL)] = BotClient_Gearbox_WeaponPickup;
+			botmsgs[GET_USER_MSG_ID(PLID, "WeapPickup", NULL)] = BotClient_Gearbox_WeapPickup;
 			botmsgs[GET_USER_MSG_ID(PLID, "ItemPickup", NULL)] = BotClient_Gearbox_ItemPickup;
 			botmsgs[GET_USER_MSG_ID(PLID, "Health", NULL)] = BotClient_Gearbox_Health;
 			botmsgs[GET_USER_MSG_ID(PLID, "Battery", NULL)] = BotClient_Gearbox_Battery;
