@@ -20,12 +20,9 @@ Compiling with GCC or MinGW:
 	
 		make
 		- or -
-		make mmdll
+		make release
 		
-	By default, this will make a metamod plugin DLL. If you want to make a
-	standard DLL, just type:
-
-		make stddll
+	By default, this will make a standard and metamod plugin DLL.
 
 
 Compiling with Borland C++ 5.5.1:
@@ -35,13 +32,12 @@ Compiling with Borland C++ 5.5.1:
 	source. You also need to change the path to the Borland compiler. Now just
 	type:
 
-		c:\path\to\borland\make.exe -fMakefile.bcc
+		c:\path\to\borland\make.exe -f Makefile.bcc
 
 	By default, this will make a metamod plugin DLL. If you want to make a
-	standard DLL, uncomment the following line
+	standard DLL, type:
 
-		# uncomment to compile metamod plugin
-		EXTRA_CFLAGS += -DUSE_METAMOD
+		make release_std
 
 
 Compiling with MSVC6
