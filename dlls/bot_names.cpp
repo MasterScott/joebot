@@ -23,13 +23,12 @@
 // Johannes.Lampel@gmx.de
 // http://joebot.counter-strike.de
 
-
-#include "bot_names.h"
+#include <iostream.h>
 
 #include "extdll.h"
 #include "util.h"
 
-#include <iostream.h>
+#include "bot_names.h"
 
 CBotNamesItem g_DefaultName;
 extern bool g_bMixNames;
