@@ -31,43 +31,182 @@
 // dll.cpp
 //
 
+#include <iostream.h>
+
 #include "extdll.h"
-#include "enginecallback.h"
 #include "util.h"
 #include "cbase.h"
 #include "entity_state.h"
 
+#ifdef USE_METAMOD
+//#define SDK_UTIL_H  // util.h already included
+#include "meta_api.h"
+#endif /* USE_METAMOD */
+
 #include "bot.h"
+#include "bot_func.h"
+#include "bot_modid.h"
+#include "bot_wpdir.h"
 #include "CBotCS.h"
 #include "CBotDOD.h"
-#include "bot_func.h"
-#include "bot_wpstat.h"
-#include "ChatHost.h"
-#include "waypoint.h"
-
-#include "CSkill.h"
-
 #include "CCommand.h"
-
-#include "som.h"
-
-#include "Gnome.h"
+#include "ChatHost.h"
+#include "CSDecals.h"
+#include "CSkill.h"
+#include "globalvars.h"
 #include "WorldGnome.h"
+
+#include "NeuralNet.h"
 
 CWorldGnome CWG;
 
 #define _MAXCFGLINESPERFRAME 5
 
+#ifndef USE_METAMOD
 extern GETENTITYAPI other_GetEntityAPI;
 extern GETNEWDLLFUNCTIONS other_GetNewDLLFunctions;
+#endif /* not USE_METAMOD */
 extern enginefuncs_t g_engfuncs;
 #ifdef DEBUGENGINE
 extern int debug_engine;
 #endif
 extern globalvars_t  *gpGlobals;
-extern char *g_argv;
 
+#ifdef USE_METAMOD
+
+// Must provide at least one of these..
+static META_FUNCTIONS gMetaFunctionTable = {
+	GetEntityAPI,		// pfnGetEntityAPI		HL SDK; called before game DLL
+	NULL,			// pfnGetEntityAPI_Post		META; called after game DLL
+	NULL,			// pfnGetEntityAPI2		HL SDK2; called before game DLL
+	NULL,			// pfnGetEntityAPI2_Post	META; called after game DLL
+	NULL,			// pfnGetNewDLLFunctions	HL SDK2; called before game DLL
+	NULL,			// pfnGetNewDLLFunctions_Post	META; called after game DLL
+	GetEngineFunctions,	// pfnGetEngineFunctions	META; called before HL engine
+	GetEngineFunctions_Post, // pfnGetEngineFunctions_Post	META; called after HL engine
+};
+
+// Description of plugin
+plugin_info_t Plugin_info = {
+	META_INTERFACE_VERSION,	// ifvers
+	"JoeBot",	// name
+	"1.6.3",	// version
+	"2001/04/01",	// date
+	"@$3.1415rin <as3.1415rin@bots-united.com>",	// author
+	"http://joebot.bots-united.com/",	// url
+	"JOEBOT",	// logtag
+	PT_STARTUP,	// (when) loadable
+	PT_ANYPAUSE,	// (when) unloadable
+};
+
+// Global vars from metamod:
+meta_globals_t *gpMetaGlobals;
+gamedll_funcs_t *gpGamedllFuncs;
+mutil_funcs_t *gpMetaUtilFuncs;
+
+// Metamod message to dll that it will be loaded as a metamod plugin
+void Meta_Init(void)
+{
+}
+
+// Metamod requesting info about this plugin:
+//  ifvers			(given) interface_version metamod is using
+//  pPlugInfo		(requested) struct with info about plugin
+//  pMetaUtilFuncs	(given) table of utility functions provided by metamod
+int Meta_Query(char *ifvers, plugin_info_t **pPlugInfo,
+		mutil_funcs_t *pMetaUtilFuncs)
+{
+	if(ifvers);	// to satisfy gcc -Wunused
+
+	// Check for valid pMetaUtilFuncs before we continue.
+	if(!pMetaUtilFuncs) {
+		//UTIL_LogPrintf("[%s] ERROR: Meta_Query called with null pMetaUtilFuncs\n", Plugin_info.logtag);
+		return(FALSE);
+	}
+	gpMetaUtilFuncs=pMetaUtilFuncs;
+
+	// Give metamod our plugin_info struct
+	*pPlugInfo=&Plugin_info;
+
+	// Check for interface version compatibility.
+	if(!FStrEq(ifvers, Plugin_info.ifvers)) {
+		int mmajor=0, mminor=0, pmajor=0, pminor=0;
+		LOG_MESSAGE(PLID, "WARNING: meta-interface version mismatch; requested=%s ours=%s",
+				Plugin_info.logtag, ifvers);
+		// If plugin has later interface version, it's incompatible (update
+		// metamod).
+		sscanf(ifvers, "%d:%d", &mmajor, &mminor);
+		sscanf(META_INTERFACE_VERSION, "%d:%d", &pmajor, &pminor);
+		if(pmajor > mmajor || (pmajor==mmajor && pminor > mminor)) {
+			LOG_ERROR(PLID, "metamod version is too old for this plugin; update metamod");
+			return(FALSE);
+		}
+		// If plugin has older major interface version, it's incompatible
+		// (update plugin).
+		else if(pmajor < mmajor) {
+			LOG_ERROR(PLID, "metamod version is incompatible with this plugin; please find a newer version of this plugin");
+			return(FALSE);
+		}
+		// Minor interface is older, but this is guaranteed to be backwards
+		// compatible, so we warn, but we still accept it.
+		else if(pmajor==mmajor && pminor < mminor)
+			LOG_MESSAGE(PLID, "WARNING: metamod version is newer than expected; consider finding a newer version of this plugin");
+		else
+			LOG_ERROR(PLID, "unexpected version comparison; metavers=%s, mmajor=%d, mminor=%d; plugvers=%s, pmajor=%d, pminor=%d", ifvers, mmajor, mminor, META_INTERFACE_VERSION, pmajor, pminor);
+	}
+
+	return(TRUE);
+}
+
+// Metamod attaching plugin to the server.
+//  now				(given) current phase, ie during map, during changelevel, or at startup
+//  pFunctionTable	(requested) table of function tables this plugin catches
+//  pMGlobals		(given) global vars from metamod
+//  pGamedllFuncs	(given) copy of function tables from game dll
+int Meta_Attach(PLUG_LOADTIME now, META_FUNCTIONS *pFunctionTable,
+		meta_globals_t *pMGlobals, gamedll_funcs_t *pGamedllFuncs)
+{
+	if(now > Plugin_info.loadable) {
+		LOG_ERROR(PLID, "Can't load plugin right now");
+		return(FALSE);
+	}
+	if(!pMGlobals) {
+		LOG_ERROR(PLID, "Meta_Attach called with null pMGlobals");
+		return(FALSE);
+	}
+	gpMetaGlobals=pMGlobals;
+	if(!pFunctionTable) {
+		LOG_ERROR(PLID, "Meta_Attach called with null pFunctionTable");
+		return(FALSE);
+	}
+	memcpy(pFunctionTable, &gMetaFunctionTable, sizeof(META_FUNCTIONS));
+	gpGamedllFuncs=pGamedllFuncs;
+
+	LOG_MESSAGE(PLID, "%s v%s  %s", Plugin_info.name, Plugin_info.version, 
+			Plugin_info.date);
+	LOG_MESSAGE(PLID, "by %s", Plugin_info.author);
+	LOG_MESSAGE(PLID, "   %s", Plugin_info.url);
+
+	// Let's go.
+	return(TRUE);
+}
+
+// Metamod detaching plugin from the server.
+// now		(given) current phase, ie during map, etc
+// reason	(given) why detaching (refresh, console unload, forced unload, etc)
+int Meta_Detach(PLUG_LOADTIME now, PL_UNLOAD_REASON reason) {
+	if(now > Plugin_info.unloadable && reason != PNL_CMD_FORCED) {
+		LOG_ERROR(PLID, "Can't unload plugin right now");
+		return(FALSE);
+	}
+	// Done!
+	return(TRUE);
+}
+#endif /* USE_METAMOD */
+
+#ifdef DEBUGENGINE
 static FILE *fp;
+#endif
 
 CSkill Skill;
 CSDecals SDecals;
@@ -87,7 +226,9 @@ HostageLog_t gHossi[_MAXHOSTAGEREC];
 
 long lGDCount = 4;
 
+#ifndef USE_METAMOD
 DLL_FUNCTIONS other_gFunctionTable;
+#endif /* not USE_METAMOD */
 DLL_GLOBAL const Vector g_vecZero = Vector(0,0,0);
 
 CChatHost g_ChatHost;
@@ -96,7 +237,7 @@ bool g_bSpray = true;
 int mod_id = -1;
 int m_spriteTexture = 0;
 //int default_bot_skill = 2;
-int isFakeClientCommand = 0;
+bool isFakeClientCommand = FALSE;
 int fake_arg_count;
 float bot_check_time = 2.0;
 int min_bots = -1;
@@ -119,6 +260,7 @@ char szPrefixDef[32]="[J0E]";
 bool g_bForceNOStat = false;
 bool g_bJoinWHumanMAX = false;		// only use max_bots when a human already joined
 bool g_bJoinWHumanRES = false;		// only respawn when a human already joined
+bool g_bIsSteam = false;
 
 CCommands Commands;
 
@@ -153,8 +295,6 @@ int flf_bug_fix;  // for FLF 1.1 capture point bug
 int flf_bug_check;  // for FLF 1.1 capture point bug
 
 edict_t *pEdictLastJoined;
-
-cvar_t sv_bot = {"joebot",""};
 
 char *show_menu_1,			// pointer to texts
 *show_menu_2,
@@ -393,7 +533,7 @@ CBotWPDir g_WPDir;
 
 char welcome_msg[200];
 char _JOEBOTVERSION[80];
-char _JOEBOTVERSIONWOOS[80]= "1.6.2";
+char _JOEBOTVERSIONWOOS[80]= "1.6.3";
 bool bDedicatedWelcome = false;
 int g_iTypeoM;
 int g_iLanguage;
@@ -408,7 +548,9 @@ bool g_bMyBirthday;
 long g_lAge;
 
 void BotNameInit(void);
+#ifndef USE_METAMOD
 void UpdateClientData(const struct edict_s *ent, int sendweapons, struct clientdata_s *cd);
+#endif /* USE_METAMOD */
 void ProcessBotCfgFile(void);
 
 void UpdateLanguage(void){
@@ -503,30 +645,43 @@ void CalcDistances(void){
 	}
 }
 
+void ServerCommand(void)
+{
+	bool bCmdOK = Commands.Exec(NULL, CM_DEDICATED, CMD_ARGV(1), CMD_ARGV(2), CMD_ARGV(3), CMD_ARGV(4), CMD_ARGV(5));
+	if (!bCmdOK)
+#ifdef USE_METAMOD
+		SERVER_PRINT("Unrecognized joebot server command\n");
+#else /* not USE_METAMOD */
+		(*g_engfuncs.pfnServerPrint)("Unrecognized joebot server command\n");
+#endif /* USE_METAMOD */
+}
+
 void GameDLLInit( void )
 {
 	long lschl;
 	printf("JoeBOT: Launching DLL (CBB%liCBC%liCBD%li%li@%s)\n",sizeof(CBotBase),sizeof(CBotCS),sizeof(CBotDOD),time(NULL),"---");
-	CVAR_REGISTER (&sv_bot);
+#ifdef USE_METAMOD
+	REG_SVR_COMMAND("joebot", ServerCommand);
+#else /* not USE_METAMOD */
+	(*g_engfuncs.pfnAddServerCommand)("joebot", ServerCommand);
+#endif /* USE_METAMOD */
 	
 	g_bMyBirthday = MyBirthday();
 	
-#ifdef __linux__
-	sprintf(_JOEBOTVERSION,"%s (linux)",_JOEBOTVERSIONWOOS);
-#else
+#ifdef _WIN32
 	sprintf(_JOEBOTVERSION,"%s (win32)",_JOEBOTVERSIONWOOS);
+#else
+	sprintf(_JOEBOTVERSION,"%s (linux)",_JOEBOTVERSIONWOOS);
 #endif
 #ifdef _DEBUG
 	strcat(_JOEBOTVERSION," DBGV");
 #endif
-
-	sprintf(welcome_msg,"----- JoeBot %s by @$3.1415rin { http://www.joebot.net }; -----\n\0",_JOEBOTVERSION);
-
+	
+	sprintf(welcome_msg,"----- JoeBot %s by @$3.1415rin { http://joebot.bots-united.com/ }; -----\n\0",_JOEBOTVERSION);
+	
 	for (int i=0; i<32; i++){
 		clients[i] = NULL;
-		for(int ii=0; ii<2; ii++){
-			Buy[ii][i] = 0;
-		}
+		Buy[i] = 0;
 		bWelcome[i] = false;
 		welcome_time[i] = 5;
 		bDedicatedWelcome = false;
@@ -566,63 +721,35 @@ void GameDLLInit( void )
 	g_ChatHost.GetChat("texts.txt");
 	
 	// init func table for buying weapons
-	Buy[TE][CS_WEAPON_P228]			= BotBuy_CS_WEAPON_P228_T;
-	Buy[TE][CS_WEAPON_SCOUT]		= BotBuy_CS_WEAPON_SCOUT_T;
-	Buy[TE][CS_WEAPON_HEGRENADE]	= BotBuy_CS_WEAPON_HEGRENADE_T;
-	Buy[TE][CS_WEAPON_XM1014]		= BotBuy_CS_WEAPON_XM1014_T;
-	Buy[TE][CS_WEAPON_MAC10]		= BotBuy_CS_WEAPON_MAC10_T;
-	Buy[TE][CS_WEAPON_AUG]			= BotBuy_CS_WEAPON_AUG_T;
-	Buy[TE][CS_WEAPON_SMOKEGRENADE] = BotBuy_CS_WEAPON_SMOKEGRENADE_T;
-	Buy[TE][CS_WEAPON_ELITE]		= BotBuy_CS_WEAPON_ELITE_T;
-	Buy[TE][CS_WEAPON_FIVESEVEN]	= BotBuy_CS_WEAPON_FIVESEVEN_T;
-	Buy[TE][CS_WEAPON_UMP45]		= BotBuy_CS_WEAPON_UMP45_T;
-	Buy[TE][CS_WEAPON_SG550]		= BotBuy_CS_WEAPON_SG550_T;
-	Buy[TE][CS_WEAPON_USP]			= BotBuy_CS_WEAPON_USP_T;
-	Buy[TE][CS_WEAPON_GLOCK18]		= BotBuy_CS_WEAPON_GLOCK18_T;
-	Buy[TE][CS_WEAPON_AWP]			= BotBuy_CS_WEAPON_AWP_T;
-	Buy[TE][CS_WEAPON_MP5NAVY]		= BotBuy_CS_WEAPON_MP5NAVY_T;
-	Buy[TE][CS_WEAPON_M249]			= BotBuy_CS_WEAPON_M249_T;
-	Buy[TE][CS_WEAPON_M3]			= BotBuy_CS_WEAPON_M3_T;
-	Buy[TE][CS_WEAPON_M4A1]			= BotBuy_CS_WEAPON_M4A1_T;
-	Buy[TE][CS_WEAPON_TMP]			= BotBuy_CS_WEAPON_TMP_T;
-	Buy[TE][CS_WEAPON_G3SG1]		= BotBuy_CS_WEAPON_G3SG1_T;
-	Buy[TE][CS_WEAPON_FLASHBANG]	= BotBuy_CS_WEAPON_FLASHBANG_T;
-	Buy[TE][CS_WEAPON_DEAGLE]		= BotBuy_CS_WEAPON_DEAGLE_T;
-	Buy[TE][CS_WEAPON_SG552]		= BotBuy_CS_WEAPON_SG552_T;
-	Buy[TE][CS_WEAPON_AK47]			= BotBuy_CS_WEAPON_AK47_T;
-	Buy[TE][CS_WEAPON_P90]			= BotBuy_CS_WEAPON_P90_T;
-	/*Buy[TE][CS_WEAPON_HEGRENADE]	= BotBuy_CS_WEAPON_HE_T;
-	Buy[TE][CS_WEAPON_FLASHBANG]	= BotBuy_CS_WEAPON_FL_T;
-	Buy[TE][CS_WEAPON_SMOKEGRENADE]	= BotBuy_CS_WEAPON_SG_T;*/
-
-	Buy[CT][CS_WEAPON_P228]			= BotBuy_CS_WEAPON_P228_CT;
-	Buy[CT][CS_WEAPON_SCOUT]		= BotBuy_CS_WEAPON_SCOUT_CT;
-	Buy[CT][CS_WEAPON_HEGRENADE]	= BotBuy_CS_WEAPON_HEGRENADE_CT;
-	Buy[CT][CS_WEAPON_XM1014]		= BotBuy_CS_WEAPON_XM1014_CT;
-	Buy[CT][CS_WEAPON_MAC10]		= BotBuy_CS_WEAPON_MAC10_CT;
-	Buy[CT][CS_WEAPON_AUG]			= BotBuy_CS_WEAPON_AUG_CT;
-	Buy[CT][CS_WEAPON_SMOKEGRENADE] = BotBuy_CS_WEAPON_SMOKEGRENADE_CT;
-	Buy[CT][CS_WEAPON_ELITE]		= BotBuy_CS_WEAPON_ELITE_CT;
-	Buy[CT][CS_WEAPON_FIVESEVEN]	= BotBuy_CS_WEAPON_FIVESEVEN_CT;
-	Buy[CT][CS_WEAPON_UMP45]		= BotBuy_CS_WEAPON_UMP45_CT;
-	Buy[CT][CS_WEAPON_SG550]		= BotBuy_CS_WEAPON_SG550_CT;
-	Buy[CT][CS_WEAPON_USP]			= BotBuy_CS_WEAPON_USP_CT;
-	Buy[CT][CS_WEAPON_GLOCK18]		= BotBuy_CS_WEAPON_GLOCK18_CT;
-	Buy[CT][CS_WEAPON_AWP]			= BotBuy_CS_WEAPON_AWP_CT;
-	Buy[CT][CS_WEAPON_MP5NAVY]		= BotBuy_CS_WEAPON_MP5NAVY_CT;
-	Buy[CT][CS_WEAPON_M249]			= BotBuy_CS_WEAPON_M249_CT;
-	Buy[CT][CS_WEAPON_M3]			= BotBuy_CS_WEAPON_M3_CT;
-	Buy[CT][CS_WEAPON_M4A1]			= BotBuy_CS_WEAPON_M4A1_CT;
-	Buy[CT][CS_WEAPON_TMP]			= BotBuy_CS_WEAPON_TMP_CT;
-	Buy[CT][CS_WEAPON_G3SG1]		= BotBuy_CS_WEAPON_G3SG1_CT;
-	Buy[CT][CS_WEAPON_FLASHBANG]	= BotBuy_CS_WEAPON_FLASHBANG_CT;
-	Buy[CT][CS_WEAPON_DEAGLE]		= BotBuy_CS_WEAPON_DEAGLE_CT;
-	Buy[CT][CS_WEAPON_SG552]		= BotBuy_CS_WEAPON_SG552_CT;
-	Buy[CT][CS_WEAPON_AK47]			= BotBuy_CS_WEAPON_AK47_CT;
-	Buy[CT][CS_WEAPON_P90]			= BotBuy_CS_WEAPON_P90_CT;
-	/*Buy[CT][CS_WEAPON_HEGRENADE]	= BotBuy_CS_WEAPON_HE_CT;
-	Buy[CT][CS_WEAPON_FLASHBANG]	= BotBuy_CS_WEAPON_FL_CT;
-	Buy[CT][CS_WEAPON_SMOKEGRENADE]	= BotBuy_CS_WEAPON_SG_CT;*/
+	Buy[CS_WEAPON_P228]			= BotBuy_CS_WEAPON_P228;
+	Buy[CS_WEAPON_SCOUT]		= BotBuy_CS_WEAPON_SCOUT;
+	Buy[CS_WEAPON_HEGRENADE]	= BotBuy_CS_WEAPON_HEGRENADE;
+	Buy[CS_WEAPON_XM1014]		= BotBuy_CS_WEAPON_XM1014;
+	Buy[CS_WEAPON_MAC10]		= BotBuy_CS_WEAPON_MAC10;
+	Buy[CS_WEAPON_AUG]			= BotBuy_CS_WEAPON_AUG;
+	Buy[CS_WEAPON_SMOKEGRENADE] = BotBuy_CS_WEAPON_SMOKEGRENADE;
+	Buy[CS_WEAPON_ELITE]		= BotBuy_CS_WEAPON_ELITE;
+	Buy[CS_WEAPON_FIVESEVEN]	= BotBuy_CS_WEAPON_FIVESEVEN;
+	Buy[CS_WEAPON_UMP45]		= BotBuy_CS_WEAPON_UMP45;
+	Buy[CS_WEAPON_SG550]		= BotBuy_CS_WEAPON_SG550;
+#ifndef CSTRIKE15
+	Buy[CS_WEAPON_GALIL]        = BotBuy_CS_WEAPON_GALIL;
+	Buy[CS_WEAPON_FAMAS]        = BotBuy_CS_WEAPON_FAMAS;
+#endif /* CSTRIKE15 */
+	Buy[CS_WEAPON_USP]			= BotBuy_CS_WEAPON_USP;
+	Buy[CS_WEAPON_GLOCK18]		= BotBuy_CS_WEAPON_GLOCK18;
+	Buy[CS_WEAPON_AWP]			= BotBuy_CS_WEAPON_AWP;
+	Buy[CS_WEAPON_MP5NAVY]		= BotBuy_CS_WEAPON_MP5NAVY;
+	Buy[CS_WEAPON_M249]			= BotBuy_CS_WEAPON_M249;
+	Buy[CS_WEAPON_M3]			= BotBuy_CS_WEAPON_M3;
+	Buy[CS_WEAPON_M4A1]			= BotBuy_CS_WEAPON_M4A1;
+	Buy[CS_WEAPON_TMP]			= BotBuy_CS_WEAPON_TMP;
+	Buy[CS_WEAPON_G3SG1]		= BotBuy_CS_WEAPON_G3SG1;
+	Buy[CS_WEAPON_FLASHBANG]	= BotBuy_CS_WEAPON_FLASHBANG;
+	Buy[CS_WEAPON_DEAGLE]		= BotBuy_CS_WEAPON_DEAGLE;
+	Buy[CS_WEAPON_SG552]		= BotBuy_CS_WEAPON_SG552;
+	Buy[CS_WEAPON_AK47]			= BotBuy_CS_WEAPON_AK47;
+	Buy[CS_WEAPON_P90]			= BotBuy_CS_WEAPON_P90;
 	
 	if (!bNNInit){
 		// init SOMPattern
@@ -690,8 +817,12 @@ void GameDLLInit( void )
 	if (IS_DEDICATED_SERVER())
 		printf("JoeBOT: 'Precaching' nets\n");
 	
+#ifdef USE_METAMOD
+	RETURN_META(MRES_HANDLED);
+#else /* not USE_METAMOD */
 	//other_gFunctionTable.pfnGameInit;
 	(*other_gFunctionTable.pfnGameInit)();
+#endif /* USE_METAMOD */
 }
 
 int DispatchSpawn( edict_t *pent )
@@ -713,7 +844,7 @@ int DispatchSpawn( edict_t *pent )
 		}
 #endif
 		
-		if (!strcmp(pClassname, "worldspawn"))
+		if (FStrEq(pClassname, "worldspawn"))
 		{
 			g_bMyBirthday = MyBirthday();		// check if it is my birthday :D
 			
@@ -797,9 +928,14 @@ int DispatchSpawn( edict_t *pent )
 		}
 	}
 	
+#ifdef USE_METAMOD
+	RETURN_META_VALUE(MRES_HANDLED, 0);
+#else /* not USE_METAMOD */
 	return (*other_gFunctionTable.pfnSpawn)(pent);
+#endif /* USE_METAMOD */
 }
 
+#ifndef USE_METAMOD
 void DispatchThink( edict_t *pent )
 {
 	(*other_gFunctionTable.pfnThink)(pent);
@@ -819,6 +955,7 @@ void DispatchBlocked( edict_t *pentBlocked, edict_t *pentOther )
 {
 	(*other_gFunctionTable.pfnBlocked)(pentBlocked, pentOther);
 }
+#endif /* not USE_METAMOD */
 
 void DispatchKeyValue( edict_t *pentKeyvalue, KeyValueData *pkvd )
 {
@@ -827,9 +964,14 @@ void DispatchKeyValue( edict_t *pentKeyvalue, KeyValueData *pkvd )
 	
 	//   fp=fopen("bot.txt","a"); fprintf(fp, "DispatchKeyValue: %x %s=%s\n",pentKeyvalue,pkvd->szKeyName,pkvd->szValue); fclose(fp);
 	
+#ifdef USE_METAMOD
+	RETURN_META(MRES_HANDLED);
+#else /* not USE_METAMOD */
 	(*other_gFunctionTable.pfnKeyValue)(pentKeyvalue, pkvd);
+#endif /* USE_METAMOD */
 }
 
+#ifndef USE_METAMOD
 void DispatchSave( edict_t *pent, SAVERESTOREDATA *pSaveData )
 {
 	(*other_gFunctionTable.pfnSave)(pent, pSaveData);
@@ -869,6 +1011,7 @@ void ResetGlobalState( void )
 {
 	(*other_gFunctionTable.pfnResetGlobalState)();
 }
+#endif /* not USE_METAMOD */
 
 BOOL ClientConnect( edict_t *pEntity, const char *pszName, const char *pszAddress, char szRejectReason[ 128 ]  )
 { 
@@ -882,7 +1025,7 @@ BOOL ClientConnect( edict_t *pEntity, const char *pszName, const char *pszAddres
 #endif
 		
 		// check if this client is the listen server client
-		if (!strcmp(pszAddress, "loopback"))
+		if (FStrEq(pszAddress, "loopback"))
 		{
 			// save the edict of the listen server client...
 			listenserver_edict = pEntity;
@@ -891,7 +1034,7 @@ BOOL ClientConnect( edict_t *pEntity, const char *pszName, const char *pszAddres
 		}
 		
 		// check if this is NOT a bot joining the server...
-		if (strcmp(pszAddress, "127.0.0.1"))
+		if (!FStrEq(pszAddress, "127.0.0.1"))
 		{
 			// don't try to add bots for 60 seconds, give client time to get added
 			//bot_check_time = gpGlobals->time + 60.0;
@@ -934,7 +1077,11 @@ BOOL ClientConnect( edict_t *pEntity, const char *pszName, const char *pszAddres
 		}
 	}
 	
+#ifdef USE_METAMOD
+	RETURN_META_VALUE(MRES_HANDLED, TRUE);
+#else /* not USE_METAMOD */
 	return (*other_gFunctionTable.pfnClientConnect)(pEntity, pszName, pszAddress, szRejectReason);
+#endif /* USE_METAMOD */
 }
 
 void ClientDisconnect( edict_t *pEntity )
@@ -955,7 +1102,7 @@ void ClientDisconnect( edict_t *pEntity )
 		
 		i = UTIL_GetBotIndex(pEntity);
 		if(i!=-1){
-			if ( FBitSet( VARS( pEntity )->flags, FL_FAKECLIENT ) )	// fix by Leon Hartwig
+			if ( FBitSet( VARS( pEntity )->flags, FL_THIRDPARTYBOT ) )	// fix by Leon Hartwig
 			{
 				//FREE_PRIVATE( pEntity );
 			}
@@ -982,7 +1129,11 @@ void ClientDisconnect( edict_t *pEntity )
 		}
 	}
 	
+#ifdef USE_METAMOD
+	RETURN_META(MRES_HANDLED);
+#else /* not USE_METAMOD */
 	(*other_gFunctionTable.pfnClientDisconnect)(pEntity);
+#endif /* USE_METAMOD */
 }
 
 void ClientKill( edict_t *pEntity )
@@ -990,7 +1141,11 @@ void ClientKill( edict_t *pEntity )
 #ifdef DEBUGENGINE
 	if (debug_engine) { fp=fopen("bot.txt","a"); fprintf(fp, "ClientKill: %x\n",pEntity); fclose(fp); }
 #endif
+#ifdef USE_METAMOD
+	RETURN_META(MRES_HANDLED);
+#else /* not USE_METAMOD */
 	(*other_gFunctionTable.pfnClientKill)(pEntity);
+#endif /* USE_METAMOD */
 }
 
 void ClientPutInServer( edict_t *pEntity )
@@ -1007,7 +1162,7 @@ void ClientPutInServer( edict_t *pEntity )
 	if (i < 32)
 		clients[i] = pEntity;  // store this clients edict in the clients array
 	
-	if (!FBitSet( pEntity->v.flags, FL_FAKECLIENT ))
+	if ( !(pEntity->v.flags & (FL_FAKECLIENT | FL_THIRDPARTYBOT)) )
 	{
 		int count = 0;
 		for (i=0; i < 32; i++)
@@ -1032,7 +1187,11 @@ void ClientPutInServer( edict_t *pEntity )
 		}
 	}
 
+#ifdef USE_METAMOD
+	RETURN_META(MRES_HANDLED);
+#else /* not USE_METAMOD */
 	(*other_gFunctionTable.pfnClientPutInServer)(pEntity);
+#endif /* USE_METAMOD */
 }
 
 void FillServer(int iType, int iTypeAdd){
@@ -1154,17 +1313,17 @@ void KickBots(edict_t *pEntity,int iTeam,int iAll){
 void TrainNN(edict_t *pEntity){
 /*char szDir[80];
 if(mod_id == CSTRIKE_DLL){
-#ifdef __linux__
-sprintf(szDir,"cstrike/joebot/");
-#else
+#ifdef _WIN32
 sprintf(szDir,"cstrike\\joebot\\");
+#else
+sprintf(szDir,"cstrike/joebot/");
 #endif
 }
 else if(mod_id == DOD_DLL){
-#ifdef __linux__
-sprintf(szDir,"dod/joebot/");
-#else
+#ifdef _WIN32
 sprintf(szDir,"dod\\joebot\\");
+#else
+sprintf(szDir,"dod/joebot/");
 #endif
 }
 char szLoadText[80];
@@ -1242,45 +1401,28 @@ void Endround(void){
 
 void ClientCommand( edict_t *pEntity )
 {
-	//	int i;
 	// only allow custom commands if deathmatch mode and NOT dedicated server and
 	// client sending command is the listen server client...
 	
 	if ((gpGlobals->deathmatch) && (!IS_DEDICATED_SERVER()) &&
 		(pEntity == listenserver_edict))
 	{
-		const char *pcmd = Cmd_Argv(0);
-		const char *arg1 = Cmd_Argv(1);
-		const char *arg2 = Cmd_Argv(2);
-		const char *arg3 = Cmd_Argv(3);
-		const char *arg4 = Cmd_Argv(4);
-		const char *arg5 = Cmd_Argv(5);
-		const char *arg6 = Cmd_Argv(6);
-		const char *arg7 = Cmd_Argv(7);
-		const char *arg8 = Cmd_Argv(8);
-		//		char msg[80];
 #ifdef DEBUGENGINE
-		if (debug_engine)
-		{
-			fp=fopen("bot.txt","a"); fprintf(fp,"ClientCommand: %s",pcmd);
-			if ((arg1 != NULL) && (*arg1 != 0))
-				fprintf(fp," %s", arg1);
-			if ((arg2 != NULL) && (*arg2 != 0))
-				fprintf(fp," %s", arg2);
-			if ((arg3 != NULL) && (*arg3 != 0))
-				fprintf(fp," %s", arg3);
-			if ((arg4 != NULL) && (*arg4 != 0))
-				fprintf(fp," %s", arg4);
-			fprintf(fp, "\n");
-			fclose(fp);
-		}
+		if (debug_engine) { fp=fopen("bot.txt","a"); fprintf(fp,"ClientCommand: %s\n",g_argv); fclose(fp); }
 #endif
-		
-		if(Commands.Exec(pEntity,CM_CONSOLE,pcmd,arg1,arg2,arg3,arg4))
+		if (Commands.Exec(pEntity, CM_CONSOLE, CMD_ARGV(0), CMD_ARGV(1), CMD_ARGV(2), CMD_ARGV(3), CMD_ARGV(4)))
+#ifdef USE_METAMOD
+			RETURN_META(MRES_SUPERCEDE);
+#else /* not USE_METAMOD */
 			return;
+#endif /* USE_METAMOD */
 	}
 	
+#ifdef USE_METAMOD
+	RETURN_META(MRES_HANDLED);
+#else /* not USE_METAMOD */
 	(*other_gFunctionTable.pfnClientCommand)(pEntity);
+#endif /* USE_METAMOD */
 }
 
 void ClientUserInfoChanged( edict_t *pEntity, char *infobuffer )
@@ -1288,10 +1430,14 @@ void ClientUserInfoChanged( edict_t *pEntity, char *infobuffer )
 #ifdef DEBUGENGINE
 	if (debug_engine) { fp=fopen("bot.txt", "a"); fprintf(fp, "ClientUserInfoChanged: pEntity=%x infobuffer=%s\n", pEntity, infobuffer); fclose(fp); }
 #endif
-	
+#ifdef USE_METAMOD
+	RETURN_META(MRES_HANDLED);
+#else /* not USE_METAMOD */
 	(*other_gFunctionTable.pfnClientUserInfoChanged)(pEntity, infobuffer);
+#endif /* USE_METAMOD */
 }
 
+#ifndef USE_METAMOD
 void ServerActivate( edict_t *pEdictList, int edictCount, int clientMax )
 {
 	(*other_gFunctionTable.pfnServerActivate)(pEdictList, edictCount, clientMax);
@@ -1311,6 +1457,7 @@ void PlayerPostThink( edict_t *pEntity )
 {
 	(*other_gFunctionTable.pfnPlayerPostThink)(pEntity);
 }
+#endif /* not USE_METAMOD */
 
 void SearchEs_CSTRIKE(void){		// search entities
 	long lNumS = 0,lNumF=0,lNumH=0;
@@ -1331,7 +1478,7 @@ void SearchEs_CSTRIKE(void){		// search entities
 	}
 	while(pEnt = UTIL_FindEntityByClassname(pEnt,"grenade")){
 		strcpy(szModel,STRING(pEnt->v.model));
-		if(!strcmpi(szModel,"models/w_smokegrenade.mdl")){
+		if(FStrEq(szModel,"models/w_smokegrenade.mdl")){
 			gSmoke[lNumS].p = pEnt;
 			gSmoke[lNumS].VOrigin = pEnt->v.origin;
 			gSmoke[lNumS].bUsed = true;
@@ -1340,7 +1487,7 @@ void SearchEs_CSTRIKE(void){		// search entities
 			if(lNumS >= _MAXGRENADEREC)
 				lNumS--;
 		}
-		else if(!strcmpi(szModel,"models/w_flashbang.mdl")){
+		else if(FStrEq(szModel,"models/w_flashbang.mdl")){
 			gFlash[lNumF].p = pEnt;
 			gFlash[lNumF].VOrigin = pEnt->v.origin;
 			gFlash[lNumF].bUsed = true;
@@ -1590,22 +1737,18 @@ void StartFrame( void )
 	if (gpGlobals->deathmatch)
 	{
 		edict_t *pPlayer;
-		static float check_server_cmd = 0.0;
 		static int i, index, player_index, bot_index;
 		static float previous_time = -1.0;
 		static float client_update_time = 0.0;
 		clientdata_s cd;
 		char msg[256];
 		int count;
-		//check_server_cmd = 0;
 		
 		// if a new map has started then (MUST BE FIRST IN StartFrame)...
 		if ((gpGlobals->time + 0.1) < previous_time)
 		{
 			char filename[256];
 			char mapname[64];
-			
-			check_server_cmd = 0.0;  // reset at start of map
 			
 			// check if mapname_bot.cfg file exists...
 			
@@ -1838,7 +1981,7 @@ void StartFrame( void )
 										welcome_time[i] = gpGlobals->time + _PAUSE_TIME;  // welcome in 5 seconds
 										continue;
 									}
-									if(pEnt->v.flags & FL_FAKECLIENT){
+									if(pEnt->v.flags & FL_THIRDPARTYBOT){
 										bWelcome[i] = true;
 										continue;
 									}
@@ -1963,7 +2106,11 @@ void StartFrame( void )
 					{
 						memset(&cd, 0, sizeof(cd));
 						
+#ifdef USE_METAMOD
+						MDLL_UpdateClientData( bots[i]->pEdict, 1, &cd );
+#else /* not USE_METAMOD */
 						UpdateClientData( bots[i]->pEdict, 1, &cd );
+#endif /* USE_METAMOD */
 						
 						// see if a weapon was dropped...
 						if (bots[i]->bot_weapons != cd.weapons)
@@ -2009,6 +2156,7 @@ void StartFrame( void )
 			if ((bots[bot_index]) &&  // is this slot used AND
 				(SBInfo[bot_index].respawn_state == RESPAWN_IDLE))  // not respawning
 			{
+				//try{
 				if (g_bJoinWHumanRES &&
 					bots[bot_index]->bot_team != 6 &&
 					bots[bot_index]->bot_team > 0 &&
@@ -2017,10 +2165,14 @@ void StartFrame( void )
 					sprintf(szTemp, "kick \"%s\"\n", STRING(bots[bot_index]->pEdict->v.netname));
 					SERVER_COMMAND(szTemp);
 				}
-				else
-					bots[bot_index]->Think();
 
+				bots[bot_index]->Think();
+				
 				count++;
+				/*}
+				catch(...){
+				FILE *fhd = fopen("scheisse.txt","a");fprintf(fhd,"scheisse in think\n");fclose(fhd);
+			}*/
 			}
 		}
 		
@@ -2199,7 +2351,7 @@ void StartFrame( void )
 					
 					// if there are currently less than the maximum number of "players"
 					// then add another bot using the default skill level...
-					if ((count < max_bots) && (max_bots != -1)&& (count < gpGlobals->maxClients))
+					if ((count < max_bots) && (max_bots != -1) && (count < gpGlobals->maxClients))
 					{
 						//cout << " ------------------- creating bot due to max_bots" << endl;
 						if(!g_bJoinWHumanMAX){
@@ -2228,90 +2380,6 @@ void StartFrame( void )
 				}
 				
 			}  
-			
-			// if time to check for server commands then do so...
-			if ((check_server_cmd <= gpGlobals->time) && IS_DEDICATED_SERVER())
-			{
-				check_server_cmd = gpGlobals->time + 1.0;
-				
-				char *cvar_bot = (char *)CVAR_GET_STRING( "joebot" );
-				
-				if ( cvar_bot && cvar_bot[0] )
-				{
-					char cmd_line[80];
-					char *cmd, *arg1, *arg2, *arg3, *arg4, *arg5, *arg6;
-					
-					strcpy(cmd_line, cvar_bot);
-					
-					index = 0;
-					cmd = cmd_line;
-					//cout << cmd << endl;
-					arg1 = arg2 = arg3 = arg4 = arg5 = arg6 = NULL;
-					
-					// skip to blank or end of string...
-					while ((cmd_line[index] != '|') && (cmd_line[index] != 0))
-						index++;
-					
-					if (cmd_line[index] == '|')
-					{
-						cmd_line[index++] = 0;
-						arg1 = &cmd_line[index];
-						
-						// skip to blank or end of string...
-						while ((cmd_line[index] != '|') && (cmd_line[index] != 0))
-							index++;
-						
-						if (cmd_line[index] == '|')
-						{
-							cmd_line[index++] = 0;
-							arg2 = &cmd_line[index];
-							
-							// skip to blank or end of string...
-							while ((cmd_line[index] != '|') && (cmd_line[index] != 0))
-								index++;
-							
-							if (cmd_line[index] == '|')
-							{
-								cmd_line[index++] = 0;
-								arg3 = &cmd_line[index];
-								
-								// skip to blank or end of string...
-								while ((cmd_line[index] != '|') && (cmd_line[index] != 0))
-									index++;
-								
-								if (cmd_line[index] == '|')
-								{
-									cmd_line[index++] = 0;
-									arg4 = &cmd_line[index];
-									
-									// skip to blank or end of string...
-									while ((cmd_line[index] != '|') && (cmd_line[index] != 0))
-										index++;
-									
-									if (cmd_line[index] == '|')
-									{
-										cmd_line[index++] = 0;
-										arg5 = &cmd_line[index];
-										
-										// skip to blank or end of string...
-										while ((cmd_line[index] != '|') && (cmd_line[index] != 0))
-											index++;
-										
-										if (cmd_line[index] == '|')
-										{
-											cmd_line[index++] = 0;
-											arg6 = &cmd_line[index];
-										}
-									}
-								}
-							}
-						}
-					}
-					Commands.Exec(0,CM_DEDICATED,cmd,arg1,arg2,arg3,arg4);
-					
-					CVAR_SET_STRING("joebot", "");
-				}
-			}
 			
 			/*// check if time to see if a bot needs to be created...
 			if (bot_check_time < gpGlobals->time)
@@ -2343,9 +2411,14 @@ void StartFrame( void )
    FILE *fhd = fopen("scheisse.txt","a");fprintf(fhd,"scheisse in startframe\n");fclose(fhd);
    }*/
    
+#ifdef USE_METAMOD
+   RETURN_META(MRES_HANDLED);
+#else /* not USE_METAMOD */
    (*other_gFunctionTable.pfnStartFrame)();
+#endif /* USE_METAMOD */
 }
 
+#ifndef USE_METAMOD
 void ParmsNewLevel( void )
 {
 	(*other_gFunctionTable.pfnParmsNewLevel)();
@@ -2360,6 +2433,7 @@ const char *GetGameDescription( void )
 {
 	return (*other_gFunctionTable.pfnGetGameDescription)();
 }
+#endif /* not USE_METAMOD */
 
 void PlayerCustomization( edict_t *pEntity, customization_t *pCust )
 {
@@ -2367,9 +2441,14 @@ void PlayerCustomization( edict_t *pEntity, customization_t *pCust )
 	if (debug_engine) { fp=fopen("bot.txt", "a"); fprintf(fp, "PlayerCustomization: %x\n",pEntity); fclose(fp); }
 #endif
 	
+#ifdef USE_METAMOD
+	RETURN_META(MRES_HANDLED);
+#else /* not USE_METAMOD */
 	(*other_gFunctionTable.pfnPlayerCustomization)(pEntity, pCust);
+#endif /* USE_METAMOD */
 }
 
+#ifndef USE_METAMOD
 void SpectatorConnect( edict_t *pEntity )
 {
 	(*other_gFunctionTable.pfnSpectatorConnect)(pEntity);
@@ -2459,6 +2538,7 @@ void CreateInstancedBaselines( void )
 {
 	(*other_gFunctionTable.pfnCreateInstancedBaselines)();
 }
+#endif /* not USE_METAMOD */
 
 int InconsistentFile( const edict_t *player, const char *filename, char *disconnect_message )
 {
@@ -2466,15 +2546,85 @@ int InconsistentFile( const edict_t *player, const char *filename, char *disconn
 	if (debug_engine) { fp=fopen("bot.txt", "a"); fprintf(fp, "InconsistentFile: %x filename=%s\n",player,filename); fclose(fp); }
 #endif
 	
+#ifdef USE_METAMOD
+	RETURN_META_VALUE(MRES_HANDLED, 0);
+#else /* not USE_METAMOD */
 	return (*other_gFunctionTable.pfnInconsistentFile)(player, filename, disconnect_message);
+#endif /* USE_METAMOD */
 }
 
+#ifndef USE_METAMOD
 int AllowLagCompensation( void )
 {
 	return (*other_gFunctionTable.pfnAllowLagCompensation)();
 }
+#endif /* not USE_METAMOD */
 
+#ifdef USE_METAMOD
+DLL_FUNCTIONS gFunctionTable =
+{
+   GameDLLInit,               //pfnGameInit
+   DispatchSpawn,             //pfnSpawn
+   NULL,             //pfnThink
+   NULL,               //pfnUse
+   NULL,             //pfnTouch
+   NULL,           //pfnBlocked
+   DispatchKeyValue,          //pfnKeyValue
+   NULL,              //pfnSave
+   NULL,           //pfnRestore
+   NULL, //pfnAbsBox
 
+   NULL,           //pfnSaveWriteFields
+   NULL,            //pfnSaveReadFields
+
+   NULL,           //pfnSaveGlobalState
+   NULL,        //pfnRestoreGlobalState
+   NULL,          //pfnResetGlobalState
+
+   ClientConnect,             //pfnClientConnect
+   ClientDisconnect,          //pfnClientDisconnect
+   ClientKill,                //pfnClientKill
+   ClientPutInServer,         //pfnClientPutInServer
+   ClientCommand,             //pfnClientCommand
+   ClientUserInfoChanged,     //pfnClientUserInfoChanged
+   NULL,            //pfnServerActivate
+   NULL,          //pfnServerDeactivate
+
+   NULL,            //pfnPlayerPreThink
+   NULL,           //pfnPlayerPostThink
+
+   StartFrame,                //pfnStartFrame
+   NULL,             //pfnParmsNewLevel
+   NULL,          //pfnParmsChangeLevel
+
+   NULL,        //pfnGetGameDescription    Returns string describing current .dll game.
+   PlayerCustomization,       //pfnPlayerCustomization   Notifies .dll of new customization for player.
+
+   NULL,          //pfnSpectatorConnect      Called when spectator joins server
+   NULL,       //pfnSpectatorDisconnect   Called when spectator leaves the server
+   NULL,            //pfnSpectatorThink        Called when spectator sends a command packet (usercmd_t)
+
+   NULL,                 //pfnSys_Error          Called when engine has encountered an error
+
+   NULL,                   //pfnPM_Move
+   NULL,                   //pfnPM_Init            Server version of player movement initialization
+   NULL,        //pfnPM_FindTextureType
+
+   NULL,           //pfnSetupVisibility        Set up PVS and PAS for networking for this client
+   NULL,          //pfnUpdateClientData       Set up data sent only to specific client
+   NULL,             //pfnAddToFullPack
+   NULL,            //pfnCreateBaseline        Tweak entity baseline for network encoding, allows setup of player baselines, too.
+   NULL,          //pfnRegisterEncoders      Callbacks for network encoding
+   NULL,             //pfnGetWeaponData
+   NULL,                  //pfnCmdStart
+   NULL,                    //pfnCmdEnd
+   NULL,      //pfnConnectionlessPacket
+   NULL,             //pfnGetHullBounds
+   NULL,  //pfnCreateInstancedBaselines
+   InconsistentFile,          //pfnInconsistentFile
+   NULL,      //pfnAllowLagCompensation
+};
+#else /* not USE_METAMOD */
 DLL_FUNCTIONS gFunctionTable =
 {
 	GameDLLInit,               //pfnGameInit
@@ -2538,6 +2688,7 @@ DLL_FUNCTIONS gFunctionTable =
 		InconsistentFile,          //pfnInconsistentFile
 		AllowLagCompensation,      //pfnAllowLagCompensation
 };
+#endif /* USE_METAMOD */
 
 #ifdef __BORLANDC__
 int EXPORT GetEntityAPI( DLL_FUNCTIONS *pFunctionTable, int interfaceVersion )
@@ -2553,16 +2704,19 @@ extern "C" EXPORT int GetEntityAPI( DLL_FUNCTIONS *pFunctionTable, int interface
 	// pass engine callback function table to engine...
 	memcpy( pFunctionTable, &gFunctionTable, sizeof( DLL_FUNCTIONS ) );
 	
+#ifndef USE_METAMOD
 	// pass other DLLs engine callbacks to function table...
 	if (!(*other_GetEntityAPI)(&other_gFunctionTable, INTERFACE_VERSION))
 	{
 		return FALSE;  // error initializing function table!!!
 	}
+#endif /* not USE_METAMOD */
 	
 	return TRUE;
 }
 
 
+#ifndef USE_METAMOD
 #ifdef __BORLANDC__
 int EXPORT GetNewDLLFunctions( NEW_DLL_FUNCTIONS *pFunctionTable, int *interfaceVersion )
 #else
@@ -2573,112 +2727,147 @@ extern "C" EXPORT int GetNewDLLFunctions( NEW_DLL_FUNCTIONS *pFunctionTable, int
 		return FALSE;
 	
 	// pass other DLLs engine callbacks to function table...
-	if (!(*other_GetNewDLLFunctions)(pFunctionTable, interfaceVersion))
-	{
+	if (!(*other_GetNewDLLFunctions)(pFunctionTable, interfaceVersion)) {
 		return FALSE;  // error initializing function table!!!
 	}
 	
 	return TRUE;
 }
+#endif /* not USE_METAMOD */
 
-
-void FakeClientCommand(edict_t *pBot, char *arg1, char *arg2, char *arg3)
+void FakeClientCommand (edict_t *pFakeClient, const char *fmt, ...)
 {
-	int length;
-	
-	memset(g_argv, 0, sizeof(g_argv));
-	
-	isFakeClientCommand = 1;
-	
-	if ((arg1 == NULL) || (*arg1 == 0))
-		return;
-	
-	if ((arg2 == NULL) || (*arg2 == 0))
-	{
-		length = sprintf(&g_argv[0], "%s", arg1);
-		fake_arg_count = 1;
-	}
-	else if ((arg3 == NULL) || (*arg3 == 0))
-	{
-		length = sprintf(&g_argv[0], "%s %s", arg1, arg2);
-		fake_arg_count = 2;
-	}
-	else
-	{
-		length = sprintf(&g_argv[0], "%s %s %s", arg1, arg2, arg3);
-		fake_arg_count = 3;
-	}
-	
-	g_argv[length] = 0;  // null terminate just in case
-	
-	strcpy(&g_argv[64], arg1);
-	
-	if (arg2)
-		strcpy(&g_argv[128], arg2);
-	
-	if (arg3)
-		strcpy(&g_argv[192], arg3);
-	
-	// allow the MOD DLL to execute the ClientCommand...
-	ClientCommand(pBot);
-	
-	isFakeClientCommand = 0;
+   // this function is from Pierre-Marie Baty's RACC 
+
+   // the purpose of this function is to provide fakeclients (bots) with the same client
+   // command-scripting advantages (putting multiple commands in one line between semicolons)
+   // as real players. It is an improved version of botman's FakeClientCommand, in which you
+   // supply directly the whole string as if you were typing it in the bot's "console". It
+   // is supposed to work exactly like the pfnClientCommand (server-sided client command).
+
+   va_list argptr;
+   static char command[256];
+   int length, fieldstart, fieldstop, i, index, stringindex = 0;
+
+   // concatenate all the arguments in one string
+   va_start (argptr, fmt);
+   vsprintf (command, fmt, argptr);
+   va_end (argptr);
+
+   if ((command == NULL) || (*command == 0))
+      return; // if nothing in the command buffer, return
+
+   isFakeClientCommand = TRUE; // set the "fakeclient command" flag
+   length = strlen (command); // get the total length of the command string
+
+   // process all individual commands (separated by a semicolon) one each a time
+   while (stringindex < length)
+   {
+      fieldstart = stringindex; // save field start position (first character)
+      while ((stringindex < length) && (command[stringindex] != ';'))
+         stringindex++; // reach end of field
+      if (command[stringindex - 1] == '\n')
+         fieldstop = stringindex - 2; // discard any trailing '\n' if needed
+      else
+         fieldstop = stringindex - 1; // save field stop position (last character before semicolon or end)
+      for (i = fieldstart; i <= fieldstop; i++)
+         g_argv[i - fieldstart] = command[i]; // store the field value in the g_argv global string
+      g_argv[i - fieldstart] = 0; // terminate the string
+      stringindex++; // move the overall string index one step further to bypass the semicolon
+
+      index = 0;
+      fake_arg_count = 0; // let's now parse that command and count the different arguments
+
+      // count the number of arguments
+      while (index < i - fieldstart)
+      {
+         while ((index < i - fieldstart) && (g_argv[index] == ' '))
+            index++; // ignore spaces
+
+         // is this field a group of words between quotes or a single word ?
+         if (g_argv[index] == '"')
+         {
+            index++; // move one step further to bypass the quote
+            while ((index < i - fieldstart) && (g_argv[index] != '"'))
+               index++; // reach end of field
+            index++; // move one step further to bypass the quote
+         }
+         else
+            while ((index < i - fieldstart) && (g_argv[index] != ' '))
+               index++; // this is a single word, so reach the end of field
+
+         fake_arg_count++; // we have processed one argument more
+      }
+
+#ifdef USE_METAMOD
+      MDLL_ClientCommand(pFakeClient);
+#else /* not USE_METAMOD */
+      ClientCommand (pFakeClient); // tell now the MOD DLL to execute this ClientCommand...
+#endif /* USE_METAMOD */
+   }
+
+   g_argv[0] = 0; // when it's done, reset the g_argv field
+   isFakeClientCommand = FALSE; // reset the "fakeclient command" flag
+   fake_arg_count = 0; // and the argument count
 }
 
-
-const char *Cmd_Args( void )
+const char *GetField (const char *string, int field_number)
 {
-	if (isFakeClientCommand)
-	{
-		return &g_argv[0];
-	}
-	else
-	{
-		return (*g_engfuncs.pfnCmd_Args)();
-	}
+   // this function is from Pierre-Marie Baty's RACC 
+
+   // This function gets and returns a particuliar field in a string where several fields are
+   // concatenated. Fields can be words, or groups of words between quotes ; separators may be
+   // white space or tabs. A purpose of this function is to provide bots with the same Cmd_Argv
+   // convenience the engine provides to real clients. This way the handling of real client
+   // commands and bot client commands is exactly the same, just have a look in engine.cpp
+   // for the hooking of pfnCmd_Argc, pfnCmd_Args and pfnCmd_Argv, which redirects the call
+   // either to the actual engine functions (when the caller is a real client), either on
+   // our function here, which does the same thing, when the caller is a bot.
+
+   static char field[256];
+   int length, i, index = 0, field_count = 0, fieldstart, fieldstop;
+
+   field[0] = 0; // reset field
+   length = strlen (string); // get length of string
+
+   // while we have not reached end of line
+   while ((index < length) && (field_count <= field_number))
+   {
+      while ((index < length) && ((string[index] == ' ') || (string[index] == '\t')))
+         index++; // ignore spaces or tabs
+
+      // is this field multi-word between quotes or single word ?
+      if (string[index] == '"')
+      {
+         index++; // move one step further to bypass the quote
+         fieldstart = index; // save field start position
+         while ((index < length) && (string[index] != '"'))
+            index++; // reach end of field
+         fieldstop = index - 1; // save field stop position
+         index++; // move one step further to bypass the quote
+      }
+      else
+      {
+         fieldstart = index; // save field start position
+         while ((index < length) && ((string[index] != ' ') && (string[index] != '\t')))
+            index++; // reach end of field
+         fieldstop = index - 1; // save field stop position
+      }
+
+      // is this field we just processed the wanted one ?
+      if (field_count == field_number)
+      {
+         for (i = fieldstart; i <= fieldstop; i++)
+            field[i - fieldstart] = string[i]; // store the field value in a string
+         field[i - fieldstart] = 0; // terminate the string
+         break; // and stop parsing
+      }
+
+      field_count++; // we have parsed one field more
+   }
+
+   return (&field[0]); // returns the wanted field
 }
-
-
-const char *Cmd_Argv( int argc )
-{
-	if (isFakeClientCommand)
-	{
-		if (argc == 0)
-		{
-			return &g_argv[64];
-		}
-		else if (argc == 1)
-		{
-			return &g_argv[128];
-		}
-		else if (argc == 2)
-		{
-			return &g_argv[192];
-		}
-		else
-		{
-			return NULL;
-		}
-	}
-	else
-	{
-		return (*g_engfuncs.pfnCmd_Argv)(argc);
-	}
-}
-
-
-int Cmd_Argc( void )
-{
-	if (isFakeClientCommand)
-	{
-		return fake_arg_count;
-	}
-	else
-	{
-		return (*g_engfuncs.pfnCmd_Argc)();
-	}
-}
-
 
 void ProcessBotCfgFile(void)
 {
@@ -2824,4 +3013,3 @@ void ProcessBotCfgFile(void)
 		SERVER_COMMAND(server_cmd);
 	}
 }
-
