@@ -242,10 +242,12 @@ void BotClient_DOD_WeaponList(void *p, int bot_index, int iAdd)
 			// store away this weapon with it's ammo information...
 			weapon_defs[bot_weapon.iId] = bot_weapon;
 
+#ifdef DEBUGENGINE
 			FILE *fhd;
 			fhd = fopen("weapons.txt","a");
 			fprintf(fhd,"%i %s\n",bot_weapon.iId,bot_weapon.szClassname);
 			fclose(fhd);
+#endif
 			
 			state = 0;
 		}
@@ -1311,7 +1313,7 @@ void BotClient_CS_Flashlight(void *p, int bot_index,int iAdd)
 	}
 }
 
-void BotMsgsInit(void)
+void JBRegMsgs(void)
 {
 	static bool bInitDone = FALSE;
 

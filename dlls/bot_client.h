@@ -149,5 +149,5 @@ const char *GetUserMsgName(int msgid, int *size);
 
 typedef void (*botmsg_t)(void *, int, int);
 extern botmsg_t botmsgs[MAX_REG_MSGS];
-void BotMsgsInit(void);
+void JBRegMsgs(void);
 extern int msg_state;
