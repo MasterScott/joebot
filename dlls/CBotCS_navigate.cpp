@@ -416,7 +416,8 @@ bool CBotCS :: HeadTowardSpEnt(void){
 					|| FStrEq("models/w_sg550.mdl",STRING(pEnt->v.model))
 					|| FStrEq("models/w_m249.mdl",STRING(pEnt->v.model))
 					|| FStrEq("models/w_galil.mdl",STRING(pEnt->v.model))
-					|| FStrEq("models/w_famas.mdl",STRING(pEnt->v.model))){
+					|| FStrEq("models/w_famas.mdl",STRING(pEnt->v.model))
+					|| FStrEq("models/w_shield.mdl",STRING(pEnt->v.model))){
 					Goto(pEnt->v.origin);
 					return true;
 				}
@@ -668,7 +669,7 @@ bool CBotCS :: Bored(void){
 				//WaypointDrawBeam(pEdict,v1,v2,20,1,200,200,0,200,100);
 				UTIL_TraceLine(v1,v2,ignore_monsters,dont_ignore_glass,pEdict,&tr);
 				if(tr.pHit){
-					long itndex = ENTINDEX(tr.pHit);
+					int itndex = ENTINDEX(tr.pHit);
 					char *szDecal = SDecals.GetRandomDecal();
 					//cout << szDecal << endl;
 					long idndex = DECAL_INDEX(szDecal);
