@@ -1090,7 +1090,7 @@ bool bc_bottkpunish(edict_t *pEntity,int iType,const char *arg1,const char *arg2
 }
 
 bool bc_showen(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
-	UTIL_ConsoleMessage(pEntity, "\"showen\" - This command is only to be used for debugging purposes by the author, %s !\n\0",STRING(pEntity->v.netname));
+	UTIL_ConsoleMessage(pEntity, "\"showen\" - This command is only to be used for debugging purposes by the author, %s !\n\0",pEntity ? STRING(pEntity->v.netname) : "");
 	
 	if (FStrEq(arg1, "on")){
 		CVAR_SET_FLOAT("jb_showen", 1);
@@ -1403,11 +1403,11 @@ bool bc_language(edict_t *pEntity,int iType,const char *arg1,const char *arg2,co
 	else if (FStrEq(arg1, "de")) {
 		CVAR_SET_FLOAT("jb_language", LANG_DE);
 	}
-	else if (FStrEq(arg1, "e")) {
+	else if (FStrEq(arg1, "en") || FStrEq(arg1, "e")) {
 		CVAR_SET_FLOAT("jb_language", LANG_EN);
 	}
 	else {
-		UTIL_ConsoleMessage(pEntity, "Usage: language [fr/de/e]\n");
+		UTIL_ConsoleMessage(pEntity, "Usage: language [fr/de/en]\n");
 	}
 	switch(int(jb_language->value)) {
 		case LANG_FR:
