@@ -20,14 +20,15 @@ BASECFLAGS = -I$(JOEBOTDIR)\engine -I$(JOEBOTDIR)\common\
  -I$(JOEBOTDIR)\pm_shared -I$(MMDIR)\metamod -I$(JOEBOTDIR)\NNSim\som\
  -I$(JOEBOTDIR)\NNSim -I$(JOEBOTDIR)\dlls -I$(BCCDIR)\Include
 
-BASEFLAGS = -DUSE_METAMOD
+# uncomment to compile metamod plugin
+EXTRA_CFLAGS += -DUSE_METAMOD
 
 # uncomment to compile debug code
 #EXTRA_CFLAGS += -DDEBUGENGINE
 #EXTRA_CFLAGS += -DDEBUGMESSAGES
 #EXTRA_CFLAGS += -D_DEBUG
 
-CFLAGS = -w- -4 $(BASECFLAGS)
+CFLAGS = -4 $(BASECFLAGS) $(EXTRA_CFLAGS)
 
 LIB = $(BCCDIR)\lib;$(BCCDIR)\lib\psdk
 
