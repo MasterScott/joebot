@@ -540,11 +540,15 @@ bool bc_mix_names(edict_t *pEntity,int iType,const char *arg1,const char *arg2,c
 		if (IS_DEDICATED_SERVER())UTIL_ConsoleMessage(pEntity, "NOTE: This command only takes effect before adding bots\n");
 		CVAR_SET_FLOAT("jb_mixnames", 0);
 	}
+	else if(strlen(arg1)){
+		UTIL_ConsoleMessage(pEntity, "JoeBOT: Invalid paramameter: %s\n",arg1);
+	}
+
 	if ( CVAR_BOOL(jb_mixnames) ){
-		if (IS_DEDICATED_SERVER())UTIL_ConsoleMessage(pEntity, "Bot names order is random\n");
+		UTIL_ConsoleMessage(pEntity, "Bot names order is random\n");
 	}
 	else{
-		if (IS_DEDICATED_SERVER())UTIL_ConsoleMessage(pEntity, "Bot names follow order in bot_names.txt\n");
+		UTIL_ConsoleMessage(pEntity, "Bot names follow order in bot_names.txt\n");
 	}
 	return true;
 }
@@ -557,15 +561,15 @@ bool bc_welcome(edict_t *pEntity,int iType,const char *arg1,const char *arg2,con
 	else if (FStrEq(arg1, "off")){
 		CVAR_SET_FLOAT("jb_msgwelcome", 0);
 	}
+	else if(strlen(arg1)){
+		UTIL_ConsoleMessage(pEntity, "JoeBOT: Invalid paramameter: %s\n",arg1);
+	}
+
 	if(CVAR_BOOL(jb_msgwelcome)){
-		if(IS_DEDICATED_SERVER()){
-			UTIL_ConsoleMessage(pEntity, "Welcome messages are ON\n");
-		}
+		UTIL_ConsoleMessage(pEntity, "Welcome messages are ON\n");
 	}
 	else{
-		if(IS_DEDICATED_SERVER()){
-			UTIL_ConsoleMessage(pEntity, "Welcome messages are OFF\n");
-		}
+		UTIL_ConsoleMessage(pEntity, "Welcome messages are OFF\n");
 	}
 	return true;
 }
@@ -585,6 +589,10 @@ bool bc_extjoe(edict_t *pEntity,int iType,const char *arg1,const char *arg2,cons
 	else if (FStrEq(arg1, "off")){
 		CVAR_SET_FLOAT("jb_prefixaggression", 0);
 	}
+	else if(strlen(arg1)){
+		UTIL_ConsoleMessage(pEntity, "JoeBOT: Invalid paramameter: %s\n",arg1);
+	}
+
 	if(CVAR_BOOL(jb_prefixaggression)){
 		UTIL_ConsoleMessage(pEntity, "Bot name aggression prefix is ON (%s, %s or %s)\n",jb_prefixaggressive->string,jb_prefixnormal->string,jb_prefixdefensive->string);
 	}
@@ -602,6 +610,10 @@ bool bc_extskill(edict_t *pEntity,int iType,const char *arg1,const char *arg2,co
 	else if (FStrEq(arg1, "off")){
 		CVAR_SET_FLOAT("jb_suffixskill", 0);
 	}
+	else if(strlen(arg1)){
+		UTIL_ConsoleMessage(pEntity, "JoeBOT: Invalid paramameter: %s\n",arg1);
+	}
+
 	if(CVAR_BOOL(jb_suffixskill)){
 		UTIL_ConsoleMessage(pEntity, "Bot name skill suffix is ON\n");
 	}
@@ -744,6 +756,9 @@ bool bc_botuseradio(edict_t *pEntity,int iType,const char *arg1,const char *arg2
 	}
 	else if (FStrEq(arg1, "off")){
 		CVAR_SET_FLOAT("jb_msgradio", 0);
+	}
+	else if(strlen(arg1)){
+		UTIL_ConsoleMessage(pEntity, "JoeBOT: Invalid paramameter: %s\n",arg1);
 	}
 	if(CVAR_BOOL(jb_msgradio)){
 		UTIL_ConsoleMessage(pEntity, "Bots use radio commands\n");
@@ -999,6 +1014,10 @@ bool bc_edown(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const
 	else if (FStrEq(arg1, "off")){
 		CVAR_SET_FLOAT("jb_msgenemydown", 0);
 	}
+	else if(strlen(arg1)){
+		UTIL_ConsoleMessage(pEntity, "JoeBOT: Invalid paramameter: %s\n",arg1);
+	}
+
 	if(CVAR_BOOL(jb_msgenemydown)){
 		UTIL_ConsoleMessage(pEntity, "Bots report \"Enemy down\"\n");
 	}
@@ -1097,6 +1116,10 @@ bool bc_botshoot(edict_t *pEntity,int iType,const char *arg1,const char *arg2,co
 	{
 		CVAR_SET_FLOAT("jb_shoot", 0);
 	}
+	else if(strlen(arg1)){
+		UTIL_ConsoleMessage(pEntity, "JoeBOT: Invalid paramameter: %s\n",arg1);
+	}
+
 	if (CVAR_BOOL(jb_shoot)){
 		UTIL_ConsoleMessage(pEntity, "Bots shoot is ON (they aren't friendly)\n");
 	}
@@ -1117,6 +1140,10 @@ bool bc_bottkpunish(edict_t *pEntity,int iType,const char *arg1,const char *arg2
 	{
 		CVAR_SET_FLOAT("jb_tkpunish", 0);
 	}
+	else if(strlen(arg1)){
+		UTIL_ConsoleMessage(pEntity, "JoeBOT: Invalid paramameter: %s\n",arg1);
+	}
+
 	if (CVAR_BOOL(jb_tkpunish)){
 		UTIL_ConsoleMessage(pEntity, "Bots tkpunish is ON (they sometimes shoot at a teamm8 after a tk)\n");
 	}
@@ -1138,6 +1165,10 @@ bool bc_showen(edict_t *pEntity,int iType,const char *arg1,const char *arg2,cons
 	else if (FStrEq(arg1, "off")){
 		CVAR_SET_FLOAT("jb_showen", 0);
 	}
+	else if(strlen(arg1)){
+		UTIL_ConsoleMessage(pEntity, "JoeBOT: Invalid paramameter: %s\n",arg1);
+	}
+
 	
 	return true;
 }
@@ -1150,6 +1181,10 @@ bool bc_debug_engine(edict_t *pEntity,int iType,const char *arg1,const char *arg
 	else if (FStrEq(arg1, "off")) {
 		CVAR_SET_FLOAT("jb_debugengine", 0);
 	}
+	else if(strlen(arg1)){
+		UTIL_ConsoleMessage(pEntity, "JoeBOT: Invalid paramameter: %s\n",arg1);
+	}
+
 	if (CVAR_BOOL(jb_debugengine)) {
 		UTIL_ConsoleMessage(pEntity,  "Debug engine ON\n");
 	}
@@ -1838,6 +1873,9 @@ bool bc_autowaypointaddjump(edict_t *pEntity,int iType,const char *arg1,const ch
 	else if (FStrEq(arg1, "off"))
 	{
 		CVAR_SET_FLOAT("jb_wpautojump", 0);
+	}
+	else if(strlen(arg1)){
+		UTIL_ConsoleMessage(pEntity, "JoeBOT: Invalid paramameter: %s\n",arg1);
 	}
 	
 	if (CVAR_BOOL(jb_wpautojump))
