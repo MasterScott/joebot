@@ -18,8 +18,10 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 ******************************************************************************/
-#include "CLTMem.h"
+#include "extdll.h"
+#include "util.h"
 
+#include "CLTMem.h"
 
 CLTMemItem :: CLTMemItem(){
 	bUsed		= false;
@@ -44,7 +46,7 @@ CLTMem :: ~CLTMem(){
 }
 
 int CLTMem :: Add(long lEvent,edict_t *pEdict,Vector &VAdd,Vector &VAdd2){
-	//FakeClientCommand(pEdict,"say","---",0);
+	//FakeClientCommand(pEdict,"say ---");
 
 	FMItem[iCount].bUsed = true;
 	FMItem[iCount].fTime = gpGlobals->time;
