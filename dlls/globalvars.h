@@ -151,7 +151,7 @@ extern float f_LastRadio;
 
 extern float f_timesrs;
 extern float f_round_start;
-extern float f_start_round;
+extern float f_end_freezetime;
 
 extern float gf_5th;
 extern bool g_b5th;
@@ -161,7 +161,6 @@ extern char szWPCreator[80];
 extern int iGlobalRSCount;		// setting to number of bots on roundstart. every init of bot result in decrementing this variable. if it is 0 and it hasn't been called this rs, a global init function is called :D
 extern float fLGlobalRSInit;
 
-extern char szLPBFile[80];
 extern bool bLoadedLPB;
 
 extern edict_t *listenserver_edict;
