@@ -372,8 +372,8 @@ void CBotCS :: Fight( void ){
 			}
 		}
 		
-		float fAngle = (pEdict->v.punchangle.y + pEdict->v.punchangle.x) / 2.f;
-		if(tan(fAngle) * fEnemyDist > 1.5f){		//  test the amount of recoil
+		double dAngle = (fabs(pEdict->v.punchangle.y) + fabs(pEdict->v.punchangle.x)) / 360.f * 3.14159265358979;		// not 180, but 360, because (2 x angles) / 2 / 180 *pi
+		if(tan(dAngle) * fEnemyDist > 20){		//  test the amount of recoil
 			if(f_PauseShoot < gpGlobals->time-.4)
 				f_PauseShoot = gpGlobals->time + WeaponDefs.dpWeaponPauseTime[mod_id][current_weapon.iId];
 #ifdef DEBUGMESSAGES
