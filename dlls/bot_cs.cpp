@@ -59,10 +59,10 @@ void BotBuy_CS_WEAPON_SCOUT(CBotBase *pBot){
 	{
 		switch (pBot->bot_teamnm)
 		{
-			case TE:
+			case CS_TEAM_TE:
 				FakeClientCommand(pEdict,"buy;menuselect 4;menuselect 3");
 				break;
-			case CT:
+			case CS_TEAM_CT:
 				FakeClientCommand(pEdict,"buy;menuselect 4;menuselect 2");
 				break;
 		}
@@ -168,10 +168,10 @@ void BotBuy_CS_WEAPON_AWP(CBotBase *pBot){
 	{
 		switch (pBot->bot_teamnm)
 		{
-			case TE:
+			case CS_TEAM_TE:
 				FakeClientCommand(pEdict,"buy;menuselect 4;menuselect 5");
 				break;
-			case CT:
+			case CS_TEAM_CT:
 				FakeClientCommand(pEdict,"buy;menuselect 4;menuselect 6");
 				break;
 		}
@@ -304,10 +304,10 @@ void BotBuy_CS_WEAPON_NightVision(CBotBase *pBot){
 	{
 		switch (pBot->bot_teamnm)
 		{
-			case TE:
+			case CS_TEAM_TE:
 				FakeClientCommand(pEdict,"buyequip;menuselect 6");
 				break;
-			case CT:
+			case CS_TEAM_CT:
 				FakeClientCommand(pEdict,"buyequip;menuselect 7");
 				break;
 		}
