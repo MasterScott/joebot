@@ -85,11 +85,9 @@ int CBotWPDir :: Load(const char *szFileName){			// load WPDir into ram ...
 #endif
 				if(strlen(szName) < 20){
 					strcpy(szPDir[lNum].szDir,szName);
-#ifndef __linux__
-					cout << "JoeBOT: adding wp-directory : cstrike\\joebot\\wpjs\\"<<szName << endl;
-#else
-					cout << "JoeBOT: adding wp-directory : cstrike/joebot/wpjs/"<<szName << endl;
-#endif
+					char szFilePath[256];
+					UTIL_BuildFileName(szFilePath,"joebot",szName);
+					cout << "JoeBOT: adding wp-directory : " << szFilePath << endl;
 					lNum++;
 				}
 				else{
