@@ -22,7 +22,6 @@
 #define __CBOTDOD_H
 
 #include "CBotBase.h"
-#include "Chat.h"
 
 #define _MAXFLAGS 10
 
@@ -98,4 +97,4 @@ protected:
 private:
 };
 
-#endif  __CBOTDOD_H
+#endif //__CBOTDOD_H
