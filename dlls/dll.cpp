@@ -121,7 +121,7 @@ int Meta_Query(char *ifvers, plugin_info_t **pPlugInfo,
 
 	// Check for valid pMetaUtilFuncs before we continue.
 	if(!pMetaUtilFuncs) {
-		//UTIL_LogPrintf("[%s] ERROR: Meta_Query called with null pMetaUtilFuncs\n", Plugin_info.logtag);
+		ALERT(at_logged, "[%s] ERROR: Meta_Query called with null pMetaUtilFuncs\n", Plugin_info.logtag);
 		return(FALSE);
 	}
 	gpMetaUtilFuncs=pMetaUtilFuncs;
@@ -376,6 +376,7 @@ void GameDLLInit( void )
 	(*g_engfuncs.pfnAddServerCommand)("joebot", JBServerCmd);
 #endif /* USE_METAMOD */
 	JBRegCvars();
+
 	WeaponDefs.Init();
 
 	g_bMyBirthday = MyBirthday();
@@ -389,7 +390,7 @@ void GameDLLInit( void )
 	strcat(_JOEBOTVERSION," DBGV");
 #endif
 	
-	sprintf(welcome_msg,"----- JoeBot %s by @$3.1415rin { http://joebot.bots-united.com/ }; -----\n\0",_JOEBOTVERSION);
+	sprintf(welcome_msg,"----- JoeBOT %s by @$3.1415rin { http://joebot.bots-united.com/ }; -----\n\0",_JOEBOTVERSION);
 	
 	for (int i=0; i<32; i++){
 		clients[i] = NULL;
@@ -528,7 +529,7 @@ void GameDLLInit( void )
 		printf("JoeBOT: 'Precaching' nets\n");
 	
 #ifdef USE_METAMOD
-	RETURN_META(MRES_HANDLED);
+	RETURN_META(MRES_IGNORED);
 #else /* not USE_METAMOD */
 	//other_gFunctionTable.pfnGameInit;
 	(*other_gFunctionTable.pfnGameInit)();
@@ -630,7 +631,7 @@ int DispatchSpawn( edict_t *pent )
 	}
 	
 #ifdef USE_METAMOD
-	RETURN_META_VALUE(MRES_HANDLED, 0);
+	RETURN_META_VALUE(MRES_IGNORED, 0);
 #else /* not USE_METAMOD */
 	return (*other_gFunctionTable.pfnSpawn)(pent);
 #endif /* USE_METAMOD */
@@ -767,7 +768,7 @@ BOOL ClientConnect( edict_t *pEntity, const char *pszName, const char *pszAddres
 	}
 	
 #ifdef USE_METAMOD
-	RETURN_META_VALUE(MRES_HANDLED, TRUE);
+	RETURN_META_VALUE(MRES_IGNORED, TRUE);
 #else /* not USE_METAMOD */
 	return (*other_gFunctionTable.pfnClientConnect)(pEntity, pszName, pszAddress, szRejectReason);
 #endif /* USE_METAMOD */
@@ -818,7 +819,7 @@ void ClientDisconnect( edict_t *pEntity )
 	}
 	
 #ifdef USE_METAMOD
-	RETURN_META(MRES_HANDLED);
+	RETURN_META(MRES_IGNORED);
 #else /* not USE_METAMOD */
 	(*other_gFunctionTable.pfnClientDisconnect)(pEntity);
 #endif /* USE_METAMOD */
@@ -862,7 +863,7 @@ void ClientPutInServer( edict_t *pEntity )
 			for (i=0; i < 32; i++){
 				if (bots[i]){  // is this slot used?
 					sprintf(szTemp, "kick \"%s\"\n", STRING(bots[i]->pEdict->v.netname));
-					
+
 					SERVER_COMMAND(szTemp);  // kick the bot using (kick "name")
 					
 					break;
@@ -872,7 +873,7 @@ void ClientPutInServer( edict_t *pEntity )
 	}
 
 #ifdef USE_METAMOD
-	RETURN_META(MRES_HANDLED);
+	RETURN_META(MRES_IGNORED);
 #else /* not USE_METAMOD */
 	(*other_gFunctionTable.pfnClientPutInServer)(pEntity);
 #endif /* USE_METAMOD */
@@ -1105,7 +1106,7 @@ void ClientCommand( edict_t *pEntity )
 	}
 	
 #ifdef USE_METAMOD
-	RETURN_META(MRES_HANDLED);
+	RETURN_META(MRES_IGNORED);
 #else /* not USE_METAMOD */
 	(*other_gFunctionTable.pfnClientCommand)(pEntity);
 #endif /* USE_METAMOD */
@@ -2088,7 +2089,7 @@ void StartFrame( void )
    }*/
    
 #ifdef USE_METAMOD
-   RETURN_META(MRES_HANDLED);
+   RETURN_META(MRES_IGNORED);
 #else /* not USE_METAMOD */
    (*other_gFunctionTable.pfnStartFrame)();
 #endif /* USE_METAMOD */
