@@ -21,44 +21,26 @@
 #ifndef __CBOTBASE_H
 #define __CBOTBASE_H
 
-#include "bot_globaldefs.h"
-
 #include "extdll.h"
-#include "util.h"
-#include "cbase.h"
-#include "weaponinfo.h"
-#include "limits.h"
 
+#include "bot_globaldefs.h"
+#include "bot_weapons.h"
 #include "waypoint.h"
-//#include "util.h"
 
-//#include "ChatHost.h"
 #include "ChatBot.h"
-
-#include "bot_func.h"
-#include "NeuralNet.h"
-#include "som.h"
-#include "NNWeapon.h"
-#include "CRadio.h"
-#include "CSkill.h"
-#include "CSTMem.h"
 #include "CLTMem.h"
-#include "CState.h"
-#include "CTask.h"
 #include "CPersonality.h"
-#include "bot_names.h"
-#include "bot_wpdir.h"
-#include "CSDecals.h"
-#include "Commandfunc.h"
+#include "CRadio.h"
+#include "CState.h"
+#include "CSTMem.h"
+#include "CTask.h"
 
-#include "Gnome.h"
-#include "WorldGnome.h"
-
-#include "globalvars.h"
+#include "BotNNDefs.h"
+#include "NeuralNetDefs.h"
 
 // stuff for Win32 vs. Linux builds
 
-#ifndef __linux__
+#ifdef _WIN32
 
 typedef int (FAR *GETENTITYAPI)(DLL_FUNCTIONS *, int);
 typedef int (FAR *GETNEWDLLFUNCTIONS)(NEW_DLL_FUNCTIONS *, int *);
@@ -84,7 +66,6 @@ char *GET_INFOBUFFER( edict_t *e );
 char *GET_INFO_KEY_VALUE( char *infobuffer, char *key );
 void SET_CLIENT_KEY_VALUE( int clientIndex, char *infobuffer,char *key, char *value );
 
-void FakeClientCommand(edict_t *pBot, char *arg1, char *arg2, char *arg3);
 //edict_t *GetNearestPlayer(edict_t *pEdict,int iTeam,float &fMin,bool bVisible=false,bool bIVC=false);
 
 #define _PAUSE_TIME 1.0
@@ -503,4 +484,4 @@ enum RadioCommands{
 	RADIO_MAX_ITEM
 };
 
-#endif  __CBOTBASE_H
+#endif // __CBOTBASE_H
