@@ -38,6 +38,10 @@
 #include "cbase.h"
 #include "entity_state.h"
 
+#ifdef _WIN32
+#include <time.h>
+#endif
+
 #ifdef USE_METAMOD
 //#define SDK_UTIL_H  // util.h already included
 #include "meta_api.h"

@@ -22,7 +22,7 @@
 #ifndef __NAMES_H
 #define __NAMES_H
 
-#include <list.h>
+#include <list>
 
 #include "CParser.h"
 

@@ -35,6 +35,7 @@
 
 #ifdef _WIN32
 #include <io.h>
+#include <time.h>
 #endif
 #include <fcntl.h>
 #include <sys/stat.h>
