@@ -46,7 +46,7 @@ CLTMem :: ~CLTMem(){
 }
 
 int CLTMem :: Add(long lEvent,edict_t *pEdict,Vector &VAdd,Vector &VAdd2){
-	//FakeClientCommand(pEdict,"say ---");
+	//DEBUG_CLIENTCOMMAND(pEdict,"say ---");
 
 	FMItem[iCount].bUsed = true;
 	FMItem[iCount].fTime = gpGlobals->time;
