@@ -64,6 +64,41 @@ GIVEFNPTRSTODLL other_GiveFnptrsToDll = NULL;
 
 extern int mod_id;
 
+// Adapted from metamod game_support.cpp
+typedef struct game_modinfo_s {
+	char *name;		// name (the game dir)
+	char *linux_so;	// filename of linux shared lib
+	char *win_dll;	// filename of win32 dll
+	char *desc;		// our long-name description
+	int mod_id;		// mod ID
+} game_modinfo_t;
+
+typedef game_modinfo_t game_modlist_t[];
+
+game_modlist_t known_games = {
+	{"valve",	"hl_i386.so",	"hl.dll",	"Half-Life Deathmatch", VALVE_DLL},
+	{"tfc",	"tfc_i386.so",	"tfc.dll",	"Team Fortress Classic", TFC_DLL},
+	{"cstrike",	"cs_i386.so",	"mp.dll",	"Counter-Strike", CSTRIKE_DLL},
+	{"retrocs",	"rcs_i386.so",	"rcs.dll",	"Retro Counter-Strike", CSTRIKE_DLL},
+	{"csclassic",	"cs_i386.so",	"mp.dll",	"Counter-Strike", CSCLASSIC_DLL},
+	{"gearbox",	"opfor_i386.so",	"opfor.dll",	"Opposing Force", GEARBOX_DLL},
+	{"dod",	"dod_i386.so",	"dod.dll",	"Day of Defeat", DOD_DLL},
+	{"frontline",	"front_i386.so",	"frontline.dll",	"Frontline Force", FRONTLINE_DLL},
+	{NULL, NULL, NULL, NULL}
+};
+
+// Find a modinfo corresponding to the given game name.
+game_modinfo_t *lookup_game(const char *name) {
+	game_modinfo_t *imod;
+	int i;
+	for(i=0; known_games[i].name; i++) {
+		imod=&known_games[i];
+		if(FStrEq(imod->name, name))
+			return(imod);
+	}
+	// no match found
+	return(NULL);
+}
 
 #ifdef _WIN32
 
@@ -104,141 +139,57 @@ extern "C" void DLLEXPORT GiveFnptrsToDll( enginefuncs_t* pengfuncsFromEngine, g
 extern "C" DLLEXPORT void GiveFnptrsToDll( enginefuncs_t* pengfuncsFromEngine, globalvars_t *pGlobals )
 #endif
 {
-   int pos;
    char game_dir[256];
-   char mod_name[32];
-   char game_dll_filename[256];
+   char game_name[32];
+   char game_dll[256];
 
    // get the engine functions from the engine...
-
    memcpy(&g_engfuncs, pengfuncsFromEngine, sizeof(enginefuncs_t));
    gpGlobals = pGlobals;
-   
-   // find the directory name of the currently running MOD...
-   (*g_engfuncs.pfnGetGameDir)(game_dir);
    
    // check if we're running under Steam
    struct stat buf;
    if (stat("valve/steam.inf", &buf) == 0)
 	   g_bIsSteam = true;
 
-   pos = 0;
+   // find the directory name of the currently running MOD...
+   GET_GAME_DIR(game_dir);
+   UTIL_normalize_pathname(game_dir);
+   char *cp = game_dir;
    
-   // copied from botman's board ( well, just one line, but giving credits is something you gotta do :D )
-   if (strstr(game_dir, "/") != NULL){
-	   pos = strlen(game_dir) - 1;
-	   
-	   // scan backwards till first directory separator...
-	   while ((pos) && (game_dir[pos] != '/'))
-		   pos--;
-	   
-	   if (pos == 0)
-	   {
-		   // Error getting directory name!
-		   ALERT( at_error, "[JOEBOT] Error determining MOD directory name!\n" );
-	   }
-	   pos++;
-   }
-   strcpy(mod_name, &game_dir[pos]);
+   if (strstr(game_dir, "/") != NULL)
+	   cp = strrchr(game_dir, '/') + 1;
 
-   game_dll_filename[0] = 0;
+   if (!strlen(cp))
+   {
+      // Error getting directory name!
+      ALERT( at_error, "[JOEBOT] Error determining MOD directory name!\n" );
+	  return;
+   }
+   strcpy(game_name, cp);
+   game_modinfo_t *known = lookup_game(game_name);
 
-   if (FStrEq(mod_name, "valve"))
+   if (known)
    {
-      mod_id = VALVE_DLL;
+      mod_id = known->mod_id;
+	  strcpy(mod_name, game_name);
 #ifdef _WIN32
-      strcpy(game_dll_filename, "valve\\dlls\\hl.dll");
+      snprintf(game_dll, sizeof(game_dll), "%s/dlls/%s", known->name, known->win_dll);
+      h_Library = LoadLibrary(game_dll);
+      h_global_argv = GlobalAlloc(GMEM_SHARE, 1024);
+      g_argv = (char *)GlobalLock(h_global_argv);
 #else
-      strcpy(game_dll_filename, "valve/dlls/hl_i386.so");
-#endif
-   }
-   else if (FStrEq(mod_name, "tfc"))
-   {
-      mod_id = TFC_DLL;
-#ifdef _WIN32
-      strcpy(game_dll_filename, "tfc\\dlls\\tfc.dll");
-#else
-      strcpy(game_dll_filename, "tfc/dlls/tfc_i386.so");
-#endif
-   }
-   else if (FStrEq(mod_name, "cstrike"))
-   {
-      mod_id = CSTRIKE_DLL;
-#ifdef _WIN32
-      strcpy(game_dll_filename, "cstrike\\dlls\\mp.dll");
-#else
-      strcpy(game_dll_filename, "cstrike/dlls/cs_i386.so");
-#endif
-   }
-   else if (FStrEq(mod_name, "retrocs"))
-   {
-      mod_id = CSTRIKE_DLL;
-#ifdef _WIN32
-      strcpy(game_dll_filename, "retrocs\\dlls\\mp.dll");
-#else
-      strcpy(game_dll_filename, "retrocs/dlls/cs_i386.so");
-#endif
-   }
-   else if (FStrEq(mod_name, "csclassic"))
-   {
-      mod_id = CSCLASSIC_DLL;
-#ifdef _WIN32
-      strcpy(game_dll_filename, "csclassic\\dlls\\mp.dll");
-#else
-      strcpy(game_dll_filename, "csclassic/dlls/cs_i386.so");
-#endif
-   }
-   else if (FStrEq(mod_name, "gearbox"))
-   {
-      mod_id = GEARBOX_DLL;
-#ifdef _WIN32
-      strcpy(game_dll_filename, "gearbox\\dlls\\opfor.dll");
-#else
-      strcpy(game_dll_filename, "gearbox/dlls/opfor_i386.so");
-#endif
-   }
-   else if (FStrEq(mod_name, "dod"))
-   {
-      mod_id = DOD_DLL;
-#ifdef _WIN32
-      strcpy(game_dll_filename, "dod\\dlls\\dod.dll");
-#else
-      strcpy(game_dll_filename, "dod/dlls/dod_i386.so");
-#endif
-   }
-   else if (FStrEq(mod_name, "frontline"))
-   {
-      mod_id = FRONTLINE_DLL;
-#ifdef _WIN32
-      strcpy(game_dll_filename, "frontline\\dlls\\frontline.dll");
-#else
-      strcpy(game_dll_filename, "frontline/dlls/front_i386.so");
-#endif
-   }
-
-   if (game_dll_filename[0])
-   {
-#ifdef _WIN32
-      h_Library = LoadLibrary(game_dll_filename);
-#else
-      h_Library = dlopen(game_dll_filename, RTLD_NOW);
+      snprintf(game_dll, sizeof(game_dll), "%s/dlls/%s", known->name, known->linux_so);
+      h_Library = dlopen(game_dll, RTLD_NOW);
+      g_argv = (char *)h_global_argv;
 #endif
    }
    else
    {
       // Directory error or Unsupported MOD!
-
-		ALERT( at_error, "[JOEBOT] MOD dll not found (or unsupported MOD)!\n" );
-
+      ALERT( at_error, "[JOEBOT] MOD dll not found (or unsupported MOD)!\n" );
       return;
    }
-
-#ifdef _WIN32
-   h_global_argv = GlobalAlloc(GMEM_SHARE, 1024);
-   g_argv = (char *)GlobalLock(h_global_argv);
-#else
-   g_argv = (char *)h_global_argv;
-#endif
 
 #ifndef USE_METAMOD
    other_GetEntityAPI = (GETENTITYAPI)GetProcAddress(h_Library, "GetEntityAPI");
@@ -270,7 +221,7 @@ extern "C" DLLEXPORT void GiveFnptrsToDll( enginefuncs_t* pengfuncsFromEngine, g
 
 
 #ifdef _WIN32
-   LoadSymbols(game_dll_filename);  // Load exported symbol table
+   LoadSymbols(game_dll);  // Load exported symbol table
 #endif
 
    pengfuncsFromEngine->pfnPrecacheModel = pfnPrecacheModel;
