@@ -18,9 +18,18 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 ******************************************************************************/
-#include "CBotBase.h"
+#include <iostream.h>
+#include <stdio.h>
+#include <string.h>
+
+#include "extdll.h"
+#include "util.h"
+
 #include "CSDecals.h"
-#include "string.h"
+
+#include "bot_modid.h"
+#include "bot_globaldefs.h"
+#include "globalvars.h"
 
 CSDecals :: CSDecals (){
 	Init();
@@ -68,14 +77,14 @@ void CSDecals :: Load(void){
 	FILE *fhd;
 	
 	if(mod_id == CSTRIKE_DLL){
-#ifndef __linux__
+#ifdef _WIN32
 		strcpy(szFileName, "cstrike\\joebot\\");
 #else
 		strcpy(szFileName, "cstrike/joebot/");
 #endif
 	}
 	else if(mod_id == DOD_DLL){
-#ifndef __linux__
+#ifdef _WIN32
 		strcpy(szFileName, "dod\\joebot\\");
 #else
 		strcpy(szFileName, "dod/joebot/");

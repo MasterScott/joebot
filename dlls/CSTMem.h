@@ -21,7 +21,9 @@
 #ifndef __STMEM_H
 #define __STMEM_H
 
-#include "basemem.h"
+#include "extdll.h"
+
+#include "waypoint.h"
 
 // func def in bot.h therefore just cpied it
 bool IsAlive(edict_t *pEdict);
@@ -74,4 +76,4 @@ protected:
 private:
 };
 
-#endif __STMEM_H
+#endif //__STMEM_H
