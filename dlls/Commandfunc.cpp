@@ -667,7 +667,7 @@ bool bc_kickbot(edict_t *pEntity,int iType,const char *arg1,const char *arg2,con
 }
 
 bool bc_leetposs(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
-	int leetposs = atof(arg1);
+	float leetposs = atof(arg1);
 	CVAR_SET_FLOAT("jb_chat1337", leetposs);
 	sprintf(szTemp,"JoeBOT: possibility for leet is @ %f\nJoeBOT: note that this has only an effect for bots which will be added later.\n",leetposs);
 	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
@@ -935,7 +935,7 @@ bool bc_botskill(edict_t *pEntity,int iType,const char *arg1,const char *arg2,co
 					if(strstr(arg1,STRING(bots[i]->pEdict->v.netname))){
 						float f_AMomentum = atof (arg2);
 						if(f_AMomentum >= 0 && f_AMomentum <= 100){
-							bots[i]->bot_skill = f_AMomentum;
+							bots[i]->bot_skill = int(f_AMomentum);
 							bots[i]->UpdateSkill();
 							sprintf(szTemp,"Skill set to %.0f for %s\n",f_AMomentum,STRING(bots[i]->pEdict->v.netname));
 							ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
