@@ -21,18 +21,7 @@
 #ifndef __BOT_WPStat_H
 #define __BOT_WPStat_H
 
-#include "extdll.h"
-#include "util.h"
-#include "cbase.h"
-#include "weaponinfo.h"
-#include "limits.h"
-
-//#include "bot.h"
-//#include "CBotCS.h"
-//#include "CBotDOD.h"
 #include "waypoint.h"
-
-// #defines
 
 // define search stuff
 
@@ -122,4 +111,4 @@ protected:
 private:
 };
 
-#endif  __BOT_WPStat_H
+#endif  //__BOT_WPStat_H
