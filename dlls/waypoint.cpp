@@ -3463,7 +3463,6 @@ void WaypointFloyds(unsigned short *shortest_path, unsigned short *from_to)
 bool WaypointGetDir(char *szFile,char *szDest){
 	char szBaseDir[200],szDir[200],szFilename[200];
 	int iDir = 0;
-	FILE *fhd;
 	*szDest=0;
 	
 	UTIL_BuildFileName(szBaseDir, sizeof(szBaseDir), "joebot/wpjs");
