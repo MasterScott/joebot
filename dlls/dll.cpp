@@ -899,10 +899,10 @@ FILL_FULL
 			if(!strncmp(STRING(pEnt->v.classname),"player",6)){
 				char *infobuffer; 
 				char cl_name[128]; 
-				cl_name[0]=NULL; 
+				cl_name[0]='\0'; 
 				infobuffer = (*g_engfuncs.pfnGetInfoKeyBuffer)(pEnt); 
 				strcpy(cl_name,g_engfuncs.pfnInfoKeyValue(infobuffer, "name")); 
-				if(cl_name[0]!=NULL) 
+				if(cl_name[0]!='\0') 
 				{ 
 					iPAll ++;
 					if(UTIL_GetTeam(pEnt) == 0){
