@@ -23,7 +23,14 @@
 // Johannes.Lampel@gmx.de
 // http://joebot.counter-strike.de
 
+#include "extdll.h"
+#include "util.h"
+
 #include "CBotCS.h"
+
+#include "bot.h"
+#include "bot_wpstat.h"
+#include "globalvars.h"
 
 float g_fmin_std_swp = 10;
 float g_fmax_std_swp = 30;
@@ -42,15 +49,15 @@ bool CBotCS :: GoToSpEnt( void ){
 	}
 	f_CheckSpEnt = gpGlobals->time + 1.0;
 	if(bot_vip){
-		//FakeClientCommand(pEdict,"say","i'm a vip",0);
+		//FakeClientCommand(pEdict,"say i'm a vip");
 		return breturn;
 	}
 	if(Task.current&&Task.current->lType&BT_IGNOREENEMY){
-		//FakeClientCommand(pEdict,"say","ignorenemy is there",0);
+		//FakeClientCommand(pEdict,"say ignorenemy is there");
 		return breturn;
 	}
 	if(f_LastFight > gpGlobals->time - 1){
-		//FakeClientCommand(pEdict,"say","last fight is too near",0);
+		//FakeClientCommand(pEdict,"say last fight is too near");
 		return breturn;
 	}
 	
@@ -104,8 +111,7 @@ bool CBotCS :: HeadTowardSpEnt(void){
 			//fDistance = Vector(pEnt->v.origin - pEdict->v.origin).Length();
 			if(fDistance < 1500
 				&& FVisible(gFlash[lNumF].VOrigin,pEdict)){
-				if(Task.current
-					&& ((Task.current->lType&(BT_HIDE|BT_LOCKED))!=(BT_HIDE|BT_LOCKED))){
+				if(Task.current&&Task.current->lType&(BT_HIDE|BT_LOCKED)!=(BT_HIDE|BT_LOCKED)){
 					// it's near and visible
 					
 					Vector v_diff = pEdict->v.origin - gFlash[lNumF].VOrigin;
@@ -117,7 +123,7 @@ bool CBotCS :: HeadTowardSpEnt(void){
 					FixIdealYaw();
 					FixIdealPitch();
 #ifdef DEBUGMESSAGES
-					FakeClientCommand(pEdict,"say","head away",0);
+					FakeClientCommand(pEdict,"say head away");
 #endif
 					return true;
 				}
@@ -136,7 +142,7 @@ bool CBotCS :: HeadTowardSpEnt(void){
 		fDistance = Vector(pEnt->v.origin - pEdict->v.origin).Length2D();
 		strcpy( szClassname , STRING(pEnt->v.classname) );
 
-		if (!strcmp(szClassname,"hostage_entity")){		// hostages
+		if (FStrEq(szClassname,"hostage_entity")){		// hostages
 			if(bot_teamnm == CT){
 				if(fPDistance > 300						// don't 'steal' hostages
 					&& GetHosVel(pEnt) < 1.f
@@ -148,7 +154,7 @@ bool CBotCS :: HeadTowardSpEnt(void){
 						continue;
 					}
 					if(f_gotohostage + 10.0f < gpGlobals->time){	// new try to get hostage
-						//FakeClientCommand(pEdict,"say_team","got hostage",0);
+						//FakeClientCommand(pEdict,"say_team got hostage");
 						if(bot_teamnm==CT)UTIL_HostSay(pEdict,1,"got hostage");
 						f_gotohostage = gpGlobals->time;
 					}
@@ -201,7 +207,7 @@ bool CBotCS :: HeadTowardSpEnt(void){
 		else if(!strncmp(szClassname,"weapon_",iWSL)){
 			if(!(Action.lAction&BA_DEFUSE)){
 				if(pEnt->v.owner){
-					if(!strcmp(STRING(pEnt->v.owner->v.classname),"weaponbox")
+					if(FStrEq(STRING(pEnt->v.owner->v.classname),"weaponbox")
 						&& FVisible(pEnt->v.owner->v.origin,pEdict)){
 						fRDistance = (pEnt->v.owner->v.origin - pEdict->v.origin).Length();
 						
@@ -256,7 +262,7 @@ bool CBotCS :: HeadTowardSpEnt(void){
 												if(fRDistance < 70.0){
 													if( (IsPrimaryWeapon(1<<lWeaponID) && HasPrimary() == current_weapon.iId)
 														||(IsSecondaryWeapon(1<<lWeaponID) && HasSecondary() == current_weapon.iId)){
-														FakeClientCommand(pEdict,"drop","","");
+														FakeClientCommand(pEdict,"drop");
 														Action.lAction &=~BA_PICKUP;
 													}
 												}
@@ -271,9 +277,9 @@ bool CBotCS :: HeadTowardSpEnt(void){
 				}
 			}
 		}
-		else if(!strcmp(szClassname,"grenade")){
+		else if(FStrEq(szClassname,"grenade")){
 			if(bot_teamnm == CT){
-				if(!strcmp(STRING(pEnt->v.model),"models/w_c4.mdl")){	// only planted c4
+				if(FStrEq(STRING(pEnt->v.model),"models/w_c4.mdl")){	// only planted c4
 					// is the origin of player 45 units above the ground ??
 					//fRDistance = Vector(pEnt->v.origin - (pEdict->v.origin - Vector(0,0,45))).Length();
 					fRDistance = fDistance;
@@ -324,13 +330,13 @@ bool CBotCS :: HeadTowardSpEnt(void){
 				}
 			}
 		}
-		else if(!strcmp(szClassname,"item_thighpack")){
+		else if(FStrEq(szClassname,"item_thighpack")){
 			if(bot_teamnm == CT
 				&& !(Action.lAction & BA_DEFKIT)){
 				Goto(pEnt->v.origin);
 			}
 		}
-		else if (!strcmp(szClassname,"func_button") )
+		else if (FStrEq(szClassname,"func_button") )
 		{
 			//if(Action.lAction & BA_GOBUTTON && pEnt==pButton2Use){
 			if(Task.current){
@@ -341,7 +347,7 @@ bool CBotCS :: HeadTowardSpEnt(void){
 					
 					TraceResult tr;
 					UTIL_TraceLine(pEdict->v.origin+pEdict->v.view_ofs,entity_origin,dont_ignore_monsters,ignore_glass,pEdict,&tr);
-					if(strcmp(STRING(tr.pHit->v.classname),"func_button")){
+					if(!FStrEq(STRING(tr.pHit->v.classname),"func_button")){
 						continue;
 					}
 					
@@ -369,45 +375,47 @@ bool CBotCS :: HeadTowardSpEnt(void){
 				}
 			}
 		}
-		else if(!strcmp(szClassname,"armory_entity")){
+		else if(FStrEq(szClassname,"armory_entity")){
 			//cout << "-";
-			if(!strcmpi("models/w_hegrenade.mdl",STRING(pEnt->v.model))
+			if(FStrEq("models/w_hegrenade.mdl",STRING(pEnt->v.model))
 				&& !(bot_weapons & (1<<CS_WEAPON_HEGRENADE))){
 				Goto(pEnt->v.origin);
 				return true;
 			}
-			else if(!strcmpi("models/w_flashbang.mdl",STRING(pEnt->v.model))
+			else if(FStrEq("models/w_flashbang.mdl",STRING(pEnt->v.model))
 				&& !(bot_weapons & (1<<CS_WEAPON_FLASHBANG))){
 				Goto(pEnt->v.origin);
 				return true;
 			}
-			else if(!strcmpi("models/w_smokegrenade.mdl",STRING(pEnt->v.model))
+			else if(FStrEq("models/w_smokegrenade.mdl",STRING(pEnt->v.model))
 				&& !(bot_weapons & (1<<CS_WEAPON_SMOKEGRENADE))){
 				Goto(pEnt->v.origin);
 				return true;
 			}
-			else if(!strcmpi("models/w_kevlar.mdl",STRING(pEnt->v.model))
+			else if(FStrEq("models/w_kevlar.mdl",STRING(pEnt->v.model))
 				&& bot_armor < 80){
 				Goto(pEnt->v.origin);
 				return true;
 			}
 			else if(!HasPrimary()){
-				if(!strcmpi("models/w_mp5navy.mdl",STRING(pEnt->v.model))
-					|| !strcmpi("models/w_tmp.mdl",STRING(pEnt->v.model))
-					|| !strcmpi("models/w_p90.mdl",STRING(pEnt->v.model))
-					|| !strcmpi("models/w_mac10.mdl",STRING(pEnt->v.model))
-					|| !strcmpi("models/w_ump45.mdl",STRING(pEnt->v.model))
-					|| !strcmpi("models/w_xm1014.mdl",STRING(pEnt->v.model))
-					|| !strcmpi("models/w_m3.mdl",STRING(pEnt->v.model))
-					|| !strcmpi("models/w_ak47.mdl",STRING(pEnt->v.model))
-					|| !strcmpi("models/w_sg552.mdl",STRING(pEnt->v.model))
-					|| !strcmpi("models/w_m4a1.mdl",STRING(pEnt->v.model))
-					|| !strcmpi("models/w_aug.mdl",STRING(pEnt->v.model))
-					|| !strcmpi("models/w_scout.mdl",STRING(pEnt->v.model))
-					|| !strcmpi("models/w_awp.mdl",STRING(pEnt->v.model))
-					|| !strcmpi("models/w_g3sg1.mdl",STRING(pEnt->v.model))
-					|| !strcmpi("models/w_sg550.mdl",STRING(pEnt->v.model))
-					|| !strcmpi("models/w_m249.mdl",STRING(pEnt->v.model))){
+				if(FStrEq("models/w_mp5navy.mdl",STRING(pEnt->v.model))
+					|| FStrEq("models/w_tmp.mdl",STRING(pEnt->v.model))
+					|| FStrEq("models/w_p90.mdl",STRING(pEnt->v.model))
+					|| FStrEq("models/w_mac10.mdl",STRING(pEnt->v.model))
+					|| FStrEq("models/w_ump45.mdl",STRING(pEnt->v.model))
+					|| FStrEq("models/w_xm1014.mdl",STRING(pEnt->v.model))
+					|| FStrEq("models/w_m3.mdl",STRING(pEnt->v.model))
+					|| FStrEq("models/w_ak47.mdl",STRING(pEnt->v.model))
+					|| FStrEq("models/w_sg552.mdl",STRING(pEnt->v.model))
+					|| FStrEq("models/w_m4a1.mdl",STRING(pEnt->v.model))
+					|| FStrEq("models/w_aug.mdl",STRING(pEnt->v.model))
+					|| FStrEq("models/w_scout.mdl",STRING(pEnt->v.model))
+					|| FStrEq("models/w_awp.mdl",STRING(pEnt->v.model))
+					|| FStrEq("models/w_g3sg1.mdl",STRING(pEnt->v.model))
+					|| FStrEq("models/w_sg550.mdl",STRING(pEnt->v.model))
+					|| FStrEq("models/w_m249.mdl",STRING(pEnt->v.model))
+					|| FStrEq("models/w_galil.mdl",STRING(pEnt->v.model))
+					|| FStrEq("models/w_famas.mdl",STRING(pEnt->v.model))){
 					Goto(pEnt->v.origin);
 					return true;
 				}
@@ -436,7 +444,7 @@ bool CBotCS :: DistanceSight(void){
 		
 		if(!strncmp(szClassname,"weapon_",strlen("weapon_"))){
 			if(pEnt->v.owner){
-				if(!strcmp(STRING(pEnt->v.owner->v.classname),"weaponbox")
+				if(FStrEq(STRING(pEnt->v.owner->v.classname),"weaponbox")
 					&& FVisible(pEnt->v.owner->v.origin+Vector(0,0,20),pEdict)){
 					fRDistance = (pEnt->v.owner->v.origin - pEdict->v.origin).Length();
 					
@@ -508,7 +516,7 @@ bool CBotCS :: DistanceSight(void){
 				}
 			}
 		}
-		else if (!strcmp(szClassname,"hostage_entity")){		// hostages
+		else if (FStrEq(szClassname,"hostage_entity")){		// hostages
 			if(bot_teamnm == CT){
 				if(fDistance > 400 &&						// don't 'steal' hostages
 					fPDistance > 400 &&
@@ -531,7 +539,7 @@ bool CBotCS :: DistanceSight(void){
 			else{
 			}
 		}
-		/*else if(!strcmp(szClassname,"item_thighpack")){
+		/*else if(FStrEq(szClassname,"item_thighpack")){
 		if(bot_teamnm == CT
 		&& FVisible(pEnt->v.origin,pEdict)
 		&& !(Action.lAction & BA_DEFKIT)){
@@ -544,9 +552,9 @@ bool CBotCS :: DistanceSight(void){
 		}
 		}
 		}*/
-		else if(!strcmp(szClassname,"grenade")){
+		else if(FStrEq(szClassname,"grenade")){
 			if(bot_teamnm == CT){
-				if(strcmp(STRING(pEnt->v.model),"models/w_c4.mdl") == 0){	// only planted c4
+				if(FStrEq(STRING(pEnt->v.model),"models/w_c4.mdl")){	// only planted c4
 					fDistance = Vector(pEnt->v.origin - pEdict->v.origin).Length2D();
 					
 					// is the origin of player 45 units above the ground ??
@@ -612,7 +620,7 @@ bool CBotCS :: Bored(void){
 
 					if(/*FVisible(entity_origin,pEdict)*/1){
 						if(tr.flFraction == 1.0f
-							||!strcmp(STRING(tr.pHit->v.classname),"func_breakable")){
+							||FStrEq(STRING(tr.pHit->v.classname),"func_breakable")){
 							// aim
 							Vector v_enemy = entity_origin - GetGunPosition(pEdict);
 							
@@ -637,7 +645,7 @@ bool CBotCS :: Bored(void){
 							Vector VAim=entity_origin-pEdict->v.origin;
 							FireWeapon(VAim);
 							//BotFireWeapon(entity_origin,pBot);
-							//FakeClientCommand(pEdict,"say","bored",0);
+							//FakeClientCommand(pEdict,"say bored");
 							return true;
 						}
 					}
@@ -664,9 +672,10 @@ bool CBotCS :: Bored(void){
 					//cout << szDecal << endl;
 					long idndex = (*g_engfuncs.pfnDecalIndex)(szDecal);
 					
-					if(idndex != -1)
-						if(UTIL_PlayerDecalTrace(&tr,ENTINDEX(pEdict),idndex,true))
-							(*g_engfuncs.pfnEmitSound)(pEdict,CHAN_VOICE,"player/sprayer.wav",1,ATTN_NORM,0,100);
+					if(idndex != -1 && tr.flFraction != 1.0){
+						UTIL_PlayerDecalTrace(&tr,ENTINDEX(pEdict),idndex,true);
+						(*g_engfuncs.pfnEmitSound)(pEdict,CHAN_VOICE,"player/sprayer.wav",1,ATTN_NORM,0,100);
+					}
 				}
 			}
 			
@@ -719,7 +728,7 @@ bool CBotCS :: HandleNearWP(int iNearWP, bool &bReturn){
 							f_Pause = gpGlobals->time + 3.0f;
 							f_move_speed = 0;
 							f_dont_check_stuck= gpGlobals->time + 1.0;
-							//FakeClientCommand(pEdict,"say_team","planting bomb",0);
+							//FakeClientCommand(pEdict,"say_team planting bomb");
 							//UTIL_HostSay(pEdict,1,"planting bomb");
 							bReturn = true;
 							return true;
@@ -745,7 +754,7 @@ bool CBotCS :: HandleNearWP(int iNearWP, bool &bReturn){
 						bool bBomb  = false;
 						edict_t *pEnt=0;
 						/*while(pEnt=UTIL_FindEntityInSphere(pEnt,pEdict->v.origin,500)){
-							if(!strcmp(STRING(pEnt->v.classname),"grenade")){
+							if(FStrEq(STRING(pEnt->v.classname),"grenade")){
 								bBomb = true;
 								break;
 							}
@@ -812,7 +821,7 @@ bool CBotCS :: HeadTowardWaypoint( void ){
 	
 	// to have some time without going to WPs
 	if(f_noWP > gpGlobals->time){
-		//FakeClientCommand(pEdict,"say","not using wp",0);
+		//FakeClientCommand(pEdict,"say not using wp");
 		return false;
 	}
 	
@@ -885,8 +894,7 @@ bool CBotCS :: HeadTowardWaypoint( void ){
 						if(f_noCamp < gpGlobals->time){
 							//cout << "reached campatgoal" << endl;
 							Task.AddTask(BT_CAMP,fDuration,0,0,0);
-							//sprintf(szTemp,"%f",Task.current->fAdd);
-							//FakeClientCommand(pEdict,"say",szTemp,0);
+							//FakeClientCommand(pEdict,"say %f",Task.current->fAdd);
 							//InitCamp();
 							if(g_bUseRadio && Task.current->p){
 								SendRadioCommand(RADIO_IM_IN_POSITION);
@@ -926,8 +934,7 @@ bool CBotCS :: HeadTowardWaypoint( void ){
 				if(fCDistance < 50){
 					//lNextWP = IsInWay(FW_Cur,i_CurrWP);		// look where this near wp is in the calced way
 					
-					//sprintf(szTemp,"%f",fCDistance-f_D2C);
-					//FakeClientCommand(pEdict,"say",szTemp,0);
+					//FakeClientCommand(pEdict,"say %f",fCDistance-f_D2C);
 					iNextWP = GoNextWPOnPath();
 					
 					if(waypoints[iNearWP].flags & W_FL_JUMP && !bReplay){
@@ -964,8 +971,7 @@ bool CBotCS :: HeadTowardWaypoint( void ){
 								}
 								fStartADVM += pWPAMPlay->Rec[iMin].fTime;
 #ifdef DEBUGMESSAGES
-								sprintf(szTemp,"%f",pWPAMPlay->Rec[iMin].fTime);
-								FakeClientCommand(pEdict,"say",szTemp,0);
+								FakeClientCommand(pEdict,"say %f",pWPAMPlay->Rec[iMin].fTime);
 #endif
 							}
 							else{
@@ -974,7 +980,7 @@ bool CBotCS :: HeadTowardWaypoint( void ){
 								f_move_speed = 0;
 								lButton &= ~IN_JUMP;
 #ifdef DEBUGMESSAGES
-								FakeClientCommand(pEdict,"say","waiting because there is already a motherfucker in the way",0);
+								FakeClientCommand(pEdict,"say waiting because there is already a motherfucker in the way");
 #endif
 								f_D2C1 = 1000;
 								return false;
@@ -989,7 +995,7 @@ bool CBotCS :: HeadTowardWaypoint( void ){
 						|| iNextWP == iNearWP
 						|| iNextWP > WAYPOINT_UNREACHABLE/2){
 #ifdef DEBUGMESSAGES
-						//FakeClientCommand(pEdict,"say","lost way",0);
+						//FakeClientCommand(pEdict,"say lost way");
 #endif
 						//cout << "unreachable" << endl;
 						ResetWPlanning();
@@ -1169,7 +1175,7 @@ bool CBotCS :: HeadTowardWaypoint( void ){
 				}
 			}
 		}
-		//FakeClientCommand(pEdict,"say","-",0);
+		//FakeClientCommand(pEdict,"say -");
 		i_CurrWP = WaypointFindNearest(pEdict,100,bot_teamnm,0,true,true,true);
 		if(i_CurrWP == -1){
 			i_CurrWP = WaypointFindNearest(pEdict,200,bot_teamnm,0,true,false,true);
@@ -1184,7 +1190,7 @@ bool CBotCS :: HeadTowardWaypoint( void ){
 		iFarGoal = iGoal = i_CurrWP;
 		VRunningTo = waypoints[i_CurrWP].origin;
 		
-		//FakeClientCommand(pEdict,"say","heading to",0);
+		//FakeClientCommand(pEdict,"say heading to");
 		//if( (pEdict->v.origin - waypoints[i_CurrWP].origin).Length() < _NEAR ){
 		//if( WaypointFindNearest(pEdict,_NEAR,bot_teamnm) != -1 ){
 		if( (waypoints[i_CurrWP].origin - pEdict->v.origin).Length() < _NEAR*2 ){
@@ -1359,7 +1365,7 @@ void CBotCS :: FindRoute(int iNearWP){
 				if(indexes[index].Way1.iNum > 3		// sackgasse ?
 					&& indexes[index].Way2.iNum > 3){
 					if(indexes[index].Way1.iIndices[indexes[index].Way1.iNum-1] == indexes[index].Way2.iIndices[1]){
-						//FakeClientCommand(pEdict,"say","going back - we don't really want that, are we ?",0);
+						//FakeClientCommand(pEdict,"say going back - we don't really want that, are we ?");
 						indexes[index].index = -1;
 					}
 				}
@@ -1454,7 +1460,7 @@ void CBotCS :: FindRoute(int iNearWP){
 			else{
 				if(i_UsedHostages){
 					iFarGoal = -1;
-					//FakeClientCommand(pEdict,"say","no way for hostages",0);
+					//FakeClientCommand(pEdict,"say no way for hostages");
 				}
 				else{
 					iGoal = iFarGoal;
@@ -1475,7 +1481,7 @@ void CBotCS :: FindRoute(int iNearWP){
 					//&&Task.SearchT(BT_GOBUTTON) == -1){
 					Task.AddTask(BT_GOTO|BT_GOBUTTON|BT_TMP,-1,iDest,pToUse,0);
 				}
-				//FakeClientCommand(pEdict,"say","wanting to go where pressing a button is needed",0);
+				//FakeClientCommand(pEdict,"say wanting to go where pressing a button is needed");
 			}
 	}
 	else{
@@ -1509,7 +1515,7 @@ void CBotCS :: FindRoute(int iNearWP){
 						//&&Task.SearchT(BT_GOBUTTON) == -1){
 						Task.AddTask(BT_GOTO|BT_GOBUTTON|BT_TMP,-1,iDest,pToUse,0);
 					}
-					//FakeClientCommand(pEdict,"say","wanting to go where pressing a button is needed",0);
+					//FakeClientCommand(pEdict,"say wanting to go where pressing a button is needed");
 				}
 			}
 			delete pWay;
@@ -1522,7 +1528,7 @@ void CBotCS :: FindRoute(int iNearWP){
 bool CBotCS :: DecideOnWay(void){
 	int iNearest = WaypointFindNearest(pEdict,300,bot_teamnm);
 	
-	//FakeClientCommand(pEdict,"say","generating new way",0);
+	//FakeClientCommand(pEdict,"say generating new way");
 	
 	iWantedDiv = 0;		// by default the are no wanted divisions
 	
@@ -1589,7 +1595,7 @@ bool CBotCS :: DecideOnWay(void){
 		}
 		
 		if (g_iTypeoM == MT_CS){		// cs
-			//FakeClientCommand(pEdict,"say","cs",0);
+			//FakeClientCommand(pEdict,"say cs");
 			if(bot_teamnm == TE){								// te
 				if(f_timesrs < 20
 					&& RANDOM_LONG(0,100) < 20
@@ -1648,7 +1654,7 @@ bool CBotCS :: DecideOnWay(void){
 				if(i_UsedHostages>0){		// bring hostages back home
 					lDestination = WaypointFindRandomGoal(pEdict->v.origin,pEdict,100000,bot_teamnm,W_FL_RESCUE);
 					iWantedDiv = 1;
-					//FakeClientCommand(pEdict,"say","cs-ct-wf",0);
+					//FakeClientCommand(pEdict,"say cs-ct-wf");
 				}
 				else if(HasSniper()			// go to sniper point, if ya've a good sniper weapon
 					&& RANDOM_LONG(0,100) < 50){
@@ -1699,7 +1705,7 @@ bool CBotCS :: DecideOnWay(void){
 			}
 		}
 		else if (g_iTypeoM == MT_DE){	// de
-			//FakeClientCommand(pEdict,"say","de",0);
+			//FakeClientCommand(pEdict,"say de");
 			if(bot_teamnm == TE){								// te
 				if(HasSniper()			// go to sniper point, if ya've a good sniper weapon
 					&& RANDOM_LONG(0,100) < 50
@@ -1724,7 +1730,12 @@ bool CBotCS :: DecideOnWay(void){
 					}
 				}
 				else if(bot_weapons & 1<<CS_WEAPON_C4					// if ya've c4 and U#ve already played some time ...
-					&& f_timesrs > 60.0f){
+					&& RANDOM_LONG(0,100) < 50){
+					lDestination = WaypointFindRandomGoal(pEdict->v.origin,pEdict,100000,bot_teamnm,W_FL_FLAG);
+					iWantedDiv = 0;
+				}
+				else if(bot_weapons & 1<<CS_WEAPON_C4					// if ya've c4 and U#ve already played some time ...
+					&&f_timesrs > 60.0f){
 					lDestination = WaypointFindNearestGoal(pEdict->v.origin,pEdict,100000,bot_teamnm,W_FL_FLAG);
 					iWantedDiv = 0;
 				}
@@ -1769,14 +1780,9 @@ bool CBotCS :: DecideOnWay(void){
 					//FindWayFlag(pEdict,W_FL_FLAG,FW_Cur,WayDecideShortest);
 					if(iNearWP == -1)
 						iNearWP = WaypointFindNearest(pEdict,5000,bot_teamnm);
-					int iCount =0;
+
 					lDestination = WaypointFindNearestGoal(pEdict->v.origin,pEdict,100000,bot_teamnm,W_FL_FLAG,400);		// todo ... IMPROVE !!!!
-					while(WaypointDistanceFromTo(iNearWP,lDestination,bot_teamnm) < 300){
-						lDestination = WaypointFindRandomGoal(pEdict->v.origin,pEdict,100000,bot_teamnm,W_FL_FLAG);
-						iCount ++;
-						if(iCount > 10)		// just to prevent hanging
-							break;
-					}
+
 					if(lDestination != -1){
 						Task.AddTask(BT_GOTO,0,lDestination,(void *) iWantedDiv,0);
 						return true;
@@ -1866,12 +1872,12 @@ bool CBotCS :: DecideOnWay(void){
 			}
 	}
 	else if(g_iTypeoM == MT_AS){
-		//if(RANDOM_LONG(0,100) < 10)FakeClientCommand(pEdict,"say","---------------",0);
+		//if(RANDOM_LONG(0,100) < 10)FakeClientCommand(pEdict,"say ---------------");
 		if(bot_teamnm == CT){
 			if(bot_vip){
 				lDestination = WaypointFindRandomGoal(pEdict->v.origin,pEdict,100000,bot_teamnm,W_FL_VIP_RESCUE);
 				iWantedDiv = 1;
-				//FakeClientCommand(pEdict,"say","vip",0);
+				//FakeClientCommand(pEdict,"say vip");
 				if(lDestination != -1){
 					Task.AddTask(BT_GOTO,0,lDestination,(void *) iWantedDiv,0);
 					return true;
@@ -1948,7 +1954,7 @@ bool CBotCS :: DecideOnWay(void){
 	}
 	}
 	
-	/*FakeClientCommand(pEdict,"say","This type of map is not yet implementated",0);
+	/*FakeClientCommand(pEdict,"say This type of map is not yet implementated");
 	ResetWPlanning();*/
 	return false;
 }
