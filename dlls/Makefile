@@ -3,30 +3,28 @@
 # ---------------------------------------------------------------------------
 include ../Config.mk
 
-# build object path
+# build object paths
+ifeq ($(OPT), debug)
+ BASE_OBJDIR = $(OBJDIR_DEBUG)
+else
+ BASE_OBJDIR = $(OBJDIR_RELEASE)
+endif
+
 ifeq ($(DLLTYPE),std)
  DLLNAME = joebot
- ifeq ($(OPT),debug)
-  OBJDIR = $(OBJDIR_DEBUG_STD)
- else
-  OBJDIR = $(OBJDIR_RELEASE_STD)
- endif
+ OBJDIR = $(BASE_OBJDIR)/std
 else
  DLLNAME = joebot_mm
- ifeq ($(OPT),debug)
-  OBJDIR = $(OBJDIR_DEBUG_MM)
- else
-  OBJDIR = $(OBJDIR_RELEASE_MM)
- endif
+ OBJDIR = $(BASE_OBJDIR)/mm
 endif
 
 # build external source list
 include ../NNSim/som/Config.mk
 SRC_SOM := $(SRC:%.cpp=../NNSim/som/%.cpp)
-OBJ_SOM := $(SRC:%.cpp=../NNSim/som/$(OBJDIR)/%.o)
+OBJ_SOM := $(SRC:%.cpp=../NNSim/som/$(BASE_OBJDIR)/%.o)
 include ../NNSim/Config.mk
 SRC_NNSIM := $(SRC:%.cpp=../NNSim/%.cpp)
-OBJ_NNSIM := $(SRC:%.cpp=../NNSim/$(OBJDIR)/%.o)
+OBJ_NNSIM := $(SRC:%.cpp=../NNSim/$(BASE_OBJDIR)/%.o)
 
 # build source list
 include Config.mk
