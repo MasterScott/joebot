@@ -98,6 +98,8 @@ private:
 };
 
 void BotBuy_CS_WEAPON_P228_T(CBotBase *pBot);
+void BotBuy_CS_WEAPON_FAMAS_T(CBotBase *pBot);
+void BotBuy_CS_WEAPON_GALIL_T(CBotBase *pBot);
 void BotBuy_CS_WEAPON_SCOUT_T(CBotBase *pBot);
 void BotBuy_CS_WEAPON_HEGRENADE_T(CBotBase *pBot);
 void BotBuy_CS_WEAPON_XM1014_T(CBotBase *pBot);
@@ -127,6 +129,8 @@ void BotBuy_CS_WEAPON_FL_T(CBotBase *pBot);
 void BotBuy_CS_WEAPON_SG_T(CBotBase *pBot);*/
 
 void BotBuy_CS_WEAPON_P228_CT(CBotBase *pBot);
+void BotBuy_CS_WEAPON_FAMAS_CT(CBotBase *pBot);
+void BotBuy_CS_WEAPON_GALIL_CT(CBotBase *pBot);
 void BotBuy_CS_WEAPON_SCOUT_CT(CBotBase *pBot);
 void BotBuy_CS_WEAPON_HEGRENADE_CT(CBotBase *pBot);
 void BotBuy_CS_WEAPON_XM1014_CT(CBotBase *pBot);
@@ -158,6 +162,10 @@ void BotBuy_CS_WEAPON_SG_CT(CBotBase *pBot);*/
 
 void BotBuy_PAmmo(CBotBase *pBot);
 void BotBuy_SAmmo(CBotBase *pBot);
+
+void BotBuy_CS_Kevlar(CBotBase *pBot);
+void BotBuy_CS_KevlarHelmet(CBotBase *pBot);
+void BotBuy_CS_DefKit(CBotBase *pBot);
 
 
 #endif  __CBOTCS_H

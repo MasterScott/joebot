@@ -41,7 +41,7 @@ void BotBuy_CS_WEAPON_P228_T(CBotBase *pBot){
 	
 	FakeClientCommand(pEdict,"buy",0,0);
 	FakeClientCommand(pEdict,"menuselect","1",0);
-	FakeClientCommand(pEdict,"menuselect","4",0);
+	FakeClientCommand(pEdict,"menuselect","3",0);
 }
 
 void BotBuy_CS_WEAPON_SCOUT_T(CBotBase *pBot){
@@ -49,7 +49,7 @@ void BotBuy_CS_WEAPON_SCOUT_T(CBotBase *pBot){
 	
 	FakeClientCommand(pEdict,"buy",0,0);
 	FakeClientCommand(pEdict,"menuselect","4",0);
-	FakeClientCommand(pEdict,"menuselect","5",0);
+	FakeClientCommand(pEdict,"menuselect","3",0);
 }
 
 void BotBuy_CS_WEAPON_HEGRENADE_T(CBotBase *pBot){
@@ -103,7 +103,7 @@ void BotBuy_CS_WEAPON_UMP45_T(CBotBase *pBot){
 	
 	FakeClientCommand(pEdict,"buy",0,0);
 	FakeClientCommand(pEdict,"menuselect","3",0);
-	FakeClientCommand(pEdict,"menuselect","5",0);
+	FakeClientCommand(pEdict,"menuselect","3",0);
 }
 
 void BotBuy_CS_WEAPON_SG550_T(CBotBase *pBot){
@@ -131,7 +131,7 @@ void BotBuy_CS_WEAPON_AWP_T(CBotBase *pBot){
 	
 	FakeClientCommand(pEdict,"buy",0,0);
 	FakeClientCommand(pEdict,"menuselect","4",0);
-	FakeClientCommand(pEdict,"menuselect","6",0);
+	FakeClientCommand(pEdict,"menuselect","5",0);
 }
 
 void BotBuy_CS_WEAPON_MP5NAVY_T(CBotBase *pBot){
@@ -139,7 +139,7 @@ void BotBuy_CS_WEAPON_MP5NAVY_T(CBotBase *pBot){
 	
 	FakeClientCommand(pEdict,"buy",0,0);
 	FakeClientCommand(pEdict,"menuselect","3",0);
-	FakeClientCommand(pEdict,"menuselect","1",0);
+	FakeClientCommand(pEdict,"menuselect","2",0);
 }
 
 void BotBuy_CS_WEAPON_M249_T(CBotBase *pBot){
@@ -159,11 +159,15 @@ void BotBuy_CS_WEAPON_M3_T(CBotBase *pBot){
 }
 
 void BotBuy_CS_WEAPON_M4A1_T(CBotBase *pBot){
-	return; // it's simply not possible to buy a m4a1 aug as terrorist
+	return; // it's simply not possible to buy a m4a1 m4a1 as terrorist
 }
 
 void BotBuy_CS_WEAPON_TMP_T(CBotBase *pBot){
 	return; // it's simply not possible to buy a tmp as terrorist
+}
+
+void BotBuy_CS_WEAPON_FAMAS_T(CBotBase *pBot){
+	return; // it's not possible for a terrorist to buy a famas
 }
 
 void BotBuy_CS_WEAPON_G3SG1_T(CBotBase *pBot){
@@ -186,7 +190,7 @@ void BotBuy_CS_WEAPON_DEAGLE_T(CBotBase *pBot){
 	
 	FakeClientCommand(pEdict,"buy",0,0);
 	FakeClientCommand(pEdict,"menuselect","1",0);
-	FakeClientCommand(pEdict,"menuselect","3",0);
+	FakeClientCommand(pEdict,"menuselect","4",0);
 }
 
 void BotBuy_CS_WEAPON_SG552_T(CBotBase *pBot){
@@ -194,7 +198,7 @@ void BotBuy_CS_WEAPON_SG552_T(CBotBase *pBot){
 	
 	FakeClientCommand(pEdict,"buy",0,0);
 	FakeClientCommand(pEdict,"menuselect","4",0);
-	FakeClientCommand(pEdict,"menuselect","2",0);
+	FakeClientCommand(pEdict,"menuselect","4",0);
 }
 
 void BotBuy_CS_WEAPON_AK47_T(CBotBase *pBot){
@@ -202,7 +206,7 @@ void BotBuy_CS_WEAPON_AK47_T(CBotBase *pBot){
 	
 	FakeClientCommand(pEdict,"buy",0,0);
 	FakeClientCommand(pEdict,"menuselect","4",0);
-	FakeClientCommand(pEdict,"menuselect","1",0);
+	FakeClientCommand(pEdict,"menuselect","2",0);
 }
 
 void BotBuy_CS_WEAPON_P90_T(CBotBase *pBot){
@@ -210,7 +214,15 @@ void BotBuy_CS_WEAPON_P90_T(CBotBase *pBot){
 	
 	FakeClientCommand(pEdict,"buy",0,0);
 	FakeClientCommand(pEdict,"menuselect","3",0);
-	FakeClientCommand(pEdict,"menuselect","3",0);
+	FakeClientCommand(pEdict,"menuselect","4",0);
+}
+
+void BotBuy_CS_WEAPON_GALIL_T(CBotBase *pBot){
+	edict_t *pEdict = pBot->pEdict;
+	
+	FakeClientCommand(pEdict,"buy",0,0);
+	FakeClientCommand(pEdict,"menuselect","4",0);
+	FakeClientCommand(pEdict,"menuselect","1",0);
 }
 
 void BotBuy_PAmmo(CBotBase *pBot){
@@ -259,7 +271,11 @@ void BotBuy_CS_WEAPON_P228_CT(CBotBase *pBot){
 }
 
 void BotBuy_CS_WEAPON_SCOUT_CT(CBotBase *pBot){
-	BotBuy_CS_WEAPON_SCOUT_T(pBot);
+	edict_t *pEdict = pBot->pEdict;
+	
+	FakeClientCommand(pEdict,"buy",0,0);
+	FakeClientCommand(pEdict,"menuselect","4",0);
+	FakeClientCommand(pEdict,"menuselect","2",0);
 }
 
 void BotBuy_CS_WEAPON_HEGRENADE_CT(CBotBase *pBot){
@@ -295,7 +311,7 @@ void BotBuy_CS_WEAPON_FIVESEVEN_CT(CBotBase *pBot){
 	
 	FakeClientCommand(pEdict,"buy",0,0);
 	FakeClientCommand(pEdict,"menuselect","1",0);
-	FakeClientCommand(pEdict,"menuselect","6",0);
+	FakeClientCommand(pEdict,"menuselect","5",0);
 }
 
 void BotBuy_CS_WEAPON_UMP45_CT(CBotBase *pBot){
@@ -307,7 +323,7 @@ void BotBuy_CS_WEAPON_SG550_CT(CBotBase *pBot){
 	
 	FakeClientCommand(pEdict,"buy",0,0);
 	FakeClientCommand(pEdict,"menuselect","4",0);
-	FakeClientCommand(pEdict,"menuselect","8",0);
+	FakeClientCommand(pEdict,"menuselect","5",0);
 }
 
 void BotBuy_CS_WEAPON_USP_CT(CBotBase *pBot){
@@ -319,7 +335,11 @@ void BotBuy_CS_WEAPON_GLOCK18_CT(CBotBase *pBot){
 }
 
 void BotBuy_CS_WEAPON_AWP_CT(CBotBase *pBot){
-	BotBuy_CS_WEAPON_AWP_T(pBot);
+	edict_t *pEdict = pBot->pEdict;
+	
+	FakeClientCommand(pEdict,"buy",0,0);
+	FakeClientCommand(pEdict,"menuselect","4",0);
+	FakeClientCommand(pEdict,"menuselect","6",0);
 }
 
 void BotBuy_CS_WEAPON_MP5NAVY_CT(CBotBase *pBot){
@@ -347,7 +367,15 @@ void BotBuy_CS_WEAPON_TMP_CT(CBotBase *pBot){
 	
 	FakeClientCommand(pEdict,"buy",0,0);
 	FakeClientCommand(pEdict,"menuselect","3",0);
-	FakeClientCommand(pEdict,"menuselect","2",0);
+	FakeClientCommand(pEdict,"menuselect","1",0);
+}
+
+void BotBuy_CS_WEAPON_FAMAS_CT(CBotBase *pBot){
+	edict_t *pEdict = pBot->pEdict;
+	
+	FakeClientCommand(pEdict,"buy",0,0);
+	FakeClientCommand(pEdict,"menuselect","4",0);
+	FakeClientCommand(pEdict,"menuselect","1",0);
 }
 
 void BotBuy_CS_WEAPON_G3SG1_CT(CBotBase *pBot){
@@ -370,9 +398,21 @@ void BotBuy_CS_WEAPON_AK47_CT(CBotBase *pBot){
 	return; // it's simply not possible to buy a ak47 as counter terrorist
 }
 
+void BotBuy_CS_WEAPON_GALIL_CT(CBotBase *pBot){
+	return; // it's not possible for a ct to buy a galil
+}
+
 void BotBuy_CS_WEAPON_P90_CT(CBotBase *pBot){
 	BotBuy_CS_WEAPON_P90_T(pBot);
 }
+
+void BotBuy_CS_WEAPON_SHIELD_CT(CBotBase *pBot){
+	edict_t *pEdict = pBot->pEdict;
+	
+	FakeClientCommand(pEdict,"buyequip",0,0);
+	FakeClientCommand(pEdict,"menuselect","8",0);
+}
+
 /*
 void BotBuy_CS_WEAPON_HE_CT(CBotBase *pBot){
 	edict_t *pEdict = pBot->pEdict;
@@ -394,3 +434,26 @@ void BotBuy_CS_WEAPON_SG_CT(CBotBase *pBot){
 	FakeClientCommand(pEdict,"buyequip",0,0);
 	FakeClientCommand(pEdict,"menuselect","5",0);
 }*/
+
+// general stuff
+
+void BotBuy_CS_Kevlar(CBotBase *pBot){
+	edict_t *pEdict = pBot->pEdict;
+	
+	FakeClientCommand(pEdict,"buyequip",0,0);
+	FakeClientCommand(pEdict,"menuselect","1",0);
+}
+
+void BotBuy_CS_KevlarHelmet(CBotBase *pBot){
+	edict_t *pEdict = pBot->pEdict;
+	
+	FakeClientCommand(pEdict,"buyequip",0,0);
+	FakeClientCommand(pEdict,"menuselect","2",0);
+}
+
+void BotBuy_CS_DefKit(CBotBase *pBot){
+	edict_t *pEdict = pBot->pEdict;
+	
+	FakeClientCommand(pEdict,"buyequip",0,0);
+	FakeClientCommand(pEdict,"menuselect","6",0);
+}

@@ -545,17 +545,13 @@ bool CBotCS :: BuyWeapon(void){
 			&&bot_teamnm == CT
 			&&RANDOM_LONG(0,100) < 30){
 			
-			FakeClientCommand(pEdict,"buyequip",0,0);
-			FakeClientCommand(pEdict,"menuselect","6",0);
+			BotBuy_CS_DefKit(this);
 		}
 		
 		if(bot_armor<50
 			&& RANDOM_LONG(0,100) < 50){
-			FakeClientCommand(pEdict,"buyequip",0,0);
-			FakeClientCommand(pEdict,"menuselect","2",0);// kevlar + helmet
-			
-														 /*FakeClientCommand(pEdict,"buyequip",0,0);
-			FakeClientCommand(pEdict,"menuselect","1",0);// kevlar without helmet - if not enough money*/
+			BotBuy_CS_KevlarHelmet(this);
+			BotBuy_CS_Kevlar(this);
 		}
 		return true;
 	}
