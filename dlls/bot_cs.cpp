@@ -39,33 +39,34 @@
 
 #include "bot.h"
 #include "CBotCS.h"
+#include "Commandfunc.h"
 
 void BotBuy_CS_WEAPON_P228(CBotBase *pBot){
 	edict_t *pEdict = pBot->pEdict;
 	
-#ifdef CSTRIKE15
-	FakeClientCommand(pEdict,"buy;menuselect 1;menuselect 4");
-#else
-	FakeClientCommand(pEdict,"buy;menuselect 1;menuselect 3");
-#endif
+	if (bool(jb_cstrike15->value))
+		FakeClientCommand(pEdict,"buy;menuselect 1;menuselect 4");
+	else
+		FakeClientCommand(pEdict,"buy;menuselect 1;menuselect 3");
 }
 
 void BotBuy_CS_WEAPON_SCOUT(CBotBase *pBot){
 	edict_t *pEdict = pBot->pEdict;
 	
-#ifdef CSTRIKE15
-	FakeClientCommand(pEdict,"buy;menuselect 4;menuselect 5");
-#else
-	switch (pBot->bot_teamnm)
+	if (bool(jb_cstrike15->value))
+		FakeClientCommand(pEdict,"buy;menuselect 4;menuselect 5");
+	else
 	{
-		case TE:
-			FakeClientCommand(pEdict,"buy;menuselect 4;menuselect 3");
-			break;
-		case CT:
-			FakeClientCommand(pEdict,"buy;menuselect 4;menuselect 2");
-			break;
+		switch (pBot->bot_teamnm)
+		{
+			case TE:
+				FakeClientCommand(pEdict,"buy;menuselect 4;menuselect 3");
+				break;
+			case CT:
+				FakeClientCommand(pEdict,"buy;menuselect 4;menuselect 2");
+				break;
+		}
 	}
-#endif
 }
 
 void BotBuy_CS_WEAPON_HEGRENADE(CBotBase *pBot){
@@ -83,11 +84,10 @@ void BotBuy_CS_WEAPON_XM1014(CBotBase *pBot){
 void BotBuy_CS_WEAPON_MAC10(CBotBase *pBot){
 	edict_t *pEdict = pBot->pEdict;
 	
-#ifdef CSTRIKE15
-	FakeClientCommand(pEdict,"buy;menuselect 3;menuselect 4");
-#else
-	FakeClientCommand(pEdict,"buy;menuselect 3;menuselect 1");
-#endif
+	if (bool(jb_cstrike15->value))
+		FakeClientCommand(pEdict,"buy;menuselect 3;menuselect 4");
+	else
+		FakeClientCommand(pEdict,"buy;menuselect 3;menuselect 1");
 }
 
 void BotBuy_CS_WEAPON_AUG(CBotBase *pBot){
@@ -111,34 +111,30 @@ void BotBuy_CS_WEAPON_ELITE(CBotBase *pBot){
 void BotBuy_CS_WEAPON_FIVESEVEN(CBotBase *pBot){
 	edict_t *pEdict = pBot->pEdict;
 	
-#ifdef CSTRIKE15
-	FakeClientCommand(pEdict,"buy;menuselect 1;menuselect 6");
-#else
-	FakeClientCommand(pEdict,"buy;menuselect 1;menuselect 5");
-#endif
+	if (bool(jb_cstrike15->value))
+		FakeClientCommand(pEdict,"buy;menuselect 1;menuselect 6");
+	else
+		FakeClientCommand(pEdict,"buy;menuselect 1;menuselect 5");
 }
 
 void BotBuy_CS_WEAPON_UMP45(CBotBase *pBot){
 	edict_t *pEdict = pBot->pEdict;
 	
-#ifdef CSTRIKE15
-	FakeClientCommand(pEdict,"buy;menuselect 3;menuselect 5");
-#else
-	FakeClientCommand(pEdict,"buy;menuselect 3;menuselect 3");
-#endif
+	if (bool(jb_cstrike15->value))
+		FakeClientCommand(pEdict,"buy;menuselect 3;menuselect 5");
+	else
+		FakeClientCommand(pEdict,"buy;menuselect 3;menuselect 3");
 }
 
 void BotBuy_CS_WEAPON_SG550(CBotBase *pBot){
 	edict_t *pEdict = pBot->pEdict;
 	
-#ifdef CSTRIKE15
-	FakeClientCommand(pEdict,"buy;menuselect 4;menuselect 8");
-#else
-	FakeClientCommand(pEdict,"buy;menuselect 4;menuselect 5");
-#endif
+	if (bool(jb_cstrike15->value))
+		FakeClientCommand(pEdict,"buy;menuselect 4;menuselect 8");
+	else
+		FakeClientCommand(pEdict,"buy;menuselect 4;menuselect 5");
 }
 
-#ifndef CSTRIKE15
 void BotBuy_CS_WEAPON_GALIL(CBotBase *pBot){
 	edict_t *pEdict = pBot->pEdict;
 
@@ -150,7 +146,6 @@ void BotBuy_CS_WEAPON_FAMAS(CBotBase *pBot){
 
 	FakeClientCommand(pEdict,"buy;menuselect 4;menuselect 1");
 }
-#endif /* CSTRIKE15 */
 
 void BotBuy_CS_WEAPON_USP(CBotBase *pBot){
 	edict_t *pEdict = pBot->pEdict;
@@ -167,29 +162,29 @@ void BotBuy_CS_WEAPON_GLOCK18(CBotBase *pBot){
 void BotBuy_CS_WEAPON_AWP(CBotBase *pBot){
 	edict_t *pEdict = pBot->pEdict;
 	
-#ifdef CSTRIKE15
-	FakeClientCommand(pEdict,"buy;menuselect 4;menuselect 6");
-#else
-	switch (pBot->bot_teamnm)
+	if (bool(jb_cstrike15->value))
+		FakeClientCommand(pEdict,"buy;menuselect 4;menuselect 6");
+	else
 	{
-		case TE:
-			FakeClientCommand(pEdict,"buy;menuselect 4;menuselect 5");
-			break;
-		case CT:
-			FakeClientCommand(pEdict,"buy;menuselect 4;menuselect 6");
-			break;
+		switch (pBot->bot_teamnm)
+		{
+			case TE:
+				FakeClientCommand(pEdict,"buy;menuselect 4;menuselect 5");
+				break;
+			case CT:
+				FakeClientCommand(pEdict,"buy;menuselect 4;menuselect 6");
+				break;
+		}
 	}
-#endif
 }
 
 void BotBuy_CS_WEAPON_MP5NAVY(CBotBase *pBot){
 	edict_t *pEdict = pBot->pEdict;
 	
-#ifdef CSTRIKE15
-	FakeClientCommand(pEdict,"buy;menuselect 3;menuselect 1");
-#else
-	FakeClientCommand(pEdict,"buy;menuselect 3;menuselect 2");
-#endif
+	if (bool(jb_cstrike15->value))
+		FakeClientCommand(pEdict,"buy;menuselect 3;menuselect 1");
+	else
+		FakeClientCommand(pEdict,"buy;menuselect 3;menuselect 2");
 }
 
 void BotBuy_CS_WEAPON_M249(CBotBase *pBot){
@@ -213,21 +208,19 @@ void BotBuy_CS_WEAPON_M4A1(CBotBase *pBot){
 void BotBuy_CS_WEAPON_TMP(CBotBase *pBot){
 	edict_t *pEdict = pBot->pEdict;
 	
-#ifdef CSTRIKE15
-	FakeClientCommand(pEdict,"buy;menuselect 3;menuselect 2");
-#else
-	FakeClientCommand(pEdict,"buy;menuselect 3;menuselect 1");
-#endif
+	if (bool(jb_cstrike15->value))
+		FakeClientCommand(pEdict,"buy;menuselect 3;menuselect 2");
+	else
+		FakeClientCommand(pEdict,"buy;menuselect 3;menuselect 1");
 }
 
 void BotBuy_CS_WEAPON_G3SG1(CBotBase *pBot){
 	edict_t *pEdict = pBot->pEdict;
 	
-#ifdef CSTRIKE15
-	FakeClientCommand(pEdict,"buy;menuselect 4;menuselect 7");
-#else
-	FakeClientCommand(pEdict,"buy;menuselect 4;menuselect 6");
-#endif
+	if (bool(jb_cstrike15->value))
+		FakeClientCommand(pEdict,"buy;menuselect 4;menuselect 7");
+	else
+		FakeClientCommand(pEdict,"buy;menuselect 4;menuselect 6");
 }
 
 void BotBuy_CS_WEAPON_FLASHBANG(CBotBase *pBot){
@@ -239,41 +232,37 @@ void BotBuy_CS_WEAPON_FLASHBANG(CBotBase *pBot){
 void BotBuy_CS_WEAPON_DEAGLE(CBotBase *pBot){
 	edict_t *pEdict = pBot->pEdict;
 	
-#ifdef CSTRIKE15
-	FakeClientCommand(pEdict,"buy;menuselect 1;menuselect 3");
-#else
-	FakeClientCommand(pEdict,"buy;menuselect 1;menuselect 4");
-#endif
+	if (bool(jb_cstrike15->value))
+		FakeClientCommand(pEdict,"buy;menuselect 1;menuselect 3");
+	else
+		FakeClientCommand(pEdict,"buy;menuselect 1;menuselect 4");
 }
 
 void BotBuy_CS_WEAPON_SG552(CBotBase *pBot){
 	edict_t *pEdict = pBot->pEdict;
 	
-#ifdef CSTRIKE15
-	FakeClientCommand(pEdict,"buy;menuselect 4;menuselect 2");
-#else
-	FakeClientCommand(pEdict,"buy;menuselect 4;menuselect 4");
-#endif
+	if (bool(jb_cstrike15->value))
+		FakeClientCommand(pEdict,"buy;menuselect 4;menuselect 2");
+	else
+		FakeClientCommand(pEdict,"buy;menuselect 4;menuselect 4");
 }
 
 void BotBuy_CS_WEAPON_AK47(CBotBase *pBot){
 	edict_t *pEdict = pBot->pEdict;
 	
-#ifdef CSTRIKE15
-	FakeClientCommand(pEdict,"buy;menuselect 4;menuselect 1");
-#else
-	FakeClientCommand(pEdict,"buy;menuselect 4;menuselect 2");
-#endif
+	if (bool(jb_cstrike15->value))
+		FakeClientCommand(pEdict,"buy;menuselect 4;menuselect 1");
+	else
+		FakeClientCommand(pEdict,"buy;menuselect 4;menuselect 2");
 }
 
 void BotBuy_CS_WEAPON_P90(CBotBase *pBot){
 	edict_t *pEdict = pBot->pEdict;
 	
-#ifdef CSTRIKE15
-	FakeClientCommand(pEdict,"buy;menuselect 3;menuselect 3");
-#else
-	FakeClientCommand(pEdict,"buy;menuselect 3;menuselect 4");
-#endif
+	if (bool(jb_cstrike15->value))
+		FakeClientCommand(pEdict,"buy;menuselect 3;menuselect 3");
+	else
+		FakeClientCommand(pEdict,"buy;menuselect 3;menuselect 4");
 }
 
 void BotBuy_PAmmo(CBotBase *pBot){
@@ -309,25 +298,24 @@ void BotBuy_CS_WEAPON_Defuse(CBotBase *pBot){
 void BotBuy_CS_WEAPON_NightVision(CBotBase *pBot){
 	edict_t *pEdict = pBot->pEdict;
 	
-#ifdef CSTRIKE15
-	FakeClientCommand(pEdict,"buyequip;menuselect 7");
-#else
-	switch (pBot->bot_teamnm)
+	if (bool(jb_cstrike15->value))
+		FakeClientCommand(pEdict,"buyequip;menuselect 7");
+	else
 	{
-		case TE:
-			FakeClientCommand(pEdict,"buyequip;menuselect 6");
-			break;
-		case CT:
-			FakeClientCommand(pEdict,"buyequip;menuselect 7");
-			break;
+		switch (pBot->bot_teamnm)
+		{
+			case TE:
+				FakeClientCommand(pEdict,"buyequip;menuselect 6");
+				break;
+			case CT:
+				FakeClientCommand(pEdict,"buyequip;menuselect 7");
+				break;
+		}
 	}
-#endif
 }
 
-#ifndef CSTRIKE15
 void BotBuy_CS_WEAPON_Shield(CBotBase *pBot){
 	edict_t *pEdict = pBot->pEdict;
 	
 	FakeClientCommand(pEdict,"buyequip;menuselect 8");
 }
-#endif /* CSTRIKE15 */
