@@ -42,280 +42,215 @@
 #include "Commandfunc.h"
 
 void BotBuy_CS_WEAPON_P228(CBotBase *pBot){
-	edict_t *pEdict = pBot->pEdict;
-	
 	if (CVAR_BOOL(jb_cstrike15))
-		FakeClientCommand(pEdict,"buy;menuselect 1;menuselect 4");
+		FakeClientCommand(pBot->pEdict,"buy;menuselect 1;menuselect 4");
 	else
-		FakeClientCommand(pEdict,"buy;menuselect 1;menuselect 3");
+		FakeClientCommand(pBot->pEdict,"buy;menuselect 1;menuselect 3");
+}
+
+void BotBuy_CS_WEAPON_SHIELD(CBotBase *pBot){
+	if (!CVAR_BOOL(jb_cstrike15))
+		FakeClientCommand(pBot->pEdict,"buyequip;menuselect 8");
 }
 
 void BotBuy_CS_WEAPON_SCOUT(CBotBase *pBot){
-	edict_t *pEdict = pBot->pEdict;
-	
 	if (CVAR_BOOL(jb_cstrike15))
-		FakeClientCommand(pEdict,"buy;menuselect 4;menuselect 5");
+		FakeClientCommand(pBot->pEdict,"buy;menuselect 4;menuselect 5");
 	else
 	{
 		switch (pBot->bot_teamnm)
 		{
 			case CS_TEAM_TE:
-				FakeClientCommand(pEdict,"buy;menuselect 4;menuselect 3");
+				FakeClientCommand(pBot->pEdict,"buy;menuselect 4;menuselect 3");
 				break;
 			case CS_TEAM_CT:
-				FakeClientCommand(pEdict,"buy;menuselect 4;menuselect 2");
+				FakeClientCommand(pBot->pEdict,"buy;menuselect 4;menuselect 2");
 				break;
 		}
 	}
 }
 
 void BotBuy_CS_WEAPON_HEGRENADE(CBotBase *pBot){
-	edict_t *pEdict = pBot->pEdict;
-	
-	FakeClientCommand(pEdict,"buyequip;menuselect 4");
+	FakeClientCommand(pBot->pEdict,"buyequip;menuselect 4");
 }
 
 void BotBuy_CS_WEAPON_XM1014(CBotBase *pBot){
-	edict_t *pEdict = pBot->pEdict;
-	
-	FakeClientCommand(pEdict,"buy;menuselect 2;menuselect 2");
+	FakeClientCommand(pBot->pEdict,"buy;menuselect 2;menuselect 2");
 }
 
 void BotBuy_CS_WEAPON_MAC10(CBotBase *pBot){
-	edict_t *pEdict = pBot->pEdict;
-	
 	if (CVAR_BOOL(jb_cstrike15))
-		FakeClientCommand(pEdict,"buy;menuselect 3;menuselect 4");
+		FakeClientCommand(pBot->pEdict,"buy;menuselect 3;menuselect 4");
 	else
-		FakeClientCommand(pEdict,"buy;menuselect 3;menuselect 1");
+		FakeClientCommand(pBot->pEdict,"buy;menuselect 3;menuselect 1");
 }
 
 void BotBuy_CS_WEAPON_AUG(CBotBase *pBot){
-	edict_t *pEdict = pBot->pEdict;
-	
-	FakeClientCommand(pEdict,"buy;menuselect 4;menuselect 4");
+	FakeClientCommand(pBot->pEdict,"buy;menuselect 4;menuselect 4");
 }
 
 void BotBuy_CS_WEAPON_SMOKEGRENADE(CBotBase *pBot){
-	edict_t *pEdict = pBot->pEdict;
-	
-	FakeClientCommand(pEdict,"buyequip;menuselect 5");
+	FakeClientCommand(pBot->pEdict,"buyequip;menuselect 5");
 }
 
 void BotBuy_CS_WEAPON_ELITE(CBotBase *pBot){
-	edict_t *pEdict = pBot->pEdict;
-	
-	FakeClientCommand(pEdict,"buy;menuselect 1;menuselect 5");
+	FakeClientCommand(pBot->pEdict,"buy;menuselect 1;menuselect 5");
 }
 
 void BotBuy_CS_WEAPON_FIVESEVEN(CBotBase *pBot){
-	edict_t *pEdict = pBot->pEdict;
-	
 	if (CVAR_BOOL(jb_cstrike15))
-		FakeClientCommand(pEdict,"buy;menuselect 1;menuselect 6");
+		FakeClientCommand(pBot->pEdict,"buy;menuselect 1;menuselect 6");
 	else
-		FakeClientCommand(pEdict,"buy;menuselect 1;menuselect 5");
+		FakeClientCommand(pBot->pEdict,"buy;menuselect 1;menuselect 5");
 }
 
 void BotBuy_CS_WEAPON_UMP45(CBotBase *pBot){
-	edict_t *pEdict = pBot->pEdict;
-	
 	if (CVAR_BOOL(jb_cstrike15))
-		FakeClientCommand(pEdict,"buy;menuselect 3;menuselect 5");
+		FakeClientCommand(pBot->pEdict,"buy;menuselect 3;menuselect 5");
 	else
-		FakeClientCommand(pEdict,"buy;menuselect 3;menuselect 3");
+		FakeClientCommand(pBot->pEdict,"buy;menuselect 3;menuselect 3");
 }
 
 void BotBuy_CS_WEAPON_SG550(CBotBase *pBot){
-	edict_t *pEdict = pBot->pEdict;
-	
 	if (CVAR_BOOL(jb_cstrike15))
-		FakeClientCommand(pEdict,"buy;menuselect 4;menuselect 8");
+		FakeClientCommand(pBot->pEdict,"buy;menuselect 4;menuselect 8");
 	else
-		FakeClientCommand(pEdict,"buy;menuselect 4;menuselect 5");
+		FakeClientCommand(pBot->pEdict,"buy;menuselect 4;menuselect 5");
 }
 
 void BotBuy_CS_WEAPON_GALIL(CBotBase *pBot){
-	edict_t *pEdict = pBot->pEdict;
-
-	FakeClientCommand(pEdict,"buy;menuselect 4;menuselect 1");
+	if (!CVAR_BOOL(jb_cstrike15))
+		FakeClientCommand(pBot->pEdict,"buy;menuselect 4;menuselect 1");
 }
 
 void BotBuy_CS_WEAPON_FAMAS(CBotBase *pBot){
-	edict_t *pEdict = pBot->pEdict;
-
-	FakeClientCommand(pEdict,"buy;menuselect 4;menuselect 1");
+	if (!CVAR_BOOL(jb_cstrike15))
+		FakeClientCommand(pBot->pEdict,"buy;menuselect 4;menuselect 1");
 }
 
 void BotBuy_CS_WEAPON_USP(CBotBase *pBot){
-	edict_t *pEdict = pBot->pEdict;
-	
-	FakeClientCommand(pEdict,"buy;menuselect 1;menuselect 2");
+	FakeClientCommand(pBot->pEdict,"buy;menuselect 1;menuselect 2");
 }
 
 void BotBuy_CS_WEAPON_GLOCK18(CBotBase *pBot){
-	edict_t *pEdict = pBot->pEdict;
-	
-	FakeClientCommand(pEdict,"buy;menuselect 1;menuselect 1");
+	FakeClientCommand(pBot->pEdict,"buy;menuselect 1;menuselect 1");
 }
 
 void BotBuy_CS_WEAPON_AWP(CBotBase *pBot){
-	edict_t *pEdict = pBot->pEdict;
-	
 	if (CVAR_BOOL(jb_cstrike15))
-		FakeClientCommand(pEdict,"buy;menuselect 4;menuselect 6");
+		FakeClientCommand(pBot->pEdict,"buy;menuselect 4;menuselect 6");
 	else
 	{
 		switch (pBot->bot_teamnm)
 		{
 			case CS_TEAM_TE:
-				FakeClientCommand(pEdict,"buy;menuselect 4;menuselect 5");
+				FakeClientCommand(pBot->pEdict,"buy;menuselect 4;menuselect 5");
 				break;
 			case CS_TEAM_CT:
-				FakeClientCommand(pEdict,"buy;menuselect 4;menuselect 6");
+				FakeClientCommand(pBot->pEdict,"buy;menuselect 4;menuselect 6");
 				break;
 		}
 	}
 }
 
 void BotBuy_CS_WEAPON_MP5NAVY(CBotBase *pBot){
-	edict_t *pEdict = pBot->pEdict;
-	
 	if (CVAR_BOOL(jb_cstrike15))
-		FakeClientCommand(pEdict,"buy;menuselect 3;menuselect 1");
+		FakeClientCommand(pBot->pEdict,"buy;menuselect 3;menuselect 1");
 	else
-		FakeClientCommand(pEdict,"buy;menuselect 3;menuselect 2");
+		FakeClientCommand(pBot->pEdict,"buy;menuselect 3;menuselect 2");
 }
 
 void BotBuy_CS_WEAPON_M249(CBotBase *pBot){
-	edict_t *pEdict = pBot->pEdict;
-	
-	FakeClientCommand(pEdict,"buy;menuselect 5;menuselect 1");
+	FakeClientCommand(pBot->pEdict,"buy;menuselect 5;menuselect 1");
 }
 
 void BotBuy_CS_WEAPON_M3(CBotBase *pBot){
-	edict_t *pEdict = pBot->pEdict;
-	
-	FakeClientCommand(pEdict,"buy;menuselect 2;menuselect 1");
+	FakeClientCommand(pBot->pEdict,"buy;menuselect 2;menuselect 1");
 }
 
 void BotBuy_CS_WEAPON_M4A1(CBotBase *pBot){
-	edict_t *pEdict = pBot->pEdict;
-	
-	FakeClientCommand(pEdict,"buy;menuselect 4;menuselect 3");
+	FakeClientCommand(pBot->pEdict,"buy;menuselect 4;menuselect 3");
 }
 
 void BotBuy_CS_WEAPON_TMP(CBotBase *pBot){
-	edict_t *pEdict = pBot->pEdict;
-	
 	if (CVAR_BOOL(jb_cstrike15))
-		FakeClientCommand(pEdict,"buy;menuselect 3;menuselect 2");
+		FakeClientCommand(pBot->pEdict,"buy;menuselect 3;menuselect 2");
 	else
-		FakeClientCommand(pEdict,"buy;menuselect 3;menuselect 1");
+		FakeClientCommand(pBot->pEdict,"buy;menuselect 3;menuselect 1");
 }
 
 void BotBuy_CS_WEAPON_G3SG1(CBotBase *pBot){
-	edict_t *pEdict = pBot->pEdict;
-	
 	if (CVAR_BOOL(jb_cstrike15))
-		FakeClientCommand(pEdict,"buy;menuselect 4;menuselect 7");
+		FakeClientCommand(pBot->pEdict,"buy;menuselect 4;menuselect 7");
 	else
-		FakeClientCommand(pEdict,"buy;menuselect 4;menuselect 6");
+		FakeClientCommand(pBot->pEdict,"buy;menuselect 4;menuselect 6");
 }
 
 void BotBuy_CS_WEAPON_FLASHBANG(CBotBase *pBot){
-	edict_t *pEdict = pBot->pEdict;
-	
-	FakeClientCommand(pEdict,"buyequip;menuselect 3");
+	FakeClientCommand(pBot->pEdict,"buyequip;menuselect 3");
 }
 
 void BotBuy_CS_WEAPON_DEAGLE(CBotBase *pBot){
-	edict_t *pEdict = pBot->pEdict;
-	
 	if (CVAR_BOOL(jb_cstrike15))
-		FakeClientCommand(pEdict,"buy;menuselect 1;menuselect 3");
+		FakeClientCommand(pBot->pEdict,"buy;menuselect 1;menuselect 3");
 	else
-		FakeClientCommand(pEdict,"buy;menuselect 1;menuselect 4");
+		FakeClientCommand(pBot->pEdict,"buy;menuselect 1;menuselect 4");
 }
 
 void BotBuy_CS_WEAPON_SG552(CBotBase *pBot){
-	edict_t *pEdict = pBot->pEdict;
-	
 	if (CVAR_BOOL(jb_cstrike15))
-		FakeClientCommand(pEdict,"buy;menuselect 4;menuselect 2");
+		FakeClientCommand(pBot->pEdict,"buy;menuselect 4;menuselect 2");
 	else
-		FakeClientCommand(pEdict,"buy;menuselect 4;menuselect 4");
+		FakeClientCommand(pBot->pEdict,"buy;menuselect 4;menuselect 4");
 }
 
 void BotBuy_CS_WEAPON_AK47(CBotBase *pBot){
-	edict_t *pEdict = pBot->pEdict;
-	
 	if (CVAR_BOOL(jb_cstrike15))
-		FakeClientCommand(pEdict,"buy;menuselect 4;menuselect 1");
+		FakeClientCommand(pBot->pEdict,"buy;menuselect 4;menuselect 1");
 	else
-		FakeClientCommand(pEdict,"buy;menuselect 4;menuselect 2");
+		FakeClientCommand(pBot->pEdict,"buy;menuselect 4;menuselect 2");
 }
 
 void BotBuy_CS_WEAPON_P90(CBotBase *pBot){
-	edict_t *pEdict = pBot->pEdict;
-	
 	if (CVAR_BOOL(jb_cstrike15))
-		FakeClientCommand(pEdict,"buy;menuselect 3;menuselect 3");
+		FakeClientCommand(pBot->pEdict,"buy;menuselect 3;menuselect 3");
 	else
-		FakeClientCommand(pEdict,"buy;menuselect 3;menuselect 4");
+		FakeClientCommand(pBot->pEdict,"buy;menuselect 3;menuselect 4");
 }
 
 void BotBuy_PAmmo(CBotBase *pBot){
-	edict_t *pEdict = pBot->pEdict;
-	
-	FakeClientCommand(pEdict,"buy;menuselect 6");
+	FakeClientCommand(pBot->pEdict,"buy;menuselect 6");
 }
 
 void BotBuy_SAmmo(CBotBase *pBot){
-	edict_t *pEdict = pBot->pEdict;
-	
-	FakeClientCommand(pEdict,"buy;menuselect 7");
+	FakeClientCommand(pBot->pEdict,"buy;menuselect 7");
 }
 
 void BotBuy_Kevlar(CBotBase *pBot){
-	edict_t *pEdict = pBot->pEdict;
-	
-	FakeClientCommand(pEdict,"buyequip;menuselect 1");
+	FakeClientCommand(pBot->pEdict,"buyequip;menuselect 1");
 }
 
 void BotBuy_KevlarHelmet(CBotBase *pBot){
-	edict_t *pEdict = pBot->pEdict;
-	
-	FakeClientCommand(pEdict,"buyequip;menuselect 2");
+	FakeClientCommand(pBot->pEdict,"buyequip;menuselect 2");
 }
 
 void BotBuy_Defuse(CBotBase *pBot){
-	edict_t *pEdict = pBot->pEdict;
-	
-	FakeClientCommand(pEdict,"buyequip;menuselect 6");
+	FakeClientCommand(pBot->pEdict,"buyequip;menuselect 6");
 }
 
 void BotBuy_NightVision(CBotBase *pBot){
-	edict_t *pEdict = pBot->pEdict;
-	
 	if (CVAR_BOOL(jb_cstrike15))
-		FakeClientCommand(pEdict,"buyequip;menuselect 7");
+		FakeClientCommand(pBot->pEdict,"buyequip;menuselect 7");
 	else
 	{
 		switch (pBot->bot_teamnm)
 		{
 			case CS_TEAM_TE:
-				FakeClientCommand(pEdict,"buyequip;menuselect 6");
+				FakeClientCommand(pBot->pEdict,"buyequip;menuselect 6");
 				break;
 			case CS_TEAM_CT:
-				FakeClientCommand(pEdict,"buyequip;menuselect 7");
+				FakeClientCommand(pBot->pEdict,"buyequip;menuselect 7");
 				break;
 		}
 	}
-}
-
-void BotBuy_Shield(CBotBase *pBot){
-	edict_t *pEdict = pBot->pEdict;
-	
-	FakeClientCommand(pEdict,"buyequip;menuselect 8");
 }
