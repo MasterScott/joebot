@@ -84,7 +84,7 @@ void BotClient_CS_DeathMsg(void *p, int bot_index,int iAdd);
 void BotClient_CS_Money(void *p, int bot_index,int iAdd);
 void BotClient_CS_ShowMenu(void *p, int bot_index,int iAdd);
 void BotClient_CS_StatusIcon(void *p, int bot_index,int iAdd);
-void BotClient_CS_Roundtime(void *p, int bot_index,int iAdd);
+void BotClient_CS_RoundTime(void *p, int bot_index,int iAdd);
 void BotClient_CS_TextMsg(void *p, int bot_index,int iAdd);
 void BotClient_CS_StatusValue(void *p, int bot_index,int iAdd);
 void BotClient_CS_SetFOV(void *p, int bot_index,int iAdd);
@@ -142,7 +142,6 @@ void AddUserMsg(const char *msgname, int msgid, int size);
 int GetUserMsgId(const char *msgname, int *size);
 const char *GetUserMsgName(int msgid, int *size);
 
-#define PLID NULL
 #define GET_USER_MSG_ID(plid, msgname, size) GetUserMsgId(msgname, size)
 #define GET_USER_MSG_NAME(plid, msgid, size) GetUserMsgName(msgid, size)
 #endif /* USE_METAMOD */
