@@ -66,7 +66,7 @@ extern bool		g_bBombDropped;
 
 extern AWP_EntLogItem AWP_ED[32];
 
-#define LANG_E	0
+#define LANG_EN	0
 #define LANG_DE	1
 #define LANG_FR	2
 
