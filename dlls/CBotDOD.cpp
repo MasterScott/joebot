@@ -526,11 +526,10 @@ edict_t *CBotDOD :: FindEnemy(){
 			// search the world for players...
 			is_team_play = 1.0;
 			
-			//for (i = 1; i <= gpGlobals->maxClients; i++)
-			for (i = gpGlobals->maxClients; i>=1; i--){
+			for (i = 0; i < gpGlobals->maxClients; i++){
 				FFEP = &FFE[i];
 				edict_old = FFEP->pEdict;
-				pPlayer = INDEXENT(i);
+				pPlayer = INDEXENT(i + 1);
 				FFEP->pEdict = 0;
 				
 				// skip invalid players and skip self (i.e. this bot)
@@ -648,7 +647,7 @@ edict_t *CBotDOD :: FindEnemy(){
 			
 			float fMin = 100000;
 			
-			for (i = gpGlobals->maxClients; i; i--){
+			for (i = 0; i < gpGlobals->maxClients; i++){
 				FFEP = &FFE[i];
 				if(FFEP->pEdict){
 					if (FFEP->fRecogn + FFEP->fTime2seeit <= gpGlobals->time){
@@ -849,9 +848,9 @@ bool CBotDOD :: HandleOrders(void){		// this fucntion is called every second
 			else{
 				// just get a new teammember
 				Task.current->p = GetRandomPlayer(pEdict,bot_teamnm,1);
-				int i = UTIL_GetBotIndex((edict_t*)Task.current->p);
-				if(i!=-1){
-					if(bots[i]->Task.SearchT( BT_ROAMTEAM|BT_COVER) != -1){	// just to make it easy ... although i don't like this
+				CBotBase *pB = UTIL_GetBotPointer((edict_t*)Task.current->p);
+				if(pB){
+					if(pB->Task.SearchT( BT_ROAMTEAM|BT_COVER) != -1){	// just to make it easy ... although i don't like this
 						Task.NextTask();
 						return false;
 					}
@@ -2650,8 +2649,8 @@ bool CBotDOD :: ReactOnSound(void){
 	TraceResult tr;
 	Vector v_bot_view = pEdict->v.origin + pEdict->v.view_ofs;
 	
-	for (i = gpGlobals->maxClients; i ; i--){
-		pEnt = INDEXENT(i);
+	for (i = 0; i < gpGlobals->maxClients; i++){
+		pEnt = INDEXENT(i + 1);
 		
 		// skip invalid players and skip self (i.e. this bot)
 		if ((pEnt) && (!pEnt->free) && (pEnt != pEdict))

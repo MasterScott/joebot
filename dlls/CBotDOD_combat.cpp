@@ -54,17 +54,14 @@ void CBotDOD :: Fight(void){
 	
 	if(pBotEnemy != pBotOldEnemy){		// enemy changed
 		int index = UTIL_ClientIndex(pBotEnemy);
-		if(index!=-1
-			&&index<32){
+		if(index!=-1){
 			if(f_ES[index] + _ESTIME < gpGlobals->time){		// i.e. not seen for a while
 				if(CVAR_BOOL(jb_msgradio))
 					SendRadioCommand(RADIO_ENEMY_SPOTTED);
 				int iETeam = UTIL_GetTeam(pBotEnemy);
 
-				edict_t *pEnt;
-				int i;
-				for (i = gpGlobals->maxClients; i>=1; i--){
-					pEnt = INDEXENT(i);
+				for (int i = 0; i < gpGlobals->maxClients; i++){
+					edict_t *pEnt = INDEXENT(i + 1);
 					if (!FNullEnt(pEnt) && (!pEnt->free)){
 						if(iETeam == UTIL_GetTeam(pEnt)){				// set time back for every player of other team
 							f_ES[i] = gpGlobals->time - _ESTIME /3.0;		// don't say es too often, when groups hit each other
