@@ -12,7 +12,7 @@
       <td> 
               <div align="center"><font face="Verdana, Arial, Helvetica, sans-serif"> 
                 <font size="5"><b>README FOR <a href="mailto:as3.1415rin@joebot.net">@$3.1415rin's</a> 
-                JoeBOT 1.6.1- <a href="http://joebot.net/index.php">http://www.joebot.net</a> 
+                JoeBOT 1.6.2- <a href="http://joebot.net/index.php">http://www.joebot.net</a> 
                 </b> </font> </font> </div>
   </table>
         <p>Check out <a href="http://sourceforge.net/projects/joebot">JoeBOT on 
@@ -779,19 +779,41 @@ sort of backtracking combined with the floyd/warshall algorithm. <br>
         but please sort them from 0-100.</font></p>
       <p><font face="Verdana, Arial, Helvetica, sans-serif"><b><i>Of course you 
         can use bots with skills in between. For those bots, the definitions from 
-        bot_skill.txt are interpolated.</i></b> </font></p>
-      <p><font face="Verdana, Arial, Helvetica, sans-serif"><br>
-        # VSC : Speed of changing the direction<br>
-        # VSM : Momentum for changing direction<br>
-        # REA : Reaction time<br>
-        # STH : values over 90 mean they don't have to estimate ur position, but 
-        the know the exact position<br>
-        # DIS : distance to overlook instantly // at bots with sniper weapons 
-        this is 2 times<br>
-        # TPD : milliseconds it takes to look further 1000 units<br>
-        # PDI : distance to overlook instantly // at bots with sniper weapons 
-        this is 2 times <i>(prone)</i><br>
-        # PTD : milliseconds it takes to look further 1000 units <i>(prone)</i></font><font face="Verdana, Arial, Helvetica, sans-serif"><br>
+        bot_skill.txt are interpolated.</i></b></font><br>
+      </p>
+      <ul>
+        <li><font face="Verdana, Arial, Helvetica, sans-serif"># VSC : Speed of 
+          changing the direction<br>
+          </font>
+        <li><font face="Verdana, Arial, Helvetica, sans-serif"># VSM : Momentum 
+          for changing direction<br>
+          </font>
+        <li><font face="Verdana, Arial, Helvetica, sans-serif"># REA : Reaction 
+          time<br>
+          </font>
+        <li><font face="Verdana, Arial, Helvetica, sans-serif"># STH : values 
+          over 90 mean they don't have to estimate ur position, but the know the 
+          exact position<br>
+          </font>
+        <li><font face="Verdana, Arial, Helvetica, sans-serif"># DIS : distance 
+          to overlook instantly // at bots with sniper weapons this is 2 times<br>
+          </font>
+        <li><font face="Verdana, Arial, Helvetica, sans-serif"># TPD : milliseconds 
+          it takes to look further 1000 units<br>
+          </font>
+        <li><font face="Verdana, Arial, Helvetica, sans-serif"># PDI : distance 
+          to overlook instantly // at bots with sniper weapons this is 2 times 
+          <i>(prone)</i><br>
+          </font>
+        <li><font face="Verdana, Arial, Helvetica, sans-serif"># PTD : milliseconds 
+          it takes to look further 1000 units <i>(prone)<br>
+          </i></font>
+        <li><font face="Verdana, Arial, Helvetica, sans-serif"># REC : Amount 
+          of recoil when the bot should stop shooting for some short time ( amount 
+          is tan(RecoilAngle) * fEnemyDistance )<br>
+          </font>
+      </ul>
+        <br>
         <br>
         <br>
         -------:::::: SUPPORTED MAPS ::::::--------<br>
@@ -803,9 +825,9 @@ sort of backtracking combined with the floyd/warshall algorithm. <br>
         /joebot/wpjs/dir.txt to play other wpj if there are more than one version 
         of one waypoint file)<br>
         <br>
-        <b>5. trainnn :</b> The neural net is a 6-5-5-5 bprop feedforward net. (for nntrain.pta) 
-        </font> </p>
-<pre>
+        <b>5. trainnn :</b> The neural net is a 6-5-5-5 bprop feedforward net. 
+        (for nntrain.pta)  <p></p>
+      <pre>
 Inputs are :
 	IHealth,			// health of bot ( -1 is 0%; 1 is 100% )
 	IDistance,			// distance to en ( -1 is near, 1 is far )

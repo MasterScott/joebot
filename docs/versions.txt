@@ -21,6 +21,9 @@ Current Developer on Sourceforge/joebot
 -- This Bot is based on botman's HPB_bot - template code - http://planethalflife.com/botman --
 ----------------------------------------------------------------------------------------------
 
+JoeBOT 1.6.2
+- Windows Version is now botmixer compatible too
+- burst fire is configurable via skill system
 - Fixed problems with min_bots
 - some little perfomance issues
 
