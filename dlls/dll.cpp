@@ -115,7 +115,7 @@ C_DLLEXPORT void Meta_Init(void)
 //  ifvers			(given) interface_version metamod is using
 //  pPlugInfo		(requested) struct with info about plugin
 //  pMetaUtilFuncs	(given) table of utility functions provided by metamod
-C_DLLEXPORT Meta_Query(char *ifvers, plugin_info_t **pPlugInfo,
+C_DLLEXPORT int Meta_Query(char *ifvers, plugin_info_t **pPlugInfo,
 		mutil_funcs_t *pMetaUtilFuncs)
 {
 	if(ifvers);	// to satisfy gcc -Wunused
@@ -165,7 +165,7 @@ C_DLLEXPORT Meta_Query(char *ifvers, plugin_info_t **pPlugInfo,
 //  pFunctionTable	(requested) table of function tables this plugin catches
 //  pMGlobals		(given) global vars from metamod
 //  pGamedllFuncs	(given) copy of function tables from game dll
-C_DLLEXPORT Meta_Attach(PLUG_LOADTIME now, META_FUNCTIONS *pFunctionTable,
+C_DLLEXPORT int Meta_Attach(PLUG_LOADTIME now, META_FUNCTIONS *pFunctionTable,
 		meta_globals_t *pMGlobals, gamedll_funcs_t *pGamedllFuncs)
 {
 	if(now > Plugin_info.loadable) {
@@ -196,7 +196,7 @@ C_DLLEXPORT Meta_Attach(PLUG_LOADTIME now, META_FUNCTIONS *pFunctionTable,
 // Metamod detaching plugin from the server.
 // now		(given) current phase, ie during map, etc
 // reason	(given) why detaching (refresh, console unload, forced unload, etc)
-C_DLLEXPORT Meta_Detach(PLUG_LOADTIME now, PL_UNLOAD_REASON reason) {
+C_DLLEXPORT int Meta_Detach(PLUG_LOADTIME now, PL_UNLOAD_REASON reason) {
 	if(now > Plugin_info.unloadable && reason != PNL_CMD_FORCED) {
 		LOG_ERROR(PLID, "Can't unload plugin right now");
 		return(FALSE);
@@ -429,7 +429,7 @@ void GameDLLInit( void )
 	}
 	
 	g_WPDir.Init();
-	if (bool(jb_wploadrandom->value)){
+	if (CVAR_BOOL(jb_wploadrandom)){
 		g_WPDir.MixIt();
 	}
 
@@ -1488,8 +1488,8 @@ void StartFrame( void )
 			bot_check_time = gpGlobals->time + _PAUSE_TIME*2;
 		}
 		
-		if(bool(jb_wprecalc->value)
-			&&!bool(jb_wp->value)
+		if(CVAR_BOOL(jb_wprecalc)
+			&&!CVAR_BOOL(jb_wp)
 			&& num_waypoints)
 			WPStat.CalcSlice();
 		
@@ -1520,7 +1520,7 @@ void StartFrame( void )
 #endif
 			
 			/* begin all .2s code */
-			if(bool(jb_msgwelcome->value)||g_bMyBirthday){
+			if(CVAR_BOOL(jb_msgwelcome)||g_bMyBirthday){
 				if(!bDedicatedWelcome
 					&& gpGlobals->time > _PAUSE_TIME){
 					bDedicatedWelcome = true;
@@ -1826,7 +1826,7 @@ void StartFrame( void )
 				(SBInfo[bot_index].respawn_state == RESPAWN_IDLE))  // not respawning
 			{
 				//try{
-				if (!bool(jb_jointeam->value) &&
+				if (!CVAR_BOOL(jb_jointeam) &&
 					bots[bot_index]->bot_team != 6 &&
 					bots[bot_index]->bot_team > 0 &&
 					!UTIL_HumansInGame())
@@ -1853,7 +1853,7 @@ void StartFrame( void )
 			
 			if (pPlayer && !pPlayer->free)
 			{
-				if (bool(jb_wp->value) && FBitSet(pPlayer->v.flags, FL_CLIENT))
+				if (CVAR_BOOL(jb_wp) && FBitSet(pPlayer->v.flags, FL_CLIENT))
 				{
 					WaypointThink(pPlayer);
 				}
@@ -1954,7 +1954,7 @@ void StartFrame( void )
 				
 				if (index < 32)
 				{
-					if(bool(jb_jointeam->value) || (!bool(jb_jointeam->value) && UTIL_HumansInGame() != 0)){
+					if(CVAR_BOOL(jb_jointeam) || (!CVAR_BOOL(jb_jointeam) && UTIL_HumansInGame() != 0)){
 						SBInfo[index].respawn_state = RESPAWN_IS_RESPAWNING;
 						if(bots[index]) delete bots[index];      // free up this slot
 						bots[index] = 0;
@@ -2020,7 +2020,7 @@ void StartFrame( void )
 					{
 						//cout << " ------------------- creating bot due to max_bots" << endl;
 						// enter the game if jb_entergame is set or if humans are in the game
-						if(bool(jb_entergame->value || UTIL_HumansInGame())){
+						if(CVAR_BOOL(jb_entergame) || UTIL_HumansInGame()){
 							BotCreate( NULL, NULL, NULL, NULL, NULL);
 						}
 					}
