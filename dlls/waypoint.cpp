@@ -50,6 +50,7 @@
 
 #include "bot_modid.h"
 #include "CBotBase.h"
+#include "Commandfunc.h"
 
 extern int mod_id;
 extern int m_spriteTexture;
@@ -82,19 +83,7 @@ int num_recadvm;
 // time that this waypoint was displayed (while editing)
 float wp_display_time[MAX_WAYPOINTS];
 
-bool g_waypoint_stat = true;
-
 bool g_waypoint_paths = FALSE;		// have any paths been allocated?
-bool g_waypoint_on = FALSE;
-bool g_auto_waypoint = FALSE;
-bool g_bTestJump = TRUE;
-bool g_bAutowpHuman = FALSE;
-bool g_auto_addpath = TRUE;
-bool g_path_waypoint = FALSE;
-bool g_bshowen = FALSE;
-bool g_autowpjump = TRUE;
-bool g_waypointadv = TRUE;
-bool g_waypointsound = TRUE;
 Vector last_waypoint;
 float f_path_time = 0.0;
 
@@ -102,8 +91,6 @@ char szWPCreator[80];
 
 #define _AWP_NNWPDIST 150		// min distance to last wp when a wp should be added
 #define _AWP_LNWPDIST 100		// min distance to last wp when a wp should be added on a ladder
-
-static FILE *fp;
 
 AWP_EntLogItem AWP_ED[32];
 ADV_WPRecMove ADVL[32];
@@ -233,14 +220,14 @@ int WaypointFindNearest(edict_t *pEntity, float range, int team, float fMin,bool
 
 void WaypointDebug(void)
 {
+#ifdef DEBUGENGINE
 	int y = 1, x = 1;
 	
-	fp=fopen("bot.txt","a");
-	fprintf(fp,"WaypointDebug: LINKED LIST ERROR!!!\n");
-	fclose(fp);
+	BOT_LOG("WaypointDebug", "LINKED LIST ERROR!!!");
 	
 	x = x - 1;  // x is zero
 	y = y / x;  // cause an divide by zero exception
+#endif
 	
 	return;
 }
@@ -1437,7 +1424,7 @@ int WaypointAdd(edict_t *pEntity)
 	// draw a blue waypoint
 	WaypointDrawBeam(pEntity, start, end, 30, 0, 0, 0, 255, 250, 5);
 	
-	if(g_waypointsound)
+	if(bool(jb_wpsound->value))
 		EMIT_SOUND_DYN2(pEntity, CHAN_WEAPON, "weapons/xbow_hit1.wav", 1.0,	ATTN_NORM, 0, 100);
 	
 	// increment total number of waypoints if adding at end of array...
@@ -1448,7 +1435,7 @@ int WaypointAdd(edict_t *pEntity)
 	if(waypoints[index].flags & W_FL_LADDER)	// dont add to ladders
 		return index;
 	
-	if(g_auto_addpath){
+	if(bool(jb_wpautopath->value)){
 		for (int i=0; i < num_waypoints; i++)
 		{
 			if (i == index)
@@ -1573,7 +1560,7 @@ void WaypointAddAiming(edict_t *pEntity)
 	// draw a blue waypoint
 	WaypointDrawBeam(pEntity, start, end, 30, 0, 0, 0, 255, 250, 5);
 	
-	if(g_waypointsound)
+	if(bool(jb_wpsound->value))
 		EMIT_SOUND_DYN2(pEntity, CHAN_WEAPON, "weapons/xbow_hit1.wav", 1.0,ATTN_NORM, 0, 100);
 	
 	// increment total number of waypoints if adding at end of array...
@@ -1724,7 +1711,7 @@ void WaypointDelete(int index,edict_t *pEntity){
 	
 	wp_display_time[index] = 0.0;
 	
-	if(g_waypointsound)
+	if(bool(jb_wpsound->value))
 		if(pEntity)
 			EMIT_SOUND_DYN2(pEntity, CHAN_WEAPON, "weapons/mine_activate.wav", 1.0,ATTN_NORM, 0, 100);
 		
@@ -1748,14 +1735,14 @@ void WaypointCreatePath(edict_t *pEntity, int cmd)
 		if (waypoint1 == -1)
 		{
 			// play "cancelled" sound...
-			if(g_waypointsound)
+			if(bool(jb_wpsound->value))
 				EMIT_SOUND_DYN2(pEntity, CHAN_WEAPON, "common/wpn_moveselect.wav", 1.0,ATTN_NORM, 0, 100);
 			
 			return;
 		}
 		
 		// play "start" sound...
-		if(g_waypointsound)
+		if(bool(jb_wpsound->value))
 			EMIT_SOUND_DYN2(pEntity, CHAN_WEAPON, "common/wpn_hudoff.wav", 1.0,ATTN_NORM, 0, 100);
 		
 		return;
@@ -1768,7 +1755,7 @@ void WaypointCreatePath(edict_t *pEntity, int cmd)
 		if ((waypoint1 == -1) || (waypoint2 == -1))
 		{
 			// play "error" sound...
-			if(g_waypointsound)
+			if(bool(jb_wpsound->value))
 				EMIT_SOUND_DYN2(pEntity, CHAN_WEAPON, "common/wpn_denyselect.wav", 1.0,ATTN_NORM, 0, 100);
 			
 			return;
@@ -1777,7 +1764,7 @@ void WaypointCreatePath(edict_t *pEntity, int cmd)
 		WaypointAddPath(waypoint1, waypoint2);
 		
 		// play "done" sound...
-		if(g_waypointsound)
+		if(bool(jb_wpsound->value))
 			EMIT_SOUND_DYN2(pEntity, CHAN_WEAPON, "common/wpn_hudon.wav", 1.0,ATTN_NORM, 0, 100);
 	}
 }
@@ -1796,14 +1783,14 @@ void WaypointRemovePath(edict_t *pEntity, int cmd)
 		if (waypoint1 == -1)
 		{
 			// play "cancelled" sound...
-			if(g_waypointsound)
+			if(bool(jb_wpsound->value))
 				EMIT_SOUND_DYN2(pEntity, CHAN_WEAPON, "common/wpn_moveselect.wav", 1.0,ATTN_NORM, 0, 100);
 			
 			return;
 		}
 		
 		// play "start" sound...
-		if(g_waypointsound)
+		if(bool(jb_wpsound->value))
 			EMIT_SOUND_DYN2(pEntity, CHAN_WEAPON, "common/wpn_hudoff.wav", 1.0,ATTN_NORM, 0, 100);
 		
 		return;
@@ -1816,7 +1803,7 @@ void WaypointRemovePath(edict_t *pEntity, int cmd)
 		if ((waypoint1 == -1) || (waypoint2 == -1))
 		{
 			// play "error" sound...
-			if(g_waypointsound)
+			if(bool(jb_wpsound->value))
 				EMIT_SOUND_DYN2(pEntity, CHAN_WEAPON, "common/wpn_denyselect.wav", 1.0,ATTN_NORM, 0, 100);
 			
 			return;
@@ -1825,14 +1812,14 @@ void WaypointRemovePath(edict_t *pEntity, int cmd)
 		WaypointDeletePath(waypoint1, waypoint2);
 		
 		// play "done" sound...
-		if(g_waypointsound)
+		if(bool(jb_wpsound->value))
 			EMIT_SOUND_DYN2(pEntity, CHAN_WEAPON, "common/wpn_hudon.wav", 1.0,ATTN_NORM, 0, 100);
 	}
 }
 
 bool WaypointLoad(edict_t *pEntity, const char *szDir)
 {
-	if(pEntity&&g_waypointsound)
+	if(pEntity&&bool(jb_wpsound->value))
 		(*g_engfuncs.pfnClientCommand)(pEntity,"speak \"loading\"\n");
 	
 	char mapname[64];
@@ -1892,6 +1879,9 @@ bool WaypointLoad(edict_t *pEntity, const char *szDir)
 		header.filetype[7] = 0;
 		if (FStrEq(header.filetype, _WPFILEDESC))
 		{
+			sprintf(szTemp, "%s,v%d", filename, header.waypoint_file_version);
+			CVAR_SET_STRING("jb_wpfilename", szTemp);
+
 			if (header.waypoint_file_version == 1)
 			{
 				printf("JoeBOT: loading waypoint file type 1\n");
@@ -1919,10 +1909,9 @@ bool WaypointLoad(edict_t *pEntity, const char *szDir)
 					if(waypoints[i].origin.Length() == 0){
 						waypoints[i].flags |= W_FL_DELETED;
 					}
-#ifndef CSTRIKE15
-// HACK: compensate for cs1.6 origin
-waypoints[i].origin = waypoints[i].origin - Vector(1150.0,0.0,0.0);
-#endif
+					// HACK: offset for maps with new origin
+					waypoints[i].origin = waypoints[i].origin - Vector(jb_wpoffsetx->value,jb_wpoffsety->value,jb_wpoffsetz->value);
+
 					num_waypoints++;
 				}
 				
@@ -1956,6 +1945,9 @@ waypoints[i].origin = waypoints[i].origin - Vector(1150.0,0.0,0.0);
 				for (i=0; i < header.number_of_waypoints; i++)
 				{
 					fread(&waypoints[i], sizeof(waypoints[0]), 1, bfp);
+					// HACK: offset for maps with new origin
+					waypoints[i].origin = waypoints[i].origin - Vector(jb_wpoffsetx->value,jb_wpoffsety->value,jb_wpoffsetz->value);
+
 					num_waypoints++;
 				}
 				
@@ -2013,11 +2005,9 @@ waypoints[i].origin = waypoints[i].origin - Vector(1150.0,0.0,0.0);
 		if (IS_DEDICATED_SERVER())
 			printf("waypoint file %s not found!\n", filename);
 		
-		FILE *fhd;
-		fhd = fopen("bot.txt","a");
-		if(fhd)fprintf(fhd,"joebot waypoint file \"%s\" not found\n",filename);
-		if(fhd)fclose(fhd);
-		
+#ifdef DEBUGENGINE
+		BOT_LOG("WaypointLoad", "joebot waypoint file \"%s\" not found", filename);
+#endif
 		return FALSE;
 	}
 	
@@ -2090,10 +2080,6 @@ bool WaypointSave(edict_t *pEntity,const char *szDir)
 		// write the waypoint data to the file...
 		for (index=0; index < num_waypoints; index++)
 		{
-#ifndef CSTRIKE15
-// HACK: compensate for cs1.6 origin
-waypoints[index].origin = waypoints[index].origin + Vector(1150.0,0.0,0.0);
-#endif
 			fwrite(&waypoints[index], sizeof(waypoints[0]), 1, bfp);
 		}
 		
@@ -2171,7 +2157,7 @@ waypoints[index].origin = waypoints[index].origin + Vector(1150.0,0.0,0.0);
 		fclose(bfp);
 
 		if(pEntity
-			&&g_waypointsound)
+			&&bool(jb_wpsound->value))
 			(*g_engfuncs.pfnClientCommand)(pEntity,"speak \"save\"\n");
 		return true;
 	}
@@ -2909,7 +2895,7 @@ void WaypointThink(edict_t *pEntity)
 	int p;
 	static bool bwpon;
 	
-	if (g_auto_waypoint)  // is auto waypoint on?
+	if (bool(jb_wpauto->value))  // is auto waypoint on?
 	{
 		edict_t *pEnt;
 		int iNearL,iNear,iAdd=-1;
@@ -2918,7 +2904,7 @@ void WaypointThink(edict_t *pEntity)
 		for (i = gpGlobals->maxClients; i ; i--){
 			pEnt = INDEXENT(i);
 			
-			if(g_bAutowpHuman){		// only humans can autowaypoint
+			if(!bool(jb_wpautobots->value)){		// only humans can autowaypoint
 				if(UTIL_GetBotIndex(pEnt) == -1){
 					continue;
 				}
@@ -2948,7 +2934,7 @@ void WaypointThink(edict_t *pEntity)
 							iAdd = WaypointAdd(pEnt);
 					}
 				}
-				if(pEnt->v.button & IN_JUMP && g_autowpjump && !bRec[i]){
+				if(pEnt->v.button & IN_JUMP && bool(jb_wpautojump->value) && !bRec[i]){
 					AWP_ED[i].fLJumpTime = gpGlobals->time;
 					iNearL = WaypointFindNearestGoal(pEnt->v.origin,pEnt,50,UTIL_GetTeam(pEnt),W_FL_JUMP);
 
@@ -3011,15 +2997,14 @@ void WaypointThink(edict_t *pEntity)
 						VEnd = pEnt -> v.origin - Vector(0,0,24);
 					}
 					UTIL_TraceLine(VStart,VEnd,ignore_monsters,dont_ignore_glass,pEnt,&tr);
-					if(!g_bTestJump
+					if(!bool(jb_wpautojumptest->value)
 						|| tr.flFraction != 1.0
 						|| !WaypointReachable(AWP_ED[i].VLastJumpStartOrigin,pEnt->v.origin,pEnt)){		// i.e. line is fract and there is the need of using a jump wp or the location isn't reachable
 						// add wp at start
 						if(AWP_ED[i].iLastJumpStartWPIndex == -1){
-							bool temp;
 							float fMin = 0;
-							temp = g_auto_addpath;
-							g_auto_addpath = false;
+							float pval = jb_wpautopath->value;
+							CVAR_SET_FLOAT("jb_wpautopath", 0);
 							if((iAdd=WaypointFindNearest(pEnt,20,UTIL_GetTeam(pEnt),fMin,false,false,false)) != -1){
 								waypoints[iAdd].flags|= W_FL_JUMP;
 							}
@@ -3029,7 +3014,7 @@ void WaypointThink(edict_t *pEntity)
 							
 							// cause wpadd traces down to the ground, set the origin a second time
 							waypoints[iAdd].origin = AWP_ED[i].VLastJumpStartOrigin;
-							g_auto_addpath = temp;
+							CVAR_SET_FLOAT("jb_wpautopath", pval);
 						}
 						else{
 							waypoints[AWP_ED[i].iLastJumpStartWPIndex].flags|= W_FL_JUMP;
@@ -3048,19 +3033,17 @@ void WaypointThink(edict_t *pEntity)
 						// look for a near waypoint or add one for if needed
 						iNearL = WaypointFindNearest(pEnt->v.origin,pEnt,30,UTIL_GetTeam(pEnt));
 						if(iNearL==-1){
-							bool temp;
-							temp = g_auto_addpath;
-							g_auto_addpath = false;
+							float pval = jb_wpautopath->value;
+							CVAR_SET_FLOAT("jb_wpautopath", 0);
 							iAdd = WaypointAdd(pEnt);
-							//waypoints[iAdd].flags|= W_FL_JUMP;
-							g_auto_addpath = temp;
+							CVAR_SET_FLOAT("jb_wpautopath", pval);
 							
 							iNearL = iAdd;
 						}
 						
 						ADVL[i].iIndexEndWP = iNearL;
 						
-						if(g_waypointadv)
+						if(bool(jb_wpautoadvanced->value))
 							WaypointAddADV(ADVL[i].iIndexStartWP,ADVL[i].iIndexEndWP,&ADVL[i]);
 					}
 					else{
@@ -3138,12 +3121,12 @@ void WaypointThink(edict_t *pEntity)
 	PATH *ppath;
 	bool b1ND;
 	
-	if(bwpon != g_waypoint_on){
+	if(bwpon != bool(jb_wp->value)){
 		for (i=0; i < num_waypoints; i++)
 			wp_display_time[i] = 0;
 	}
 	
-	if (g_waypoint_on && g_b5th)  // display the waypoints if turned on...
+	if (bool(jb_wp->value) && g_b5th)  // display the waypoints if turned on...
 	{
 		// display information :
 		if(listenserver_edict && listenserver_edict == pEntity){
@@ -3174,7 +3157,7 @@ void WaypointThink(edict_t *pEntity)
 			UTIL_ShowText(listenserver_edict,message_params,szWPInfo);
 		}
 		//bool bnot;
-		bwpon = g_waypoint_on;
+		bwpon = bool(jb_wp->value);
 		b1ND = 0;
 		if(pEntity == pEdictPlayer)
 			for (i=0; i < num_waypoints; i++)
@@ -3335,7 +3318,7 @@ void WaypointThink(edict_t *pEntity)
 							b1ND |= WaypointDrawBeam(pEntity, start, eend, iWidth, 2, 0,255,0, 250, 5);
 						}
 #ifdef DEBUGMESSAGES
-						if(g_waypoint_stat){
+						if(bool(jb_wpstats->value)){
 							start = waypoints[i].origin + Vector(20,0,-20);
 							eend = waypoints[i].origin + Vector(20,0,0);
 							b1ND |= WaypointDrawBeam(pEntity, start, eend, iWidth/2, 2, 0,255,0, 50, 5);
@@ -3473,7 +3456,7 @@ void WaypointThink(edict_t *pEntity)
       }
 	  
       // check if path waypointing is on...
-      if (g_path_waypoint)
+      if (bool(jb_wppath->value))
       {
 		  // check if player is close enough to a waypoint and time to draw path...
 		  if ((min_distance <= 50) && (f_path_time <= gpGlobals->time))
@@ -3945,7 +3928,7 @@ void WaypointRouteInit(void)
 // return the next waypoint index for a path from the Floyd matrix when
 // going from a source waypoint index (src) to a destination waypoint
 // index (dest)...
-int WaypointRouteFromTo(int src, int dest, int team)
+unsigned short WaypointRouteFromTo(int src, int dest, int team)
 {
 	if((unsigned int)src < route_num_waypoints&&(unsigned int)dest < route_num_waypoints){
 		unsigned short *pFromTo;
@@ -3963,11 +3946,11 @@ int WaypointRouteFromTo(int src, int dest, int team)
 			return -1;
 		
 		pFromTo = from_to[team];
-		
+
 		return pFromTo[src * route_num_waypoints + dest];
 	}
 	else
-		return -1;
+		return WAYPOINT_UNREACHABLE;
 }
 
 

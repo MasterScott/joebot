@@ -216,7 +216,7 @@ void WaypointPrintTest(edict_t *pEntity);
 void WaypointThink(edict_t *pEntity);
 void WaypointFloyds(short *shortest_path, short *from_to);
 void WaypointRouteInit(void);
-int  WaypointRouteFromTo(int src, int dest, int team);
+unsigned short  WaypointRouteFromTo(int src, int dest, int team);
 int  WaypointDistanceFromTo(int src, int dest, int team);
 
 bool WaypointGetDir(char *szFile,char *szDest);
