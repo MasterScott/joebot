@@ -177,5 +177,4 @@ qboolean pfnVoice_GetClientListening(int iReceiver, int iSender);
 qboolean pfnVoice_SetClientListening(int iReceiver, int iSender, qboolean bListen);
 const char *pfnGetPlayerAuthID(edict_t *e);
 
-#endif // ENGINE_H
-
+#endif //ENGINE_H
