@@ -56,6 +56,8 @@ bool DistanceSight(void);
 	virtual long IsKnifeWeapon(long lbit);
 	virtual long IsMachineGunWeapon(long lbit);
 	virtual long IsGrenadeWeapon(long lbit);
+	virtual bool HasShield(void);
+	virtual bool IsShieldDrawn(void);
 	virtual long WeaponModel2ID(const char *);
 
 	virtual bool IsWeaponBetterCurrent(long);
@@ -123,12 +125,13 @@ void BotBuy_CS_WEAPON_DEAGLE(CBotBase *pBot);
 void BotBuy_CS_WEAPON_SG552(CBotBase *pBot);
 void BotBuy_CS_WEAPON_AK47(CBotBase *pBot);
 void BotBuy_CS_WEAPON_P90(CBotBase *pBot);
+
 void BotBuy_PAmmo(CBotBase *pBot);
 void BotBuy_SAmmo(CBotBase *pBot);
-
-void BotBuy_CS_WEAPON_Kevlar(CBotBase *pBot);
-void BotBuy_CS_WEAPON_KevlarHelmet(CBotBase *pBot);
-void BotBuy_CS_WEAPON_Defuse(CBotBase *pBot);
-void BotBuy_CS_WEAPON_Shield(CBotBase *pBot);
+void BotBuy_Kevlar(CBotBase *pBot);
+void BotBuy_KevlarHelmet(CBotBase *pBot);
+void BotBuy_Defuse(CBotBase *pBot);
+void BotBuy_NightVision(CBotBase *pBot);
+void BotBuy_Shield(CBotBase *pBot);
 
 #endif //__CBOTCS_H
