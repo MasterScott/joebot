@@ -35,30 +35,14 @@
 #include "bot.h"
 #include "CBotBase.h"
 
+#ifdef _WIN32
 #ifdef __BORLANDC__
-extern HINSTANCE _h_Library;
-#elif _WIN32
+#define h_Library _h_Library
+#endif /* __BORLANDC__ */
 extern HINSTANCE h_Library;
 #else
 extern void *h_Library;
-#endif
-
-#ifdef __BORLANDC__
-
-#define LINK_ENTITY_TO_FUNC(mapClassName) \
-	extern "C" EXPORT void mapClassName( entvars_t *pev ); \
-	void mapClassName( entvars_t *pev ) { \
-	static LINK_ENTITY_FUNC otherClassName = NULL; \
-	static int skip_this = 0; \
-	if (skip_this) return; \
-	if (otherClassName == NULL) \
-	otherClassName = (LINK_ENTITY_FUNC)GetProcAddress(_h_Library, #mapClassName); \
-	if (otherClassName == NULL) { \
-	skip_this = 1; return; \
-	} \
-(*otherClassName)(pev); }
-
-#else
+#endif /* _WIN32 */
 
 #define LINK_ENTITY_TO_FUNC(mapClassName) \
 	extern "C" EXPORT void mapClassName( entvars_t *pev ); \
@@ -72,8 +56,6 @@ extern void *h_Library;
 	skip_this = 1; return; \
 	} \
 (*otherClassName)(pev); }
-
-#endif
 
 
 // Entities for Valve's hl.dll and Standard SDK...
