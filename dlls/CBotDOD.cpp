@@ -108,7 +108,7 @@ void CBotDOD :: HandleMenu( void )
 		//FakeClientCommand(pEdict, "menuselect %i", bot_class);
 		
 		// bot has now joined the game (doesn't need to be started)
-		//not_started = 0;
+		//not_started = false;
 		return;
 	}
 	else if (start_action == MSG_DOD_CLASS_SELECT_AX)
@@ -137,7 +137,7 @@ void CBotDOD :: HandleMenu( void )
 		//FakeClientCommand(pEdict, "menuselect %i", bot_class);
 		
 		// bot has now joined the game (doesn't need to be started)
-		//not_started = 0;
+		//not_started = false;
 		return;
 	}
 
@@ -170,7 +170,7 @@ void CBotDOD :: HandleMenu( void )
 		FakeClientCommand(pEdict, "%s", c_class);
 		
 		// bot has now joined the game (doesn't need to be started)
-		//not_started = 0;
+		//not_started = false;
 		return;
 	}
 	else if (start_action == MSG_DOD_CLASS_SELECT_AX_PARA)
@@ -204,7 +204,7 @@ void CBotDOD :: HandleMenu( void )
 		FakeClientCommand(pEdict, "%s", c_class);
 		
 		// bot has now joined the game (doesn't need to be started)
-		//not_started = 0;
+		//not_started = false;
 		return;
 	}
 
@@ -380,7 +380,7 @@ void CBotDOD :: SpawnInit(void)
 	bot_armor = 0;
 	bot_weapons = 0;
 	
-	//f_max_speed = CVAR_GET_FLOAT("sv_maxspeed");
+	//f_max_speed = g_sv_maxspeed->value;
 	
 	prev_speed = 0.0;  // fake "paused" since bot is NOT stuck
 	
@@ -1938,7 +1938,7 @@ Init();
 iGoal = -1;
 iFarGoal = -1;
 // don't forget the freezetime !! -> freezetime is done by setmaxspeed
-//f_pause_time  = gpGlobals->time + CVAR_GET_FLOAT("mp_freezetime");
+//f_pause_time  = gpGlobals->time + g_mp_freezetime->value;
 
 //FakeClientCommand(pEdict,"say inited");
 bRSInit = false;		// don't process this a second time this round

@@ -96,10 +96,13 @@ SOMPattern SP(6);
 bool bNNInit = false;
 bool bNNInitError;
 
+cvar_t *g_sv_maxspeed;		// sv_maxspeed cvar
+cvar_t *g_mp_freezetime;	// mp_freezetime cvar
+
 SInfo SBInfo[32];
 CBotBase *bots[32];   // max of 32 bots in a game
 
-int   need_init = 1;
+bool   need_init = true;
 
 bool g_bBombPlanted;		// bomb has been planted
 float g_iBombExplode;
@@ -139,7 +142,7 @@ void InitGlobalRS(void){
 				pEnt = INDEXENT(ischl);
 
 				if(pEBot && pEnt && (!pEBot->free) && (!pEnt->free)){
-					piDist[ischl][iBotschl] = (pEBot->v.origin-pEnt->v.origin).Length();
+					piDist[ischl][iBotschl] = int((pEBot->v.origin-pEnt->v.origin).Length());
 					piDist[iBotschl][ischl] = piDist[ischl][iBotschl];
 				}
 			}
@@ -269,12 +272,15 @@ void BotCreate( edict_t *pPlayer, const char *szTeam, const char *szClass,const 
 	int index; // index of pointer to bot ( bot[] )
 	
 	// initialize the bots array of structures if first time here...
-	if (need_init == 1)
+	if (need_init)
 	{
-		need_init = 0;
+		need_init = false;
 		//memset(bots, 0, sizeof(bots));
 		for(long l=0;l<32;l++){
 		}
+
+		g_sv_maxspeed = CVAR_GET_POINTER("sv_maxspeed");
+		g_mp_freezetime = CVAR_GET_POINTER("mp_freezetime");
 	}
 	
 	const CBotNamesItem *pName = 0;
@@ -436,7 +442,7 @@ void BotCreate( edict_t *pPlayer, const char *szTeam, const char *szClass,const 
 		
 		pBot->pEKilled = NULL;
 
-		pBot->not_started = 1;  // hasn't joined game yet
+		pBot->not_started = true;  // hasn't joined game yet
 		
 		if (mod_id == TFC_DLL)
 			pBot->start_action = MSG_TFC_IDLE;

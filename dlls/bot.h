@@ -107,6 +107,9 @@ typedef struct{
 #define DOD_FLAG_ALLIES	1
 #define DOD_FLAG_AXIS	2
 
+extern cvar_t *g_sv_maxspeed;		// sv_maxspeed cvar
+extern cvar_t *g_mp_freezetime;	// mp_freezetime cvar
+
 typedef struct{
 	int respawn_state;
 	float kick_time;

@@ -73,7 +73,7 @@ void CBotCS :: HandleMenu( void )
 					bot_team = 5; // auto-assign if invalid
 			}
 			start_action = MSG_CS_IDLE; // switch back to idle
-			not_started = 0;
+			if (bot_team != 6) not_started = false;
 			FakeClientCommand(pEdict, "menuselect %d", bot_team);
 			break;
 
@@ -81,7 +81,7 @@ void CBotCS :: HandleMenu( void )
 		case MSG_CS_T_SELECT:  // terrorist
 			if ((bot_class < 1) || (bot_class > 4)) bot_class = 5;  // auto-select if invalid
 			start_action = MSG_CS_IDLE;  // switch back to idle
-			not_started = 0; // bot has now joined the game (doesn't need to be started)
+			not_started = false; // bot has now joined the game (doesn't need to be started)
 			FakeClientCommand(pEdict, "menuselect %d", bot_class);
 			break;
 
@@ -104,8 +104,8 @@ void CBotCS :: SpawnInit(void)
 	bot_weapons = 0;
 	bot_money = 0;
 	
-	f_max_speed = CVAR_GET_FLOAT("sv_maxspeed");
-	f_Pause  = gpGlobals->time + CVAR_GET_FLOAT("mp_freezetime");
+	f_max_speed = g_sv_maxspeed->value;
+	f_Pause  = gpGlobals->time + g_mp_freezetime->value;
 	
 	prev_speed = 0.0;  // fake "paused" since bot is NOT stuck
 	
@@ -126,7 +126,7 @@ void CBotCS :: SpawnInit(void)
 }
 
 void CBotCS :: Init(void){
-	float ffreeze = CVAR_GET_FLOAT("mp_freezetime");
+	float ffreeze = g_mp_freezetime->value;
 	float fRSS = gpGlobals-> time + ffreeze;
 	bot_teamnm = UTIL_GetTeam(pEdict);
 	//	f_5th = RANDOM_FLOAT(0.0,0.5);
@@ -362,7 +362,6 @@ bool CBotCS :: BuyWeapon(void){
 		int ibot_money = bot_money-200;
 		int iWeaponDecision=-1;
 		float fChoice;
-		bool bDontBuyFW = false;
 		float fBuyLProb[32];
 		
 		long lKSniper=0,
@@ -1876,7 +1875,7 @@ void CBotCS :: Think(void){
 		
 		ResetWPlanning();
 		// don't forget the freezetime !! -> freezetime is done by setmaxspeed
-		//f_pause_time  = gpGlobals->time + CVAR_GET_FLOAT("mp_freezetime");
+		//f_pause_time  = gpGlobals->time + g_mp_freezetime->value;
 		
 		//FakeClientCommand(pEdict,"say inited");
 		bRSInit = false;		// don't process this a second time this round
@@ -1889,6 +1888,7 @@ void CBotCS :: Think(void){
 	// set this for the next time the bot dies so it will initialize stuff
 	need_to_initialize = TRUE;
 	
+	f_max_speed = g_sv_maxspeed->value;
 	f_move_speed = f_max_speed;
 	if (g_b5th){								// this is every .2 s the case
 		Think5th();
