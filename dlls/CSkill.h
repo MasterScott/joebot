@@ -39,6 +39,7 @@ struct CSkillItem{
 	float fTPD;				// how much time it takes to recognize enemies above this distance ... this value is milliseconds per 1000 units
 	float fProneInDistance;	// max distance at which enemies are seen instantly - prone
 	float fProneTPD;		// how much time it takes to recognize enemies above this distance ... this value is milliseconds per 1000 units - prone
+	float fMaxRecoil;		// maximum ammount of recoil before the bots stops shooting for some time ( burst fire )
 };
 
 class CSkill:private CParser{

@@ -15,6 +15,7 @@
 # TPD : milliseconds it takes to look further 1000 units
 # PDI : distance to overlook instantly									|| prone
 # PTD : milliseconds it takes to look further 1000 units						|| prone
+# REC : Amount of recoil when the bot should stop shooting for some short time ( amount is tan(RecoilAngle) * fEnemyDistance )
 #
 # Note that PDI and PTD are added to the normal delay DIS and TPD
 # 
@@ -32,6 +33,7 @@ DIS 500
 TPD 1000
 PDI 250
 PTD 3000
+REC 50
 }
 
 SKILL 100
@@ -45,4 +47,5 @@ DIS 2000
 TPD 10
 PDI 1000
 PTD 1000
+REC 20
 }

@@ -138,6 +138,8 @@ CBotBase :: CBotBase():LTMem(this){
 	f_NJumpTill=0;
 	f_TimeBJumps=1;
 
+	f_MaxRecoil = 20;
+
 	v_avoid = Vector(0,0,0);
 	
 	f_IOrigD = 0;
@@ -2119,6 +2121,7 @@ void CBotBase :: UpdateSkill(void){
 	f_ProneInDistance	= temp.fProneInDistance;
 	f_ProneTPD			= temp.fProneTPD;
 	i_ITP				= temp.fITurnProb;
+	f_MaxRecoil			= temp.fMaxRecoil;
 
 	char *infobuffer;
 	int clientIndex;

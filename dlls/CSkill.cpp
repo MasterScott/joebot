@@ -77,6 +77,7 @@ void CSkill :: Load(void){
 				SITemp.fProneTPD = 0;
 				SITemp.fTPD = 0;
 				SITemp.fShootThru = 0;
+				SITemp.fMaxRecoil = 20;
 
 				szNext = strstr(szAct,"SKILL");
 				sscanf(szAct,"SKILL %i",&SITemp.iSkill);
@@ -141,6 +142,12 @@ void CSkill :: Load(void){
 					sscanf(szRead,"PTD %f",&SITemp.fProneTPD);
 				}
 
+				szRead = szAct;
+				szRead = strstr(szRead,"REC");
+				if(szRead){
+					sscanf(szRead,"REC %f",&SITemp.fMaxRecoil);
+				}
+
 				szAct ++;
 				
 				// copy data to class
@@ -189,6 +196,9 @@ void CSkill :: GetSkill(int iSkill,CSkillItem &Copy2){
 			/float(SData[ischl].iSkill-SData[ischl-1].iSkill))
 			*(iSkill-SData[ischl-1].iSkill);
 		Copy2.fTPD = SData[ischl-1].fTPD + ((SData[ischl].fTPD-SData[ischl-1].fTPD)
+			/float(SData[ischl].iSkill-SData[ischl-1].iSkill))
+			*(iSkill-SData[ischl-1].iSkill);
+		Copy2.fMaxRecoil = SData[ischl-1].fMaxRecoil + ((SData[ischl].fMaxRecoil-SData[ischl-1].fMaxRecoil)
 			/float(SData[ischl].iSkill-SData[ischl-1].iSkill))
 			*(iSkill-SData[ischl-1].iSkill);
 	}

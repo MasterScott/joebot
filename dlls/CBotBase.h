@@ -284,6 +284,7 @@ public:
 	int i_ITP;
 	float f_Delay;			// delay before first shoot
 	float f_PauseShoot;		// time to pause shooting - Used by PauseShoot based on Data from NNWeapon.cpp
+	float f_MaxRecoil;		// max recoil
 	float f_DenyWChange;	// set it to a certain time when u don't want any weapon changes
 	float f_TKPunish;
 	float f_Camp;			// last time of camping

@@ -409,6 +409,7 @@ void CBotDOD :: UpdateSkill(void){
 	f_ProneInDistance	= temp.fProneInDistance;
 	f_ProneTPD			= temp.fProneTPD;
 	i_ITP				= temp.fITurnProb;
+	f_MaxRecoil			= temp.fMaxRecoil;
 	
 	char *infobuffer;
 	int clientIndex;
