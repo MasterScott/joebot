@@ -283,18 +283,18 @@ bool CBotCS :: BuyWeapon(void){
 	FakeClientCommand(pEdict,"menuselect 0");
 	
 	//BotHandleMenu(pBot);
-	if(m_iBotMoney < 300)
+	if(m_iBotMoney < 300)			// poor bots cant buy weapons
 		return false;
 	
-	if(Task.SearchT(BT_PICKUP) != -1)
+	if(Task.SearchT(BT_PICKUP) != -1)		// if we are about to pick up some weapon, just return
 		return false;
 	
-	if(HasPrimary())
+	if(HasPrimary())				// if we have already a primary, we need ammo
 		BotBuy_PAmmo(this);
 	
-	if(m_iBotMoney < 1600
-		|| CVAR_BOOL(jb_pistolonly)
-		|| (HasPrimary() && m_iBotMoney > 4000))
+	if(m_iBotMoney < 1600					// just buy a pistol when having only few credits
+		|| CVAR_BOOL(jb_pistolonly)			// or if we don't want anything else but pistols
+		|| (HasPrimary() && m_iBotMoney > 4000))	// or if we can afford something better :D
 	{
 		if(HasSecondary() != CS_WEAPON_DEAGLE &&			// ya don't need 2 deagles etc.
 			HasSecondary() != CS_WEAPON_ELITE &&
@@ -331,12 +331,12 @@ bool CBotCS :: BuyWeapon(void){
 				m_flBuyTime = gpGlobals->time + 2.0f;
 			}
 			
-			BotBuy_SAmmo(this);
+			BotBuy_SAmmo(this);			// of course we need ammo
 		}
 		return true;
 	}
 	else{
-		if(HasPrimary())
+		if(HasPrimary())				// we cannot carry 2 weapons
 			return true;
 		
 		if(!bLoadedLPB){				// evtl. load probabilities
@@ -357,7 +357,7 @@ bool CBotCS :: BuyWeapon(void){
 			bKSub = false,
 			bKShot = false;
 		
-		// process log of weapon with which the bot has been killed
+		// process log of weapon with which the bot has been killed. the prop of such a weapon should be higher
 		for(ischl = 0;ischl < _MAXLKW;ischl++){
 			if(FLKW[ischl] != -1){
 				if(IsSniperWeapon(1<<FLKW[ischl])){
@@ -375,7 +375,7 @@ bool CBotCS :: BuyWeapon(void){
 		lKSniper>lKSub&&lKSniper>lKShot?
 			bKSniper=true:lKSub>lKSniper&&lKSub>lKShot?
 				bKSub=true:lKShot>lKSniper&&lKShot>lKSub?
-					bKShot=true:0==0;
+					bKShot=true:0==0;		// set flags to increase propability later on
 		
 		if(im_iBotMoney > 3500)
 			im_iBotMoney -= 1000;
@@ -421,19 +421,19 @@ bool CBotCS :: BuyWeapon(void){
 				}
 				if(lPWeapon == lschl)							// pref weapon
 					fTemp[lschl] *=2.0;
-				if(WeaponDefs.iCost[mod_id][lschl] > im_iBotMoney){	// no prob for too expenive weapons
+				if(WeaponDefs.iCost[mod_id][lschl] > im_iBotMoney){	// no prob for too expensive weapons
 					fTemp[lschl]=0;
 				}
-				if(WeaponDefs.iTeam[mod_id][lschl] != -1){
+				if(WeaponDefs.iTeam[mod_id][lschl] != -1){		// check if this team can buy such a weapon
 					if(WeaponDefs.iTeam[mod_id][lschl] != bot_teamnm){
 						fTemp[lschl]=0;
 					}
 				}
 			}
-			for(lschl=0;lschl<32;lschl++)
+			for(lschl=0;lschl<32;lschl++)		// sum up to calculate probability
 				fSum+=fTemp[lschl];
 			
-			for(lschl=0;lschl<32;lschl++){
+			for(lschl=0;lschl<32;lschl++){		// normalize everything to 100 ... not really needed, although the code later on might look simpler
 				fBuyLProb[lschl] = fLast + fTemp[lschl] / fSum * 100.0f;
 				fLast = fBuyLProb[lschl];
 				if(fTemp[lschl] == .0)
@@ -441,7 +441,7 @@ bool CBotCS :: BuyWeapon(void){
 			}
 			//////////////////////////////////
 			
-			for(ischl=0;ischl<32;ischl++){
+			for(ischl=0;ischl<32;ischl++){		// select that weapon the random generator selected
 				if(fChoice < fBuyLProb[ischl]){
 					iWeaponDecision = ischl;
 					break;
@@ -463,9 +463,10 @@ bool CBotCS :: BuyWeapon(void){
 					LOG_BUYWEAPON(UTIL_VarArgs(" is ok\n"));
 				}
 				
-				//FakeClientCommand(pEdict,"menuselect 0");	//quit fuckin menues
 				Buy[iWeaponDecision](this);
 				
+				// if we bought a sniper weapon, we shouldnt follow someone else, but we should be free
+				// to call on radio for cover ... therefore remove BT_ROAMTEAM
 				if(iWeaponDecision == CS_WEAPON_SCOUT || iWeaponDecision == CS_WEAPON_AWP){
 					Task.RemoveT(BT_ROAMTEAM);
 				}
@@ -473,10 +474,8 @@ bool CBotCS :: BuyWeapon(void){
 		}
 		
 		BotBuy_PAmmo(this);
-		/*Buy[CS_WEAPON_HEGRENADE](this);
-		Buy[CS_WEAPON_FLASHBANG](this);
-		Buy[CS_WEAPON_FLASHBANG](this);*/
 		
+		// buy grenades
 		if(im_iBotMoney > 900 &&
 			HasPrimary()){
 			if(RANDOM_LONG(0,100) > _BUY_HE){
@@ -490,6 +489,7 @@ bool CBotCS :: BuyWeapon(void){
 			}
 		}
 		
+		// maybe buy a better pistol ?
 		if((HasSniper() == CS_WEAPON_AWP
 			||HasSniper() == CS_WEAPON_SCOUT
 			||HasSniper() == CS_WEAPON_G3SG1
@@ -532,7 +532,8 @@ bool CBotCS :: BuyWeapon(void){
 			BotBuy_Defuse(this);
 		}
 		
-		if(bot_armor<50
+		// if we can afford some additional armor and we need some
+		if(bot_armor < 50
 			&& RANDOM_LONG(0,100) < 50){
 			if (im_iBotMoney > 1000)
 				BotBuy_KevlarHelmet(this);
