@@ -438,7 +438,7 @@ bool UTIL_IsVIP(edict_t *pEntity){
 		
 		infobuffer = GET_INFOKEYBUFFER( pEntity );
 		strcpy(model_name, INFOKEY_VALUE(infobuffer, "model"));
-		return FStrEq(model_name, "vip");
+		return FStrEq(model_name, "vip") ? true : false;
 	}
 	else
 		return false;
