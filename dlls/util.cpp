@@ -54,9 +54,10 @@
 #include "bot.h"
 #include "bot_func.h"
 #include "bot_modid.h"
-#include "globalvars.h"
 #include "CBotBase.h"
 #include "CBotCS.h"
+#include "Commandfunc.h"
+#include "globalvars.h"
 
 extern int mod_id;
 
@@ -1178,3 +1179,27 @@ void UTIL_strlwr(char *p){
 		p ++;
 	}
 }
+
+#ifdef DEBUGENGINE
+int BOT_LOG(const char *fnName, const char *fmt, ...)
+{
+	static FILE *fp;
+	va_list argptr;
+	int n = 0;
+
+	if (debug_engine)
+	{
+		fp = fopen("bot.txt","a");
+
+		n += fprintf(fp, "%s: ", fnName);
+		va_start (argptr, fmt);
+		n += vfprintf (fp, fmt, argptr);
+		va_end (argptr);
+		n += fprintf(fp, "\n");
+		
+		fclose(fp);
+	}
+
+	return n;
+}
+#endif

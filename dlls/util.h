@@ -24,10 +24,6 @@
 #include "activity.h"
 #endif
 
-// teams in CStrike
-#define TE 0
-#define CT 1
-
 #ifndef ENGINECALLBACK_H
 #include "enginecallback.h"
 #endif
@@ -105,7 +101,6 @@ typedef int BOOL;
 //
 // Conversion among the three types of "entity", including identity-conversions.
 //
-
 #ifdef DEBUG
 	extern edict_t *DBG_EntOfVars(const entvars_t *pev);
 	inline edict_t *ENT(const entvars_t *pev){ return DBG_EntOfVars(pev); }
@@ -215,11 +210,13 @@ extern Vector		UTIL_VecToAngles		(const Vector &vec);
 extern float		UTIL_AngleMod			(float a);
 extern float		UTIL_AngleDiff			( float destAngle, float srcAngle );
 
-/*extern CBaseEntity	*UTIL_FindEntityInSphere(CBaseEntity *pStartEntity, const Vector &vecCenter, float flRadius);
+/*
+extern CBaseEntity	*UTIL_FindEntityInSphere(CBaseEntity *pStartEntity, const Vector &vecCenter, float flRadius);
 extern CBaseEntity	*UTIL_FindEntityByString(CBaseEntity *pStartEntity, const char *szKeyword, const char *szValue );
 extern CBaseEntity	*UTIL_FindEntityByClassname(CBaseEntity *pStartEntity, const char *szName );
 extern CBaseEntity	*UTIL_FindEntityByTargetname(CBaseEntity *pStartEntity, const char *szName );
-extern CBaseEntity	*UTIL_FindEntityGeneric(const char *szName, Vector &vecSrc, float flRadius );*/
+extern CBaseEntity	*UTIL_FindEntityGeneric(const char *szName, Vector &vecSrc, float flRadius );
+*/
 
 // returns a CBaseEntity pointer to a player by index.  Only returns if the player is spawned and connected
 // otherwise returns NULL
@@ -257,7 +254,6 @@ extern void			UTIL_TraceLine			(const Vector &vecStart, const Vector &vecEnd, IG
 extern void			UTIL_TraceLine			(const Vector &vecStart, const Vector &vecEnd, IGNORE_MONSTERS igmon, IGNORE_GLASS ignoreGlass, edict_t *pentIgnore, TraceResult *ptr);
 typedef enum { point_hull=0, human_hull=1, large_hull=2, head_hull=3 } HULLTYPE;
 extern void			UTIL_TraceHull			(const Vector &vecStart, const Vector &vecEnd, IGNORE_MONSTERS igmon, int hullNumber, edict_t *pentIgnore, TraceResult *ptr);
-extern void			UTIL_TraceHull			(const Vector &vecStart, const Vector &vecEnd, IGNORE_MONSTERS igmon, IGNORE_GLASS ignoreGlass,int hullNumber, edict_t *pentIgnore, TraceResult *ptr);
 extern TraceResult	UTIL_GetGlobalTrace		(void);
 extern void			UTIL_TraceModel			(const Vector &vecStart, const Vector &vecEnd, int hullNumber, edict_t *pentModel, TraceResult *ptr);
 extern Vector		UTIL_GetAimVector		(edict_t* pent, float flSpeed);
@@ -329,11 +325,6 @@ typedef struct hudtextparms_s
 	float		fxTime;
 	int			channel;
 } hudtextparms_t;
-
-void UTIL_HostSay( edict_t *pEntity, int teamonly, char *message );
-void UTIL_ShowMenu( edict_t *pEdict, int slots, int displaytime, bool needmore, char *pText );
-void UTIL_ShowText( edict_t *pEntity, const hudtextparms_t &textparms, const char *pMessage );
-void UTIL_BuildFileName(char *filename, const char *arg1, const char *arg2);
 
 // prints as transparent 'title' to the HUD
 extern void			UTIL_HudMessageAll( const hudtextparms_t &textparms, const char *pMessage );
@@ -555,7 +546,28 @@ float UTIL_SharedRandomFloat( unsigned int seed, float low, float high );
 
 float UTIL_WeaponTimeBase( void );
 
-// Misc. non-Valve defines and prototypes
+/***
+*
+*	Misc. non-Valve defines and prototypes below
+*
+****/
+// teams in CStrike
+#define TE 0
+#define CT 1
+
+#ifdef DEBUGENGINE
+int BOT_LOG(const char *fnName, const char *fmt, ...);
+#else
+#define BOT_LOG /* */
+#endif
+
+void UTIL_TraceHull(const Vector &vecStart, const Vector &vecEnd, IGNORE_MONSTERS igmon, IGNORE_GLASS ignoreGlass,int hullNumber, edict_t *pentIgnore, TraceResult *ptr);
+
+void UTIL_HostSay( edict_t *pEntity, int teamonly, char *message );
+void UTIL_ShowMenu( edict_t *pEdict, int slots, int displaytime, bool needmore, char *pText );
+void UTIL_ShowText( edict_t *pEntity, const hudtextparms_t &textparms, const char *pMessage );
+void UTIL_BuildFileName(char *filename, const char *arg1, const char *arg2);
+
 edict_t	*UTIL_FindEntityInSphere(edict_t *pStartEntity, const Vector &vecCenter, float flRadius);
 edict_t	*UTIL_FindEntityByString(edict_t *pStartEntity, const char *szKeyword, const char *szValue );
 edict_t	*UTIL_FindEntityByClassname(edict_t *pStartEntity, const char *szName );
