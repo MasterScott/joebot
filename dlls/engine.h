@@ -171,6 +171,7 @@ int pfnCreateInstancedBaseline( int classname, struct entity_state_s *baseline )
 void pfnCvar_DirectSet( struct cvar_s *var, char *value );
 void pfnForceUnmodified( FORCE_TYPE type, float *mins, float *maxs, const char *filename );
 void pfnGetPlayerStats( const edict_t *pClient, int *ping, int *packet_loss );
+void pfnAddServerCommand( char *cmd_name, void (*function) (void) );
 
 qboolean pfnVoice_GetClientListening(int iReceiver, int iSender);
 qboolean pfnVoice_SetClientListening(int iReceiver, int iSender, qboolean bListen);

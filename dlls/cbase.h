@@ -53,8 +53,8 @@ CBaseEntity
 
 // C functions for external declarations that call the appropriate C++ methods
 
-#ifdef _WIN32
-#ifdef _MSC_VER
+#ifndef __linux__
+#if defined(_MSC_VER) || defined(__BORLANDC__)
 #define EXPORT	_declspec( dllexport )
 #else
 #define EXPORT	__declspec( dllexport )
@@ -63,13 +63,9 @@ CBaseEntity
 #define EXPORT
 #endif
 
-#ifdef _GCC
-#undef EXPORT
-#define EXPORT
-#endif
-
 extern "C" EXPORT int GetEntityAPI( DLL_FUNCTIONS *pFunctionTable, int interfaceVersion );
 extern "C" EXPORT int GetEntityAPI2( DLL_FUNCTIONS *pFunctionTable, int *interfaceVersion );
+extern "C" EXPORT int GetNewDLLFunctions( NEW_DLL_FUNCTIONS *pFunctionTable, int *interfaceVersion );
 
 extern int DispatchSpawn( edict_t *pent );
 extern void DispatchKeyValue( edict_t *pentKeyvalue, KeyValueData *pkvd );
@@ -303,10 +299,10 @@ public:
 #ifdef _DEBUG
 	void FunctionCheck( void *pFunction, char *name ) 
 	{ 
-#ifdef _WIN32
+#ifndef __linux__
 		if (pFunction && !NAME_FOR_FUNCTION((unsigned long)(pFunction)) )
 			ALERT( at_error, "No EXPORT: %s:%s (%08lx)\n", STRING(pev->classname), name, (unsigned long)pFunction );
-#endif // _WIN32
+#endif // __linux__
 	}
 
 	BASEPTR	ThinkSet( BASEPTR func, char *name ) 

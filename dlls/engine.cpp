@@ -1534,6 +1534,13 @@ void pfnGetPlayerStats(const edict_t *pClient, int *ping, int *packet_loss)
 #endif
 	(*g_engfuncs.pfnGetPlayerStats)(pClient, ping, packet_loss);
 }
+void pfnAddServerCommand(char *cmd_name, void (*function)(void))
+{
+#ifdef DEBUGENGINE
+   if (debug_engine) { fp=fopen("bot.txt","a"); fprintf(fp,"pfnAddServerCommand: %s %x\n",cmd_name,function); fclose(fp); }
+#endif
+   (*g_engfuncs.pfnAddServerCommand)(cmd_name, function);
+}
 
 // hl1108
 

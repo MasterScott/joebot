@@ -106,8 +106,15 @@ inline void *GET_PRIVATE( edict_t *pent )
 #define GET_MODEL_PTR				(*g_engfuncs.pfnGetModelPtr)
 #define REG_USER_MSG				(*g_engfuncs.pfnRegUserMsg)
 #define GET_BONE_POSITION			(*g_engfuncs.pfnGetBonePosition)
+
+#ifndef __linux__
+unsigned long FUNCTION_FROM_NAME(const char *pName);
+const char *NAME_FOR_FUNCTION(unsigned long function);
+#else
 #define FUNCTION_FROM_NAME			(*g_engfuncs.pfnFunctionFromName)
 #define NAME_FOR_FUNCTION			(*g_engfuncs.pfnNameForFunction)
+#endif
+
 #define TRACE_TEXTURE				(*g_engfuncs.pfnTraceTexture)
 #define CLIENT_PRINTF				(*g_engfuncs.pfnClientPrintf)
 #define CMD_ARGS					(*g_engfuncs.pfnCmd_Args)
