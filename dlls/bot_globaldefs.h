@@ -26,8 +26,6 @@
 #define DEBUGENGINE
 #endif
 
-#include "bot_modid.h"
-
 // fillserver #defs
 #define FILL_0		1
 #define FILL_1		2
@@ -137,8 +135,6 @@
 #define DOD_CLASS_STURMTRUP			6
 #define DOD_CLASS_GERMANSNIPER		7
 #define DOD_CLASS_HEAVYWEAPONSGER	8
-
-#include "BotNNDefs.h"
 
 #define BOT_SKIN_LEN 32
 #define BOT_NAME_LEN 32
@@ -262,14 +258,6 @@
 #define _LOGNETINPUT 0
 #define _LOGNETOUTPUT 1
 
-typedef struct
-{
-	int  iId;     // weapon ID
-	int  iClip;   // amount of ammo in the clip
-	int  iAmmo1;  // amount of ammo in primary reserve
-	int  iAmmo2;  // amount of ammo in secondary reserve
-} bot_current_weapon_t;
-
 // AvoidCollision stuff
 
 #define _CAA 35		// angles of each trace to middle
@@ -277,9 +265,6 @@ typedef struct
 
 #define SPRAYDECALFILE "spray.txt"
 
-#include "cdll_dll.h"
-#include "bot_weapons.h"
-
 #define _WPFILEDESC "Joe_bot"
 
-#endif  __BOT_GLOBALDEFS_H
+#endif //__BOT_GLOBALDEFS_H
