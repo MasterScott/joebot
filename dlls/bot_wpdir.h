@@ -21,19 +21,7 @@
 #ifndef __BOT_WPDir_H
 #define __BOT_WPDir_H
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <iostream.h>
-
-#include "extdll.h"
-#include "util.h"
-#include "cbase.h"
-#include "weaponinfo.h"
-//#include "bot.h"
-
 #include "bot_globaldefs.h"
-
 #include "CParser.h"
 
 typedef struct{
@@ -59,4 +47,4 @@ private:
 	long lNum;
 };
 
-#endif __BOT_WPDir_H
+#endif //__BOT_WPDir_H
