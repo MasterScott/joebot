@@ -1475,7 +1475,7 @@ int GetUserMsgId(const char *msgname, int *size)
 		}
 
 	// unregistered user message, have the engine register it
-	return (pfnRegUserMsg (msgname, -1)); // ask the engine to register this new message
+	return (REG_USER_MSG (msgname, -1)); // ask the engine to register this new message
 }
 
 const char *GetUserMsgName(int msgid, int *size)
