@@ -1,7 +1,5 @@
 LIBRARY joebot
 EXPORTS
- GetEntityAPI = _GetEntityAPI
- GetEngineFunctions = _GetEngineFunctions
  Meta_Attach = _Meta_Attach
  Meta_Detach = _Meta_Detach
  Meta_Init = _Meta_Init
