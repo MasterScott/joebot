@@ -65,11 +65,7 @@ CChatHost::~CChatHost()
 CChat *CChatHost :: GetChat(const char *szNameP){
 	char szName[256];
 
-#ifdef _WIN32
-		UTIL_BuildFileName(szName,"joebot\\chat",szNameP);
-#else
-		UTIL_BuildFileName(szName,"joebot/chat",szNameP);
-#endif
+	UTIL_BuildFileName(szName, sizeof(szName), "joebot/chat/%s", szNameP);
 
 	//cout << "wanting "<<szName<<endl;
 	CChatHostData *p = 0,*pp = 0;
@@ -107,11 +103,7 @@ CChat *CChatHost :: GetChat(const char *szNameP){
 int CChatHost :: DisconnectChat(const char *szNameP){
 	char szName[80];
 
-#ifdef _WIN32
-		UTIL_BuildFileName(szName,"joebot\\chat",szNameP);
-#else
-		UTIL_BuildFileName(szName,"joebot/chat",szNameP);
-#endif
+	UTIL_BuildFileName(szName, sizeof(szName), "joebot/chat/%s", szNameP);
 
 	CChatHostData 
 		*p = 0,

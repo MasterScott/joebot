@@ -34,7 +34,6 @@
 
 #include "bot_modid.h"
 #include "bot_globaldefs.h"
-#include "globalvars.h"
 
 #define SPRAYDECALFILE "spray.txt"
 
@@ -83,22 +82,7 @@ void CSDecals :: Load(void){
 	//long lToReadLength;
 	FILE *fhd;
 	
-	if(mod_id == CSTRIKE_DLL){
-#ifdef _WIN32
-		strcpy(szFileName, "cstrike\\joebot\\");
-#else
-		strcpy(szFileName, "cstrike/joebot/");
-#endif
-	}
-	else if(mod_id == DOD_DLL){
-#ifdef _WIN32
-		strcpy(szFileName, "dod\\joebot\\");
-#else
-		strcpy(szFileName, "dod/joebot/");
-#endif
-	}
-	
-	strcat(szFileName, SPRAYDECALFILE);
+	UTIL_BuildFileName(szFileName, sizeof(szFileName), "joebot/%s", SPRAYDECALFILE);
 	
 	if(lFileSize = GetFileSize(szFileName))
 	{

@@ -64,7 +64,7 @@ bool CBotNames::init(void){
 	if (bInited)
 		return true;
 
-	UTIL_BuildFileName(szfilename, "joebot","bot_names.txt");
+	UTIL_BuildFileName(szfilename, sizeof(szfilename), "joebot/bot_names.txt");
 	bool bSuccess = load(szfilename);
 	if (CVAR_BOOL(jb_mixnames)) mixIt(); // randomize order?
 	m_ICName = m_LNames.begin(); // set list iterator

@@ -42,13 +42,8 @@ CBotWPDir :: CBotWPDir(){
 
 int CBotWPDir :: Init(void){
 	char filename[80];
-#ifdef _WIN32
-	UTIL_BuildFileName(filename,"joebot\\wpjs","dir.txt");
+	UTIL_BuildFileName(filename, sizeof(filename), "joebot/wpjs/dir.txt");
 	return Load(filename);
-#else
-	UTIL_BuildFileName(filename,"joebot/wpjs","dir.txt");
-	return Load(filename);
-#endif
 }
 
 CBotWPDir :: ~CBotWPDir(){
@@ -94,7 +89,7 @@ int CBotWPDir :: Load(const char *szFileName){			// load WPDir into ram ...
 				if(strlen(szName) < 20){
 					strcpy(szPDir[lNum].szDir,szName);
 					char szFilePath[256];
-					UTIL_BuildFileName(szFilePath,"joebot/wpjs",szName);
+					UTIL_BuildFileName(szFilePath, sizeof(szFilePath), "joebot/wpjs/%s", szName);
 					LOG_MESSAGE(PLID, "Adding wp-directory: %s", szFilePath);
 					lNum++;
 				}

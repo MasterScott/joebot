@@ -46,7 +46,6 @@
 bool bLoadedLPB = false;
 
 extern int mod_id;
-void UTIL_BuildFileName(char *filename, const char *arg1, const char *arg2);
 
 #define _DELAY_NONE .3
 
@@ -363,7 +362,7 @@ NNWeapon :: ~NNWeapon(){}
 
 void NNWeapon :: Load(const char *szFileName){
 	char szfilename[80];
-	UTIL_BuildFileName(szfilename, "joebot",szFileName);
+	UTIL_BuildFileName(szfilename, sizeof(szfilename), "joebot/%s", szFileName);
 	LoadFile(szfilename);
 }
 
@@ -397,7 +396,7 @@ void NNWeapon :: LoadFile(const char *szFileName){
 			for(lschl=0;lschl < 32;lschl ++){
 				if(strlen(weapon_defs[lschl].szClassname)){
 					if(szAct = strstr(szFileContent,weapon_defs[lschl].szClassname)){
-						sprintf(szName,"%s %%f",weapon_defs[lschl].szClassname);
+						snprintf(szName,sizeof(szName),"%s %%f",weapon_defs[lschl].szClassname);
 						//cout << szName << endl;
 						sscanf(szAct,szName,&fPBuyProb[mod_id][lschl]);
 						//cout << fPBuyProb[mod_id][lschl] << endl;

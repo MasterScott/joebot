@@ -48,8 +48,7 @@ void CSkill :: Load(void){
 	FILE *fhd;
 
 	char szFileName[80];
-
-	UTIL_BuildFileName(szFileName,"joebot","bot_skill.txt");
+	UTIL_BuildFileName(szFileName, sizeof(szFileName), "joebot/bot_skill.txt");
 
 	CSkillItem SITemp;
 	

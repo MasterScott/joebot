@@ -236,23 +236,11 @@ int CWPStat::Load(void){
 
 	Init();
 	
-	strcpy(mapname, STRING(gpGlobals->mapname));
 	strcpy(wpsHeader.szMapname, STRING(gpGlobals->mapname));		// copy mapname there
-	strcat(mapname, ".wpj");
-	
+	snprintf(mapname, sizeof(mapname), "%s.wpj", STRING(gpGlobals->mapname));
 	WaypointGetDir(mapname,dirname);
-	
-	strcpy(filename, dirname);
-	strcat(filename,"routes");
+	snprintf(filename, sizeof(filename), "%s/routes/%s.wst", dirname, STRING(gpGlobals->mapname));
 
-#ifdef _WIN32
-	strcat(filename, "\\");
-#else
-	strcat(filename, "/");
-#endif
-
-	strcat(filename, STRING(gpGlobals->mapname));
-	strcat(filename, ".wst");
 	if(fhd = fopen(filename,"rb")){
 		fread(&wpsHeaderLoad,sizeof(WPSHEADER),1,fhd);
 		if(!FStrEq(wpsHeaderLoad.szFTName,_FTNAME)){
@@ -317,22 +305,10 @@ int CWPStat::Save(void){
 	char mapname[30];
 	FILE *fhd;
 
-	//strcpy(mapname, STRING(gpGlobals->mapname));
-	strcpy(mapname, wpsHeader.szMapname);
-	strcat(mapname, ".wpj");
-	
+	snprintf(mapname, sizeof(mapname), "%s.wpj", wpsHeader.szMapname);
 	WaypointGetDir(mapname,dirname);
+	snprintf(filename, sizeof(filename), "%s/routes/%s.wst", dirname, wpsHeader.szMapname);
 	
-	strcpy(filename, dirname);
-	strcat(filename,"routes");
-#ifdef _WIN32
-	strcat(filename, "\\");
-#else
-	strcat(filename, "/");
-#endif
-
-	strcat(filename, wpsHeader.szMapname);
-	strcat(filename, ".wst");
 	if(fhd = fopen(filename,"wb")){
 		fwrite(&wpsHeader,sizeof(WPSHEADER),1,fhd);
 

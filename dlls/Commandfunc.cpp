@@ -1071,7 +1071,7 @@ bool bc_trainnn(edict_t *pEntity,int iType,const char *arg1,const char *arg2,con
 
 bool bc_savenn(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	char filename[80];
-	UTIL_BuildFileName(filename,"joebot","nn.br3");
+	UTIL_BuildFileName(filename, sizeof(filename), "joebot/nn.br3");
 	NNCombat->SaveFile(filename);
 	return true;
 }

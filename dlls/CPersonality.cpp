@@ -83,26 +83,14 @@ CPersonality :: ~CPersonality(){
 }
 
 void CPersonality :: Load(char *szName){
-	char szFilename[256];
 	char szWFilename[256];
 	char *szFile,*szAct;
 	FILE *fhd;
 	
-	strcpy(szFilename,szName);
-	strcat(szFilename,".per");
-	
-#ifdef _WIN32
-	UTIL_BuildFileName(szWFilename,"joebot\\per",szFilename);
-#else
-	UTIL_BuildFileName(szWFilename,"joebot/per",szFilename);
-#endif
+	UTIL_BuildFileName(szWFilename, sizeof(szWFilename), "joebot/per/%s.per", szName);
 	
 	if(!(fhd = fopen(szWFilename,"r"))){
-#ifdef _WIN32
-		UTIL_BuildFileName(szWFilename,"joebot\\per","default.per");
-#else
-		UTIL_BuildFileName(szWFilename,"joebot/per","default.per");
-#endif
+		UTIL_BuildFileName(szWFilename, sizeof(szWFilename), "joebot/per/default.per");
 	}
 	else{
 		fclose(fhd);
@@ -158,19 +146,11 @@ void CPersonality :: Load(char *szName){
 }
 
 void CPersonality :: Save(char *szName){
-	char szFilename[256];
 	char szWFilename[256];
 	//	char *szFile,*szAct;
 	FILE *fhd;
 	
-	strcpy(szFilename,szName);
-	strcat(szFilename,".per");
-	
-#ifdef _WIN32
-	UTIL_BuildFileName(szWFilename,"joebot\\per",szFilename);
-#else
-	UTIL_BuildFileName(szWFilename,"joebot/per",szFilename);
-#endif
+	UTIL_BuildFileName(szWFilename, sizeof(szWFilename), "joebot/per/%s.per", szName);
 	
 	LOG_MESSAGE(PLID, "Saving personality file for %s : %s", szName, szWFilename);
 	
