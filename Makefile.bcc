@@ -5,17 +5,18 @@
  CFG = release_mm
 !endif
 
+BASE_DLLNAME = joebot
 !if "$(CFG)" == "release_mm"
- DLLNAME = joebot_mm
+ DLLNAME = $(BASE_DLLNAME)_mm
  OBJDIR = dlls\release\win32\mm_bcc
 !elif "$(CFG)" == "debug_mm"
- DLLNAME = joebot_mm
+ DLLNAME = $(BASE_DLLNAME)_mm
  OBJDIR = dlls\debug\win32\mm_bcc
 !elif "$(CFG)" == "release_std"
- DLLNAME = joebot
+ DLLNAME = $(BASE_DLLNAME)
  OBJDIR = dlls\release\win32\std_bcc
 !elif "$(CFG)" == "debug_std"
- DLLNAME = joebot
+ DLLNAME = $(BASE_DLLNAME)
  OBJDIR = dlls\debug\win32\std_bcc
 !endif
 
@@ -24,6 +25,9 @@ DLL = $(OBJDIR)\$(DLLNAME).dll
 SDKDIR = U:\netgames\install\hl\sdk\multiplayer
 JOEBOTDIR = U:\netgames\install\hl\bots\joebot\src
 MMDIR = U:\netgames\install\hl\server\metamod\src\1.17
+CSDIR = D:\Games\Steam\SteamApps\cruft@hotmail.com\counter-strike\cstrike\joebot
+SERVERDIR = D:\Games\HLServer\cstrike\joebot
+SERVERDIR_CS15 = D:\Games\Half-Life\cstrike\joebot
 
 BCCDIR = c:\tools\borland\bcc55
 BINDIR = $(BCCDIR)\bin
@@ -188,13 +192,18 @@ clean:
 	-$(RM) $(OBJDIR)\$(DLLNAME).tds
 	-$(RM) $(DLL)
 
+install:
+	$(CP) $(DLL) $(CSDIR)\$(DLLNAME).dll
+	$(CP) $(DLL) $(SERVERDIR)\$(DLLNAME).dll
+	$(CP) $(DLL) $(SERVERDIR_CS15)\$(DLLNAME).dll
+
 # ---------------------------------------------------------------------------
 # Rules
 # ---------------------------------------------------------------------------
-$(DLL): $(OBJ) $(OBJDIR)\linkfunc.obj $(OBJDIR)\$(DLLNAME).res
+$(DLL): $(OBJ) $(OBJDIR)\linkfunc.obj $(OBJDIR)\$(BASE_DLLNAME).res
 	$(LD) -L$(LIB) $(LDFLAGS) c0d32.obj $(OBJ) $(OBJDIR)\linkfunc.obj, \
 	$@, $(OBJDIR)\$(DLLNAME).map, import32.lib cw32mt.lib, \
-	$(DLLNAME)_bcc.def, $(OBJDIR)\$(DLLNAME).res
+	$(DLLNAME)_bcc.def, $(OBJDIR)\$(BASE_DLLNAME).res
 
 $(OBJDIR):
 	-$(MD) $(OBJDIR)
@@ -202,8 +211,8 @@ $(OBJDIR):
 $(OBJDIR)\linkfunc.obj: dlls\linkfunc.cpp
 	$(CC) $(CFLAGS) -u- -o$@ -c dlls\linkfunc.cpp
 
-$(OBJDIR)\$(DLLNAME).res: dlls\$(DLLNAME).rc
-	$(RC) $(RCFLAGS) -fo$@ dlls\$(DLLNAME).rc
+$(OBJDIR)\$(BASE_DLLNAME).res: dlls\$(BASE_DLLNAME).rc
+	$(RC) $(RCFLAGS) -fo$@ dlls\$(BASE_DLLNAME).rc
 
 {dlls;NNSim;NNSim\som}.cpp{$(OBJDIR)}.obj:
 	$(CC) $(CFLAGS) -o$@ -c $<
