@@ -398,14 +398,14 @@ int UTIL_GetTeam(edict_t *pEntity)
 		infobuffer = (*g_engfuncs.pfnGetInfoKeyBuffer)( pEntity );
 		strcpy(model_name, (g_engfuncs.pfnInfoKeyValue(infobuffer, "model")));
 		
-		if ((strcmp(model_name, "terror") == 0) ||  // Phoenix Connektion
+		/*if ((strcmp(model_name, "terror") == 0) ||  // Phoenix Connektion
 			(strcmp(model_name, "arab") == 0) ||    // L337 Krew
 			(strcmp(model_name, "artic") == 0) ||   // Artic Avenger
 			(strcmp(model_name, "guerilla") == 0))  // Gorilla Warfare
 		{
 			return 0;
 		}
-		else if ((strcmp(model_name, "urban") == 0) ||  // Seal Team 6
+		else */if ((strcmp(model_name, "urban") == 0) ||  // Seal Team 6
 			(strcmp(model_name, "gsg9") == 0) ||   // German GSG-9
 			(strcmp(model_name, "sas") == 0) ||    // UK SAS
 			(strcmp(model_name, "gign") == 0) ||   // French GIGN
@@ -414,7 +414,7 @@ int UTIL_GetTeam(edict_t *pEntity)
 			return 1;
 		}
 		
-		return 0;  // return zero if team is unknown
+		return 0;  // return zero ( TE ) otherwise
 	}
 	else
 	{
