@@ -58,13 +58,71 @@
 
         <p align="left"><font face="Verdana, Arial, Helvetica, sans-serif"><i><b>7. 
 Do Flashbangs and Smokegrenades affect the bots ? ... and how ?</b></i></font></p>
-        <p align="left"><font face="Verdana, Arial, Helvetica, sans-serif">
-
-Yes, the bots are affected by both types of grenades, flashbangs and smokegrenades. After a flashbang attack they won't see anything for some time, this is very similar to the effect on human players. Higher skilled bots will try to shoot where they have heard or seen an enemy before being blinded.<br>
-The effect of smokegrenades is faked. It's _really_ difficult to detect all the single smoke puffs, therefore it's seen as a plane of smoke in which the grenade lies. If the enemy bot is behind a smoke grenade, it won't be able to detect you instantly, you have appr. 4 seconds to run in the sight of an enemy behind a smokegrenade without being detected. But of course the radius of the grenade is limited and you'll be detected almost instantly by muzzle flashs, i.e. when you shoot yourself, no matter what direction. ( btw, this is the same with being prone in DoD, but the time of not being detectable is configurable in bot_skill.txt )
-
-</font></p>
-
+        <p align="left"><font face="Verdana, Arial, Helvetica, sans-serif"> Yes, 
+          the bots are affected by both types of grenades, flashbangs and smokegrenades. 
+          After a flashbang attack they won't see anything for some time, this 
+          is very similar to the effect on human players. Higher skilled bots 
+          will try to shoot where they have heard or seen an enemy before being 
+          blinded.<br>
+          The effect of smokegrenades is faked. It's _really_ difficult to detect 
+          all the single smoke puffs, therefore it's seen as a plane of smoke 
+          in which the grenade lies. If the enemy bot is behind a smoke grenade, 
+          it won't be able to detect you instantly, you have appr. 4 seconds to 
+          run in the sight of an enemy behind a smokegrenade without being detected. 
+          But of course the radius of the grenade is limited and you'll be detected 
+          almost instantly by muzzle flashs, i.e. when you shoot yourself, no 
+          matter what direction. ( btw, this is the same with being prone in DoD, 
+          but the time of not being detectable is configurable in bot_skill.txt 
+          ) </font></p>
+        <p align="left"><font face="Verdana, Arial, Helvetica, sans-serif"><b><i>8. 
+          How can I run <a href="http://www.metamod.org">metamod</a> with JoeBOT 
+          ?</i></b></font></p>
+        <p align="left"><font face="Verdana, Arial, Helvetica, sans-serif"><i>First 
+          : It is possible to run JoeBOT with Metamod :-)</i><br>
+          ok, now how to do this : first you install JoeBOT, then you install 
+          Metamod. You might have noticed now, that you got the functionality 
+          of Metamod, but you cannot get the Bots. So why ? <br>
+          The Answer is simple : Metamod is now between the game and the mod - 
+          dll, the place the bot - dll normally has. Therefore we somehow gotta 
+          tell Metamod, that it should load the joebot.dll into this dll chain 
+          as well. We do this by adding a command to the commandline when starting 
+          hl ( how to do this ? take a look at the question about the console 
+          :) ) : It's &quot;+localinfo mm_gamedll ../joebot/joebot.dll&quot; ( 
+          of course without the quotes ). The same for the linux ppl, you only 
+          have to replace the .dll with .so.<br>
+          Easy, isn't it ?!</font></p>
+        <p align="left"><font face="Verdana, Arial, Helvetica, sans-serif"><b><i>9. 
+          How to run JoeBOT with <a href="http://www.planethalflife.com/botman/">botman</a>'s 
+          <a href="http://www.planethalflife.com/botman/botmixer.shtml">BotMixer5000</a> 
+          ?</i></b></font></p>
+        <p align="left"><font face="Verdana, Arial, Helvetica, sans-serif">First 
+          you should install all the bots you wanna use together in one game. 
+          Then you install the BotMixer by botman, go to the half-life/botmixer 
+          folder and execute the install.bat file in the respective folder.<br>
+          Now you go to your cstrike/ folder and edit the botmixer.cfg. There 
+          you have to define where to find the dlls ( or the .so for the linux 
+          ppl again ). Botman obviously wasnt careful when creating the line for 
+          the joebot, it has to be &quot;joe ../joebot/joebot.dll&quot; there 
+          of course ( again, without the quotes ! ).<br>
+          If you want to deinstall botmixer before installing another bot, e.g., 
+          please deinstall it with the deinstall.bat file from the botmixer folder, 
+          otherwise you'll have serious problems, because when installing botmixer, 
+          some files have to be renamed, and if you are not 100% sure what's done, 
+          leave this work to the batch files, and you can become old with your 
+          halflife installation.<br>
+          Of course you can also install a bot without deinstalling botmixer, 
+          but then, take a look at the cstrike/liblist.gam before installing the 
+          bot, make a copy for example, and then restore it after the installation 
+          of the bot.<br>
+          <i><b>Metamod + BotMixer : </b></i>Hey, that's possible as well :D. 
+          Just install everything as usual without metamod, then install metamod, 
+          and do the same as with the normal metamod installation and one bot. 
+          But the commandline has to be modified, now you shouldnt point to a 
+          bot - dll, but to the botmixer.dll in the cstrike/dlls folder.<br>
+          <i><b>Problems with BotMixer : </b></i>My game always crashes when I 
+          try to play joebot with the botmixer. Why ? --- Well, get the newest 
+          version of joebot and everything will be cool dude ! <font size="-2">( 
+          at least I hope so, nobody's perfect )</font></font></p>
         <p align="left"><font face="Verdana, Arial, Helvetica, sans-serif"><i><b>Why 
           is this bot called JoeBOT ? That name doesn't sound very creative !</b></i></font></p>
         <p align="left"><font face="Verdana, Arial, Helvetica, sans-serif">LOL, 
