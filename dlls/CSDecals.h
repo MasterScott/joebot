@@ -21,6 +21,8 @@
 #ifndef __CSDECALS_H
 #define __CSDECALS_H
 
+#include "CParser.h"
+
 class CSDecals : CParser{
 public:
 	CSDecals();
@@ -34,4 +36,4 @@ public:
 	long lNum;
 };
 
-#endif
+#endif //__CSDECALS_H

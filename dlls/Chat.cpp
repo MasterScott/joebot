@@ -23,10 +23,15 @@
 // Johannes.Lampel@gmx.de
 // http://joebot.counter-strike.de
 
-//#include "bot_client.h"
-//#include "bot_func.h"
-//#include "bot.h"
+#include <iostream.h>
+
+#include "extdll.h"
+#include "util.h"
+
 #include "Chat.h"
+
+#include "bot_modid.h"
+#include "globalvars.h"
 
 char szTags[_MAX_TAGS][15] = {"[bombplanted]","[hostdown]","[kill]","[dead]","[teamattack]","[welcome]"};
 char szReplyTag[] = "[reply]\0";

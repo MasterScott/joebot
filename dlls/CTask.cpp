@@ -23,6 +23,9 @@
 // Johannes.Lampel@gmx.de
 // http://joebot.counter-strike.de
 
+#include "extdll.h"
+#include "util.h"
+
 #include "CTask.h"
 
 CTaskItem :: CTaskItem(){

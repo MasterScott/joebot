@@ -23,6 +23,11 @@
 // Johannes.Lampel@gmx.de
 // http://joebot.counter-strike.de
 
+#include <iostream.h>
+
+#include "extdll.h"
+#include "util.h"
+
 #include "CSkill.h"
 
 CSkill :: CSkill(){

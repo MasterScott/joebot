@@ -23,6 +23,9 @@
 // Johannes.Lampel@gmx.de
 // http://joebot.counter-strike.de
 
+#include "extdll.h"
+#include "util.h"
+
 #include "CSTMem.h"
 
 #define _MAXSTMITEMS 6

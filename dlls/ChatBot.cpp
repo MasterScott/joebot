@@ -22,6 +22,9 @@
 //
 //////////////////////////////////////////////////////////////////////
 
+#include "extdll.h"
+#include "util.h"
+
 #include "ChatBot.h"
 #include "ChatHost.h"
 #include "CBotBase.h"
