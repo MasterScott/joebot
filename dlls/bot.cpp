@@ -209,26 +209,6 @@ void InitGlobalRS(void){
 	}
 }
 
-edict_t *CREATE_FAKE_CLIENT( const char *netname )
-{
-	return (*g_engfuncs.pfnCreateFakeClient)( netname );
-}
-
-char *GET_INFOBUFFER( edict_t *e )
-{
-	return (*g_engfuncs.pfnGetInfoKeyBuffer)( e );
-}
-
-char *GET_INFO_KEY_VALUE( char *infobuffer, char *key )
-{
-	return (g_engfuncs.pfnInfoKeyValue( infobuffer, key ));
-}
-
-void SET_CLIENT_KEY_VALUE( int clientIndex, char *infobuffer, char *key, char *value )
-{
-	(*g_engfuncs.pfnSetClientKeyValue)( clientIndex, infobuffer, key, value );
-}
-
 //extern "C"
 //{
 // this is the LINK_ENTITY_TO_CLASS function that creates a player (bot)
@@ -283,7 +263,7 @@ void BotCreate( edict_t *pPlayer, const char *szTeam, const char *szClass,const 
 		g_mp_freezetime = CVAR_GET_POINTER("mp_freezetime");
 	}
 	
-	const CBotNamesItem *pName = 0;
+	const CBotNamesItem *pName = NULL;
 	char szNameThis[32];
 	char szTempName[32];
 	int iSkill;
@@ -296,7 +276,7 @@ void BotCreate( edict_t *pPlayer, const char *szTeam, const char *szClass,const 
 		index++;
 	
 	if (index == 32){
-		ClientPrint( VARS(pPlayer), HUD_PRINTNOTIFY, "JoeBOT : Can't create bot!\n");
+		UTIL_ConsoleMessage( pPlayer, "Can't create bot!\n");
 		return;
 	}
 	
@@ -355,7 +335,7 @@ void BotCreate( edict_t *pPlayer, const char *szTeam, const char *szClass,const 
 			bots[index] = 0;
 		}
 		if (pPlayer){
-			ClientPrint( VARS(pPlayer), HUD_PRINTNOTIFY, "JoeBOT : Max. Players reached.  Can't create bot!\n");
+			UTIL_ConsoleMessage( pPlayer, "Max players reached; can't create bot!\n");
 		}
 	}
 	else
@@ -365,9 +345,9 @@ void BotCreate( edict_t *pPlayer, const char *szTeam, const char *szClass,const 
 		int clientIndex;
 		
 		if (IS_DEDICATED_SERVER())
-			printf("JoeBOT : Creating bot...\n");
+			LOG_MESSAGE(PLID, "Creating bot...");
 		else if (pPlayer)
-			ClientPrint( VARS(pPlayer), HUD_PRINTNOTIFY, "JoeBOT : Creating bot...\n");
+			UTIL_ConsoleMessage( pPlayer, "Creating bot...\n");
 
 		//FREE_PRIVATE(BotEnt);
 		//BotEnt->pvPrivateData = 0;
@@ -377,22 +357,22 @@ void BotCreate( edict_t *pPlayer, const char *szTeam, const char *szClass,const 
 		
 		player( VARS(BotEnt) );
 		
-		infobuffer = GET_INFOBUFFER( BotEnt );
+		infobuffer = GET_INFOKEYBUFFER( BotEnt );
 		clientIndex = ENTINDEX( BotEnt );
 		
-		SET_CLIENT_KEY_VALUE( clientIndex, infobuffer, "model", "gina" );
+		SET_CLIENT_KEYVALUE( clientIndex, infobuffer, "model", "gina" );
 		
 		if (mod_id == CSTRIKE_DLL||mod_id == CSCLASSIC_DLL){
-			SET_CLIENT_KEY_VALUE( clientIndex, infobuffer, "rate", "3500.000000");
-			SET_CLIENT_KEY_VALUE( clientIndex, infobuffer, "cl_updaterate", "20");
-			SET_CLIENT_KEY_VALUE( clientIndex, infobuffer, "cl_lw", "1");
-			SET_CLIENT_KEY_VALUE( clientIndex, infobuffer, "cl_lc", "1");
-			SET_CLIENT_KEY_VALUE( clientIndex, infobuffer, "tracker", "0");
-			SET_CLIENT_KEY_VALUE( clientIndex, infobuffer, "cl_dlmax", "128");
-			SET_CLIENT_KEY_VALUE( clientIndex, infobuffer, "lefthand", "1");
-			SET_CLIENT_KEY_VALUE( clientIndex, infobuffer, "friends", "0");
-			SET_CLIENT_KEY_VALUE( clientIndex, infobuffer, "dm", "0");
-			SET_CLIENT_KEY_VALUE( clientIndex, infobuffer, "ah", "1");
+			SET_CLIENT_KEYVALUE( clientIndex, infobuffer, "rate", "3500.000000");
+			SET_CLIENT_KEYVALUE( clientIndex, infobuffer, "cl_updaterate", "20");
+			SET_CLIENT_KEYVALUE( clientIndex, infobuffer, "cl_lw", "1");
+			SET_CLIENT_KEYVALUE( clientIndex, infobuffer, "cl_lc", "1");
+			SET_CLIENT_KEYVALUE( clientIndex, infobuffer, "tracker", "0");
+			SET_CLIENT_KEYVALUE( clientIndex, infobuffer, "cl_dlmax", "128");
+			SET_CLIENT_KEYVALUE( clientIndex, infobuffer, "lefthand", "1");
+			SET_CLIENT_KEYVALUE( clientIndex, infobuffer, "friends", "0");
+			SET_CLIENT_KEYVALUE( clientIndex, infobuffer, "dm", "0");
+			SET_CLIENT_KEYVALUE( clientIndex, infobuffer, "ah", "1");
 		}
 		
 #ifdef USE_METAMOD
