@@ -551,14 +551,24 @@ float UTIL_WeaponTimeBase( void );
 *	Misc. non-Valve defines and prototypes below
 *
 ****/
+#define FIND_ENTITY_BY_VARS  (*g_engfuncs.pfnFindEntityByVars)
+#define CREATE_FAKE_CLIENT   (*g_engfuncs.pfnCreateFakeClient)
+#define RUN_PLAYER_MOVE      (*g_engfuncs.pfnRunPlayerMove)
+#define GET_INFOKEYBUFFER    (*g_engfuncs.pfnGetInfoKeyBuffer)
+#define INFOKEY_VALUE        (*g_engfuncs.pfnInfoKeyValue)
+#define SET_CLIENT_KEYVALUE  (*g_engfuncs.pfnSetClientKeyValue)
+#define REG_SVR_COMMAND      (*g_engfuncs.pfnAddServerCommand)
+#define SERVER_PRINT         (*g_engfuncs.pfnServerPrint)
+#define SET_SERVER_KEYVALUE  (*g_engfuncs.pfnSetKeyValue)
+
 // teams in CStrike
-#define TE 0
-#define CT 1
+#define CS_TEAM_TE 0
+#define CS_TEAM_CT 1
 
 #ifdef DEBUGENGINE
 int BOT_LOG(const char *fnName, const char *fmt, ...);
 #else
-#define BOT_LOG /* */
+#define BOT_LOG(fnName, args) /* */
 #endif
 
 #ifdef _WIN32
@@ -614,5 +624,13 @@ edict_t *UTIL_BestPlayer(void);
 
 float GetHosVel(edict_t *pEdict);
 void UTIL_strlwr(char *p);
+
+void UTIL_LogPrintf(const char *fmt, ...);
+void UTIL_LogMessage(const char *plid, const char *fmt, ...);
+void UTIL_ConsoleMessage(edict_t *pEdict, const char *fmt, ...);
+#ifndef USE_METAMOD
+#define PLID NULL
+#define LOG_MESSAGE UTIL_LogMessage
+#endif /* USE_METAMOD */
 
 #endif //__UTIL_H
