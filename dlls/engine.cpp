@@ -586,6 +586,7 @@ void pfnAlertMessage(ALERT_TYPE atype, char *szFmt, ...)
 			if (!strncmp(cp + 6, "triggered \"Round_Start\"", 23))
 			{
 				g_fRoundStart = gpGlobals->time;
+				g_fFreezeTimeEnd = g_fRoundStart;
 			}
 			// ... Round_End
 			else if (!strncmp(cp + 6, "triggered \"Round_End\"", 21))
