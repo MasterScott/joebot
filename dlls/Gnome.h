@@ -22,36 +22,11 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#if !defined(__GNOME_H)
+#ifndef __GNOME_H
 #define __GNOME_H
 
-#include "LListElem.h"
-
 #include "extdll.h"
-#include "enginecallback.h"
-#include "util.h"
-#include "cbase.h"
-
-#include "bot_func.h"
-#include "NeuralNet.h"
-#include "som.h"
-#include "NNWeapon.h"
-#include "CRadio.h"
-#include "CSkill.h"
-#include "CSTMem.h"
-#include "CLTMem.h"
-#include "CState.h"
-#include "CTask.h"
-#include "CPersonality.h"
-#include "bot_names.h"
-#include "bot_wpdir.h"
-#include "CSDecals.h"
-#include "Commandfunc.h"
-
-#include "bot_globaldefs.h"
-#include "globalvars.h"
-
-#include "waypoint.h"
+#include "LListElem.h"
 
 class CGnome : public CLListElem  
 {
@@ -76,4 +51,4 @@ public:
 	int iLWP;
 };
 
-#endif // !defined(__GNOME_H)
+#endif //__GNOME_H
