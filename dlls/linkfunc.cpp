@@ -651,5 +651,22 @@ LINK_ENTITY_TO_FUNC(weapon_gerknife);
 LINK_ENTITY_TO_FUNC(weapon_spade);
 LINK_ENTITY_TO_FUNC(weapon_m1carbine);
 
+// DoD 3.0
+LINK_ENTITY_TO_FUNC(info_gameplaylogic);
+LINK_ENTITY_TO_FUNC(info_doddetect);		// used in para maps
+LINK_ENTITY_TO_FUNC(para_roundtimer);
+LINK_ENTITY_TO_FUNC(dod_stats);
+LINK_ENTITY_TO_FUNC(weapon_scopedkar);
+LINK_ENTITY_TO_FUNC(weapon_greasegun);
+LINK_ENTITY_TO_FUNC(weapon_fg42);
+LINK_ENTITY_TO_FUNC(weapon_k43);
+LINK_ENTITY_TO_FUNC(ammo_scopedkar);
+LINK_ENTITY_TO_FUNC(ammo_greasegun);
+LINK_ENTITY_TO_FUNC(ammo_fg42);
+LINK_ENTITY_TO_FUNC(ammo_k43);
 
+LINK_ENTITY_TO_FUNC(env_model);
+LINK_ENTITY_TO_FUNC(env_state);
+LINK_ENTITY_TO_FUNC(dod_camera);
+LINK_ENTITY_TO_FUNC(dod_location);
 
