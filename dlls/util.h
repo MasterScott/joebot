@@ -639,12 +639,12 @@ qboolean UTIL_CallGameEntity(const char *entStr, entvars_t *pev);
 #define LOG_MESSAGE UTIL_LogMessage
 #define CALL_GAME_ENTITY(plid, entStr, pev) UTIL_CallGameEntity(entStr, pev)
 
+#endif /* USE_METAMOD */
+
 #ifdef _WIN32
 #define snprintf _snprintf
 #define vsnprintf _vsnprintf
 #endif
-
-#endif /* USE_METAMOD */
 
 #include <ctype.h> // isupper, tolower
 
