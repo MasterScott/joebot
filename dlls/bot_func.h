@@ -35,7 +35,6 @@ void KickBots(edict_t *pEntity,int iTeam,int iAll);
 void FillServer(int iType, int iTypeAdd);
 void BotCreate( edict_t *pPlayer, const char *, const char *,const char *,const char *);
 void Endround(void);
+void ServerCommand(void);
 
-
-#endif // BOT_FUNC_H
-
+#endif //BOT_FUNC_H
