@@ -51,9 +51,11 @@
 #include "CBotDOD.h"
 #include "CCommand.h"
 #include "ChatHost.h"
+#include "Commandfunc.h"
 #include "CSDecals.h"
 #include "CSkill.h"
 #include "globalvars.h"
+#include "NNWeapon.h"
 #include "WorldGnome.h"
 
 #include "NeuralNet.h"
@@ -73,7 +75,6 @@ extern int debug_engine;
 extern globalvars_t  *gpGlobals;
 
 #ifdef USE_METAMOD
-
 // Must provide at least one of these..
 static META_FUNCTIONS gMetaFunctionTable = {
 	GetEntityAPI,		// pfnGetEntityAPI		HL SDK; called before game DLL
@@ -89,7 +90,7 @@ static META_FUNCTIONS gMetaFunctionTable = {
 // Description of plugin
 plugin_info_t Plugin_info = {
 	META_INTERFACE_VERSION,	// ifvers
-	"JoeBot",	// name
+	"JoeBOT",	// name
 	"1.6.3",	// version
 	"2001/04/01",	// date
 	"@$3.1415rin <as3.1415rin@bots-united.com>",	// author
@@ -204,10 +205,6 @@ int Meta_Detach(PLUG_LOADTIME now, PL_UNLOAD_REASON reason) {
 }
 #endif /* USE_METAMOD */
 
-#ifdef DEBUGENGINE
-static FILE *fp;
-#endif
-
 CSkill Skill;
 CSDecals SDecals;
 float TIMETOBEBORED = _TIMETOBEBORED;
@@ -233,33 +230,19 @@ DLL_GLOBAL const Vector g_vecZero = Vector(0,0,0);
 
 CChatHost g_ChatHost;
 
-bool g_bSpray = true;
 int mod_id = -1;
 int m_spriteTexture = 0;
 //int default_bot_skill = 2;
 bool isFakeClientCommand = FALSE;
 int fake_arg_count;
 float bot_check_time = 2.0;
-int min_bots = -1;
-int max_bots = -1;
 int num_bots = 0;
 int prev_num_bots = 0;
 bool g_GameRules = FALSE;
 edict_t *clients[32];
 edict_t *listenserver_edict = NULL;
 bool bWelcome[32];
-bool bCheckWelcome = true;
 float welcome_time[32];
-int g_menu_waypoint;
-int g_menu_state = 0;
-bool b_addjoe = true;
-bool b_addskill = true;
-char szPrefixAgg[32]="[JOE]";
-char szPrefixNor[32]="[JoE]";
-char szPrefixDef[32]="[J0E]";
-bool g_bForceNOStat = false;
-bool g_bJoinWHumanMAX = false;		// only use max_bots when a human already joined
-bool g_bJoinWHumanRES = false;		// only respawn when a human already joined
 bool g_bIsSteam = false;
 
 CCommands Commands;
@@ -296,239 +279,6 @@ int flf_bug_check;  // for FLF 1.1 capture point bug
 
 edict_t *pEdictLastJoined;
 
-char *show_menu_1,			// pointer to texts
-*show_menu_2,
-*show_menu_2a,
-*show_menu_2am,
-*show_menu_2b,
-*show_menu_2c,
-*show_menu_3,
-*show_menu_4,
-*show_menu_5;
-
-
-// // // /// // /// // /// /// // /// /// english joebot menu
-char *E_show_menu_1 ={"\\yJoeBOT Menu\n\n\
-\\w1. Waypoint stuff\n\
-2. Add bot\n\
-3. Kick a bot\n\
-4. End round\n\n\
-5. CANCEL\n\n\
-6. Language\n"};
-
-char *E_show_menu_2={"\\yWaypoint menu\n\n\
-\\w1. Waypoint on/off\n\
-2. Autowaypoint on/off\n\
-3. Autopath on/off\n\
-4. Add\n\
-5. Delete\n\
-6. Set flags\n\
-7. Load\n\
-8. Save\n\
-9. Pathwaypoint\n\
-"};
-
-char *E_show_menu_2a={"\\yWaypoint flags\n\n\
-\\w1. Dont Avoid\n\
-2. Ladder\n\
-3. Visit\n\
-4. Crouch\n\
-5. Aiming\n\
-6. Sniper spot\n\
-7. Bomb target / hostages\n\
-8. Team specific\n\
-9. more ...\n\
-"};
-
-char *E_show_menu_2am={"\\yWaypoint flags - 2\n\n\
-\\w1. Rescue zone\n\
-2. Dont avoid fall\n\
-3. Jump\n\
-"};
-
-char *E_show_menu_2b={"\\yPathwaypoint menu\n\n\
-\\w1. create1\n\
-2. create2\n\
-3. remove1\n\
-4. remove2\n"};
-
-char *E_show_menu_2c={"\\ySelect a team :\n\n\
-\\w1. Counterterrorists\n\
-2. Terrorists\n\
-3. Not team specific\n"};
-
-char *E_show_menu_3={"\\yAdd JoeBOT(s)\n\n\
-\\w1. Add a TE\n\
-2. Add a CT\n\
-3. Add a ?\n\
-\nFill server ... \n\
-4. half with TE\n\
-5. half with CT\n\
-6. full with TE\n\
-7. full with CT\n\
-8. full\n\
-"};
-
-char *E_show_menu_4={"\\yKick JoeBOT(s)\n\n\
-\\w1. kick a te\n\
-2. kick a ct\n\
-3. kick all te\n\
-4. kick all ct\n\
-5. kick all bots\n"};
-
-char *E_show_menu_5={"\\yChoose a language\n\n\
-\\w1. English\n\
-2. German / Deutsch\n\
-3. French / Francais\n"};
-
-// // // /// // /// // /// /// // /// /// deutsches joebot menu
-char *D_show_menu_1 ={"\\yJoeBOT Menue\n\n\
-\\w1. Menu fuer Wegpunkte\n\
-2. Hinzufuegen von JoeBOTs\n\
-3. Entfernen von JoeBOTs\n\
-4. Sofortiges Ende der Runde\n\n\
-5. Abbrechen\n\n\
-6. Sprache"};
-
-char *D_show_menu_2={"\\yWPmenue\n\n\
-\\w1. Wegpunkte (WP) an/aus\n\
-2. Autom. WP an/aus\n\
-3. Autom. Pfade an/aus\n\
-4. Fuege WP hinzu\n\
-5. Loesche WP\n\
-6. Setze WP Eigenschaften\n\
-7. Lade WP\n\
-8. Speichere WP\n\
-9. Pfade\n\
-"};
-
-char *D_show_menu_2a={"\\yWegpunkt Eigenschaften\n\n\
-\\w1. Vermeide nichts\n\
-2. Leiter\n\
-3. Besuchspunkt\n\
-4. Ducken\n\
-5. Zielen\n\
-6. Sniper Spot\n\
-7. Bombe / Geiseln\n\
-8. Team spezifisch\n\
-9. mehr ...\n\
-"};
-
-char *D_show_menu_2am={"\\yWaypoint Eigenschaften - 2\n\n\
-\\w1. Rettungs-Zone\n\
-2. Verhindere nicht zu fallen\n\
-3. Spring!\n\
-"};
-
-char *D_show_menu_2b={"\\yPfad Menue\n\n\
-\\w1. Erstelle Start\n\
-2. Erstelle Ende\n\
-3. Entferne Start\n\
-4. Entferne Ende\n"};
-
-char *D_show_menu_2c={"\\yWaehle ein Team aus :\n\n\
-\\w1. Counterterrorists\n\
-2. Terrorists\n\
-3. Nicht Team spezifisch\n"};
-
-char *D_show_menu_3={"\\yHinzufuegen von JoeBOT(s)\n\n\
-\\w1. Fuege TE hinzu\n\
-2. Fuege CT hinzu\n\
-3. Fuege ? hinzu\n\
-\n'Fülle' Server ... \n\
-4. halb mit TE\n\
-5. halb mit CT\n\
-6. voll mit TE\n\
-7. voll mit CT\n\
-8. voll\n\
-"};
-
-char *D_show_menu_4={"\\yEntfernen von JoeBOT(s)\n\n\
-\\w1. Entferne einen TE\n\
-2. Entferne einen CT\n\
-3. Entferne alle TEs\n\
-4. Entferne alle CTs\n\
-5. Entferne alle Bots\n"};
-
-char *D_show_menu_5={"\\yWaehlen sie eine Sprache : \n\n\
-\\w1. English / Englisch\n\
-2. Deutsch\n\
-3. Franzoesisch / Francais\n"};
-
-// french botmenu
-char *F_show_menu_1 ={"\\yJoeBOT Menu\n\n\
-\\w1. Utilitaires waypoints\n\
-2. Ajouter un/des bot(s)\n\
-3. Kicker un bot\n\
-4. Fin du round\n\n\
-5. ANNULER\n\n\
-6. Choisis une langue\n"};
-
-char *F_show_menu_2={"\\yWaypoint menu\n\n\
-\\w1. Waypoint on/off\n\
-2. Autowaypoint on/off\n\
-3. Autopath on/off\n\
-4. Ajouter\n\
-5. Effacer\n\
-6. Ajuster les attributs\n\
-7. Charger\n\
-8. Sauvegarder\n\
-9. Pathwaypoint\n\
-"};
-
-char *F_show_menu_2a={"\\yAttributs des waypoints\n\n\
-\\w1. Ignorer obstacle\n\
-2. Echelle\n\
-3. Visite\n\
-4. Accroupi\n\
-5. Viser\n\
-6. Point de Snipe\n\
-7. Point de bombe / hostages\n\
-8. Specifique a une equipe\n\
-9. Plus ...\n\
-"};
-
-char *F_show_menu_2am={"\\yAttributs des waypoints - 2\n\n\
-\\w1. Zone de sauvetage\n\
-2. Empecher de tomber\n\
-3. Sauter\n\
-"};
-
-char *F_show_menu_2b={"\\yPathwaypoint menu\n\n\
-\\w1. Creer1\n\
-2. Creer2\n\
-3. Enlever1\n\
-4. Enlever2\n"};
-
-char *F_show_menu_2c={"\\yChoisir un team :\n\n\
-\\w1. Counter-terrorists\n\
-2. Terrorists\n\
-3. Au hasard\n"};
-
-char *F_show_menu_3={"\\yAjouter JoeBOT(s)\n\n\
-\\w1. Ajouter un terro\n\
-2. Ajouter un counter\n\
-3. Ajouter au hasard\n\
-\nCompleter le serveur avec \n\
-4. 1/2 TE\n\
-5. 1/2 CT\n\
-6. tous terros\n\
-7. tous counters\n\
-8. tous\n\
-"};
-
-char *F_show_menu_4={"\\yKicker JoeBOT(s)\n\n\
-\\w1. kicker un terro\n\
-2. kicker un counter\n\
-3. kicker tous les terros\n\
-4. kicker tous les counters\n\
-5. kicker tous les bots\n"};
-
-char *F_show_menu_5={"\\yChosissez une langue : \n\n\
-\\w1. Anglais / English\n\
-2. Allemand / German\n\
-3. Francais\n"};
-
 CBotWPDir g_WPDir;
 
 char welcome_msg[200];
@@ -536,7 +286,6 @@ char _JOEBOTVERSION[80];
 char _JOEBOTVERSIONWOOS[80]= "1.6.3";
 bool bDedicatedWelcome = false;
 int g_iTypeoM;
-int g_iLanguage;
 
 float f_round_start;	// time of roundstart
 float f_timesrs = 1000;		// time since round start	->	updated every frame by start frame
@@ -552,45 +301,6 @@ void BotNameInit(void);
 void UpdateClientData(const struct edict_s *ent, int sendweapons, struct clientdata_s *cd);
 #endif /* USE_METAMOD */
 void ProcessBotCfgFile(void);
-
-void UpdateLanguage(void){
-	switch(g_iLanguage){
-	case LANG_DE:
-		show_menu_1		= D_show_menu_1;
-		show_menu_2		= D_show_menu_2;
-		show_menu_2a	= D_show_menu_2a;
-		show_menu_2am	= D_show_menu_2am;
-		show_menu_2b	= D_show_menu_2b;
-		show_menu_2c	= D_show_menu_2c;
-		show_menu_3		= D_show_menu_3;
-		show_menu_4		= D_show_menu_4;
-		show_menu_5		= D_show_menu_5;
-		break;
-	case LANG_FR:
-		show_menu_1		= F_show_menu_1;
-		show_menu_2		= F_show_menu_2;
-		show_menu_2a	= F_show_menu_2a;
-		show_menu_2am	= F_show_menu_2am;
-		show_menu_2b	= F_show_menu_2b;
-		show_menu_2c	= F_show_menu_2c;
-		show_menu_3		= F_show_menu_3;
-		show_menu_4		= F_show_menu_4;
-		show_menu_5		= F_show_menu_5;
-		break;
-	case LANG_E:
-	default:
-		show_menu_1		= E_show_menu_1;
-		show_menu_2		= E_show_menu_2;
-		show_menu_2a	= E_show_menu_2a;
-		show_menu_2am	= E_show_menu_2am;
-		show_menu_2b	= E_show_menu_2b;
-		show_menu_2c	= E_show_menu_2c;
-		show_menu_3		= E_show_menu_3;
-		show_menu_4		= E_show_menu_4;
-		show_menu_5		= E_show_menu_5;
-		break;
-	}
-}
 
 bool bInitInfo = true;
 
@@ -645,7 +355,7 @@ void CalcDistances(void){
 	}
 }
 
-void ServerCommand(void)
+void JBServerCmd(void)
 {
 	bool bCmdOK = Commands.Exec(NULL, CM_DEDICATED, CMD_ARGV(1), CMD_ARGV(2), CMD_ARGV(3), CMD_ARGV(4), CMD_ARGV(5));
 	if (!bCmdOK)
@@ -661,11 +371,13 @@ void GameDLLInit( void )
 	long lschl;
 	printf("JoeBOT: Launching DLL (CBB%liCBC%liCBD%li%li@%s)\n",sizeof(CBotBase),sizeof(CBotCS),sizeof(CBotDOD),time(NULL),"---");
 #ifdef USE_METAMOD
-	REG_SVR_COMMAND("joebot", ServerCommand);
+	REG_SVR_COMMAND("joebot", JBServerCmd);
 #else /* not USE_METAMOD */
-	(*g_engfuncs.pfnAddServerCommand)("joebot", ServerCommand);
+	(*g_engfuncs.pfnAddServerCommand)("joebot", JBServerCmd);
 #endif /* USE_METAMOD */
-	
+	JBRegCvars();
+	WeaponDefs.Init();
+
 	g_bMyBirthday = MyBirthday();
 	
 #ifdef _WIN32
@@ -732,10 +444,8 @@ void GameDLLInit( void )
 	Buy[CS_WEAPON_FIVESEVEN]	= BotBuy_CS_WEAPON_FIVESEVEN;
 	Buy[CS_WEAPON_UMP45]		= BotBuy_CS_WEAPON_UMP45;
 	Buy[CS_WEAPON_SG550]		= BotBuy_CS_WEAPON_SG550;
-#ifndef CSTRIKE15
 	Buy[CS_WEAPON_GALIL]        = BotBuy_CS_WEAPON_GALIL;
 	Buy[CS_WEAPON_FAMAS]        = BotBuy_CS_WEAPON_FAMAS;
-#endif /* CSTRIKE15 */
 	Buy[CS_WEAPON_USP]			= BotBuy_CS_WEAPON_USP;
 	Buy[CS_WEAPON_GLOCK18]		= BotBuy_CS_WEAPON_GLOCK18;
 	Buy[CS_WEAPON_AWP]			= BotBuy_CS_WEAPON_AWP;
@@ -833,16 +543,7 @@ int DispatchSpawn( edict_t *pent )
 	{
 		char *pClassname = (char *)STRING(pent->v.classname);
 		
-#ifdef DEBUGENGINE
-		if (debug_engine)
-		{
-			fp=fopen("bot.txt","a");
-			fprintf(fp, "DispatchSpawn: %x %s\n",pent,pClassname);
-			if (pent->v.model != 0)
-				fprintf(fp, " model=%s\n",STRING(pent->v.model));
-			fclose(fp);
-		}
-#endif
+		BOT_LOG("DispatchSpawn", "pent=%x, classname=%s, model=%s", pent, pClassname, pent->v.model ? STRING(pent->v.model) : "");
 		
 		if (FStrEq(pClassname, "worldspawn"))
 		{
@@ -955,23 +656,13 @@ void DispatchBlocked( edict_t *pentBlocked, edict_t *pentOther )
 {
 	(*other_gFunctionTable.pfnBlocked)(pentBlocked, pentOther);
 }
-#endif /* not USE_METAMOD */
 
 void DispatchKeyValue( edict_t *pentKeyvalue, KeyValueData *pkvd )
 {
-	static edict_t *temp_pent;
-	static int flag_index;
-	
-	//   fp=fopen("bot.txt","a"); fprintf(fp, "DispatchKeyValue: %x %s=%s\n",pentKeyvalue,pkvd->szKeyName,pkvd->szValue); fclose(fp);
-	
-#ifdef USE_METAMOD
-	RETURN_META(MRES_HANDLED);
-#else /* not USE_METAMOD */
+	//BOT_LOG("DispatchKeyValue", "pentKeyvalue=%x, %s=%s", pentKeyvalue, pkvd->szKeyName, pkvd->szValue);
 	(*other_gFunctionTable.pfnKeyValue)(pentKeyvalue, pkvd);
-#endif /* USE_METAMOD */
 }
 
-#ifndef USE_METAMOD
 void DispatchSave( edict_t *pent, SAVERESTOREDATA *pSaveData )
 {
 	(*other_gFunctionTable.pfnSave)(pent, pSaveData);
@@ -1020,9 +711,7 @@ BOOL ClientConnect( edict_t *pEntity, const char *pszName, const char *pszAddres
 		int i;
 		int count = 0;
 		
-#ifdef DEBUGENGINE
-		if (debug_engine) { fp=fopen("bot.txt","a"); fprintf(fp, "ClientConnect: pent=%x name=%s\n",pEntity,pszName); fclose(fp); }
-#endif
+		BOT_LOG("ClientConnect", "pEntity=%x, pszName=%s", pEntity, pszName);
 		
 		// check if this client is the listen server client
 		if (FStrEq(pszAddress, "loopback"))
@@ -1048,7 +737,7 @@ BOOL ClientConnect( edict_t *pEntity, const char *pszName, const char *pszAddres
 			
 			// if there are currently more than the minimum number of bots running
 			// then kick one of the bots off the server...
-			if ((count > min_bots) && (min_bots != -1))
+			if ((count > int(jb_botsmin->value)) && (int(jb_botsmin->value) != -1))
 			{
 				for (i=0; i < 32; i++){
 					if (bots[i]){  // is this slot used?
@@ -1084,14 +773,13 @@ BOOL ClientConnect( edict_t *pEntity, const char *pszName, const char *pszAddres
 #endif /* USE_METAMOD */
 }
 
+
 void ClientDisconnect( edict_t *pEntity )
 {
 	if (gpGlobals->deathmatch)
 	{
 		int i;
-#ifdef DEBUGENGINE
-		if (debug_engine) { fp=fopen("bot.txt","a"); fprintf(fp, "ClientDisconnect: %x\n",pEntity); fclose(fp); }
-#endif
+		BOT_LOG("ClientDisconnect", "pEntity=%x", pEntity);
 		
 		i = 0;
 		while ((i < 32) && (clients[i] != pEntity))
@@ -1138,9 +826,7 @@ void ClientDisconnect( edict_t *pEntity )
 
 void ClientKill( edict_t *pEntity )
 {
-#ifdef DEBUGENGINE
-	if (debug_engine) { fp=fopen("bot.txt","a"); fprintf(fp, "ClientKill: %x\n",pEntity); fclose(fp); }
-#endif
+	BOT_LOG("ClientKill", "pEntity=%x", pEntity);
 #ifdef USE_METAMOD
 	RETURN_META(MRES_HANDLED);
 #else /* not USE_METAMOD */
@@ -1150,9 +836,7 @@ void ClientKill( edict_t *pEntity )
 
 void ClientPutInServer( edict_t *pEntity )
 {
-#ifdef DEBUGENGINE
-	if (debug_engine) { fp=fopen("bot.txt","a"); fprintf(fp, "ClientPutInServer: %x\n",pEntity); fclose(fp); }
-#endif
+	BOT_LOG("ClientPutInServer", "pEntity=%x", pEntity);
 	
 	int i = 0;
 	
@@ -1173,7 +857,7 @@ void ClientPutInServer( edict_t *pEntity )
 		
 		// if there are currently more than the minimum number of bots running
 		// then kick one of the bots off the server...
-		if ((count > min_bots) && (min_bots != -1))
+		if ((count > int(jb_botsmin->value)) && (int(jb_botsmin->value) != -1))
 		{
 			for (i=0; i < 32; i++){
 				if (bots[i]){  // is this slot used?
@@ -1393,7 +1077,11 @@ void Endround(void){
 		if(bots[i]){
 			if(IsAlive(bots[i]->pEdict)){
 				bots[i]->pEdict->v.frags++;
+#ifdef USE_METAMOD
+				MDLL_ClientKill(bots[i]->pEdict);
+#else /* not USE_METAMOD */
 				ClientKill(bots[i]->pEdict);
+#endif /* not USE_METAMOD */
 			}
 		}
 	}
@@ -1407,9 +1095,7 @@ void ClientCommand( edict_t *pEntity )
 	if ((gpGlobals->deathmatch) && (!IS_DEDICATED_SERVER()) &&
 		(pEntity == listenserver_edict))
 	{
-#ifdef DEBUGENGINE
-		if (debug_engine) { fp=fopen("bot.txt","a"); fprintf(fp,"ClientCommand: %s\n",g_argv); fclose(fp); }
-#endif
+		BOT_LOG("ClientCommand", "g_argv=%s", g_argv);
 		if (Commands.Exec(pEntity, CM_CONSOLE, CMD_ARGV(0), CMD_ARGV(1), CMD_ARGV(2), CMD_ARGV(3), CMD_ARGV(4)))
 #ifdef USE_METAMOD
 			RETURN_META(MRES_SUPERCEDE);
@@ -1425,19 +1111,13 @@ void ClientCommand( edict_t *pEntity )
 #endif /* USE_METAMOD */
 }
 
+#ifndef USE_METAMOD
 void ClientUserInfoChanged( edict_t *pEntity, char *infobuffer )
 {
-#ifdef DEBUGENGINE
-	if (debug_engine) { fp=fopen("bot.txt", "a"); fprintf(fp, "ClientUserInfoChanged: pEntity=%x infobuffer=%s\n", pEntity, infobuffer); fclose(fp); }
-#endif
-#ifdef USE_METAMOD
-	RETURN_META(MRES_HANDLED);
-#else /* not USE_METAMOD */
+	BOT_LOG("ClientUserInfoChanged", "pEntity=%x, infobuffer=%s", pEntity, infobuffer);
 	(*other_gFunctionTable.pfnClientUserInfoChanged)(pEntity, infobuffer);
-#endif /* USE_METAMOD */
 }
 
-#ifndef USE_METAMOD
 void ServerActivate( edict_t *pEdictList, int edictCount, int clientMax )
 {
 	(*other_gFunctionTable.pfnServerActivate)(pEdictList, edictCount, clientMax);
@@ -1818,8 +1498,8 @@ void StartFrame( void )
 			bot_check_time = gpGlobals->time + _PAUSE_TIME*2;
 		}
 		
-		if(!g_bForceNOStat
-			&&!g_waypoint_on
+		if(bool(jb_wprecalc->value)
+			&&!bool(jb_wp->value)
 			&& num_waypoints)
 			WPStat.CalcSlice();
 		
@@ -1850,7 +1530,7 @@ void StartFrame( void )
 #endif
 			
 			/* begin all .2s code */
-			if(bCheckWelcome||g_bMyBirthday){
+			if(bool(jb_msgwelcome->value)||g_bMyBirthday){
 				if(!bDedicatedWelcome
 					&& gpGlobals->time > _PAUSE_TIME){
 					bDedicatedWelcome = true;
@@ -2157,7 +1837,7 @@ void StartFrame( void )
 				(SBInfo[bot_index].respawn_state == RESPAWN_IDLE))  // not respawning
 			{
 				//try{
-				if (g_bJoinWHumanRES &&
+				if (!bool(jb_jointeam->value) &&
 					bots[bot_index]->bot_team != 6 &&
 					bots[bot_index]->bot_team > 0 &&
 					!UTIL_HumansInGame())
@@ -2185,7 +1865,7 @@ void StartFrame( void )
 			
 			if (pPlayer && !pPlayer->free)
 			{
-				if ((g_waypoint_on) && FBitSet(pPlayer->v.flags, FL_CLIENT))
+				if (bool(jb_wp->value) && FBitSet(pPlayer->v.flags, FL_CLIENT))
 				{
 					WaypointThink(pPlayer);
 				}
@@ -2289,7 +1969,7 @@ void StartFrame( void )
 				
 				if (index < 32)
 				{
-					if(!g_bJoinWHumanRES || (g_bJoinWHumanRES && UTIL_HumansInGame() != 0)){
+					if(bool(jb_jointeam->value) || (!bool(jb_jointeam->value) && UTIL_HumansInGame() != 0)){
 						SBInfo[index].respawn_state = RESPAWN_IS_RESPAWNING;
 						if(bots[index]) delete bots[index];      // free up this slot
 						bots[index] = 0;
@@ -2351,21 +2031,17 @@ void StartFrame( void )
 					
 					// if there are currently less than the maximum number of "players"
 					// then add another bot using the default skill level...
-					if ((count < max_bots) && (max_bots != -1) && (count < gpGlobals->maxClients))
+					if ((count < int(jb_botsmax->value)) && (int(jb_botsmax->value) != -1) && (count < gpGlobals->maxClients))
 					{
 						//cout << " ------------------- creating bot due to max_bots" << endl;
-						if(!g_bJoinWHumanMAX){
+						// enter the game if jb_entergame is set or if humans are in the game
+						if(bool(jb_entergame->value || UTIL_HumansInGame())){
 							BotCreate( NULL, NULL, NULL, NULL, NULL);
-						}
-						else{
-							if ( UTIL_HumansInGame() != 0){
-								BotCreate( NULL, NULL, NULL, NULL, NULL);
-							}
 						}
 					}
 					// if there are currently more than the minimum number of bots running
 					// then kick one of the bots off the server...
-					/*if ((count > min_bots) && (min_bots != -1))
+					/*if ((count > int(jb_botsmin->value)) && (int(jb_botsmin->value) != -1))
 					{
 						for (i=0; i < 32; i++){
 							if (bots[i]){  // is this slot used?
@@ -2396,7 +2072,7 @@ void StartFrame( void )
 			  
 			   // if there are currently less than the maximum number of "players"
 			   // then add another bot using the default skill level...
-			   if ((count < max_bots) && (max_bots != -1))
+			   if ((count < int(jb_botsmax->value)) && (int(jb_botsmax->value) != -1))
 			   {
 			   cout << " ------------------- creating bot due to max_bots" << endl;
 			   BotCreate( NULL, NULL, NULL, NULL, NULL);
@@ -2433,22 +2109,13 @@ const char *GetGameDescription( void )
 {
 	return (*other_gFunctionTable.pfnGetGameDescription)();
 }
-#endif /* not USE_METAMOD */
 
 void PlayerCustomization( edict_t *pEntity, customization_t *pCust )
 {
-#ifdef DEBUGENGINE
-	if (debug_engine) { fp=fopen("bot.txt", "a"); fprintf(fp, "PlayerCustomization: %x\n",pEntity); fclose(fp); }
-#endif
-	
-#ifdef USE_METAMOD
-	RETURN_META(MRES_HANDLED);
-#else /* not USE_METAMOD */
+	BOT_LOG("PlayerCustomization", "pEntity=%x", pEntity);
 	(*other_gFunctionTable.pfnPlayerCustomization)(pEntity, pCust);
-#endif /* USE_METAMOD */
 }
 
-#ifndef USE_METAMOD
 void SpectatorConnect( edict_t *pEntity )
 {
 	(*other_gFunctionTable.pfnSpectatorConnect)(pEntity);
@@ -2538,22 +2205,13 @@ void CreateInstancedBaselines( void )
 {
 	(*other_gFunctionTable.pfnCreateInstancedBaselines)();
 }
-#endif /* not USE_METAMOD */
 
 int InconsistentFile( const edict_t *player, const char *filename, char *disconnect_message )
 {
-#ifdef DEBUGENGINE
-	if (debug_engine) { fp=fopen("bot.txt", "a"); fprintf(fp, "InconsistentFile: %x filename=%s\n",player,filename); fclose(fp); }
-#endif
-	
-#ifdef USE_METAMOD
-	RETURN_META_VALUE(MRES_HANDLED, 0);
-#else /* not USE_METAMOD */
+	BOT_LOG("InconsistentFile", "player=%x, filename=%s", player, filename);
 	return (*other_gFunctionTable.pfnInconsistentFile)(player, filename, disconnect_message);
-#endif /* USE_METAMOD */
 }
 
-#ifndef USE_METAMOD
 int AllowLagCompensation( void )
 {
 	return (*other_gFunctionTable.pfnAllowLagCompensation)();
@@ -2563,16 +2221,16 @@ int AllowLagCompensation( void )
 #ifdef USE_METAMOD
 DLL_FUNCTIONS gFunctionTable =
 {
-   GameDLLInit,               //pfnGameInit
-   DispatchSpawn,             //pfnSpawn
-   NULL,             //pfnThink
-   NULL,               //pfnUse
-   NULL,             //pfnTouch
-   NULL,           //pfnBlocked
-   DispatchKeyValue,          //pfnKeyValue
-   NULL,              //pfnSave
-   NULL,           //pfnRestore
-   NULL, //pfnAbsBox
+   GameDLLInit,           //pfnGameInit
+   DispatchSpawn,            //pfnSpawn
+   NULL,                     //pfnThink
+   NULL,                       //pfnUse
+   NULL,                     //pfnTouch
+   NULL,                   //pfnBlocked
+   NULL,                  //pfnKeyValue
+   NULL,                      //pfnSave
+   NULL,                   //pfnRestore
+   NULL,                    //pfnAbsBox
 
    NULL,           //pfnSaveWriteFields
    NULL,            //pfnSaveReadFields
@@ -2581,47 +2239,47 @@ DLL_FUNCTIONS gFunctionTable =
    NULL,        //pfnRestoreGlobalState
    NULL,          //pfnResetGlobalState
 
-   ClientConnect,             //pfnClientConnect
-   ClientDisconnect,          //pfnClientDisconnect
-   ClientKill,                //pfnClientKill
-   ClientPutInServer,         //pfnClientPutInServer
-   ClientCommand,             //pfnClientCommand
-   ClientUserInfoChanged,     //pfnClientUserInfoChanged
+   ClientConnect,         //pfnClientConnect
+   ClientDisconnect,   //pfnClientDisconnect
+   ClientKill,               //pfnClientKill
+   ClientPutInServer, //pfnClientPutInServer
+   ClientCommand,         //pfnClientCommand
+   NULL,     //pfnClientUserInfoChanged
    NULL,            //pfnServerActivate
    NULL,          //pfnServerDeactivate
 
    NULL,            //pfnPlayerPreThink
    NULL,           //pfnPlayerPostThink
 
-   StartFrame,                //pfnStartFrame
+   StartFrame,          //pfnStartFrame
    NULL,             //pfnParmsNewLevel
    NULL,          //pfnParmsChangeLevel
 
-   NULL,        //pfnGetGameDescription    Returns string describing current .dll game.
-   PlayerCustomization,       //pfnPlayerCustomization   Notifies .dll of new customization for player.
+   NULL,        //pfnGetGameDescription   Returns string describing current .dll game.
+   NULL,       //pfnPlayerCustomization   Notifies .dll of new customization for player.
 
-   NULL,          //pfnSpectatorConnect      Called when spectator joins server
+   NULL,          //pfnSpectatorConnect   Called when spectator joins server
    NULL,       //pfnSpectatorDisconnect   Called when spectator leaves the server
-   NULL,            //pfnSpectatorThink        Called when spectator sends a command packet (usercmd_t)
+   NULL,            //pfnSpectatorThink   Called when spectator sends a command packet (usercmd_t)
 
-   NULL,                 //pfnSys_Error          Called when engine has encountered an error
+   NULL,                 //pfnSys_Error   Called when engine has encountered an error
 
    NULL,                   //pfnPM_Move
-   NULL,                   //pfnPM_Init            Server version of player movement initialization
+   NULL,                   //pfnPM_Init   Server version of player movement initialization
    NULL,        //pfnPM_FindTextureType
 
-   NULL,           //pfnSetupVisibility        Set up PVS and PAS for networking for this client
-   NULL,          //pfnUpdateClientData       Set up data sent only to specific client
+   NULL,           //pfnSetupVisibility   Set up PVS and PAS for networking for this client
+   NULL,          //pfnUpdateClientData   Set up data sent only to specific client
    NULL,             //pfnAddToFullPack
-   NULL,            //pfnCreateBaseline        Tweak entity baseline for network encoding, allows setup of player baselines, too.
-   NULL,          //pfnRegisterEncoders      Callbacks for network encoding
+   NULL,            //pfnCreateBaseline   Tweak entity baseline for network encoding, allows setup of player baselines, too.
+   NULL,          //pfnRegisterEncoders   Callbacks for network encoding
    NULL,             //pfnGetWeaponData
    NULL,                  //pfnCmdStart
    NULL,                    //pfnCmdEnd
    NULL,      //pfnConnectionlessPacket
    NULL,             //pfnGetHullBounds
    NULL,  //pfnCreateInstancedBaselines
-   InconsistentFile,          //pfnInconsistentFile
+   NULL,          //pfnInconsistentFile
    NULL,      //pfnAllowLagCompensation
 };
 #else /* not USE_METAMOD */
