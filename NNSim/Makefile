@@ -9,6 +9,10 @@ else
  OBJDIR = $(OBJDIR_RELEASE)
 endif
 
+ifeq ($(OS),Windows_NT)
+ OBJDIR := $(OBJDIR)_mingw
+endif
+
 # build source list
 include Config.mk
 OBJ := $(SRC:%.cpp=$(OBJDIR)/%.o)
