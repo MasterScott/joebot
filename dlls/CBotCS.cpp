@@ -321,7 +321,7 @@ bool CBotCS :: BuyWeapon(void){
 			&& !HasPrimary()){
 			FakeClientCommand(pEdict,"menuselect 0");	//quit fuckin menues
 			if(RANDOM_LONG(0,100) > 90){
-				if(bot_teamnm == TE){
+				if(bot_teamnm == CS_TEAM_TE){
 					if(bot_money > 1100){
 						Buy[CS_WEAPON_ELITE](this);
 					}
@@ -355,7 +355,7 @@ bool CBotCS :: BuyWeapon(void){
 		
 		if(!bLoadedLPB){				// evtl. load probabilities
 			bLoadedLPB = true;
-			WeaponDefs.Load(szLPBFile);
+			WeaponDefs.Load(jb_buyprobfile->string);
 		}
 		
 		int ischl;
@@ -398,7 +398,7 @@ bool CBotCS :: BuyWeapon(void){
 #ifdef __LOG
 			FILE *fhds;fhds=fopen("buy.txt","a");if(fhds){fprintf(fhds,"--------- %s ---------\n",STRING(pEdict->v.netname));fclose(fhds);}
 #endif
-			if(bot_teamnm == CT){		// check team dep weapon stuff and evtl. change favourite weapon
+			if(bot_teamnm == CS_TEAM_CT){		// check team dep weapon stuff and evtl. change favourite weapon
 				if(lPWeapon == CS_WEAPON_FAMAS)
 					lPWeapon = CS_WEAPON_M4A1;
 				else if(lPWeapon == CS_WEAPON_AK47)
@@ -523,7 +523,7 @@ bool CBotCS :: BuyWeapon(void){
 			&& HasSecondary() != CS_WEAPON_ELITE
 			&& HasSecondary() != CS_WEAPON_FIVESEVEN
 			&& HasSecondary() != CS_WEAPON_P228){
-			if(bot_teamnm== CT){
+			if(bot_teamnm== CS_TEAM_CT){
 				if(RANDOM_LONG(0,100) < 33){
 					Buy[CS_WEAPON_DEAGLE](this);
 				}
@@ -550,7 +550,7 @@ bool CBotCS :: BuyWeapon(void){
 		}
 		
 		if(g_iTypeoM == MT_DE		// def kit
-			&&bot_teamnm == CT
+			&&bot_teamnm == CS_TEAM_CT
 			&&RANDOM_LONG(0,100) < 30){
 			
 			BotBuy_CS_WEAPON_Defuse(this);
@@ -1816,7 +1816,7 @@ void CBotCS :: Think(void){
 	{
 		HandleMenu();
 			
-		g_engfuncs.pfnRunPlayerMove( pEdict, pEdict->v.v_angle, 0,
+		RUN_PLAYER_MOVE( pEdict, pEdict->v.v_angle, 0,
 			0, 0, pEdict->v.button, 0, byte(g_msecval));
 		
 		
@@ -1847,7 +1847,7 @@ void CBotCS :: Think(void){
 			/*if (RANDOM_LONG(1, 100) > 50)
 		lButton = IN_ATTACK;*/
 		
-		g_engfuncs.pfnRunPlayerMove( pEdict, pEdict->v.v_angle, f_move_speed,
+		RUN_PLAYER_MOVE( pEdict, pEdict->v.v_angle, f_move_speed,
 			0, 0, lButton, 0, byte(g_msecval));
 		
 		//cout << "deadthinkend" << endl;
@@ -2429,7 +2429,7 @@ void CBotCS :: Think(void){
 	// copying lButton from bot_t to pEdict->v.button
 	pEdict->v.button = lButton;			// copy the new pressed buttons to the right location
 	
-	g_engfuncs.pfnRunPlayerMove( pEdict, pEdict->v.v_angle, f_move_speed,
+	RUN_PLAYER_MOVE( pEdict, pEdict->v.v_angle, f_move_speed,
 		f_strafe, 0, pEdict->v.button, 0, byte(g_msecval));
 	
 	//BotFixIdealYaw(pEdict);
