@@ -1974,7 +1974,7 @@ void CBotCS :: CheckTasksOnReachability(int iNearWP){
 			iNextWP = WaypointRouteFromTo(iNearWP,current->lAdd,bot_teamnm);
 			
 			if(iNearWP == current->lAdd
-				|| iNextWP == -1
+				|| iNextWP == WAYPOINT_UNREACHABLE
 				|| iNextWP > WAYPOINT_UNREACHABLE/2){
 				current->lType |= BT_DEL;
 			}

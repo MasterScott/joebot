@@ -3201,9 +3201,9 @@ bool CBotBase :: IsWeaponBetterCurrent(long lWeaponID){
 }
 
 int CBotBase :: GoNextWPOnPath(void){
-	return -1;
+	return WAYPOINT_UNREACHABLE;
 }
 
 int CBotBase :: GetNextWPOnPath(void){
-	return -1;
+	return WAYPOINT_UNREACHABLE;
 }
