@@ -293,14 +293,14 @@ void BotCreate( edict_t *pPlayer, const char *szTeam, const char *szClass,const 
 		}
 	}
 	
-	Name *pName = 0;
+	const CBotNamesItem *pName = 0;
 	char szNameThis[32];
 	char szTempName[32];
 	int iSkill;
 	
 	////////////////////////////
-	pName = Names.GetName();					// get name from list
-	strcpy(szNameThis,pName->szName);
+	pName = Names.getName();					// get name from list
+	strcpy(szNameThis,pName->m_szName);
 	index = 0;
 	while ((bots[index]) && (index < 32))
 		index++;
@@ -347,7 +347,7 @@ void BotCreate( edict_t *pPlayer, const char *szTeam, const char *szClass,const 
 		pBot->bot_skill = iSkill;
 	
 	if(!szName || strlen(szName)<2 || !strcmp(szName,"default")|| !strcmp(szName,"unnamed")){// name is default or no specified, get it from bot_names.txt
-		CBotBase :: MakeName(szTempName,pName->szName,pBot->bot_skill,bots[index]->d_Manner);
+		CBotBase :: MakeName(szTempName,pName->m_szName,pBot->bot_skill,bots[index]->d_Manner);
 	}
 	else{
 		CBotBase :: MakeName(szTempName,szName,pBot->bot_skill,bots[index]->d_Manner);

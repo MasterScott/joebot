@@ -23,62 +23,47 @@
 // Johannes.Lampel@gmx.de
 // http://joebot.counter-strike.de
 
+
 #include "bot_names.h"
 
+#include "extdll.h"
+#include "Util.h"
+
+#include <iostream.h>
+
+CBotNamesItem g_DefaultName;
 extern bool g_bMixNames;
 
-CBotNames :: CBotNames(){
-	lNum = 0;
-	lLReturn = 0;
-	bInited = false;
-	for(long lschl=0;lschl < BN_MAXNAMES;lschl++){
-		memset(Names[lschl].szName,0,sizeof(char) * BN_MAXNAMELENGTH);
-	}
+//////////////////////////////////////////////////////////////////////
+// Construction/Destruction
+//////////////////////////////////////////////////////////////////////
+
+CBotNames g_Names;
+
+CBotNamesItem::CBotNamesItem(){
+	*m_szName = 0;
+}
+CBotNamesItem::~CBotNamesItem(){
 }
 
-int CBotNames :: Init(void){
+
+CBotNames::CBotNames(){
+	m_ICName = m_LNames.begin();
+	bInited = false;
+
+	strcpy(g_DefaultName.m_szName,"JoeBOT");
+}
+
+CBotNames::~CBotNames(){
+}
+
+int CBotNames::init(void){
 	char szfilename[80];
 	UTIL_BuildFileName(szfilename, "joebot","bot_names.txt");
-	return Load(szfilename);
-/*#ifndef __linux__
-	return Load("cstrike\\joebot\\bot_names.txt");
-#else
-	return Load("cstrike/joebot/bot_names.txt");
-#endif*/
+	return load(szfilename);
 }
 
-CBotNames :: ~CBotNames(){
-}
-
-Name *CBotNames :: GetName(void){
-	// check if already inited ...
-	if(!bInited){
-		Init();
-		bInited = true;
-	}
-	Name *Return = &(Names[lLReturn]);
-
-	lLReturn ++;
-	if(lLReturn >= lNum)
-		lLReturn = 0;
-	
-	return Return;
-}
-
-void CBotNames :: MixIt(void){
-	long lschl,lf,ls;
-	char szpTemp[100];
-	
-	for(lschl=0;lschl < 100;lschl++){
-		lf = RANDOM_LONG(0,lNum-1);
-		ls = RANDOM_LONG(0,lNum-1);
-		strcpy(szpTemp,Names[lf].szName);
-		strcpy(Names[lf].szName,Names[ls].szName);
-		strcpy(Names[ls].szName,szpTemp);
-	}
-}
-
-int CBotNames :: Load(const char *szFileName){			// load names into ram ...
+bool CBotNames::load(const char *szFileName){
 	char *szFileContent,*szAct,*szTmp,szName[200];
 	long lFileSize;
 	long lToReadLength;
@@ -125,8 +110,13 @@ int CBotNames :: Load(const char *szFileName){			// load names into ram ...
 				if (szName[strlen(szName) - 1] == '\r') szName[strlen(szName) - 1] = '\0';
 #endif
 				if(strlen(szName) < BN_MAXNAMELENGTH){
-					strcpy(Names[lNum].szName,szName);
+					//strcpy(Names[lNum].szName,szName);
 					//cout << szAdd << endl;
+
+					CBotNamesItem tempName;
+
+					strcpy(tempName.m_szName,szName);
+					m_LNames.push_back(tempName);
 				}
 				else{
 					szAct = strchr(szAct,'\n');
@@ -136,22 +126,58 @@ int CBotNames :: Load(const char *szFileName){			// load names into ram ...
 				
 				while(!IsInstr(*szAct) && *szAct)	// goto next text ...
 					szAct++;
-			
-				lNum ++;
-				if(lNum>BN_MAXNAMES)		// just ignore some names ...
-					lNum--;
 			}
 		}
 		delete [] szFileContent;
 	}
 	
 	// if file wasn't filled up ... or file not found ...
-	if(!lNum){
-		strcpy(Names[0].szName,"JoeBOT");
-		lNum ++;
-	}
-	else
-		if(g_bMixNames) MixIt();
+	if(g_bMixNames) mixIt();
 	
 	return true;
+}
+
+void CBotNames::mixIt(void){
+	int i1, i2,i;
+	std::list<CBotNamesItem>::iterator iter1,iter2;
+	CBotNamesItem temp;
+
+	for(i=m_LNames.size()*5; i ; i--){
+		i1 = RANDOM_LONG(0,m_LNames.size()-1);
+		i2 = RANDOM_LONG(0,m_LNames.size()-1);
+
+		if(i1 == i2)			// no need to swap
+			continue;
+
+		iter1 = iter2 = m_LNames.begin();
+
+		for(;i1; i1 --){
+			iter1++;
+		}
+		for(;i2; i2 --){
+			iter2++;
+		}
+		/*if(iter1 == m_LNames.end()
+			||iter2 == m_LNames.end()){
+			cout << "---------" << endl;
+			continue;
+		}*/
+
+		temp = *iter1;			// swap
+		*iter1 = *iter2;
+		*iter2 = temp;
+	}
+}
+
+const CBotNamesItem *CBotNames::getName(void){
+	//cout << m_LNames.size() << " names"<<endl;
+	if(m_LNames.size()){
+		m_ICName++;
+		if(m_ICName == m_LNames.end()){
+			m_ICName = m_LNames.begin();
+		}
+		return &(*m_ICName);
+	}
+	else
+		return &g_DefaultName;
 }

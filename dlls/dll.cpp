@@ -558,7 +558,7 @@ void GameDLLInit( void )
 	
 	g_WPDir.Init();
 	Skill.Load();
-	Names.Init();
+	Names.init();
 	UpdateLanguage();
 	// precaching chat files - at least the standard file :)
 	g_ChatHost.GetChat("texts.txt");
