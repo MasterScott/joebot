@@ -1151,6 +1151,7 @@ bool CBotCS :: HandleOrders(void){		// this fucntion is called every second
 bool CBotCS :: IsBehindSG(edict_t *pPlayer){
 	long lschl;
 	Vector VB,VVG,VVP, VVB;
+#ifdef USE_SGOPTIMIZED
 	float fGDistance;
 	float fPDistance;
 	float fDotBorder;
@@ -1158,9 +1159,13 @@ bool CBotCS :: IsBehindSG(edict_t *pPlayer){
 	VVP = pPlayer->v.origin - pEdict->v.origin;
 	fPDistance = VVP.Length();
 	VVP = VVP * (1.f / fPDistance);		// normalize
+#else
+ 	VVP = (pPlayer->v.origin - pEdict->v.origin).Normalize();
+#endif /* USE_SGOPTIMIZED */
 	
 	for(lschl=0;lschl < _MAXGRENADEREC;lschl++){
 		if(gSmoke[lschl].bUsed){
+#ifdef USE_SGOPTIMIZED
 			VVG = gSmoke[lschl].VOrigin - pEdict->v.origin;
 			fGDistance = VVG.Length();
 			if(fGDistance > fPDistance + _SMOKERADIUS/2)		// if that player is a lot in front of the grenade ...
@@ -1181,6 +1186,15 @@ bool CBotCS :: IsBehindSG(edict_t *pPlayer){
 			if(DotProduct(VVG,VVP) > fDotBorder /*DotProduct(VVG,VVB)*/){
 				return true;
 			}
+#else
+ 			VVG = (gSmoke[lschl].VOrigin - pEdict->v.origin).Normalize();
+ 			VB = Vector(VVG.y,VVG.x,0)/*CrossProduct(VVG,Vector(0,0,1))).Normalize()*/ * _SMOKERADIUS + gSmoke[lschl].VOrigin;
+ 			VVB = (VB - pEdict->v.origin).Normalize();
+ 			
+ 			if(DotProduct(VVG,VVP) > DotProduct(VVG,VVB)){
+				return true;
+			}
+#endif /* USE_SGOPTIMIZED */
 		}
 	}
 	return false;
