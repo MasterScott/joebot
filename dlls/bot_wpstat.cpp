@@ -104,10 +104,7 @@ void CWPStat :: Init(void){
 void CWPStat :: InitWP(long lWP){
 	long lWP1=0;
 	if(lWP>MAX_WAYPOINTS){
-#ifdef DEBUGENGINE
-		BOT_LOG("WaypointStatDebug", "ERROR!!!");
-#endif
-
+		LOG_DEBUG("WaypointStatDebug: ERROR!!!");
 		*((long*)lWP1) = 0;
 	}
 
@@ -164,7 +161,7 @@ int CWPStat :: AddKill(edict_t *pEdictKiller, edict_t *pEdictVictim){
 			d.FItem[iNVictim].lKilled++;
 			if(d.FItem[iNVictim].lKilled > lKilledMax)
 				lKilledMax = d.FItem[iNVictim].lKilled;
-			d.FItem[iNVictim].fpKilledTime[d.FItem[iNVictim].lKilledT] = f_timesrs;
+			d.FItem[iNVictim].fpKilledTime[d.FItem[iNVictim].lKilledT] = g_fRoundTime;
 			d.FItem[iNVictim].lKilledT ++;
 			if(d.FItem[iNVictim].lKilledT>=MAX_TIMES_PWP)
 				d.FItem[iNVictim].lKilledT = 0;
@@ -177,7 +174,7 @@ int CWPStat :: AddKill(edict_t *pEdictKiller, edict_t *pEdictVictim){
 			d.FItem[iNKiller].lKill++;
 			if(d.FItem[iNKiller].lKill++ > lKillMax)
 				lKillMax=d.FItem[iNKiller].lKill++;
-			d.FItem[iNKiller].fpKillTime[d.FItem[iNKiller].lKillT] = f_timesrs;
+			d.FItem[iNKiller].fpKillTime[d.FItem[iNKiller].lKillT] = g_fRoundTime;
 			d.FItem[iNKiller].lKillT ++;
 			if(d.FItem[iNKiller].lKillT>=MAX_TIMES_PWP)
 				d.FItem[iNKiller].lKillT = 0;
@@ -444,7 +441,7 @@ int CWPStat::Search(int iTeam,int iNearest,int iType, float fMin, float fMax,
 	if (!count)  // no matching waypoints found
 		return -1;
 	
-	index = RANDOM_LONG(1, count) - 1;
+	index = RANDOM_LONG(0, count - 1);
 	
 	return indexes[index];
 }
@@ -546,10 +543,10 @@ void CWPStat ::CalcSlice(void){
 		lNWPfWPV = num_waypoints;
 		pWPV = new long[lNWPfWPV*lNWPfWPV/16+16];
 
-		//BOT_LOG("CWPStat::CalcSlice", UTIL_VarArgs("%p ::: %p", prev_pWPV, pWPV));
+		//LOG_DEBUG(UTIL_VarArgs("CWPStat::CalcSlice: %p ::: %p", prev_pWPV, pWPV));
 
 		//pWPV = (long*)malloc(lNWPfWPV*(lNWPfWPV/16) * sizeof(long));
-		//if(listenserver_edict)FakeClientCommand(listenserver_edict,"say %li",lNWPfWPV);
+		//if(listenserver_edict){DEBUG_CLIENTCOMMAND(listenserver_edict,"say %li",lNWPfWPV);}
 		memset(pWPV,0,(lNWPfWPV*lNWPfWPV/16+16) * sizeof(long));
 
 		for(lschl = 0;lschl < num_waypoints;lschl++){
@@ -648,7 +645,7 @@ void CWPStat :: CalcWP(long lWP,long lWP2){
 	}
 	SetVisible(lWP,lWP2,lSet);
 	//SetVisible(lWP2,lWP,lSet);
-#ifdef DEBUGMESSAGES
+#ifdef _DEBUG
 	if(lSet != GetVisible(lWP,lWP2))
 		cout << "error" << endl;
 #endif
