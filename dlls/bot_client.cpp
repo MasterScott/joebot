@@ -42,6 +42,8 @@
 #endif /* USE_METAMOD */
 
 #include "bot_client.h"
+
+#include "bot.h"
 #include "bot_modid.h"
 #include "CBotCS.h"
 #include "CBotDOD.h"
@@ -698,7 +700,7 @@ void BotClient_CS_StatusIcon(void *p, int bot_index,int iAdd)
 		state = 0;
 }
 
-void BotClient_CS_Roundtime(void *p, int bot_index,int iAdd)
+void BotClient_CS_RoundTime(void *p, int bot_index,int iAdd)
 {
 	static int state = 0;   // current state machine state
 	
@@ -706,8 +708,12 @@ void BotClient_CS_Roundtime(void *p, int bot_index,int iAdd)
 		if (state == 0){
 			state ++;
 			
-			bots[bot_index]->f_round_time = *(short *)p;  // roundtime in min
-			//bots[bot_index]->f_start_round = gpGlobals->time;
+			float f_round_time = *(short *)p;  // roundtime in seconds
+
+			if (f_round_time <= g_mp_freezetime->value)
+				f_end_freezetime = g_mp_freezetime->value + gpGlobals->time;  // set end of freezetime
+
+			bots[bot_index]->f_round_time = f_round_time;
 		}
 		else{
 			state = 0;  // ingore this field
@@ -1364,7 +1370,7 @@ void JBRegMsgs(void)
 			botmsgs[GET_USER_MSG_ID(PLID, "ShowMenu", NULL)] = BotClient_CS_ShowMenu;
 			botmsgs[GET_USER_MSG_ID(PLID, "Money", NULL)] = BotClient_CS_Money;
 			botmsgs[GET_USER_MSG_ID(PLID, "StatusIcon", NULL)] = BotClient_CS_StatusIcon;
-			botmsgs[GET_USER_MSG_ID(PLID, "RoundTime", NULL)] = BotClient_CS_Roundtime;
+			botmsgs[GET_USER_MSG_ID(PLID, "RoundTime", NULL)] = BotClient_CS_RoundTime;
 			botmsgs[GET_USER_MSG_ID(PLID, "SetFOV", NULL)] = BotClient_CS_SetFOV;
 			botmsgs[GET_USER_MSG_ID(PLID, "ScreenFade", NULL)] = BotClient_CS_ScreenFade;
 			botmsgs[GET_USER_MSG_ID(PLID, "TextMsg", NULL)] = BotClient_CS_TextMsg;
