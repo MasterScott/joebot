@@ -23,6 +23,11 @@
 #include "extdll.h"
 #include "util.h"
 
+#ifdef USE_METAMOD
+#define SDK_UTIL_H  // util.h already included
+#include "meta_api.h"
+#endif /* USE_METAMOD */
+
 #include "bot_wpstat.h"
 
 #include "bot.h"
@@ -101,7 +106,7 @@ void CWPStat :: InitWP(long lWP){
 	long lWP1=0;
 	if(lWP>MAX_WAYPOINTS){
 #ifdef DEBUGENGINE
-		BOT_LOG("WaypointStatDebug", "ERROR!!!");
+		BOT_LOG("WaypointStatDebug", ("ERROR!!!"));
 #endif
 
 		*((long*)lWP1) = 0;
@@ -258,7 +263,7 @@ int CWPStat::Load(void){
 			bright = false;
 		}
 		if(!bright){
-			printf("JoeBOT: incompatible .wst file, recreating and continuing ....\n");
+			LOG_MESSAGE(PLID, "Incompatible .wst file, recreating and continuing ....");
 			Init();
 			fclose(fhd);
 			return true;
@@ -284,24 +289,21 @@ int CWPStat::Load(void){
 			}
 			//printf("%li,%li",d.lKill,d.lKilled);
 			fclose(fhd);
-			sprintf(msg,"JoeBOT: loading statistic file: %s - %li|%li\n", filename,d.lKill,d.lKilled);
 			
-			if (IS_DEDICATED_SERVER()){
-				cout << msg;cout.flush();
-			}
+			if (IS_DEDICATED_SERVER())
+				LOG_MESSAGE(PLID, "Loading statistic file: %s - %li|%li", filename,d.lKill,d.lKilled);
 			else
-				ALERT(at_console, msg);
+				UTIL_ConsoleMessage(NULL, "Loading statistic file: %s - %li|%li\n", filename,d.lKill,d.lKilled);
 
 			return true;
 		}
 	}
 	else{
-		sprintf(msg,"JoeBOT: couldn't load statistic file: %s - resetting statistics\n", filename);
-		if (IS_DEDICATED_SERVER()){
-			cout << msg;cout.flush();
-		}
+		if (IS_DEDICATED_SERVER())
+			LOG_MESSAGE(PLID, "Couldn't load statistic file: %s - resetting statistics", filename);
 		else
-			ALERT(at_console, msg);
+			UTIL_ConsoleMessage(NULL, "Couldn't load statistic file: %s - resetting statistics\n", filename);
+
 		Init();
 		return false;
 	}
@@ -340,7 +342,7 @@ int CWPStat::Save(void){
 		fwrite(&bRecalcWPV,sizeof(bool),1,fhd);
 
 		if (IS_DEDICATED_SERVER())
-			printf("JoeBOT: saving statistic file: %s\n", filename);
+			LOG_MESSAGE(PLID, "Saving statistic file: %s", filename);
 		fwrite(&lKillMax,sizeof(long),1,fhd);
 		fwrite(&lKilledMax,sizeof(long),1,fhd);
 
@@ -358,7 +360,7 @@ int CWPStat::Save(void){
 	else
 	{
 		if (IS_DEDICATED_SERVER())
-			printf("JoeBOT: not able to write saving statistic file: %s\n", filename);
+			LOG_MESSAGE(PLID, "Not able to write saving statistic file: %s", filename);
 		return false;
 	}
 }
@@ -570,7 +572,7 @@ void CWPStat ::CalcSlice(void){
 		lNWPfWPV = num_waypoints;
 		pWPV = new long[lNWPfWPV*lNWPfWPV/16+16];
 
-		//BOT_LOG("CWPStat::CalcSlice", "%p ::: %p", prev_pWPV, pWPV);
+		//BOT_LOG("CWPStat::CalcSlice", ("%p ::: %p", prev_pWPV, pWPV));
 
 		//pWPV = (long*)malloc(lNWPfWPV*(lNWPfWPV/16) * sizeof(long));
 		//if(listenserver_edict)FakeClientCommand(listenserver_edict,"say %li",lNWPfWPV);
@@ -598,9 +600,7 @@ void CWPStat ::CalcSlice(void){
 							&&lschl < (lNWPfWPV+1)*lNWPfWPV
 						;	lschl++){
 		while(lPercent<lschl){
-			sprintf(szTemp,"JoeBOT %3.0f percent visibility table complete\n",100.*float(lPercent)/float(((lNWPfWPV+1)*lNWPfWPV)));
-			ALERT ( at_console, szTemp );
-			cout << szTemp;cout.flush();
+			UTIL_ConsoleMessage( NULL, "JoeBOT %3.0f percent visibility table complete\n",100.*float(lPercent)/float(((lNWPfWPV+1)*lNWPfWPV)));
 			lPercent += (lNWPfWPV+1)*lNWPfWPV/10;
 		}
 		lWP = lschl / lNWPfWPV;
@@ -617,9 +617,7 @@ void CWPStat ::CalcSlice(void){
 	lWPSlice += _WPSTAT_SLICE_SIZE;
 
 	if(lWPSlice > (lNWPfWPV+1)*lNWPfWPV){
-		sprintf(szTemp,"JoeBOT %li/%li visibility table complete\n",lNWPfWPV,lNWPfWPV);
-		cout << szTemp;cout.flush();
-		ALERT ( at_console, szTemp );
+		UTIL_ConsoleMessage( NULL, "JoeBOT %li/%li visibility table complete\n",lNWPfWPV,lNWPfWPV);
 		bRecalcWPV = false;
 
 		// divide sums to get average values
