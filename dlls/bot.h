@@ -50,7 +50,7 @@ void ClientCommand( edict_t *pEntity );
 
 void FakeClientCommand(edict_t *pBot, const char *szFmt, ...);
 const char *GetField (const char *string, int field_number);
-extern bool isFakeClientCommand;
+extern bool g_bFakeClientCommand;
 extern int fake_arg_count;
 extern char *g_argv;
 
@@ -58,7 +58,7 @@ extern char *g_argv;
 void InitGlobalRS(void);
 
 // type of map
-extern int g_iTypeoM;
+extern int g_iMapType;
 
 // is the bomb planted ?
 extern bool		g_bBombPlanted;
@@ -76,8 +76,8 @@ extern float f_ES[32];
 // last time a radio command was used
 extern float f_LastRadio;
 
-extern float f_timesrs;
-extern float f_round_start;
+extern float g_fRoundTime;
+extern float g_fRoundStart;
 
 extern float gf_5th;
 extern bool g_b5th;
