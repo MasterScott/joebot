@@ -122,6 +122,7 @@ CCommands ::CCommands(){
 }
 
 CCommands ::~CCommands(){
+#ifndef __BORLANDC__
 	CCommand *p,*pp;
 	p=LCom;
 	while(p){
@@ -133,6 +134,7 @@ CCommands ::~CCommands(){
 		pp = (CCommand*)pp->prev;
 		delete p;
 	}
+#endif /* __BORLANDC__ */
 }
 
 bool CCommands :: AddCommand(const char *n,const char *n2,void *p,int iT){
