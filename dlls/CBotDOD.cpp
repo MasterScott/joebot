@@ -23,7 +23,16 @@
 // Johannes.Lampel@gmx.de
 // http://joebot.counter-strike.de
 
+#include "extdll.h"
+#include "util.h"
+
 #include "CBotDOD.h"
+
+#include "bot.h"
+#include "bot_modid.h"
+#include "Chat.h"
+#include "globalvars.h"
+#include "NNWeapon.h"
 
 DOD_Flag g_DODFlags[_MAXFLAGS];
 float fDODFlagU;
@@ -44,28 +53,28 @@ CBotDOD :: ~CBotDOD(){
 
 void CBotDOD :: HandleMenu( void )
 {
-	char c_team[32];
 	char c_class[32];
 	
 	if (start_action == MSG_DOD_IDLE){
+		if (bot_team == 3 && UTIL_HumansInGame())
+			FakeClientCommand(pEdict, "changeteam");
 	}
 	else if (start_action == MSG_DOD_TEAM_SELECT){
 		//start_action = MSG_DOD_CLASS_SELECT;  // switch back to idle
 		start_action = MSG_DOD_IDLE;  // switch back to idle
 		
 		if ((bot_team != 1) && (bot_team != 2) && (bot_team != 5))
-			bot_team = -1;
-		
+		{
+			if (g_bJoinWHumanRES)
+			{
+				bot_team = UTIL_HumansInGame() ? 5 : 3;
+			}
+			else
+				bot_team = 5; // auto-assign if invalid
+		}
 		// select the team the bot wishes to join...
-		if (bot_team == 1){strcpy(c_team, "1");
-		}
-		else if (bot_team == 2){
-			strcpy(c_team, "2");
-		}
-		else strcpy(c_team, "5");
-		
-		FakeClientCommand(pEdict, "jointeam", c_team, NULL);
-		//FakeClientCommand(pEdict, "menuselect", c_team, NULL);
+		FakeClientCommand(pEdict, "jointeam %d", bot_team);
+		//FakeClientCommand(pEdict, "menuselect %d", bot_team);
 		return;
 	}
 	
@@ -94,9 +103,8 @@ void CBotDOD :: HandleMenu( void )
 		else if (bot_class == -1)
 			strcpy(c_class, "randompc");
 
-		FakeClientCommand(pEdict, c_class, NULL,NULL);
-		//sprintf(c_class,"%i",bot_class);
-		//FakeClientCommand(pEdict, "menuselect", c_class, NULL);
+		FakeClientCommand(pEdict, "%s", c_class);
+		//FakeClientCommand(pEdict, "menuselect %i", bot_class);
 		
 		// bot has now joined the game (doesn't need to be started)
 		//not_started = 0;
@@ -124,9 +132,8 @@ void CBotDOD :: HandleMenu( void )
 		else if (bot_class == -1)
 			strcpy(c_class, "randompc");
 
-		FakeClientCommand(pEdict, c_class, NULL,NULL);
-		//sprintf(c_class,"%i",bot_class);
-		//FakeClientCommand(pEdict, "menuselect", c_class, NULL);
+		FakeClientCommand(pEdict, "%s", c_class);
+		//FakeClientCommand(pEdict, "menuselect %i", bot_class);
 		
 		// bot has now joined the game (doesn't need to be started)
 		//not_started = 0;
@@ -159,7 +166,7 @@ void CBotDOD :: HandleMenu( void )
 		else if (bot_class == -1)
 			strcpy(c_class, "para_random");
 
-		FakeClientCommand(pEdict, c_class, NULL,NULL);
+		FakeClientCommand(pEdict, "%s", c_class);
 		
 		// bot has now joined the game (doesn't need to be started)
 		//not_started = 0;
@@ -193,7 +200,7 @@ void CBotDOD :: HandleMenu( void )
 		else if (bot_class == -1)
 			strcpy(c_class, "para_random");
 
-		FakeClientCommand(pEdict, c_class, NULL,NULL);
+		FakeClientCommand(pEdict, "%s", c_class);
 		
 		// bot has now joined the game (doesn't need to be started)
 		//not_started = 0;
@@ -203,46 +210,46 @@ void CBotDOD :: HandleMenu( void )
 	else if (start_action == MSG_DOD_WPN_SELECT_SERGEANT)
 	{
 		if(RANDOM_LONG(0,100) < 50){
-			FakeClientCommand(pEdict,"selectwpn1",0,0);
+			FakeClientCommand(pEdict,"selectwpn1");
 		}
 		else
-			FakeClientCommand(pEdict,"selectwpn2",0,0);
+			FakeClientCommand(pEdict,"selectwpn2");
 		start_action = MSG_DOD_IDLE;  // switch back to idle
 	}
 	else if (start_action == MSG_DOD_WPN_SELECT_MACHINE)
 	{
 		if(RANDOM_LONG(0,100) < 50){
-			FakeClientCommand(pEdict,"selectwpn1",0,0);
+			FakeClientCommand(pEdict,"selectwpn1");
 		}
 		else
-			FakeClientCommand(pEdict,"selectwpn2",0,0);
+			FakeClientCommand(pEdict,"selectwpn2");
 		start_action = MSG_DOD_IDLE;  // switch back to idle
 	}
 	else if (start_action == MSG_DOD_WPN_SELECT_GRENADIER)
 	{
 		if(RANDOM_LONG(0,100) < 50){
-			FakeClientCommand(pEdict,"selectwpn1",0,0);
+			FakeClientCommand(pEdict,"selectwpn1");
 		}
 		else
-			FakeClientCommand(pEdict,"selectwpn2",0,0);
+			FakeClientCommand(pEdict,"selectwpn2");
 		start_action = MSG_DOD_IDLE;  // switch back to idle
 	}
 	else if (start_action == MSG_DOD_WPN_SELECT_RIFLEMAN)
 	{
 		if(RANDOM_LONG(0,100) < 50){
-			FakeClientCommand(pEdict,"selectwpn1",0,0);
+			FakeClientCommand(pEdict,"selectwpn1");
 		}
 		else
-			FakeClientCommand(pEdict,"selectwpn2",0,0);
+			FakeClientCommand(pEdict,"selectwpn2");
 		start_action = MSG_DOD_IDLE;  // switch back to idle
 	}
 	else if (start_action == MSG_DOD_WPN_SELECT_FG42)
 	{
 		if(RANDOM_LONG(0,100) < 50){
-			FakeClientCommand(pEdict,"selectwpn1",0,0);
+			FakeClientCommand(pEdict,"selectwpn1");
 		}
 		else
-			FakeClientCommand(pEdict,"selectwpn2",0,0);
+			FakeClientCommand(pEdict,"selectwpn2");
 		start_action = MSG_DOD_IDLE;  // switch back to idle
 	}
 }
@@ -426,59 +433,56 @@ long CBotDOD :: WeaponModel2ID(const char *szModel){
 	if(!szModel||!*szModel)
 		return -1;
 	
-	if(!strcmpi(szModel,"models/p_k98kl.mdl"))
+	if(FStrEq(szModel,"models/p_k98kl.mdl"))
 		return DOD_WEAPON_KAR;
-	if(!strcmpi(szModel,"models/p_k98s.mdl"))
+	if(FStrEq(szModel,"models/p_k98s.mdl"))
 		return DOD_WEAPON_KAR;
-	if(!strcmpi(szModel,"models/p_m1carb.mdl"))
+	if(FStrEq(szModel,"models/p_m1carb.mdl"))
 		return DOD_WEAPON_M1CARBINE;
-	if(!strcmpi(szModel,"models/p_bar.mdl"))
+	if(FStrEq(szModel,"models/p_bar.mdl"))
 		return DOD_WEAPON_BAR;
-	if(!strcmpi(szModel,"models/p_colt.mdl"))
+	if(FStrEq(szModel,"models/p_colt.mdl"))
 		return DOD_WEAPON_COLT;
 	
-	if(!strcmpi(szModel,"models/p_garand.mdl"))
+	if(FStrEq(szModel,"models/p_garand.mdl"))
 		return DOD_WEAPON_GARAND;
-	if(!strcmpi(szModel,"models/p_gewehr43.mdl"))
+	if(FStrEq(szModel,"models/p_gewehr43.mdl"))
 		return DOD_WEAPON_GEWEHR;
-	if(!strcmpi(szModel,"models/p_grenade.mdl"))
+	if(FStrEq(szModel,"models/p_grenade.mdl"))
 		return DOD_WEAPON_HANDGRENADE;
-	if(!strcmpi(szModel,"models/p_kar.mdl"))
+	if(FStrEq(szModel,"models/p_kar.mdl"))
 		return DOD_WEAPON_KAR;
-	if(!strcmpi(szModel,"models/p_luger.mdl"))
+	if(FStrEq(szModel,"models/p_luger.mdl"))
 		return DOD_WEAPON_LUGER;
-	if(!strcmpi(szModel,"models/p_mp40.mdl"))
+	if(FStrEq(szModel,"models/p_mp40.mdl"))
 		return DOD_WEAPON_MP40;
-	if(!strcmpi(szModel,"models/p_mp44.mdl"))
+	if(FStrEq(szModel,"models/p_mp44.mdl"))
 		return DOD_WEAPON_MP44;
-	if(!strcmpi(szModel,"models/p_spring.mdl")
-		||!strcmpi(szModel,"models/p_springl.mdl"))
+	if(FStrEq(szModel,"models/p_spring.mdl")
+		||FStrEq(szModel,"models/p_springl.mdl"))
 		return DOD_WEAPON_SPRING;
-	if(!strcmpi(szModel,"models/p_stick.mdl"))
+	if(FStrEq(szModel,"models/p_stick.mdl"))
 		return DOD_WEAPON_STICKGRENADE;
 	
-	if(!strcmpi(szModel,"models/p_tommy.mdl"))
+	if(FStrEq(szModel,"models/p_tommy.mdl"))
 		return DOD_WEAPON_THOMPSON;
-	if(!strcmpi(szModel,"models/p_youthk.mdl"))
+	if(FStrEq(szModel,"models/p_youthk.mdl"))
 		return DOD_WEAPON_GERKNIFE;
-	if(!strcmpi(szModel,"models/p_amerk.mdl"))
+	if(FStrEq(szModel,"models/p_amerk.mdl"))
 		return DOD_WEAPON_AMERKNIFE;
-	if(!strcmpi(szModel,"models/p_30cal.mdl"))
+	if(FStrEq(szModel,"models/p_30cal.mdl"))
 		return DOD_WEAPON_30CAL;
 	
-	if(!strcmpi(szModel,"models/p_mg42bu.mdl")
-		||!strcmpi(szModel,"models/p_mg42bd.mdl")
-		||!strcmpi(szModel,"models/p_mg42pr.mdl"))
+	if(FStrEq(szModel,"models/p_mg42bu.mdl")
+		||FStrEq(szModel,"models/p_mg42bd.mdl")
+		||FStrEq(szModel,"models/p_mg42pr.mdl"))
 		return DOD_WEAPON_MG42;
-	if(!strcmpi(szModel,"models/p_mg34bu.mdl")
-		||!strcmpi(szModel,"models/p_mg34bd.mdl")
-		||!strcmpi(szModel,"models/p_mg34pr.mdl"))
+	if(FStrEq(szModel,"models/p_mg34bu.mdl")
+		||FStrEq(szModel,"models/p_mg34bd.mdl")
+		||FStrEq(szModel,"models/p_mg34pr.mdl"))
 		return DOD_WEAPON_MG42;
 	
-	char nak[80];
-	strcpy(nak,szModel);
-	
-	if(listenserver_edict)FakeClientCommand(listenserver_edict,"say",nak,0);
+	if(listenserver_edict)FakeClientCommand(listenserver_edict,"say %s",szModel);
 	
 	return -1;
 }
@@ -1026,7 +1030,7 @@ void CBotDOD :: Think5th(void){
 		g_bBombPlanted?Action.lAction|=BA_BOMBPL:Action.lAction&=~BA_BOMBPL;
 		
 		if(g_bBombPlanted){
-			//FakeClientCommand(pEdict,"say","noticed it",0);
+			//FakeClientCommand(pEdict,"say noticed it");
 			Chat.l_ChatEvent |= E_BombPl;
 			Task.RemoveT(BT_CAMP);
 			ResetWPlanning();
@@ -1147,7 +1151,7 @@ void CBotDOD :: Think1(void){
 	//			DistanceSight();
 	
 	if(bSlowed){
-		//FakeClientCommand(pEdict,"say","stamina prone",0);
+		//FakeClientCommand(pEdict,"say stamina prone");
 		GoProne(true,5);
 		Task.AddTask(BT_CAMP, gpGlobals->time + 2.0,0,0,0);
 		InitCamp();
@@ -1155,7 +1159,7 @@ void CBotDOD :: Think1(void){
 	}
 	
 	if(bBleeding){
-		FakeClientCommand(pEdict,"stopbleed",0,0);
+		FakeClientCommand(pEdict,"stopbleed");
 		bBleeding = false;
 	}
 	
@@ -1163,7 +1167,7 @@ void CBotDOD :: Think1(void){
 	float fDistance;
 	for(long lschl = 0;lschl < _MAX_LTMEM;lschl++){
 		if(LTMem.FMItem[lschl].bUsed){
-			//FakeClientCommand(pEdict,"say","ltmprone",0);
+			//FakeClientCommand(pEdict,"say ltmprone");
 			if(LTMem.FMItem[lschl].lType == LTM_KILLED){
 				fDistance = (LTMem.FMItem[lschl].VAddI2 - pEdict->v.origin).Length();
 				if ( fDistance < 200 ){
@@ -1188,21 +1192,21 @@ void CBotDOD :: Think1(void){
 			if(iDest != -1&&Task.SearchT(BT_GOBUTTON) == -1){
 				Task.AddTask(BT_GOTO|BT_GOBUTTON,-1,iDest,pToUse,0);
 			}
-			//FakeClientCommand(pEdict,"say","wanting to go where pressing a button is needed",0);
+			//FakeClientCommand(pEdict,"say wanting to go where pressing a button is needed");
 		}
 	}
 	
 	// check pronetill variable
 	if(f_pronetill > 0 && f_changedprone < gpGlobals->time - 2.0){
 		if( IsProne(pEdict) && f_pronetill < gpGlobals->time){
-			FakeClientCommand(pEdict,"prone",0,0);
+			FakeClientCommand(pEdict,"prone");
 			f_changedprone = gpGlobals->time;
-			//FakeClientCommand(pEdict,"say","a prone +",0);
+			//FakeClientCommand(pEdict,"say a prone +");
 		}
 		else if( !IsProne(pEdict) && f_pronetill > gpGlobals->time){
-			FakeClientCommand(pEdict,"prone",0,0);
+			FakeClientCommand(pEdict,"prone");
 			f_changedprone = gpGlobals->time;
-			//FakeClientCommand(pEdict,"say","a prone -",0);
+			//FakeClientCommand(pEdict,"say a prone -");
 		}
 	}
 	
@@ -1262,7 +1266,7 @@ void CBotDOD :: Think1(void){
 					&&(pent->v.origin-pEdict->v.origin).Length() < 600.0
 					&& pent->v.velocity.Length() > 100.0){
 					Task.AddTask(BT_WAIT4TM8,gpGlobals->time + 10.0,0,0,0);
-					//FakeClientCommand(pEdict,"say","dangerous area",0);
+					//FakeClientCommand(pEdict,"say dangerous area");
 				}
 			}
 		}
@@ -1279,12 +1283,12 @@ void CBotDOD :: Think1(void){
 			
 			Jump();		// if the bot is longer time blocked it should jump to get of fuckin ladders at least sometimes - although it may hurt :)
 			
-			//FakeClientCommand(pEdict,"say","resetting wpstuff",0);
+			//FakeClientCommand(pEdict,"say resetting wpstuff");
 		}
 	}
 	
 	if(bNNInitError){
-		FakeClientCommand(pEdict,"say","NNs couldn't be loaded correctly, i.e. nn.br2 and/or nnc.br2",0);
+		FakeClientCommand(pEdict,"say NNs couldn't be loaded correctly, i.e. nn.br2 and/or nnc.br2");
 	}
 }
 
@@ -1300,7 +1304,7 @@ void CBotDOD :: Think(void){
 	TraceResult tr2;
 	bool found_waypoint;
 	
-	pEdict->v.flags |= FL_FAKECLIENT;
+	pEdict->v.flags |= FL_THIRDPARTYBOT;
 	
 	/*if (name[0] == 0)  // name filled in yet?
 	strcpy(name, STRING(pEdict->v.netname));*/
@@ -1351,7 +1355,7 @@ void CBotDOD :: Think(void){
 		
 		ResetWPlanning();
 		
-		//FakeClientCommand(pEdict,"say","inited",0);
+		//FakeClientCommand(pEdict,"say inited");
 		bRSInit = false;		// don't process this a second time this round
 		
 		for(int i = 0;i < 32;i++){
@@ -1605,7 +1609,7 @@ void CBotDOD :: Think(void){
 				else{
 					FireWeapon(STMem[0].VCalcedOrigin);
 					f_noWP = gpGlobals->time + .2;
-					//FakeClientCommand(pEdict,"say","shooting throught",0);
+					//FakeClientCommand(pEdict,"say shooting throught");
 				}
 			}
 			
@@ -1847,10 +1851,10 @@ TraceResult tr;
 TraceResult tr2;
 bool found_waypoint;
 
-pEdict->v.flags |= FL_FAKECLIENT;
+pEdict->v.flags |= FL_THIRDPARTYBOT;
 
 if(bNNInitError){
-FakeClientCommand(pEdict,"say","NNs couldn't be loaded correctly, i.e. nn.br2 and/or nnc.br2",0);
+FakeClientCommand(pEdict,"say NNs couldn't be loaded correctly, i.e. nn.br2 and/or nnc.br2");
 }
 
 // TheFatal - START from Advanced Bot Framework (Thanks Rich!)
@@ -1935,7 +1939,7 @@ iFarGoal = -1;
 // don't forget the freezetime !! -> freezetime is done by setmaxspeed
 //f_pause_time  = gpGlobals->time + CVAR_GET_FLOAT("mp_freezetime");
 
-//FakeClientCommand(pEdict,"say","inited",0);
+//FakeClientCommand(pEdict,"say inited");
 bRSInit = false;		// don't process this a second time this round
 
 for(int i = 0;i < 32;i++){
@@ -1995,14 +1999,14 @@ pLastGlobalKill = 0;
 // check pronetill variable
 if(f_pronetill > 0 && f_changedprone < gpGlobals->time - 2.0){
 if( IsProne(pEdict) && f_pronetill < gpGlobals->time){
-FakeClientCommand(pEdict,"prone",0,0);
+FakeClientCommand(pEdict,"prone");
 f_changedprone = gpGlobals->time;
-//FakeClientCommand(pEdict,"say","a prone +",0);
+//FakeClientCommand(pEdict,"say a prone +");
 }
 else if( !IsProne(pEdict) && f_pronetill > gpGlobals->time){
-FakeClientCommand(pEdict,"prone",0,0);
+FakeClientCommand(pEdict,"prone");
 f_changedprone = gpGlobals->time;
-//FakeClientCommand(pEdict,"say","a prone -",0);
+//FakeClientCommand(pEdict,"say a prone -");
 }
 }
 
@@ -2077,7 +2081,7 @@ Ordered.pREdict = 0;				// reset pointer
 }
 
 if(bSlowed){
-//FakeClientCommand(pEdict,"say","stamina prone",0);
+//FakeClientCommand(pEdict,"say stamina prone");
 GoProne(true,5);
 Task.AddTask(BT_CAMP, gpGlobals->time + 2.0,0,0,0);
 InitCamp();
@@ -2085,7 +2089,7 @@ bSlowed = false;
 }
 
 if(bBleeding){
-FakeClientCommand(pEdict,"stopbleed",0,0);
+FakeClientCommand(pEdict,"stopbleed");
 bBleeding = false;
 }
 
@@ -2101,7 +2105,7 @@ f_PauseShoot = 0.0;
 float fDistance;
 for(long lschl = 0;lschl < _MAX_LTMEM;lschl++){
 if(LTMem.FMItem[lschl].bUsed){
-//FakeClientCommand(pEdict,"say","ltmprone",0);
+//FakeClientCommand(pEdict,"say ltmprone");
 if(LTMem.FMItem[lschl].lType == LTM_KILLED){
 fDistance = (LTMem.FMItem[lschl].VAddI2 - pEdict->v.origin).Length();
 if ( fDistance < 200 ){
@@ -2295,7 +2299,7 @@ f_strafe = 50;
 else{
 FireWeapon(STMem[0].VCalcedOrigin);
 f_noWP = gpGlobals->time + .2;
-//FakeClientCommand(pEdict,"say","shooting throught",0);
+//FakeClientCommand(pEdict,"say shooting throught");
 }
 }
 
@@ -2334,8 +2338,8 @@ if(tr.flFraction == 1.0
 && tr2.flFraction == 1.0){				// i.e. visible
 VLookTo = VSuspEn;
 f_LookTo = gpGlobals->time +1.0;
-//FakeClientCommand(pEdict,"say","susp",0);
-//FakeClientCommand(pEdict,"say","looking to susp look",0);
+//FakeClientCommand(pEdict,"say susp");
+//FakeClientCommand(pEdict,"say looking to susp look");
 if(FInViewCone(&VSuspEn,pEdict))
 //bSawSuspLoc = true;
 Action.lAction &= ~BA_SUSPLOC;			// del susploc flag
@@ -2395,12 +2399,12 @@ if((moved_distance < 1.0)
 && (f_dont_check_stuck < gpGlobals->time)
 && f_Pause < gpGlobals->time-.5){// running against wall etc.
 //f_old_direction = (pEdict->v.angles.y - v_diff_angles.y - 8);
-//FakeClientCommand(pEdict,"say","muh die kuh",0);
+//FakeClientCommand(pEdict,"say muh die kuh");
 if(l_cState==0){		// crashed into wall for the first time ...
 l_cState ++;
 
 if(RANDOM_LONG(0,100) < 80){		// .. so jump
-//FakeClientCommand(pEdict,"say","no waypoint found and jumping cause of wall",0);
+//FakeClientCommand(pEdict,"say no waypoint found and jumping cause of wall");
 lButton |= IN_JUMP;
 lButton |= IN_DUCK;
 }
@@ -2480,8 +2484,7 @@ else{
 HeadToward(VRunningTo);
 }
 
-//sprintf(szBuffer,"-| %f ; %f",f_newspeed,f_newstrafe);
-//FakeClientCommand(pEdict,"say",szBuffer,0);
+//FakeClientCommand(pEdict,"say -| %f ; %f",f_newspeed,f_newstrafe);
 }
 else{
 f_LookTo = gpGlobals->time;
@@ -2501,7 +2504,7 @@ fDistTC = 130.0;
 pent=0;			// fix de_aztec bug
 bflag=false;
 while (pent = UTIL_FindEntityInSphere( pent, pEdict->v.origin,80)){
-if(!strcmp(STRING(pent->v.classname),"func_illusionary")){
+if(FStrEq(STRING(pent->v.classname),"func_illusionary")){
 bflag=true;
 break;
 }
@@ -2547,9 +2550,9 @@ while(i < pWPAMPlay->iNum){
 if(pWPAMPlay->Rec[i].fTime > fOffset){		// i.e. that's the last recorded item
 // copy stuff from recorded data to bot
 if(pWPAMPlay->Rec[i].lButton&IN_DUCK){
-FakeClientCommand(pEdict,"say","duckin from advm",0);
+FakeClientCommand(pEdict,"say duckin from advm");
 }
-//FakeClientCommand(pEdict,"say","-",0);
+//FakeClientCommand(pEdict,"say -");
 lButton = pWPAMPlay->Rec[i].lButton;
 pEdict->v.origin = pWPAMPlay->Rec[i].v_origin;
 pEdict->v.angles = pWPAMPlay->Rec[i].v_angles;
@@ -2581,7 +2584,7 @@ break;
 i++;
 }
 if(!(i < pWPAMPlay->iNum)){
-FakeClientCommand(pEdict,"say","stoppin advm",0);
+FakeClientCommand(pEdict,"say stoppin advm");
 bReplay = false;
 }
 }
@@ -2603,7 +2606,7 @@ return;
 bool CBotDOD :: GoProne(bool bProne, float fTime){
 	if(f_changedprone < gpGlobals->time - 2.0 && IsProne(pEdict) != bProne){
 		f_changedprone = gpGlobals->time;
-		FakeClientCommand(pEdict,"prone",0,0);
+		FakeClientCommand(pEdict,"prone");
 		if(fTime > 0){
 			f_pronetill = gpGlobals->time + fTime;
 		}
@@ -2738,43 +2741,43 @@ void CBotDOD :: SendRadioCommand(int iType){
 	switch(iType){
 	case RADIO_NEED_ASSISTANCE:
 	case RADIO_NEED_BACKUP:
-		FakeClientCommand(pEdict,"voice_backup",0,0);
+		FakeClientCommand(pEdict,"voice_backup");
 		f_UsedRadio = gpGlobals->time;
 		break;
 	case RADIO_LEFT:
-		FakeClientCommand(pEdict,"voice_left",0,0);
+		FakeClientCommand(pEdict,"voice_left");
 		f_UsedRadio = gpGlobals->time;
 		break;
 	case RADIO_RIGHT:
-		FakeClientCommand(pEdict,"voice_right",0,0);
+		FakeClientCommand(pEdict,"voice_right");
 		f_UsedRadio = gpGlobals->time;
 		break;
 	case RADIO_GRENADE:
-		FakeClientCommand(pEdict,"voice_grenade",0,0);
+		FakeClientCommand(pEdict,"voice_grenade");
 		f_UsedRadio = gpGlobals->time;
 		break;
 	case RADIO_TAKE_COVER:
-		FakeClientCommand(pEdict,"voice_takecover",0,0);
+		FakeClientCommand(pEdict,"voice_takecover");
 		f_UsedRadio = gpGlobals->time;
 		break;
 	case RADIO_SNIPER:
-		FakeClientCommand(pEdict,"voice_sniper",0,0);
+		FakeClientCommand(pEdict,"voice_sniper");
 		f_UsedRadio = gpGlobals->time;
 		break;
 	case RADIO_MEDIC:
-		FakeClientCommand(pEdict,"voice_medic",0,0);
+		FakeClientCommand(pEdict,"voice_medic");
 		f_UsedRadio = gpGlobals->time;
 		break;
 	case RADIO_FALL_BACK:
-		FakeClientCommand(pEdict,"voice_fallback",0,0);
+		FakeClientCommand(pEdict,"voice_fallback");
 		f_UsedRadio = gpGlobals->time;
 		break;
 	case RADIO_HOLD_THIS_POSITION:
-		FakeClientCommand(pEdict,"voice_hold",0,0);
+		FakeClientCommand(pEdict,"voice_hold");
 		f_UsedRadio = gpGlobals->time;
 		break;
 	case RADIO_AFFIRMATIVE:
-		FakeClientCommand(pEdict,"voice_yessir",0,0);
+		FakeClientCommand(pEdict,"voice_yessir");
 		f_UsedRadio = gpGlobals->time;
 		break;
 	default:
