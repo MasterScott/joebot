@@ -121,6 +121,9 @@ int CBotNames :: Load(const char *szFileName){			// load names into ram ...
 				if(!lToReadLength)
 					break;
 				strncpy(szName,szAct,sizeof(char) * lToReadLength);
+#ifdef __linux__
+				if (szName[strlen(szName) - 1] == '\r') szName[strlen(szName) - 1] = '\0';
+#endif
 				if(strlen(szName) < BN_MAXNAMELENGTH){
 					strcpy(Names[lNum].szName,szName);
 					//cout << szAdd << endl;
