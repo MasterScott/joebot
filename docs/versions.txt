@@ -21,6 +21,10 @@ Current Developer on Sourceforge/joebot
 -- This Bot is based on botman's HPB_bot - template code - http://planethalflife.com/botman --
 ----------------------------------------------------------------------------------------------
 
+JoeBOT 1.6.5.3
+- fixed : chat message crash caused by recent steam update
+- fixed : game radio message trapping caused by recent steam update
+
 JoeBOT 1.6.5.2
 - Added : preliminary shield support
 - fixed : awp weapon select conflict with waypoint command
