@@ -828,7 +828,7 @@ void ClientKill( edict_t *pEntity )
 {
 	BOT_LOG("ClientKill", "pEntity=%x", pEntity);
 #ifdef USE_METAMOD
-	RETURN_META(MRES_HANDLED);
+	RETURN_META(MRES_IGNORED);
 #else /* not USE_METAMOD */
 	(*other_gFunctionTable.pfnClientKill)(pEntity);
 #endif /* USE_METAMOD */
@@ -2221,130 +2221,130 @@ int AllowLagCompensation( void )
 #ifdef USE_METAMOD
 DLL_FUNCTIONS gFunctionTable =
 {
-   GameDLLInit,           //pfnGameInit
-   DispatchSpawn,            //pfnSpawn
-   NULL,                     //pfnThink
-   NULL,                       //pfnUse
-   NULL,                     //pfnTouch
-   NULL,                   //pfnBlocked
-   NULL,                  //pfnKeyValue
-   NULL,                      //pfnSave
-   NULL,                   //pfnRestore
-   NULL,                    //pfnAbsBox
+	GameDLLInit,               //pfnGameInit
+	DispatchSpawn,             //pfnSpawn
+	NULL,                      //pfnThink
+	NULL,                      //pfnUse
+	NULL,                      //pfnTouch
+	NULL,                      //pfnBlocked
+	NULL,                      //pfnKeyValue
+	NULL,                      //pfnSave
+	NULL,                      //pfnRestore
+	NULL,                      //pfnAbsBox
 
-   NULL,           //pfnSaveWriteFields
-   NULL,            //pfnSaveReadFields
+	NULL,                      //pfnSaveWriteFields
+	NULL,                      //pfnSaveReadFields
 
-   NULL,           //pfnSaveGlobalState
-   NULL,        //pfnRestoreGlobalState
-   NULL,          //pfnResetGlobalState
+	NULL,                      //pfnSaveGlobalState
+	NULL,                      //pfnRestoreGlobalState
+	NULL,                      //pfnResetGlobalState
 
-   ClientConnect,         //pfnClientConnect
-   ClientDisconnect,   //pfnClientDisconnect
-   ClientKill,               //pfnClientKill
-   ClientPutInServer, //pfnClientPutInServer
-   ClientCommand,         //pfnClientCommand
-   NULL,     //pfnClientUserInfoChanged
-   NULL,            //pfnServerActivate
-   NULL,          //pfnServerDeactivate
+	ClientConnect,             //pfnClientConnect
+	ClientDisconnect,          //pfnClientDisconnect
+	ClientKill,                //pfnClientKill
+	ClientPutInServer,         //pfnClientPutInServer
+	ClientCommand,             //pfnClientCommand
+	NULL,                      //pfnClientUserInfoChanged
+	NULL,                      //pfnServerActivate
+	NULL,                      //pfnServerDeactivate
 
-   NULL,            //pfnPlayerPreThink
-   NULL,           //pfnPlayerPostThink
+	NULL,                      //pfnPlayerPreThink
+	NULL,                      //pfnPlayerPostThink
 
-   StartFrame,          //pfnStartFrame
-   NULL,             //pfnParmsNewLevel
-   NULL,          //pfnParmsChangeLevel
+	StartFrame,                //pfnStartFrame
+	NULL,                      //pfnParmsNewLevel
+	NULL,                      //pfnParmsChangeLevel
 
-   NULL,        //pfnGetGameDescription   Returns string describing current .dll game.
-   NULL,       //pfnPlayerCustomization   Notifies .dll of new customization for player.
+	NULL,                      //pfnGetGameDescription    Returns string describing current .dll game.
+	NULL,                      //pfnPlayerCustomization   Notifies .dll of new customization for player.
 
-   NULL,          //pfnSpectatorConnect   Called when spectator joins server
-   NULL,       //pfnSpectatorDisconnect   Called when spectator leaves the server
-   NULL,            //pfnSpectatorThink   Called when spectator sends a command packet (usercmd_t)
+	NULL,                      //pfnSpectatorConnect      Called when spectator joins server
+	NULL,                      //pfnSpectatorDisconnect   Called when spectator leaves the server
+	NULL,                      //pfnSpectatorThink        Called when spectator sends a command packet (usercmd_t)
 
-   NULL,                 //pfnSys_Error   Called when engine has encountered an error
+	NULL,                      //pfnSys_Error          Called when engine has encountered an error
 
-   NULL,                   //pfnPM_Move
-   NULL,                   //pfnPM_Init   Server version of player movement initialization
-   NULL,        //pfnPM_FindTextureType
+	NULL,                      //pfnPM_Move
+	NULL,                      //pfnPM_Init            Server version of player movement initialization
+	NULL,                      //pfnPM_FindTextureType
 
-   NULL,           //pfnSetupVisibility   Set up PVS and PAS for networking for this client
-   NULL,          //pfnUpdateClientData   Set up data sent only to specific client
-   NULL,             //pfnAddToFullPack
-   NULL,            //pfnCreateBaseline   Tweak entity baseline for network encoding, allows setup of player baselines, too.
-   NULL,          //pfnRegisterEncoders   Callbacks for network encoding
-   NULL,             //pfnGetWeaponData
-   NULL,                  //pfnCmdStart
-   NULL,                    //pfnCmdEnd
-   NULL,      //pfnConnectionlessPacket
-   NULL,             //pfnGetHullBounds
-   NULL,  //pfnCreateInstancedBaselines
-   NULL,          //pfnInconsistentFile
-   NULL,      //pfnAllowLagCompensation
+	NULL,                      //pfnSetupVisibility        Set up PVS and PAS for networking for this client
+	NULL,                      //pfnUpdateClientData       Set up data sent only to specific client
+	NULL,                      //pfnAddToFullPack
+	NULL,                      //pfnCreateBaseline        Tweak entity baseline for network encoding, allows setup of player baselines, too.
+	NULL,                      //pfnRegisterEncoders      Callbacks for network encoding
+	NULL,                      //pfnGetWeaponData
+	NULL,                      //pfnCmdStart
+	NULL,                      //pfnCmdEnd
+	NULL,                      //pfnConnectionlessPacket
+	NULL,                      //pfnGetHullBounds
+	NULL,                      //pfnCreateInstancedBaselines
+	NULL,                      //pfnInconsistentFile
+	NULL,                      //pfnAllowLagCompensation
 };
 #else /* not USE_METAMOD */
 DLL_FUNCTIONS gFunctionTable =
 {
 	GameDLLInit,               //pfnGameInit
-		DispatchSpawn,             //pfnSpawn
-		DispatchThink,             //pfnThink
-		DispatchUse,               //pfnUse
-		DispatchTouch,             //pfnTouch
-		DispatchBlocked,           //pfnBlocked
-		DispatchKeyValue,          //pfnKeyValue
-		DispatchSave,              //pfnSave
-		DispatchRestore,           //pfnRestore
-		DispatchObjectCollsionBox, //pfnAbsBox
-		
-		SaveWriteFields,           //pfnSaveWriteFields
-		SaveReadFields,            //pfnSaveReadFields
-		
-		SaveGlobalState,           //pfnSaveGlobalState
-		RestoreGlobalState,        //pfnRestoreGlobalState
-		ResetGlobalState,          //pfnResetGlobalState
-		
-		ClientConnect,             //pfnClientConnect
-		ClientDisconnect,          //pfnClientDisconnect
-		ClientKill,                //pfnClientKill
-		ClientPutInServer,         //pfnClientPutInServer
-		ClientCommand,             //pfnClientCommand
-		ClientUserInfoChanged,     //pfnClientUserInfoChanged
-		ServerActivate,            //pfnServerActivate
-		ServerDeactivate,          //pfnServerDeactivate
-		
-		PlayerPreThink,            //pfnPlayerPreThink
-		PlayerPostThink,           //pfnPlayerPostThink
-		
-		StartFrame,                //pfnStartFrame
-		ParmsNewLevel,             //pfnParmsNewLevel
-		ParmsChangeLevel,          //pfnParmsChangeLevel
-		
-		GetGameDescription,        //pfnGetGameDescription    Returns string describing current .dll game.
-		PlayerCustomization,       //pfnPlayerCustomization   Notifies .dll of new customization for player.
-		
-		SpectatorConnect,          //pfnSpectatorConnect      Called when spectator joins server
-		SpectatorDisconnect,       //pfnSpectatorDisconnect   Called when spectator leaves the server
-		SpectatorThink,            //pfnSpectatorThink        Called when spectator sends a command packet (usercmd_t)
-		
-		Sys_Error,                 //pfnSys_Error          Called when engine has encountered an error
-		
-		PM_Move,                   //pfnPM_Move
-		PM_Init,                   //pfnPM_Init            Server version of player movement initialization
-		PM_FindTextureType,        //pfnPM_FindTextureType
-		
-		SetupVisibility,           //pfnSetupVisibility        Set up PVS and PAS for networking for this client
-		UpdateClientData,          //pfnUpdateClientData       Set up data sent only to specific client
-		AddToFullPack,             //pfnAddToFullPack
-		CreateBaseline,            //pfnCreateBaseline        Tweak entity baseline for network encoding, allows setup of player baselines, too.
-		RegisterEncoders,          //pfnRegisterEncoders      Callbacks for network encoding
-		GetWeaponData,             //pfnGetWeaponData
-		CmdStart,                  //pfnCmdStart
-		CmdEnd,                    //pfnCmdEnd
-		ConnectionlessPacket,      //pfnConnectionlessPacket
-		GetHullBounds,             //pfnGetHullBounds
-		CreateInstancedBaselines,  //pfnCreateInstancedBaselines
-		InconsistentFile,          //pfnInconsistentFile
-		AllowLagCompensation,      //pfnAllowLagCompensation
+	DispatchSpawn,             //pfnSpawn
+	DispatchThink,             //pfnThink
+	DispatchUse,               //pfnUse
+	DispatchTouch,             //pfnTouch
+	DispatchBlocked,           //pfnBlocked
+	DispatchKeyValue,          //pfnKeyValue
+	DispatchSave,              //pfnSave
+	DispatchRestore,           //pfnRestore
+	DispatchObjectCollsionBox, //pfnAbsBox
+
+	SaveWriteFields,           //pfnSaveWriteFields
+	SaveReadFields,            //pfnSaveReadFields
+	
+	SaveGlobalState,           //pfnSaveGlobalState
+	RestoreGlobalState,        //pfnRestoreGlobalState
+	ResetGlobalState,          //pfnResetGlobalState
+	
+	ClientConnect,             //pfnClientConnect
+	ClientDisconnect,          //pfnClientDisconnect
+	ClientKill,                //pfnClientKill
+	ClientPutInServer,         //pfnClientPutInServer
+	ClientCommand,             //pfnClientCommand
+	ClientUserInfoChanged,     //pfnClientUserInfoChanged
+	ServerActivate,            //pfnServerActivate
+	ServerDeactivate,          //pfnServerDeactivate
+	
+	PlayerPreThink,            //pfnPlayerPreThink
+	PlayerPostThink,           //pfnPlayerPostThink
+	
+	StartFrame,                //pfnStartFrame
+	ParmsNewLevel,             //pfnParmsNewLevel
+	ParmsChangeLevel,          //pfnParmsChangeLevel
+	
+	GetGameDescription,        //pfnGetGameDescription    Returns string describing current .dll game.
+	PlayerCustomization,       //pfnPlayerCustomization   Notifies .dll of new customization for player.
+	
+	SpectatorConnect,          //pfnSpectatorConnect      Called when spectator joins server
+	SpectatorDisconnect,       //pfnSpectatorDisconnect   Called when spectator leaves the server
+	SpectatorThink,            //pfnSpectatorThink        Called when spectator sends a command packet (usercmd_t)
+	
+	Sys_Error,                 //pfnSys_Error          Called when engine has encountered an error
+	
+	PM_Move,                   //pfnPM_Move
+	PM_Init,                   //pfnPM_Init            Server version of player movement initialization
+	PM_FindTextureType,        //pfnPM_FindTextureType
+	
+	SetupVisibility,           //pfnSetupVisibility        Set up PVS and PAS for networking for this client
+	UpdateClientData,          //pfnUpdateClientData       Set up data sent only to specific client
+	AddToFullPack,             //pfnAddToFullPack
+	CreateBaseline,            //pfnCreateBaseline        Tweak entity baseline for network encoding, allows setup of player baselines, too.
+	RegisterEncoders,          //pfnRegisterEncoders      Callbacks for network encoding
+	GetWeaponData,             //pfnGetWeaponData
+	CmdStart,                  //pfnCmdStart
+	CmdEnd,                    //pfnCmdEnd
+	ConnectionlessPacket,      //pfnConnectionlessPacket
+	GetHullBounds,             //pfnGetHullBounds
+	CreateInstancedBaselines,  //pfnCreateInstancedBaselines
+	InconsistentFile,          //pfnInconsistentFile
+	AllowLagCompensation,      //pfnAllowLagCompensation
 };
 #endif /* USE_METAMOD */
 
