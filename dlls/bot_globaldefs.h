@@ -21,11 +21,6 @@
 #ifndef __BOT_GLOBALDEFS_H
 #define __BOT_GLOBALDEFS_H
 
-#ifdef _DEBUG
-#define DEBUGMESSAGES
-#define DEBUGENGINE
-#endif
-
 // fillserver #defs
 #define FILL_0		1
 #define FILL_1		2
