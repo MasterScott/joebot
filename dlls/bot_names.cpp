@@ -29,9 +29,9 @@
 #include "util.h"
 
 #include "bot_names.h"
+#include "Commandfunc.h"
 
 CBotNamesItem g_DefaultName;
-extern bool g_bMixNames;
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -131,7 +131,7 @@ bool CBotNames::load(const char *szFileName){
 	}
 	
 	// if file wasn't filled up ... or file not found ...
-	if(g_bMixNames) mixIt();
+	if (bool(jb_mixnames->value)) mixIt();
 	
 	return true;
 }

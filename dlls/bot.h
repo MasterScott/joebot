@@ -60,22 +60,11 @@ void InitGlobalRS(void);
 // type of map
 extern int g_iTypeoM;
 
-// freq of nn updated ( def is 10 )
-extern float gnn_update;
-
 // is the bomb planted ?
 extern bool		g_bBombPlanted;
 extern bool		g_bBombDropped;
-extern int		g_iBaseSkillMax;
-extern int		g_iBaseSkillMin;
-extern float	g_fBaseAMomentum;
-extern float	g_fCampPoss;
-extern float	g_fBaseASpeed;
-extern bool		g_autowpjump;
 
 extern AWP_EntLogItem AWP_ED[32];
-
-extern int g_iLanguage;				// language of most stuff
 
 #define LANG_E	0
 #define LANG_DE	1
@@ -83,12 +72,6 @@ extern int g_iLanguage;				// language of most stuff
 
 // times for enemy seen
 extern float f_ES[32];
-
-// pistol - mode
-extern bool g_bOnlySec;
-
-// should the order of names should be random
-extern bool g_bMixNames;
 
 // last time a radio command was used
 extern float f_LastRadio;
@@ -136,10 +119,7 @@ typedef struct{
 
 extern SInfo SBInfo[32];
 
-extern bool g_bTKPunish;
 extern edict_t *g_pVIP;
-extern bool g_bChat;
-extern bool g_bEDown;
 extern float fM[2];
 
 //void BotVATurnTo(edict_t *pEdict,const Vector &vector);

@@ -30,6 +30,7 @@
 
 #include "bot.h"
 #include "bot_modid.h"
+#include "Commandfunc.h"
 #include "globalvars.h"
 #include "NNWeapon.h"
 
@@ -56,7 +57,7 @@ void CBotDOD :: Fight(void){
 		if(index!=-1
 			&&index<32){
 			if(f_ES[index] + _ESTIME < gpGlobals->time){		// i.e. not seen for a while
-				if(g_bUseRadio)
+				if(bool(jb_msgradio->value))
 					SendRadioCommand(RADIO_ENEMY_SPOTTED);
 				int iETeam = UTIL_GetTeam(pBotEnemy);
 
@@ -122,7 +123,7 @@ void CBotDOD :: Fight(void){
 		NNCombat->Propagate();
 		NNCombat->GetOutput(dCombatNNOut);	// copy the outputs of the output layers to this field
 		
-		f_NNNUpdate = gpGlobals->time + (1.0f / gnn_update);
+		f_NNNUpdate = gpGlobals->time + (1.0f / jb_nnupdaterate->value);
 		// collect data for SOM
 		/*if(dCombatNNIn[IAmmo] <= 1
 		&& dCombatNNIn[IAmmo] >= -1){
@@ -169,14 +170,14 @@ void CBotDOD :: Fight(void){
 			if((m_rgAmmo[current_weapon.iAmmo1]+current_weapon.iClip) == 0){// if ya clip  and ya reserve is empty
 				ChangeToLWeapon();
 				if(f_UsedRadio < gpGlobals->time - _RADIO_FREQ
-					&&g_bUseRadio){
+					&&bool(jb_msgradio->value)){
 					SendRadioCommand(RADIO_NEED_BACKUP);
 				}
 			}
 			else if(current_weapon.iClip == 0){		// only ya clip is empty, so you can propably reload, if the en is far away
 				ChangeToLWeapon();							// use another weapon, worst case the knife - no special decisions concerning distance of en
 				if(f_UsedRadio < gpGlobals->time - _RADIO_FREQ
-					&& g_bUseRadio){
+					&& bool(jb_msgradio->value)){
 					SendRadioCommand(RADIO_NEED_BACKUP);
 				}
 			}
@@ -339,7 +340,7 @@ void CBotDOD :: Fight(void){
 			Action.lAction |= BA_FIGHT;
 			
 			// shoot at aim
-			if(bBotsShoot){		// the friendly mode
+			if(bool(jb_shoot->value)){		// the friendly mode
 				if(IsCWeaponKnife()){
 					if(dCombatNNIn[IDistance] < -.5){
 						ShootAtEnemy();			// attack enemy with knife only when near

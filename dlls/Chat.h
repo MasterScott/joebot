@@ -24,8 +24,6 @@
 #include "CBotBase.h"
 #include "CParser.h"
 
-extern float g_CHATFREQ;
-
 #define _MAX_SENTENCES_PER_PART 100
 
 #define MAXL_KEY 80

@@ -53,9 +53,6 @@ char	szBOTNAME[]			="BOTNAME",
 		szLASTJOINED[]		="LASTJOINED",
 		szCHATTER[]			="CHATTER";
 
-float g_CHATFREQ=45.0;
-extern int g_ileetposs;
-
 edict_t *GetRandomPlayer(edict_t *pNot,int iTeam,int iAlive);
 
 CChatIElem :: CChatIElem(){

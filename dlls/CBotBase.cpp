@@ -25,6 +25,7 @@
 
 #include "bot.h"
 #include "bot_modid.h"
+#include "Commandfunc.h"
 #include "globalvars.h"
 
 #include "NeuralNet.h"
@@ -2156,22 +2157,22 @@ void CBotBase :: InstantTurn(void){
 }
 
 void CBotBase :: MakeName(char *szName,const char *szBotName,int iSkill,float fAgg){
-	if(b_addjoe){
+	if(bool(jb_prefixaggression->value)){
 		if(fAgg < -.5){
-			sprintf(szName,"%s%s",szPrefixDef,szBotName);
+			sprintf(szName,"%s%s",jb_prefixdefensive->string,szBotName);
 		}
 		else if(fAgg > .5){
-			sprintf(szName,"%s%s",szPrefixAgg,szBotName);
+			sprintf(szName,"%s%s",jb_prefixaggressive->string,szBotName);
 		}
 		else{
-			sprintf(szName,"%s%s",szPrefixNor,szBotName);
+			sprintf(szName,"%s%s",jb_prefixnormal->string,szBotName);
 		}
 	}
 	else{
 		sprintf(szName,"%s",szBotName);
 	}
 	
-	if(b_addskill){
+	if(bool(jb_suffixskill->value)){
 		char szSkill[10];
 		sprintf(szSkill,"(%i)",iSkill);
 		strcat(szName,szSkill);
@@ -2436,7 +2437,7 @@ bool CBotBase :: HandleNearWP(int iNearWP, bool &bReturn){
 							ResetWPlanning();
 							Task.AddTask(BT_CAMP,gpGlobals->time + _CAMPTIME * RANDOM_FLOAT(.5,2),0,0,0);
 							InitCamp();
-							if(g_bUseRadio)
+							if(bool(jb_msgradio->value))
 								FakeClientCommand(pEdict,"radio3;menuselect 5");
 							if(f_RWKnife > gpGlobals->time)
 								f_RWKnife = gpGlobals->time;
@@ -2786,7 +2787,7 @@ void CBotBase :: OnLadder( void )
 			pEdict->v.v_angle.x = UPLOOK;  // look upwards
 			iOnLadder = LADDER_UP;
 			int iNext = WaypointRouteFromTo(WaypointFindNearest(pEdict,500,bot_teamnm),iGoal,bot_teamnm);
-			if(iNext > num_waypoints || iNext < 0)
+			if(iNext > num_waypoints || iNext == WAYPOINT_UNREACHABLE)
 				iNext = i_CurrWP;
 			
 			if(waypoints[iNext].origin.z < pEdict->v.origin.z - 40){
@@ -2855,7 +2856,7 @@ bool CBotBase :: Camp(void){
 		}
 		if(f_UsedRadio < gpGlobals->time - 2.0){
 			if(Ordered.lAction & BO_AFF
-				&& g_bUseRadio){
+				&& bool(jb_msgradio->value)){
 				SendRadioCommand(RADIO_YOU_TAKE_THE_POINT);
 				Ordered.lAction=0;
 			}

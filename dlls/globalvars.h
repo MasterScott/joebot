@@ -68,34 +68,14 @@ extern int iLastSayClient;
 extern char szDeadLastSayText[80];
 extern int iDeadLastSayClient;
 
-extern bool g_bTKPunish;
 extern edict_t *g_pVIP;
-extern bool g_bChat;
 extern float _SCHATTIME;
 enum ICHATMODES{IC_ALL=0,IC_DEAD,IC_ALIVE,IC_NONE};
-extern int g_iIChat;
-extern bool g_bEDown;
 extern float fM[2];
-extern bool bCheckWelcome;
-extern int min_bots;
-extern int max_bots;
 extern edict_t *pEdictLastJoined;
-extern int g_ileetposs;
-extern float g_CHATFREQ;
-extern bool g_bshowen;
 extern int debug_engine;
-extern int g_menu_waypoint;
-extern bool g_waypointsound;
-extern int g_menu_state;
-extern bool g_waypoint_on;
-extern bool g_auto_waypoint;
-extern bool g_auto_addpath;
-extern bool g_path_waypoint;
 extern float bot_cfg_pause_time;
 extern float g_fGameCommenced;
-extern bool g_waypoint_stat;
-extern bool g_bForceNOStat;
-extern bool g_bSpray;
 
 extern float g_GRAVITYADJ;
 
@@ -128,9 +108,6 @@ extern int g_iTypeoM;
 
 extern edict_t *pEdictPlayer;
 
-// freq of nn updated ( def is 10 )
-extern float gnn_update;
-
 //dll.cpp stuff
 extern float bot_check_time;
 
@@ -138,25 +115,11 @@ extern float bot_check_time;
 extern bool		g_bBombPlanted;
 extern float	g_iBombExplode;
 extern bool		g_bBombDropped;
-extern int		g_iBaseSkillMax;
-extern int		g_iBaseSkillMin;
-extern float	g_fBaseAMomentum;
-extern float	g_fCampPoss;
-extern float	g_fBaseASpeed;
-extern bool		g_autowpjump;
-extern bool		g_waypointadv;
-extern bool		b_addjoe;
-extern bool		b_addskill;
-extern bool		g_bUseRadio;
 extern bool		bNNInitError;
 extern float	TIMETOBEBORED;
 extern float	TIMEBEINGBORED;
 extern float	fLastVIPScan;
-extern bool		g_bTestJump;
-extern bool		g_bAutowpHuman;
 extern long		lbeam;
-extern bool		g_bJoinWHumanMAX;
-extern bool		g_bJoinWHumanRES;
 extern bool		g_bIsSteam;
 
 extern char szTemp[200];
@@ -174,24 +137,14 @@ extern CChat Chat;*/
 
 extern float f_timesrs;
 
-extern bool bBotsShoot;
-
 extern CWPStat WPStat;
 
 extern AWP_EntLogItem AWP_ED[32];
 class CBotBase;
 extern CBotBase *bots[32];
 
-extern int g_iLanguage;				// language of most stuff
-
 // times for enemy seen
 extern float f_ES[32];
-
-// pistol - mode
-extern bool g_bOnlySec;
-
-// should the order of names should be random
-extern bool g_bMixNames;
 
 // last time a radio command was used
 extern float f_LastRadio;
@@ -201,10 +154,6 @@ extern float f_round_start;
 
 extern float gf_5th;
 extern bool g_b5th;
-
-extern char szPrefixAgg[32];
-extern char szPrefixNor[32];
-extern char szPrefixDef[32];
 
 extern char szWPCreator[80];
 

@@ -44,6 +44,7 @@
 #include "bot_names.h"
 #include "CBotCS.h"
 #include "CBotDOD.h"
+#include "Commandfunc.h"
 #include "CSkill.h"
 
 char szTemp[200];
@@ -68,19 +69,8 @@ float fLGlobalRSInit = -1000;
 #include "BotNNDefs.h"
 #include "NNWeapon.h"
 NNWeapon WeaponDefs;
-float gnn_update		= _DEFAULTNNUPDATE;				// updates of nn per sec
 float gnn_lrate			= _DEFAULTNNLRATE;				// default lrate
-float g_fBaseAMomentum	= _DEFAULTAMOMENTUM;
-float g_fBaseASpeed		= _DEFAULTASPEED;
-int g_iBaseSkillMin		= _DEFAULTSKILL-30;
-int g_iBaseSkillMax		= _DEFAULTSKILL;
-int g_ileetposs = 3;
-bool g_bUseRadio = true;
-float g_fCampPoss=2;
 edict_t *g_pVIP = 0;
-bool g_bOnlySec			= false;						// don't buy primary weapons
-bool g_bMixNames		= true;							// mix names after loading
-bool g_bTKPunish		= false;						// punish teamm8s for tkilling
 float fLastVIPScan		= -10000;
 
 float f_ES[32];											// enemy seen times
@@ -98,19 +88,13 @@ extern edict_t *clients[32];
 extern int mod_id;
 extern WAYPOINT waypoints[MAX_WAYPOINTS];
 extern int num_waypoints;  // number of waypoints currently in use
-extern bool b_addjoe;
-extern bool b_addskill;
 edict_t *pEdictPlayer=0;
-bool g_bChat = true;
-bool g_bEDown = true;
 
 CBaseNeuralNetFF *NNCombat = 0;
 CBaseNeuralNetFF *NNColl = 0;
 SOMPattern SP(6);
 bool bNNInit = false;
 bool bNNInitError;
-
-bool bBotsShoot=true;
 
 SInfo SBInfo[32];
 CBotBase *bots[32];   // max of 32 bots in a game
@@ -332,12 +316,12 @@ void BotCreate( edict_t *pPlayer, const char *szTeam, const char *szClass,const 
 	////////////////////////////
 	
 	if(!szSkill || !strlen(szSkill)){
-		iSkill = RANDOM_LONG(g_iBaseSkillMin,g_iBaseSkillMax);
+		iSkill = RANDOM_LONG(int(jb_skillmin->value),int(jb_skillmax->value));
 	}
 	else{
 		sscanf(szSkill,"%i",&iSkill);
 		if(!iSkill || iSkill == -1)
-			iSkill = RANDOM_LONG(g_iBaseSkillMin,g_iBaseSkillMax);
+			iSkill = RANDOM_LONG(int(jb_skillmin->value),int(jb_skillmax->value));
 	}
 	
 	if(pBot->Personality.iSkill != -1){
@@ -431,8 +415,8 @@ void BotCreate( edict_t *pPlayer, const char *szTeam, const char *szClass,const 
 		pBot->pEdict = BotEnt;
 		pBot->iEIndex = clientIndex;
 
-		pBot->f_AMomentum = g_fBaseAMomentum;
-		pBot->f_ASpeed = g_fBaseASpeed;
+		pBot->f_AMomentum = jb_aimmomentum->value;
+		pBot->f_ASpeed = jb_aimspeed->value;
 		pBot->Action.lAction = 0;
 		
 		if(pBot->Personality.iSpeakLeet != -1){

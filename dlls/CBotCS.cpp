@@ -30,6 +30,7 @@
 
 #include "bot.h"
 #include "Chat.h"
+#include "Commandfunc.h"
 #include "globalvars.h"
 #include "NNWeapon.h"
 
@@ -48,6 +49,7 @@ CBotCS :: ~CBotCS(){
 void CBotCS :: HandleMenu( void )
 {
 	// handle Counter-Strike stuff here...
+
 	switch (start_action)
 	{
 		case MSG_CS_IDLE:
@@ -58,7 +60,7 @@ void CBotCS :: HandleMenu( void )
 		case MSG_CS_TEAM_SELECT:
 			if ((bot_team != 1) && (bot_team != 2) && (bot_team != 5))
 			{
-				if (g_bJoinWHumanRES)
+				if (!bool(jb_jointeam->value))
 				{
 					if (UTIL_HumansInGame())
 						bot_team = 5;
@@ -310,7 +312,7 @@ bool CBotCS :: BuyWeapon(void){
 	}
 	
 	if(bot_money < 1600
-		|| g_bOnlySec
+		|| bool(jb_pistolonly->value)
 		|| (HasPrimary() && bot_money > 4000)){
 		if(HasSecondary() != CS_WEAPON_DEAGLE			// ya don't need 2 deagles etc.
 			&& HasSecondary() != CS_WEAPON_ELITE
@@ -642,7 +644,7 @@ void CBotCS :: ReactOnRadio(void){
 					if((IsSniperWeapon(1<<lCaWeapon)&&(HasSubM()||HasRifle())
 						|| RANDOM_LONG(0,100) < 33
 						||UTIL_IsVIP(bot_IRadioM.pECalling))
-						&& g_bUseRadio
+						&& bool(jb_msgradio->value)
 						&& !Task.Important() ){		// no current order
 						Task.AddTask(BT_FOLLOW,gpGlobals->time + 600.0,0,bot_IRadioM.pECalling,0);
 						
@@ -651,7 +653,7 @@ void CBotCS :: ReactOnRadio(void){
 						SendRadioCommand(RADIO_AFFIRMATIVE);
 					}
 					else{
-						if(RANDOM_LONG(0,100) < 50 && g_bUseRadio){
+						if(RANDOM_LONG(0,100) < 50 && bool(jb_msgradio->value)){
 							SendRadioCommand(RADIO_NEGATIVE);
 						}
 					}
@@ -673,7 +675,7 @@ void CBotCS :: ReactOnRadio(void){
 						||(HasSniper()&&(IsSubMWeapon(1<<lCaWeapon)||IsRifleWeapon(1<<lCaWeapon) )))	// and vice versa
 						|| RANDOM_LONG(0,100) < 33
 						|| UTIL_IsVIP(bot_IRadioM.pECalling)
-						&& g_bUseRadio
+						&& bool(jb_msgradio->value)
 						&& !Task.Important()
 						&& Task.SearchT(BT_COVER) == -1){		// no current order
 						Task.AddTask(BT_COVER,gpGlobals->time + 60.0,0,bot_IRadioM.pECalling,0);
@@ -684,7 +686,7 @@ void CBotCS :: ReactOnRadio(void){
 						//FakeClientCommand(pEdict,"say responding to backup call");
 					}
 					else{
-						if(RANDOM_LONG(0,100) < 50 && g_bUseRadio){
+						if(RANDOM_LONG(0,100) < 50 && bool(jb_msgradio->value)){
 							SendRadioCommand(RADIO_NEGATIVE);
 						}
 					}
@@ -739,7 +741,7 @@ void CBotCS :: ReactOnRadio(void){
 			if(bot_IRadioM.f_Time < gpGlobals->time){	// kind of reaction time
 				if(RANDOM_LONG(0,100) < 50		// todo look at callers health etc
 					&& !Task.Important()
-					&& g_bUseRadio
+					&& bool(jb_msgradio->value)
 					&&!bot_vip){		// no current order
 					Task.AddTask(BT_HELP,gpGlobals->time + 60.0,0,bot_IRadioM.pECalling,0);
 					
@@ -1481,9 +1483,9 @@ void CBotCS :: Think5th(void){
 				Task.current->fLive2 += float(RANDOM_LONG(2,HasSniper()?10:5));
 			}
 			
-			if(g_bEDown){	// flag's default is true
+			if(bool(jb_msgenemydown->value)){	// flag's default is true
 				if(f_UsedRadio < gpGlobals->time - _RADIO_FREQ
-					&& g_bUseRadio){
+					&& bool(jb_msgradio->value)){
 					SendRadioCommand(RADIO_ENEMY_DOWN);
 				}
 			}
@@ -1531,7 +1533,7 @@ void CBotCS :: Think5th(void){
 		iTm8 = UTIL_FightingAgainst(pEdict,bot_teamnm==CT?TE:CT,&pNearest,true);		// only duckin bots
 		if(iTm8>1){
 		if(f_UsedRadio < gpGlobals->time - _RADIO_FREQ
-		&&g_bUseRadio
+		&&bool(jb_msgradio->value)
 		&&Task.SearchT(BT_HIDE) != -1){
 		SendRadioCommand(RADIO_GOGOGO);
 		f_Hide = gpGlobals->time - .01f;
@@ -1610,7 +1612,7 @@ void CBotCS :: Think1(void){
 				else{
 					float fMin;
 					GetNearestPlayer(pEdict,bot_teamnm,fMin);
-					if(fMin < 500 && g_bUseRadio){
+					if(fMin < 500 && bool(jb_msgradio->value)){
 						SendRadioCommand(RADIO_COVER_ME);
 						Ordered.lAction |= BO_COVER;
 						
@@ -1835,7 +1837,7 @@ void CBotCS :: Think(void){
 			i1C--;
 			if(!i1C){
 				i1C = 5;
-				if(g_bChat)
+				if(bool(jb_chat->value))
 					Chat.Talk(this);
 			}
 		}
@@ -2043,7 +2045,7 @@ void CBotCS :: Think(void){
 			  if(RANDOM_LONG(0,100) < 6
 			  && !(Action.lAction & BA_TKAVOID)){
 			  if(f_UsedRadio < gpGlobals->time - _RADIO_FREQ
-			  &&g_bUseRadio){
+			  &&bool(jb_msgradio->value)){
 			  SendRadioCommand(NEED_ASSISTANCE);
 			  }
 			  }
@@ -2142,7 +2144,7 @@ void CBotCS :: Think(void){
 					}
 					if(!Ordered.pREdict
 						&& f_UsedRadio < gpGlobals->time - 5.0
-						&& g_bUseRadio
+						&& bool(jb_msgradio->value)
 						&&f_timesrs > 6.0){
 						SendRadioCommand(RADIO_COVER_ME);
 						Ordered.lAction |= BO_COVER;

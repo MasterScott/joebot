@@ -31,6 +31,7 @@
 #include "bot.h"
 #include "bot_modid.h"
 #include "Chat.h"
+#include "Commandfunc.h"
 #include "globalvars.h"
 #include "NNWeapon.h"
 
@@ -65,7 +66,7 @@ void CBotDOD :: HandleMenu( void )
 		
 		if ((bot_team != 1) && (bot_team != 2) && (bot_team != 5))
 		{
-			if (g_bJoinWHumanRES)
+			if (!bool(jb_jointeam->value))
 			{
 				bot_team = UTIL_HumansInGame() ? 5 : 3;
 			}
@@ -994,7 +995,7 @@ void CBotDOD :: Think5th(void){
 			else{
 				float fMin;
 				GetNearestPlayer(pEdict,bot_teamnm,fMin);
-				if(fMin < 500 && g_bUseRadio){
+				if(fMin < 500 && bool(jb_msgradio->value)){
 					SendRadioCommand(RADIO_COVER_ME);
 					Ordered.lAction |= BO_COVER;
 					
@@ -1068,9 +1069,9 @@ void CBotDOD :: Think5th(void){
 			ResetWPlanning();
 			f_Aggressivity += 1.0;		// be more agressive
 			
-			if(g_bEDown){	// flag's default is true
+			if(bool(jb_msgenemydown->value)){	// flag's default is true
 				if(f_UsedRadio < gpGlobals->time - _RADIO_FREQ
-					&& g_bUseRadio){
+					&& bool(jb_msgradio->value)){
 					SendRadioCommand(RADIO_ENEMY_DOWN);
 				}
 			}
@@ -1122,7 +1123,7 @@ void CBotDOD :: Think5th(void){
 		iTm8 = UTIL_FightingAgainst(pEdict,bot_teamnm==CT?TE:CT,&pNearest,true);		// only duckin bots
 		if(iTm8>1){
 			if(f_UsedRadio < gpGlobals->time - _RADIO_FREQ
-				&&g_bUseRadio
+				&&bool(jb_msgradio->value)
 				&&Task.SearchT(BT_HIDE) != -1){
 				SendRadioCommand(RADIO_GOGOGO);
 				//f_Hide = gpGlobals->time - .01f;
@@ -1211,7 +1212,7 @@ void CBotDOD :: Think1(void){
 	}
 	
 	// chat
-	if(g_bChat)
+	if(bool(jb_chat->value))
 		Chat.Talk(this);
 	
 	// handle ordered stuff
@@ -1333,7 +1334,7 @@ void CBotDOD :: Think(void){
 	// if the bot is dead, randomly press fire to respawn...
 	if ((pEdict->v.health < 1) || (pEdict->v.deadflag != DEAD_NO))
 	{
-		if(g_bChat)
+		if(bool(jb_chat->value))
 			Chat.Talk(this);
 		
 		if (need_to_initialize)
@@ -1497,7 +1498,7 @@ void CBotDOD :: Think(void){
 			  if(RANDOM_LONG(0,100) < 6
 			  && !(Action.lAction & BA_TKAVOID)){
 			  if(f_UsedRadio < gpGlobals->time - _RADIO_FREQ
-			  &&g_bUseRadio){
+			  &&bool(jb_msgradio->value)){
 			  SendRadioCommand(NEED_ASSISTANCE);
 			  }
 			  }
@@ -1902,7 +1903,7 @@ HandleMenu();
 // if the bot is dead, randomly press fire to respawn...
 if ((pEdict->v.health < 1) || (pEdict->v.deadflag != DEAD_NO))
 {
-if(g_bChat)
+if(bool(jb_chat->value))
 Chat.Talk(this);
 
 if (need_to_initialize)
@@ -2050,7 +2051,7 @@ int iTm8;
 iTm8 = UTIL_FightingAgainst(pEdict,bot_teamnm==CT?TE:CT,&pNearest,true);		// only duckin bots
 if(iTm8>1){
 if(f_UsedRadio < gpGlobals->time - _RADIO_FREQ
-&&g_bUseRadio
+&&bool(jb_msgradio->value)
 &&Task.SearchT(BT_HIDE) != -1){
 
 }
@@ -2067,7 +2068,7 @@ HandleOrders();
 AdaptAvoid();
 
 // chat
-if(g_bChat)
+if(bool(jb_chat->value))
 Chat.Talk(this);
 
 // handle ordered stuff
@@ -2209,7 +2210,7 @@ f_Hide = gpGlobals->time + f_HidingTime;	// duck all that time ...
 if(RANDOM_LONG(0,100) < 6
 && !(Action.lAction & BA_TKAVOID)){
 if(f_UsedRadio < gpGlobals->time - _RADIO_FREQ
-&&g_bUseRadio){
+&&bool(jb_msgradio->value)){
 
 }
 }

@@ -30,6 +30,7 @@
 
 #include "bot.h"
 #include "bot_wpstat.h"
+#include "Commandfunc.h"
 #include "globalvars.h"
 
 float g_fmin_std_swp = 10;
@@ -659,7 +660,7 @@ bool CBotCS :: Bored(void){
 		}
 		else if(i_BorA == 3
 			||  i_BorA == 4){		// spray
-			if(g_bSpray){
+			if(bool(jb_spraypaint->value)){
 				TraceResult tr;
 				Vector v1,v2;
 				v1 = pEdict -> v.origin + pEdict -> v.view_ofs;
@@ -697,7 +698,7 @@ bool CBotCS :: Bored(void){
 				GOrder.Attack(pEdict->v.origin,CS_WEAPON_FLASHBANG);
 				
 				Chat.f_SayTime = gpGlobals->time + RANDOM_FLOAT(1,4.0);
-				Chat.f_LastChat = gpGlobals->time + RANDOM_FLOAT(-g_CHATFREQ/2.0,g_CHATFREQ/2.0);
+				Chat.f_LastChat = gpGlobals->time + RANDOM_FLOAT(-jb_chatfreq->value/2.0,jb_chatfreq->value/2.0);
 				strcpy(Chat.szChatText,"hehe, a flashbang for you motherfuckin' teammates :p\n\0");
 			}
 			f_BoredTill = 0;
@@ -768,7 +769,7 @@ bool CBotCS :: HandleNearWP(int iNearWP, bool &bReturn){
 						if(!bBomb
 							&&f_UsedRadio+5.0 < gpGlobals->time
 							&& f_LastRadio + 3.0f < gpGlobals->time
-							&& g_bUseRadio){
+							&& bool(jb_msgradio->value)){
 							SendRadioCommand(RADIO_SECTOR_CLEAR);
 						}
 					}
@@ -896,7 +897,7 @@ bool CBotCS :: HeadTowardWaypoint( void ){
 							Task.AddTask(BT_CAMP,fDuration,0,0,0);
 							//FakeClientCommand(pEdict,"say %f",Task.current->fAdd);
 							//InitCamp();
-							if(g_bUseRadio && Task.current->p){
+							if(bool(jb_msgradio->value) && Task.current->p){
 								SendRadioCommand(RADIO_IM_IN_POSITION);
 							}
 							if(f_RWKnife > gpGlobals->time)

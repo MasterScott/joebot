@@ -28,9 +28,9 @@
 #include "ChatBot.h"
 #include "ChatHost.h"
 #include "CBotBase.h"
+#include "Commandfunc.h"
 #include "globalvars.h"
 
-int g_iIChat = IC_ALL;
 float _SCHATTIME = 10;
 
 //////////////////////////////////////////////////////////////////////
@@ -39,7 +39,7 @@ float _SCHATTIME = 10;
 
 CChatBot::CChatBot()
 {
-	b1337chat = RANDOM_LONG(0,100) < g_ileetposs;
+	b1337chat = RANDOM_LONG(0,100) < int(jb_chat1337->value);
 	pChat = 0;
 	f_LastChat = 20;
 	f_SayTime = 0;
@@ -58,7 +58,7 @@ int CChatBot :: Talk(CBotBase *pBBot){
 	int iSentence;
 	edict_t *pEdict = pBBot->pEdict;
 
-	if(!g_bChat || bLoadFailed)
+	if(!bool(jb_chat->value) || bLoadFailed)
 		return false;
 
 	if(!pChat && !bLoadFailed)
@@ -77,7 +77,7 @@ int CChatBot :: Talk(CBotBase *pBBot){
 			*szChatText = 0;
 		}
 	}
-	if(f_LastChat + g_CHATFREQ< gpGlobals->time){
+	if(f_LastChat + jb_chatfreq->value< gpGlobals->time){
 		if(l_ChatEvent & E_Kill){
 			iCat = T_Kill;
 		}
@@ -95,7 +95,7 @@ int CChatBot :: Talk(CBotBase *pBBot){
 		}
 		else if( !IsAlive(pEdict) && RANDOM_LONG(0,100) < 10){
 			if(RANDOM_LONG(0,100) < 50){		// don't chat too much when dead
-				f_LastChat += g_CHATFREQ;
+				f_LastChat += jb_chatfreq->value;
 				return false;
 			}
 			else{
@@ -104,11 +104,11 @@ int CChatBot :: Talk(CBotBase *pBBot){
 		}
 		else{
 			// check for chat texts from others :)
-			if(g_iIChat == IC_DEAD && IsAlive(pBBot->pEdict))
+			if(int(jb_chati->value) == IC_DEAD && IsAlive(pBBot->pEdict))
 				return false;
-			else if(g_iIChat == IC_ALIVE && !IsAlive(pBBot->pEdict))
+			else if(int(jb_chati->value) == IC_ALIVE && !IsAlive(pBBot->pEdict))
 				return false;
-			else if(g_iIChat == IC_NONE)
+			else if(int(jb_chati->value) == IC_NONE)
 				return false;
 
 			char *szSayText;
@@ -130,7 +130,7 @@ int CChatBot :: Talk(CBotBase *pBBot){
 					}
 					
 					f_SayTime = gpGlobals->time + RANDOM_FLOAT(1,4.0);
-					f_LastChat = gpGlobals->time + RANDOM_FLOAT(-g_CHATFREQ/2.0,g_CHATFREQ/2.0);
+					f_LastChat = gpGlobals->time + RANDOM_FLOAT(-jb_chatfreq->value/2.0,jb_chatfreq->value/2.0);
 					*szSayText = 0;	// just delete it :)
 					return true;
 				}
@@ -166,7 +166,7 @@ int CChatBot :: Talk(CBotBase *pBBot){
 				
 				pChat->fTime[iTeam][iCat][iSentence] = gpGlobals->time;
 				f_SayTime = gpGlobals->time + RANDOM_FLOAT(0,2.0);
-				f_LastChat = gpGlobals->time + RANDOM_FLOAT(-g_CHATFREQ/2.0,g_CHATFREQ/2.0);
+				f_LastChat = gpGlobals->time + RANDOM_FLOAT(-jb_chatfreq->value/2.0,jb_chatfreq->value/2.0);
 				return true;
 			}
 		}
