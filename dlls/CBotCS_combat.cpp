@@ -68,9 +68,8 @@ void CBotCS :: Fight( void ){
 				int iETeam = UTIL_GetTeam(pBotEnemy);
 
 				edict_t *pEnt;
-				int i;
-				for (i = gpGlobals->maxClients; i>=1; i--){
-					pEnt = INDEXENT(i);
+				for (int i = 0; i < gpGlobals->maxClients; i++){
+					pEnt = INDEXENT(i + 1);
 					if (!FNullEnt(pEnt) && (!pEnt->free)){
 						if(iETeam == UTIL_GetTeam(pEnt)){				// set time back for every player of other team
 							f_ES[i] = gpGlobals->time - _ESTIME /3.0;		// don't say es too often, when groups hit each other
@@ -496,8 +495,12 @@ bool CBotCS :: FireWeapon( Vector &v_enemy )
 	if(Action.lAction & BA_TKAVOID){	
 		// bot's currently avoid a team attack, but now he can shoot without hurting team8s
 	}
-	else
+	else{
+		if (IsShieldDrawn())
+			lButton |= IN_ATTACK2;
+
 		lButton |= IN_ATTACK;
+	}
 
 	if(g_b5th
 		&& RANDOM_LONG(0,100) < i_ITP){
