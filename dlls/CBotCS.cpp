@@ -557,8 +557,8 @@ bool CBotCS :: BuyWeapon(void){
 		
 		if(bot_armor<50
 			&& RANDOM_LONG(0,100) < 50){
-			BotBuy_CS_KevlarHelmet(this);
-			BotBuy_CS_Kevlar(this);
+			BotBuy_CS_WEAPON_Kevlar(this);
+			BotBuy_CS_WEAPON_KevlarHelmet(this);
 		}
 		return true;
 	}
