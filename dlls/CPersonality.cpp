@@ -18,16 +18,13 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 ******************************************************************************/
-#include "CPersonality.h"
+#include <iostream.h>
+#include <string.h>
 
 #include "extdll.h"
 #include "util.h"
-#include "CParser.h"
 
-#include <iostream.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include "CPersonality.h"
 
 #include "bot_modid.h"
 #include "bot_weapons.h"
@@ -89,14 +86,14 @@ void CPersonality :: Load(char *szName){
 	strcpy(szFilename,szName);
 	strcat(szFilename,".per");
 	
-#ifndef __linux__
+#ifdef _WIN32
 	UTIL_BuildFileName(szWFilename,"joebot\\per",szFilename);
 #else
 	UTIL_BuildFileName(szWFilename,"joebot/per",szFilename);
 #endif
 	
 	if(!(fhd = fopen(szWFilename,"r"))){
-#ifndef __linux__
+#ifdef _WIN32
 		UTIL_BuildFileName(szWFilename,"joebot\\per","default.per");
 #else
 		UTIL_BuildFileName(szWFilename,"joebot/per","default.per");
@@ -164,7 +161,7 @@ void CPersonality :: Save(char *szName){
 	strcpy(szFilename,szName);
 	strcat(szFilename,".per");
 	
-#ifndef __linux__
+#ifdef _WIN32
 	UTIL_BuildFileName(szWFilename,"joebot\\per",szFilename);
 #else
 	UTIL_BuildFileName(szWFilename,"joebot/per",szFilename);
@@ -206,10 +203,11 @@ void CPersonality :: Save(char *szName){
 	fprintf(fhd,"# team dependant weapons which cannot be bought, are converted to a \n");
 	fprintf(fhd,"# similar weapon of the own team.\n");
 	fprintf(fhd,"#\n");
-	fprintf(fhd,"# CS_WEAPON_M4A1	<--> CS_WEAPON_AK47;\n");
-	fprintf(fhd,"# CS_WEAPON_TMP		<--> CS_WEAPON_MAC10;\n");
-	fprintf(fhd,"# CS_WEAPON_SG550	<--> CS_WEAPON_G3SG1;\n");
-	fprintf(fhd,"# CS_WEAPON_AUG		<--> CS_WEAPON_SG552;\n");
+	fprintf(fhd,"# CS_WEAPON_FAMAS <--> CS_WEAPON_GALIL;\n");
+	fprintf(fhd,"# CS_WEAPON_M4A1  <--> CS_WEAPON_AK47;\n");
+	fprintf(fhd,"# CS_WEAPON_TMP   <--> CS_WEAPON_MAC10;\n");
+	fprintf(fhd,"# CS_WEAPON_SG550 <--> CS_WEAPON_G3SG1;\n");
+	fprintf(fhd,"# CS_WEAPON_AUG   <--> CS_WEAPON_SG552;\n");
 	fprintf(fhd,"# \n");
 	fprintf(fhd,"# weapon names are :\n");
 	fprintf(fhd,"# \n");
@@ -219,6 +217,8 @@ void CPersonality :: Save(char *szName){
 	fprintf(fhd,"# weapon_aug\n");
 	fprintf(fhd,"# weapon_ump45\n");
 	fprintf(fhd,"# weapon_sg550\n");
+	fprintf(fhd,"# weapon_galil\n");
+	fprintf(fhd,"# weapon_famas\n");
 	fprintf(fhd,"# weapon_awp\n");
 	fprintf(fhd,"# weapon_mp5navy\n");
 	fprintf(fhd,"# weapon_m249\n");
