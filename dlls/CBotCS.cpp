@@ -1854,13 +1854,11 @@ void CBotCS :: Think(void){
 		return;
 	}
 #ifdef __LOG
-	if(HasSecondary(pBot) && !HasPrimary(pBot) &&RANDOM_LONG(0,100) < 20){
-		snprintf(szBuffer,sizeof(szBuffer),"%s\t%i\n\0",STRING(pEdict->v.netname),bot_money);
-		
+	if(HasSecondary() && !HasPrimary() &&RANDOM_LONG(0,100) < 20){
 		FILE *fhd;
 		fhd=fopen("money.txt","a");
 		if(fhd){
-			fprintf(fhd,"%s",szBuffer);
+			fprintf(fhd,"%s\t%i\n\0",STRING(pEdict->v.netname),bot_money);
 			fclose(fhd);
 		}
 	}
