@@ -32,13 +32,22 @@
 #endif
 
 #define VVERSION "1.6.5.0"
-//#define VDATE "2001/04/01"
 #define VDATE __DATE__
 #define VAUTHOR "@$3.1415rin <as3.1415rin@bots-united.com>"
 #define VCOMPANY "joebot.bots-united.com"
 #define VNAME "JOEBOT"
 #define VURL "http://joebot.bots-united.com/"
 #define VLOGTAG "JOEBOT"
+#ifdef __linux__
+#define VPLATFORM "linux"
+#else
+#define VPLATFORM "win32"
+#endif
+#ifdef USE_METAMOD
+#define VDLLTYPE "MM"
+#else
+#define VDLLTYPE "STD"
+#endif
 
 #define RC_VERSION 1,6,5,0
 #ifdef USE_METAMOD
