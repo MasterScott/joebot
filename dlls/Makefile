@@ -12,11 +12,12 @@ else
  EXT_OBJDIR = $(OBJDIR_RELEASE)
 endif
 
+BASE_DLLNAME = joebot
 ifeq ($(DLLTYPE),std)
- DLLNAME = joebot
+ DLLNAME = $(BASE_DLLNAME)
  OBJDIR = $(BASE_OBJDIR)/std
 else
- DLLNAME = joebot_mm
+ DLLNAME = $(BASE_DLLNAME)_mm
  OBJDIR = $(BASE_OBJDIR)/mm
 endif
 
@@ -38,10 +39,16 @@ include Config.mk
 SRC_DLLS := $(SRC:%.cpp=%.cpp)
 OBJ_DLLS := $(SRC:%.cpp=$(OBJDIR)/%.o)
 
-SRC = $(SRC_DLLS) $(SRC_NNSIM) $(SRC_SOM)
-OBJ = $(OBJ_DLLS) $(OBJ_NNSIM) $(OBJ_SOM)
+ifeq ($(OS),Windows_NT)
+ SRC_RES = $(OBJDIR)/$(BASE_DLLNAME).rc
+ OBJ_RES = $(OBJDIR)/$(BASE_DLLNAME).res
+endif
+
+SRC = $(SRC_DLLS) $(SRC_NNSIM) $(SRC_SOM) $(SRC_RES)
+OBJ = $(OBJ_DLLS) $(OBJ_NNSIM) $(OBJ_SOM) $(OBJ_RES)
 
 CC = gcc
+RC = windres
 RM = rm -fv
 
 # includes
@@ -92,7 +99,7 @@ $(OBJDIR):
 	mkdir -p $(OBJDIR)
 	
 clean:
-	-$(RM) $(OBJDIR)/*.o $(OBJDIR)/$(DLL)
+	-$(RM) $(OBJDIR)/*.o $(OBJDIR)/*.res $(OBJDIR)/$(DLL)
 
 spotless:
 	-$(RM) -r $(OBJDIR)
@@ -102,8 +109,11 @@ rebuild: clean all
 # ---------------------------------------------------------------------------
 # Rules
 # ---------------------------------------------------------------------------
-$(OBJDIR)/$(DLL): $(OBJ)
+$(OBJDIR)/$(DLL): $(OBJ) $(OBJ_RES)
 	$(LD) $(LDFLAGS) -o $@ $(OBJ) $(LDLIBS)
+
+$(OBJDIR)/$(BASE_DLLNAME).res: $(BASE_DLLNAME).rc
+	$(RC) $(RCFLAGS) -i$< -O coff -o $@
 
 $(OBJDIR)/%.o: %.cpp
 	$(CC) $(CFLAGS) -c $< -o $@
