@@ -880,7 +880,7 @@ void CBotCS :: ReactOnRadio(void){
 					&&iFarGoal != -1){
 					if(WaypointDistanceFromTo(iNearWP,iFarGoal,bot_teamnm) < 900){		// i.e. bot is running the same goal as where there isn't anything
 						iGoal = -1;
-						iFarGoal = WaypointFindNearestGoal(pEdict,iNearWP,bot_teamnm,W_FL_FLAG,&iNearWP,1,300);
+						iFarGoal = WaypointFindNearestGoal(pEdict,iNearWP,bot_teamnm,W_FL_FLAG,300,&iNearWP,1);
 						Task.AddTask(BT_GOTO,gpGlobals->time + 60.0,iFarGoal,(void*)1,0);
 						ResetWPlanning();
 					}

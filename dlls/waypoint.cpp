@@ -717,7 +717,7 @@ int WaypointFindNearest(Vector v_src, edict_t *pEntity, float range, int team,bo
 
 // find the goal nearest to the player matching the "flags" bits and return
 // the index of that waypoint...
-int WaypointFindNearestGoal(edict_t *pEntity, int src, int team, int flags)
+/*int WaypointFindNearestGoal(edict_t *pEntity, int src, int team, int flags)
 {
 	int index, min_index;
 	int distance, min_distance;
@@ -759,9 +759,9 @@ int WaypointFindNearestGoal(edict_t *pEntity, int src, int team, int flags)
 	}
 	
 	return min_index;
-}
+}*/
 
-int WaypointFindNearestGoal(edict_t *pEntity, int src, int team, int flags,int*iField,int iNumField,float fMin)
+int WaypointFindNearestGoal(edict_t *pEntity, int src, int team, int flags,float fMin,int*piField,int iNumField)
 {
 	int index, min_index;
 	int distance, min_distance,i;
@@ -795,9 +795,11 @@ int WaypointFindNearestGoal(edict_t *pEntity, int src, int team, int flags,int*i
 			continue;  // skip this waypoint if the flags don't match
 		
 		bAvoid=false;
-		for(i=0;i<iNumField;i++){
-			if(iField[i]==index)
-				bAvoid=true;
+		if(piField){
+			for(i=0;i<iNumField;i++){
+				if(piField[i]==index)
+					bAvoid=true;
+			}
 		}
 		if(bAvoid)
 			continue;
@@ -807,8 +809,7 @@ int WaypointFindNearestGoal(edict_t *pEntity, int src, int team, int flags,int*i
 		if(distance < fMin)
 			continue;
 		
-		if (distance < min_distance)
-		{
+		if (distance < min_distance){
 			min_index = index;
 			min_distance = distance;
 		}
