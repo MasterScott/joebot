@@ -229,6 +229,7 @@ DLL_GLOBAL const Vector g_vecZero = Vector(0,0,0);
 CChatHost g_ChatHost;
 
 int mod_id = -1;
+char mod_name[32];
 int m_spriteTexture = 0;
 //int default_bot_skill = 2;
 bool isFakeClientCommand = FALSE;
@@ -374,24 +375,12 @@ void GameDLLInit( void )
 	WeaponDefs.Init();
 
 	g_bMyBirthday = MyBirthday();
-#ifdef USE_METAMOD
-#ifdef _WIN32
-	sprintf(_JOEBOTVERSION,"%smm (win32)",_JOEBOTVERSIONWOOS);
-#else
-	sprintf(_JOEBOTVERSION,"%smm (linux)",_JOEBOTVERSIONWOOS);
-#endif
-#else
-#ifdef _WIN32
-	sprintf(_JOEBOTVERSION,"%s (win32)",_JOEBOTVERSIONWOOS);
-#else
-	sprintf(_JOEBOTVERSION,"%s (linux)",_JOEBOTVERSIONWOOS);
-#endif
-#endif
+	snprintf(_JOEBOTVERSION,sizeof(_JOEBOTVERSION),"%s %s (%s)",_JOEBOTVERSIONWOOS,VDLLTYPE,VPLATFORM);
 #ifdef _DEBUG
 	strcat(_JOEBOTVERSION," DBGV");
 #endif
 	
-	sprintf(welcome_msg,"----- JoeBOT %s by @$3.1415rin { http://joebot.bots-united.com/ }; -----\n\0",_JOEBOTVERSION);
+	snprintf(welcome_msg,sizeof(welcome_msg),"----- JoeBOT %s by @$3.1415rin { http://joebot.bots-united.com/ }; -----\n\0",_JOEBOTVERSION);
 	
 	for (int i=0; i<32; i++){
 		clients[i] = NULL;
@@ -472,7 +461,7 @@ void GameDLLInit( void )
 		//SP.SetMaxPatternNum(1000000);
 		char szFileNameNN[80];
 		//try{
-		UTIL_BuildFileName(szFileNameNN,"joebot","nn.br3");
+		UTIL_BuildFileName(szFileNameNN, sizeof(szFileNameNN), "joebot/nn.br3");
 		//NNCombat->LoadFile(szFileNameNN);
 		CBaseNeuralNet *NNCombatP=0;
 		LoadNet(NNCombatP,szFileNameNN);
@@ -501,7 +490,7 @@ void GameDLLInit( void )
 			bNNInitError = true;
 	}*/
 			try{
-				UTIL_BuildFileName(szFileNameNN,"joebot","nnc.br3");
+				UTIL_BuildFileName(szFileNameNN, sizeof(szFileNameNN), "joebot/nnc.br3");
 				//NNColl.LoadFile(szFileNameNN);
 				CBaseNeuralNet *NNCollP=0;
 				LoadNet(NNCollP,szFileNameNN);
@@ -813,7 +802,7 @@ void ClientDisconnect( edict_t *pEntity )
 			char szFileName[80];
 			WPStat.Save();
 			
-			UTIL_BuildFileName(szFileName,"joebot","nn_changed.br3");
+			UTIL_BuildFileName(szFileName, sizeof(szFileName), "joebot/nn_changed.br3");
 			NNCombat->SaveFile(szFileName);
 			
 			SBInfo[i].kick_time = gpGlobals->time;  // save the kicked time
@@ -996,18 +985,10 @@ void KickBots(edict_t *pEntity,int iTeam,int iAll){
 void TrainNN(edict_t *pEntity){
 /*char szDir[80];
 if(mod_id == CSTRIKE_DLL){
-#ifdef _WIN32
-sprintf(szDir,"cstrike\\joebot\\");
-#else
-sprintf(szDir,"cstrike/joebot/");
-#endif
+snprintf(szDir,sizeof(szDir),"cstrike/joebot/");
 }
 else if(mod_id == DOD_DLL){
-#ifdef _WIN32
-sprintf(szDir,"dod\\joebot\\");
-#else
-sprintf(szDir,"dod/joebot/");
-#endif
+snprintf(szDir,sizeof(szDir),"dod/joebot/");
 }
 char szLoadText[80];
 char szSave[80];
@@ -1054,7 +1035,7 @@ strcat(szSave,"nntrain.ptt");
 	  if(lloop>10){
 	  UTIL_ConsoleMessage(pEntity, "%i. after %i epochs the net could be trained to a max error of %.2f - canceling training and reloading\n",lloop,MAX_TRIES, _MAXERROR);
 	  char filename[80];
-	  UTIL_BuildFileName(filename,"joebot","nn.br3");
+	  UTIL_BuildFileName(filename, sizeof(filename), "joebot/nn.br3");
 	  NNCombat->Save(filename);
 	  return;
 	  }
@@ -1301,9 +1282,9 @@ void ShowInfo(void){
 								strcat(szTemp,szTemp2);
 							}
 							/*if(p->lType & BT_PAUSE){
-							sprintf(szTemp2,"BT_PAUSE ");
-							strcat(szTemp,szTemp2);
-						}*/
+								sprintf(szTemp2,"BT_PAUSE ");
+								strcat(szTemp,szTemp2);
+							}*/
 							if(p->lType & BT_GOBUTTON){
 								sprintf(szTemp2,"BT_GOBUTTON ");
 								strcat(szTemp,szTemp2);
@@ -1426,9 +1407,9 @@ void StartFrame( void )
 			
 			//strcpy(mapname, STRING(gpGlobals->mapname));
 			strcpy(mapname, "bot.cfg");
-			UTIL_BuildFileName(filename,"joebot","bot.cfg");
+			UTIL_BuildFileName(filename, sizeof(filename), "joebot/bot.cfg");
 			
-			//UTIL_BuildFileName(filename, "maps", mapname);
+			//UTIL_BuildFileName(filename, sizeof(filename), "maps/%s", mapname);
 			
 			if ((bot_cfg_fp = fopen(filename, "r")) != NULL)
 			{
@@ -1539,7 +1520,7 @@ void StartFrame( void )
 					}
 					cout << "**"<<endl;
 					cout << "** Please read the readme.html carefully before asking for"<< endl;
-					cout << "** support via johannes@joebot.net - thx" << endl;
+					cout << "** support via as3.1415rin@bots-united.com - thx" << endl;
 					cout << "**" << endl;
 					cout << "*************************************************************" << endl;
 					cout << "*************************************************************" << endl;
@@ -1679,16 +1660,14 @@ void StartFrame( void )
 										*szOut1 = *szOut2 = '\0';
 										strcat (szOut2,"\n\n\n\n");
 										
-										strcpy(mapname, STRING(gpGlobals->mapname));
-										strcat(mapname, ".wpj");
+										snprintf(mapname, sizeof(mapname), "%s.wpj", STRING(gpGlobals->mapname));
 										
 										WaypointGetDir(mapname,szFileName);
 										
-										sprintf(szOut1,"JoeBOT %s using waypoint file:\n%s%s\n",_JOEBOTVERSIONWOOS,szFileName,mapname);
+										snprintf(szOut1,sizeof(szOut1),"JoeBOT %s using waypoint file:\n%s/%s\n",_JOEBOTVERSIONWOOS,szFileName,mapname);
 										strcat(szOut1,UTIL_VarArgs("( %li waypoints / stat:%li/%li )",num_waypoints,WPStat.d.lKill,WPStat.lKillMax));
 										
-										strcat(szFileName,STRING(gpGlobals->mapname));
-										strcat(szFileName,".txt");
+										strcpy(szFileName, UTIL_VarArgs("%s/%s.txt", szFileName, mapname));
 										
 										long lSize = CParser :: GetFileSize(szFileName);
 										FILE *fhd;
@@ -1889,9 +1868,9 @@ void StartFrame( void )
 				
 				//strcpy(mapname, STRING(gpGlobals->mapname));
 				strcpy(mapname, "bot.cfg");
-				UTIL_BuildFileName(filename,"joebot","bot.cfg");
+				UTIL_BuildFileName(filename, sizeof(filename), "joebot/bot.cfg");
 				
-				//UTIL_BuildFileName(filename, "maps", mapname);
+				//UTIL_BuildFileName(filename, sizeof(filename), "maps/%s", mapname);
 				
 				if ((bot_cfg_fp = fopen(filename, "r")) != NULL)
 				{
@@ -1899,7 +1878,7 @@ void StartFrame( void )
 				}
 				else
 				{
-					UTIL_BuildFileName(filename, "bot.cfg", NULL);
+					UTIL_BuildFileName(filename, sizeof(filename), "bot.cfg");
 					
 					UTIL_ConsoleMessage( NULL, "Executing %s\n", filename);
 					
@@ -1965,8 +1944,8 @@ void StartFrame( void )
 						{
 							char c_skill[2],c_team[2];
 							
-							sprintf(c_skill, "%d", SBInfo[index].bot_skill);
-							sprintf(c_team, "%d", SBInfo[index].bot_team);
+							snprintf(c_skill, sizeof(c_skill), "%d", SBInfo[index].bot_skill);
+							snprintf(c_team, sizeof(c_team), "%d", SBInfo[index].bot_team);
 							
 							BotCreate(NULL, c_team,SBInfo[index].skin, SBInfo[index].name, c_skill);
 						}
@@ -1978,9 +1957,9 @@ void StartFrame( void )
 							
 							//cout << " ------------------- respawning after map change - wanting to respawn" << endl;
 							
-							sprintf(c_skill, "%i", SBInfo[index].bot_skill);
-							sprintf(c_team, "%i", SBInfo[index].bot_team);
-							sprintf(c_class, "%i", SBInfo[index].bot_class);
+							snprintf(c_skill, sizeof(c_skill), "%i", SBInfo[index].bot_skill);
+							snprintf(c_team, sizeof(c_team), "%i", SBInfo[index].bot_team);
+							snprintf(c_class, sizeof(c_class), "%i", SBInfo[index].bot_class);
 							
 							if ((mod_id == TFC_DLL) || (mod_id == GEARBOX_DLL))
 								BotCreate(NULL, NULL, NULL, SBInfo[index].name, c_skill);
@@ -2392,7 +2371,7 @@ void FakeClientCommand (edict_t *pFakeClient, const char *fmt, ...)
 
    // concatenate all the arguments in one string
    va_start (argptr, fmt);
-   vsprintf (command, fmt, argptr);
+   vsnprintf (command, sizeof(command), fmt, argptr);
    va_end (argptr);
 
    if ((command == NULL) || (*command == 0))
