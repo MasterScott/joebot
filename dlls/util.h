@@ -114,7 +114,7 @@ inline edict_t *ENT(EOFFSET eoffset)			{ return (*g_engfuncs.pfnPEntityOfEntOffs
 inline EOFFSET OFFSET(EOFFSET eoffset)			{ return eoffset; }
 inline EOFFSET OFFSET(const edict_t *pent)
 { 
-#if _DEBUG
+#ifdef _DEBUG
 	if ( !pent )
 		ALERT( at_error, "Bad ent in OFFSET()\n" );
 #endif
@@ -122,7 +122,7 @@ inline EOFFSET OFFSET(const edict_t *pent)
 }
 inline EOFFSET OFFSET(entvars_t *pev)
 { 
-#if _DEBUG
+#ifdef _DEBUG
 	if ( !pev )
 		ALERT( at_error, "Bad pev in OFFSET()\n" );
 #endif
@@ -575,12 +575,36 @@ typedef enum {
 	COUNT_FAKE
 } count_t;
 
-#ifdef DEBUGENGINE
-void UTIL_BotLog(const char *fnName, const char *str);
-#define BOT_LOG(fnName, s) UTIL_BotLog(fnName, s)
-#else
-#define BOT_LOG(fnName, s) /* */
-#endif
+#ifdef _DEBUG
+#define DEBUG_CLIENTCOMMAND(p, s) FakeClientCommand(p, s);
+
+#define LOGFILE_ENGINE "engine.log"
+#define LOGFILE_GAMEDLL "gamedll.log"
+#define LOGFILE_DEBUG "debug.log"
+#define LOGFILE_WEAPONS "weapons.log"
+#define LOGFILE_BUYWEAPON "buyweapons.log"
+#define LOGFILE_MONEY "money.log"
+#define LOGFILE_RADIO "radio.log"
+
+void UTIL_LogFile(const char* szFilename, const char *szLogMsg);
+
+#define LOG_ENGINE(s) UTIL_LogFile(LOGFILE_ENGINE, s)
+#define LOG_GAMEDLL(s) UTIL_LogFile(LOGFILE_GAMEDLL, s)
+#define LOG_DEBUG(s) UTIL_LogFile(LOGFILE_DEBUG, s)
+#define LOG_WEAPONS(s) UTIL_LogFile(LOGFILE_WEAPONS, s)
+#define LOG_BUYWEAPON(s) UTIL_LogFile(LOGFILE_BUYWEAPON, s)
+#define LOG_MONEY(s) UTIL_LogFile(LOGFILE_MONEY, s)
+#define LOG_RADIO(s) UTIL_LogFile(LOGFILE_RADIO, s)
+#else /* not _DEBUG */
+#define DEBUG_CLIENTCOMMAND(p, s) /* */
+#define LOG_ENGINE(s) /* */
+#define LOG_GAMEDLL(s) /* */
+#define LOG_DEBUG(s) /* */
+#define LOG_WEAPONS(s) /* */
+#define LOG_BUYWEAPON(s) /* */
+#define LOG_MONEY(s) /* */
+#define LOG_RADIO(s) /* */
+#endif /* _DEBUG */
 
 #ifdef _WIN32
 #define STRIP_CR(s) /* */
@@ -592,6 +616,7 @@ if (s[strlen(s) - 1] == '\r') \
 
 void UTIL_TraceHull(const Vector &vecStart, const Vector &vecEnd, IGNORE_MONSTERS igmon, IGNORE_GLASS ignoreGlass,int hullNumber, edict_t *pentIgnore, TraceResult *ptr);
 
+void UTIL_SayText(const char *pText, edict_t *pEdict);
 void UTIL_HostSay( edict_t *pEntity, int teamonly, char *message );
 void UTIL_ShowMenu( edict_t *pEdict, int slots, int displaytime, bool needmore, char *pText );
 void UTIL_ShowText( edict_t *pEntity, const hudtextparms_t &textparms, const char *pMessage );
@@ -603,13 +628,12 @@ edict_t	*UTIL_FindEntityByClassname(edict_t *pStartEntity, const char *szName );
 edict_t	*UTIL_FindEntityByTargetname(edict_t *pStartEntity, const char *szName );
 edict_t	*UTIL_FindEntityGeneric(const char *szName, Vector &vecSrc, float flRadius );
 
-void UTIL_SayText(const char *pText, edict_t *pEdict);
 int UTIL_ClientIndex(edict_t *pEdict);
 int UTIL_GetTeam(edict_t *pEntity);
 bool UTIL_IsVIP(edict_t *pEntity);
 int UTIL_GetBotIndex(const edict_t *pEdict);
 class CBotBase;
-CBotBase  *UTIL_GetBotPointer(const edict_t *pEdict);
+CBotBase *UTIL_GetBotPointer(const edict_t *pEdict);
 bool FInViewCone(Vector *pOrigin, edict_t *pEdict);
 bool TEq(float f1,float f2,float fD);
 int UTIL_PlayerCount( count_t countType );
@@ -669,4 +693,9 @@ inline void UTIL_normalize_pathname(char *path) {
 }
 #endif
 
+// Adapted from metamod
+inline char *STRNCPY(char *dst, const char *src, int size) {
+	strcpy(dst, "\0");
+	return(strncat(dst, src, size-1));
+}
 #endif //__UTIL_H
