@@ -73,10 +73,12 @@ sort of backtracking combined with the floyd/warshall algorithm. <br>
       <p><font face="Verdana, Arial, Helvetica, sans-serif"><br>
         <b>1. Installing ...</b><br>
         First deinstall your current bot, if u'd one.<br>
-        Then exec your .exe file and follow the instructions ...<br>
-        Or, if u've got a *.zip file, copy the *.br3 and texts.txt to your CStrike/joebot 
-        dir, the *.wpj to cstrike/joebot/wpjs and the joebot.dll to half-life/joebot/. 
-        Then modify the dll entry in cstrike/liblist.gam to "dlls/joebot.dll" 
+        Then exec your <b>.exe</b> file and follow the instructions ...<br>
+        <br>
+        Or, <i><b>if u've got a *.zip file</b></i>, copy the *.br3 to your CStrike/joebot 
+        dir, the *.wpj to cstrike/joebot/wpjs/std/, the chat files ( texts.txt 
+        e.g. ) to cstrike/joebot/chat/ and the joebot.dll to half-life/joebot/. 
+        Then modify the dll entry in cstrike/liblist.gam to "../joebot/joebot.dll" 
         as shown in 'my liblist.gam' after having made a backup of this file for 
         deinstalling.(if the zip file contains directory information just unzip 
         it and copy the cstrike dir into ur hl dir and overwrite everything)<br>
@@ -92,24 +94,27 @@ sort of backtracking combined with the floyd/warshall algorithm. <br>
         <br>
         <i>addbot syntax :</i><br>
         <br>
-        addbot team model name type prefweapon<br>
+        addbot team model name skill<br>
         (addbot [1/2/5] [1/2/3/4] name )<br>
         <br>
         example : addbot 2 2 @$3.1415rin<br>
         <br>
         write 'default' for the parameter u don't want to specify<br>
-        </font><font face="Verdana, Arial, Helvetica, sans-serif"><br>
-        <b><br>
+        </font> <b><br>
         3. Commands<br>
         <br>
-        </b>( <font face="Verdana, Arial, Helvetica, sans-serif"><b>Dedicated 
-        server commands :</b> usage : "joebot command|parameter1|parameter2|...</font> 
-        ) </font><font face="Verdana, Arial, Helvetica, sans-serif"><br>
-        <br>
-        The 2nd to 4th column specify where a command can be used. <i><b>CON</b></i> 
+        </b> 
+      <table border=1 cellpadding="3" cellspacing="3" align="center" bordercolor="#ff0000">
+        <tr>
+          <td><font color="#FF0000">( <font face="Verdana, Arial, Helvetica, sans-serif"><b>Dedicated 
+            server commands :</b> usage : "joebot command|parameter1|parameter2|...</font> 
+            ) </font>
+        </table>
+      <p>The 2nd to 4th column specify where a command can be used. <i><b>CON</b></i> 
         means the in game console on a listenserver, <i><b>DED</b></i> the console 
         of a dedicated server and <i><b>CFG</b></i> a bot config file like cstrike/joebot/bot.cfg.<br>
-        </font> </p>
+        <br>
+      </p>
       <table width=90% align=center border=1>
   <tr> 
     <td> 
@@ -770,8 +775,11 @@ sort of backtracking combined with the floyd/warshall algorithm. <br>
         </font> </p>
       <pre>SKILL 0<br>{<br>VSC 10<br>VSM 70<br>REA 1.0<br>STH 0<br>DIS 500<br>TPD 1000<br>PDI 250<br>PTD 3000<br>}</pre>
       <p><font face="Verdana, Arial, Helvetica, sans-serif"><br>
-  this is data for skill 0. U can add as many skill settings as u want, but please 
-  sort them from 0-100.</font></p>
+        this is data for skill 0. U can add as many skill settings as u want, 
+        but please sort them from 0-100.</font></p>
+      <p><font face="Verdana, Arial, Helvetica, sans-serif"><b><i>Of course you 
+        can use bots with skills in between. For those bots, the definitions from 
+        bot_skill.txt are interpolated.</i></b> </font></p>
       <p><font face="Verdana, Arial, Helvetica, sans-serif"><br>
         # VSC : Speed of changing the direction<br>
         # VSM : Momentum for changing direction<br>
