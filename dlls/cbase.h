@@ -804,4 +804,4 @@ public:
 	void Precache( void );
 	void KeyValue( KeyValueData *pkvd );
 };
-#endif __CBASE_H
+#endif /* __CBASE_H */
