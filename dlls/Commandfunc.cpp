@@ -510,6 +510,7 @@ void UpdateLanguage(void)
 	
 */
 
+// adds a bot
 bool bc_addbot(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	BotCreate( pEntity, arg1, arg2, arg3, arg4);
 	
@@ -518,6 +519,7 @@ bool bc_addbot(edict_t *pEntity,int iType,const char *arg1,const char *arg2,cons
 	return true;
 }
 
+// should the names be mixed when loading the bot_names file ?
 bool bc_mix_names(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	if (FStrEq(arg1, "on")){
 		if (IS_DEDICATED_SERVER())UTIL_ConsoleMessage(pEntity, "NOTE: This command only takes effect before adding bots\n");
@@ -536,6 +538,7 @@ bool bc_mix_names(edict_t *pEntity,int iType,const char *arg1,const char *arg2,c
 	return true;
 }
 
+// do we want a welcome message
 bool bc_welcome(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	if (FStrEq(arg1, "on")){
 		CVAR_SET_FLOAT("jb_msgwelcome", 1);
@@ -556,12 +559,14 @@ bool bc_welcome(edict_t *pEntity,int iType,const char *arg1,const char *arg2,con
 	return true;
 }
 
+// kill all bots
 bool bc_endround(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	Endround();
 	UTIL_ConsoleMessage(pEntity, "Round ended\n");
 	return true;
 }
 
+// switch for the [joe] extension in front of each name
 bool bc_extjoe(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	if (FStrEq(arg1, "on")){
 		CVAR_SET_FLOAT("jb_prefixaggression", 1);
@@ -578,6 +583,7 @@ bool bc_extjoe(edict_t *pEntity,int iType,const char *arg1,const char *arg2,cons
 	return true;
 }
 
+// display the skill in the names ?
 bool bc_extskill(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	if (FStrEq(arg1, "on")){
 		CVAR_SET_FLOAT("jb_suffixskill", 1);
@@ -616,6 +622,7 @@ bool bc_max_bots(edict_t *pEntity,int iType,const char *arg1,const char *arg2,co
 	return true;
 }
 
+// kick multible bots
 bool bc_kickbots(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	if (FStrEq(arg1, "te")||FStrEq(arg1, "1")){
 		KickBots(pEntity,CS_TEAM_TE,1);
@@ -631,6 +638,8 @@ bool bc_kickbots(edict_t *pEntity,int iType,const char *arg1,const char *arg2,co
 	}
 	return true;
 }
+
+// kick single bot
 bool bc_kickbot(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	if (arg1&&(FStrEq(arg1, "te")||FStrEq(arg1, "1"))){
 		KickBots(pEntity,CS_TEAM_TE,0);
@@ -644,6 +653,7 @@ bool bc_kickbot(edict_t *pEntity,int iType,const char *arg1,const char *arg2,con
 	return true;
 }
 
+// do we wanna have "leet"- phrases sometimes ?
 bool bc_leetposs(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	float leetposs = atof(arg1);
 	CVAR_SET_FLOAT("jb_chat1337", leetposs);
@@ -651,6 +661,7 @@ bool bc_leetposs(edict_t *pEntity,int iType,const char *arg1,const char *arg2,co
 	return true;
 }
 
+// should the bots chat ? and how often ?
 bool bc_botchat(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	if (FStrEq(arg1, "on")){
 		CVAR_SET_FLOAT("jb_chat", 1);
@@ -678,6 +689,7 @@ bool bc_botchat(edict_t *pEntity,int iType,const char *arg1,const char *arg2,con
 	return true;
 }
 
+// handling interactive chat
 bool bc_botichat(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	if (FStrEq(arg1, "off")){
 		CVAR_SET_FLOAT("jb_chati", IC_NONE);
@@ -714,6 +726,7 @@ bool bc_botichat(edict_t *pEntity,int iType,const char *arg1,const char *arg2,co
 	return true;
 }
 
+// should the bots use the radio ? (recommended )
 bool bc_botuseradio(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	if (FStrEq(arg1, "on")){
 		CVAR_SET_FLOAT("jb_msgradio", 1);
@@ -730,6 +743,7 @@ bool bc_botuseradio(edict_t *pEntity,int iType,const char *arg1,const char *arg2
 	return true;
 }
 
+// setting momentum of bots aiming system - normally handled by bot_skill.cfg
 bool bc_botmomentum(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	if (FStrEq(arg1, "default")){
 		CVAR_SET_FLOAT("jb_aimmomentum", 1.0 - ( atof(arg2) / 100.0 ));
@@ -793,6 +807,7 @@ bool bc_botmomentum(edict_t *pEntity,int iType,const char *arg1,const char *arg2
 	return true;
 }
 
+// setting speed of bots aiming system - normally handled by bot_skill.cfg
 bool bc_botvspeed(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	if (FStrEq(arg1, "default")){
 		CVAR_SET_FLOAT("jb_aimspeed", atof(arg2) / 100.0);
@@ -856,6 +871,7 @@ bool bc_botvspeed(edict_t *pEntity,int iType,const char *arg1,const char *arg2,c
 	return true;
 }
 
+// setting skill of bots
 bool bc_botskill(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	if (FStrEq(arg1, "default")){
 		CVAR_SET_FLOAT("jb_skillmin", atof(arg2));
@@ -909,12 +925,14 @@ bool bc_botskill(edict_t *pEntity,int iType,const char *arg1,const char *arg2,co
 	return true;
 }
 
+// reset statistic data collected for each waypoint
 bool bc_resetstat(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	WPStat.Init();
 	UTIL_ConsoleMessage(pEntity, "Statistics have been reset\n");
 	return true;
 }
 
+// how often should the nn be updated ? 10/s should be enough
 bool bc_nnupdate(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	float ftemp = atof (arg1);
 	if(ftemp < 1.0 || ftemp > 1000){
@@ -927,6 +945,7 @@ bool bc_nnupdate(edict_t *pEntity,int iType,const char *arg1,const char *arg2,co
 	return true;
 }
 
+// how often do we want the bots to camp ?
 bool bc_campposs(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	float ftemp = atof (arg1);
 	if(ftemp < 0.0 || ftemp > 100){
@@ -939,6 +958,7 @@ bool bc_campposs(edict_t *pEntity,int iType,const char *arg1,const char *arg2,co
 	return true;
 }
 
+// show general information about map and globals stats
 bool bc_wps(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	UTIL_ConsoleMessage(pEntity, "Map   : %s\n",WPStat.wpsHeader.szMapname);
 	UTIL_ConsoleMessage(pEntity, "Kill  : %li\n",WPStat.d.lKill);
@@ -946,6 +966,7 @@ bool bc_wps(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const c
 	return true;
 }
 
+// show stats about neural network
 bool bc_nnstat(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	// combat net
 	UTIL_ConsoleMessage( pEntity,  "NNSim version: %s\n",NNCombat->Version());
@@ -959,6 +980,7 @@ bool bc_nnstat(edict_t *pEntity,int iType,const char *arg1,const char *arg2,cons
 	return true;
 }
 
+// should the bots tell via radio that they killed an enemy ? sometimes its annoyoing
 bool bc_edown(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	if (FStrEq(arg1, "on")){
 		CVAR_SET_FLOAT("jb_msgenemydown", 1);
@@ -975,11 +997,13 @@ bool bc_edown(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const
 	return true;
 }
 
+// setting variable for debugging purposes ... not used often anymore, since the variable is normally set when a listenserverplayer joins
 bool bc_setme(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	pEdictPlayer = pEntity;
 	return true;
 }
 
+// search for entities around the user ... used for debugging
 bool bc_search(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	edict_t *pent = 0;
 	char item_name[1000],szBuffer[1000];
@@ -1033,6 +1057,7 @@ bool bc_search(edict_t *pEntity,int iType,const char *arg1,const char *arg2,cons
 	return true;
 }
 
+// save som ... once upon a time a SOM was tested to be used inside the bot
 bool bc_savesom(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	SP.Save("combat.spt");
 	UTIL_ConsoleMessage(pEntity, "som data saved\n");
@@ -1051,6 +1076,7 @@ bool bc_savenn(edict_t *pEntity,int iType,const char *arg1,const char *arg2,cons
 	return true;
 }
 
+// should the bots shoot ? nice for debugging or fooling players
 bool bc_botshoot(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	if (FStrEq(arg1, "on"))
 	{
@@ -1070,6 +1096,7 @@ bool bc_botshoot(edict_t *pEntity,int iType,const char *arg1,const char *arg2,co
 	return true;
 }
 
+// is this one still implemeneted ? at least some years ago the bots shot other teammates which killed them last round
 bool bc_bottkpunish(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	if (FStrEq(arg1, "on"))
 	{
@@ -1089,6 +1116,7 @@ bool bc_bottkpunish(edict_t *pEntity,int iType,const char *arg1,const char *arg2
 	return true;
 }
 
+// wtf was this again ?
 bool bc_showen(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	UTIL_ConsoleMessage(pEntity, "\"showen\" - This command is only to be used for debugging purposes by the author, %s !\n\0",pEntity ? STRING(pEntity->v.netname) : "");
 	
@@ -1102,6 +1130,7 @@ bool bc_showen(edict_t *pEntity,int iType,const char *arg1,const char *arg2,cons
 	return true;
 }
 
+// do we wanna get a log of engine messages and calls ?
 bool bc_debug_engine(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	if (FStrEq(arg1, "on")) {
 		CVAR_SET_FLOAT("jb_debugengine", 1);
@@ -1119,12 +1148,14 @@ bool bc_debug_engine(edict_t *pEntity,int iType,const char *arg1,const char *arg
 	return true;
 }
 
+// where are we ?
 bool bc_getp(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	UTIL_ConsoleMessage(pEntity, "%.0f, %.0f, %.0f\n",pEntity->v.origin.x,pEntity->v.origin.y,pEntity->v.origin.z);
 	
 	return true;
 }
 
+// that's where we wanna be placed !
 bool bc_setp(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	Vector p;
 	p.x = atof(arg1);
@@ -1134,6 +1165,7 @@ bool bc_setp(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const 
 	return true;
 }
 
+// handling the bot menu
 bool bc_botmenu(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	if(UTIL_GetBotIndex(pEntity) == -1){
 		//FakeClientCommand(pEntity,"menuselect 0");
@@ -1149,6 +1181,7 @@ bool bc_botmenu(edict_t *pEntity,int iType,const char *arg1,const char *arg2,con
 	return true;
 }
 
+// ... and handling the bot menus entries
 bool bc_menuselect(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	if(g_menu_state == MENU_NONE)
 		return false;
@@ -1396,6 +1429,7 @@ bool bc_menuselect(edict_t *pEntity,int iType,const char *arg1,const char *arg2,
 			return true;
 }
 
+// which language should be used for the menu ?
 bool bc_language(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	if (FStrEq(arg1, "fr")) {
 		CVAR_SET_FLOAT("jb_language", LANG_FR);
@@ -1426,6 +1460,7 @@ bool bc_language(edict_t *pEntity,int iType,const char *arg1,const char *arg2,co
 	return true;
 }
 
+// send all bots to one waypoint
 bool bc_debuggoal(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	int iWP = -1;
 		  if(strlen(arg1))
@@ -1441,6 +1476,7 @@ bool bc_debuggoal(edict_t *pEntity,int iType,const char *arg1,const char *arg2,c
 		  return true;
 }
 
+// this function is only used for debugging ... place the code you wanna test here :)
 bool bc_test(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	edict_t *pent=0;
 	
@@ -1454,6 +1490,7 @@ bool bc_test(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const 
 	return true;
 }
 
+// all the waypoint commands
 bool bc_waypoint(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	pEdictPlayer = pEntity;
 		  
@@ -1706,6 +1743,7 @@ bool bc_waypoint(edict_t *pEntity,int iType,const char *arg1,const char *arg2,co
 		  return true;
 }
 
+// the autowaypointer and its commands
 bool bc_autowaypoint(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	if (FStrEq(arg1, "on"))
 	{
@@ -1815,6 +1853,7 @@ bool bc_advancedmovements(edict_t *pEntity,int iType,const char *arg1,const char
 	return true;
 }
 
+// should waypoints be automatically connected although we didnt run there ?
 bool bc_autopath(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	if (FStrEq(arg1, "on"))
 	{
@@ -1833,6 +1872,7 @@ bool bc_autopath(edict_t *pEntity,int iType,const char *arg1,const char *arg2,co
 	return true;
 }
 
+// shall paths be shown ?
 bool bc_pathwaypoint(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	if (FStrEq(arg1, "on"))
 	{
@@ -1867,6 +1907,7 @@ bool bc_pathwaypoint(edict_t *pEntity,int iType,const char *arg1,const char *arg
 	return true;
 }
 
+// setting the prefix in front of the bots names
 bool bc_prefix(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	if(strlen(arg1)&&!FStrEq(arg1,"-")){
 		CVAR_SET_STRING("jb_prefixaggressive", arg1);
@@ -1890,6 +1931,7 @@ bool bc_prefix(edict_t *pEntity,int iType,const char *arg1,const char *arg2,cons
 	return true;
 }
 
+// the pistol mode ... they'll pick up better weapons anyway
 bool bc_pistolonly(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	if (FStrEq(arg1, "on")){
 		CVAR_SET_FLOAT("jb_pistolonly", 1);
@@ -1908,6 +1950,7 @@ bool bc_pistolonly(edict_t *pEntity,int iType,const char *arg1,const char *arg2,
 	return true;
 }
 
+// minimum skill without setting in the personality files
 bool bc_botskill_min(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	int temp = atoi(arg1);
 	
@@ -1919,6 +1962,7 @@ bool bc_botskill_min(edict_t *pEntity,int iType,const char *arg1,const char *arg
 	return true;
 }
 
+// maximum skill without setting in the personality files
 bool bc_botskill_max(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	int temp = atoi(arg1);
 	
@@ -1930,6 +1974,7 @@ bool bc_botskill_max(edict_t *pEntity,int iType,const char *arg1,const char *arg
 	return true;
 }
 
+// stop the bots
 bool bc_pause(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	bot_cfg_pause_time = gpGlobals->time + atoi( arg1 );
 	
@@ -1937,6 +1982,7 @@ bool bc_pause(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const
 }
 extern CWorldGnome CWG;
 
+// just testing some autowaypointing approach
 bool bc_startgnome(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	//WaypointInit();
 	WaypointAddStdWP(pEntity);
@@ -1987,6 +2033,7 @@ bool bc_stopgnome(edict_t *pEntity,int iType,const char *arg1,const char *arg2,c
 	return true;
 }
 
+// which file should be loaded for weapon buy probabilities ?
 bool bc_loadbuyprob(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	if (strlen(arg1)){
 		CVAR_SET_STRING("jb_buyprobfile", arg1);
@@ -1996,6 +2043,7 @@ bool bc_loadbuyprob(edict_t *pEntity,int iType,const char *arg1,const char *arg2
 	return true;
 }
 
+/// fill up this server
 bool bc_fillserver(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	if(!arg1||!*arg1||!arg2||!*arg2){
 		UTIL_ConsoleMessage( pEntity, "The fillserver command needs at least one more additional argument. The syntax is fillserver [all/ct/te/0/1] [full/half]\n");
@@ -2024,6 +2072,7 @@ bool bc_fillserver(edict_t *pEntity,int iType,const char *arg1,const char *arg2,
 	return true;
 }
 
+// should the bots use spraypaints when bored ?
 bool bc_bot_spraying(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	if(!*arg1){
 		UTIL_ConsoleMessage( pEntity, "Usage: bot_spraying [on/off]\n");
@@ -2084,6 +2133,7 @@ bool bc_joinwhumanres(edict_t *pEntity,int iType,const char *arg1,const char *ar
 	return true;
 }
 
+// should we mix the order of waypoint folders ?
 bool bc_randomwpload(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	if(!*arg1){ // backward compatibility
 		CVAR_SET_FLOAT("jb_wploadrandom", 1);
@@ -2113,6 +2163,7 @@ bool bc_randomwpload(edict_t *pEntity,int iType,const char *arg1,const char *arg
 	return true;
 }
 
+// little nice effect
 bool bc_botglow(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	if(FStrEq(arg1,"on")){
 		int i;
