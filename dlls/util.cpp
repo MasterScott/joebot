@@ -71,8 +71,6 @@ extern HINSTANCE h_Library;
 extern void * h_Library;
 #endif
 
-extern int mod_id;
-
 int gmsgTextMsg = 0;
 int gmsgSayText = 0;
 int gmsgShowMenu = 0;
@@ -318,20 +316,17 @@ void UTIL_SayText( const char *pText, edict_t *pEdict )
 	MESSAGE_END();
 }
 
-long UTIL_ClientIndex(edict_t *pEdict){
-	int i;
-	edict_t *pEnt;
-	long lIndex = -1;
-	for (i = gpGlobals->maxClients; i ; i--){
-		pEnt = INDEXENT(i);
+int UTIL_ClientIndex(edict_t *pEdict){
+	for (int index = 0; index < gpGlobals->maxClients; index++){
+		edict_t *pEnt = INDEXENT(index + 1);
 		
 		// skip invalid players and skip self (i.e. this bot)
 		if ((pEnt) && (!pEnt->free) && pEnt == pEdict){
-			lIndex = i;
-			break;
+			return index;
 		}
 	}
-	return lIndex;
+
+	return -1;
 }
 
 void UTIL_PlayerDecalTrace( TraceResult *pTrace, int playernum, int decalNumber, BOOL bIsCustom )
@@ -453,9 +448,7 @@ bool UTIL_IsVIP(edict_t *pEntity){
 
 int UTIL_GetBotIndex(const edict_t *pEdict)
 {
-	int index;
-	
-	for (index=0; index < 32; index++){
+	for (int index=0; index < 32; index++){
 		if(bots[index]){
 			if (bots[index]->pEdict == pEdict){
 				return index;
@@ -465,20 +458,11 @@ int UTIL_GetBotIndex(const edict_t *pEdict)
 	return -1;  // return -1 if edict is not a bot
 }
 
-
-CBotBase *UTIL_GetBotPointer(edict_t *pEdict)
+CBotBase *UTIL_GetBotPointer(const edict_t *pEdict)
 {
-	int index;
+	int index = UTIL_GetBotIndex(pEdict);
 	
-	for (index=0; index < 32; index++)
-	{
-		if (bots[index]->pEdict == pEdict)
-		{
-			break;
-		}
-	}
-	
-	if (index < 32)
+	if (index != -1)
 		return (bots[index]);
 	
 	return NULL;  // return NULL if edict is not a bot
@@ -588,9 +572,9 @@ int UTIL_ClientsInGame( void )
 {
     int iCount = 0;
 
-    for ( int iIndex = 1; iIndex <= gpGlobals->maxClients; iIndex++ )
+    for ( int iIndex = 0; iIndex < gpGlobals->maxClients; iIndex++ )
 	{
-        edict_t * pPlayer = INDEXENT( iIndex );
+        edict_t * pPlayer = INDEXENT( iIndex + 1 );
 
         if ( pPlayer == NULL )
             continue;
@@ -611,9 +595,9 @@ int UTIL_HumansInGame( void )
 {
     int iCount = 0;
 
-    for ( int iIndex = 1; iIndex <= gpGlobals->maxClients; iIndex++ )
+    for ( int iIndex = 0; iIndex < gpGlobals->maxClients; iIndex++ )
 	{
-        edict_t *pPlayer = INDEXENT( iIndex );
+        edict_t *pPlayer = INDEXENT( iIndex + 1 );
 
         if ( pPlayer == NULL )
             continue;
@@ -637,12 +621,11 @@ long UTIL_FightingAgainst(edict_t *pEdictToBeSeen,int iTeam,edict_t **pNearest,b
 	long lNumber = 0;
 	
 	edict_t *pEnt = 0;
-	int i;
 	float fMin = 100000.0,fDistance;
 	*pNearest=0;
 	
-	for (i = gpGlobals->maxClients; i ; i--){
-		pEnt = INDEXENT(i);
+	for (int i = 0; i < gpGlobals->maxClients; i++){
+		edict_t *pEnt = INDEXENT(i + 1);
 		
 		// skip invalid players and skip self (i.e. this bot)
 		if ((pEnt) && (!pEnt->free) && (pEnt != pEdictToBeSeen))
@@ -832,15 +815,13 @@ void UTIL_BuildFileName(char *str, size_t size, const char *format, ...)
 }
 
 edict_t *GetNearestPlayer(edict_t *pEdict,int iTeam,float &fMin,bool bVisible,bool bIVC,float fMax){
-	edict_t *pEnt = 0,
-		*pNearestEdict=0;
+	edict_t *pNearestEdict=0;
 	float fDistance;
-	int i;
 
 	fMin = 100000000;
 	
-	for (i = gpGlobals->maxClients; i ; i--){
-		pEnt = INDEXENT(i);
+	for (int i = 0; i < gpGlobals->maxClients; i++){
+		edict_t *pEnt = INDEXENT(i + 1);
 		
 		// skip invalid players and skip self (i.e. this bot)
 		if ((pEnt) && (!pEnt->free) && (pEnt != pEdict))
@@ -873,15 +854,11 @@ edict_t *GetNearestPlayer(edict_t *pEdict,int iTeam,float &fMin,bool bVisible,bo
 }
 
 edict_t *UTIL_BestPlayer(void){
-	edict_t *pEnt = 0,
-			*pBestEdict=0;
-	float iFrag;
-	int i;
+	edict_t *pBestEdict=0;
+	float iFrag = -1;
 	
-	iFrag = -1;
-	
-	for (i = gpGlobals->maxClients; i ; i--){
-		pEnt = INDEXENT(i);
+	for (int i = 0; i < gpGlobals->maxClients; i++){
+		edict_t *pEnt = INDEXENT(i + 1);
 		
 		// skip invalid players and skip self (i.e. this bot)
 		if ((pEnt) && (!pEnt->free))
@@ -896,15 +873,13 @@ edict_t *UTIL_BestPlayer(void){
 }
 
 edict_t *GetNearestPlayer(Vector VOrigin,int iTeam,float &fMin,float fMax,edict_t *pNot){
-	edict_t *pEnt = 0,
-		*pNearestEdict=0;
+	edict_t *pNearestEdict=0;
 	float fDistance;
-	int i;
 	
 	fMin = 100000000;
 	
-	for (i = gpGlobals->maxClients; i ; i--){
-		pEnt = INDEXENT(i);
+	for (int i = 0; i < gpGlobals->maxClients; i++){
+		edict_t *pEnt = INDEXENT(i + 1);
 		
 		// skip invalid players and skip self (i.e. this bot)
 		if ((pEnt) && (!pEnt->free) && (pEnt != pNot))
@@ -929,14 +904,13 @@ edict_t *GetNearestPlayer(Vector VOrigin,int iTeam,float &fMin,float fMax,edict_
 }
 
 edict_t *GetRandomPlayer(edict_t *pNot,int iTeam,int iAlive){
-	int i;
 	edict_t *pFE[32],*pEnt;
 	long lCount;
 	long lreturn;
 
 	lCount = 0;
-	for (i = gpGlobals->maxClients; i ; i--){
-		pEnt = INDEXENT(i);
+	for (int i = 0; i < gpGlobals->maxClients; i++){
+		pEnt = INDEXENT(i + 1);
 		if ((pEnt) && (!pEnt->free) && (pEnt != pNot)){
 			if(iTeam!=-1){
 				if(iTeam != UTIL_GetTeam(pEnt))
@@ -962,14 +936,13 @@ edict_t *GetRandomPlayer(edict_t *pNot,int iTeam,int iAlive){
 }
 
 edict_t *GetRandomPlayerWO(edict_t *pNot,int iTeam,int iAlive, long lWithout,edict_t *pEdict){
-	int i;
 	edict_t *pFE[32],*pEnt;
 	long lCount;
 	long lreturn;
 	
 	lCount = 0;
-	for (i = gpGlobals->maxClients; i ; i--){
-		pEnt = INDEXENT(i);
+	for (int i = 0; i < gpGlobals->maxClients; i++){
+		pEnt = INDEXENT(i + 1);
 		if ((pEnt) && (!pEnt->free) && (pEnt != pNot)){
 			if(iTeam!=-1){
 				if(iTeam != UTIL_GetTeam(pEnt))
@@ -981,10 +954,10 @@ edict_t *GetRandomPlayerWO(edict_t *pNot,int iTeam,int iAlive, long lWithout,edi
 				else if((IsAlive(pEnt)) && (iAlive == 0))
 					continue;
 			}
-			int i = UTIL_GetBotIndex(pEnt);
-			if(i != -1){
-				if(((CBotCS*)bots[i])->Task.SearchP( pEdict) != -1
-					|| ((CBotCS*)bots[i])->Task.SearchT( lWithout ) != -1){
+			CBotBase *pB = UTIL_GetBotPointer(pEnt);
+			if(pB){
+				if(pB->Task.SearchP( pEdict) != -1
+					|| pB->Task.SearchT( lWithout ) != -1){
 					continue;
 				}
 			}
@@ -1172,7 +1145,7 @@ char *UTIL_VarArgs( char *format, ... )
 
 void UTIL_LogPrintf( const char *fmt, ... )
 {
-	// this function is from Will Day's metamod
+	// Adapted from Will Day's metamod
 	va_list		argptr;
 	static char		string[1024];
 
@@ -1186,7 +1159,7 @@ void UTIL_LogPrintf( const char *fmt, ... )
 
 void UTIL_LogMessage( const char* plid, const char *fmt, ... )
 {
-	// this function is from Will Day's metamod
+	// Adapted from Will Day's metamod
 	va_list ap;
 	char buf[1024];
 
