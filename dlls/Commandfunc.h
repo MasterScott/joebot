@@ -58,6 +58,7 @@ extern cvar_t *jb_wpautojumptest;
 extern cvar_t *jb_wpautoadvanced;
 extern cvar_t *jb_wpstats;
 extern cvar_t *jb_wprecalc;
+extern cvar_t *jb_wploadrandom;
 extern cvar_t *jb_prefixdefensive;
 extern cvar_t *jb_prefixnormal;
 extern cvar_t *jb_prefixaggressive;
@@ -67,12 +68,12 @@ extern cvar_t *jb_skillmax;
 extern cvar_t *jb_entergame;
 extern cvar_t *jb_jointeam;
 extern cvar_t *jb_spraypaint;
+extern cvar_t *jb_buyprobfile;
 extern cvar_t *jb_showen;
 extern cvar_t *jb_debugengine;
 
-void JBRegCvars(void);
+void RegisterCvars(void);
 void UpdateLanguage(void);
-void ClientPrintEx(entvars_t *client, int msg_dest, const char *msg_name, const char *param1, const char *param2, const char *param3, const char *param4);
 
 bool bc_addbot(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4);
 bool bc_mix_names(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4);
