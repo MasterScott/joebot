@@ -7,4 +7,4 @@ double fNKgauss2	(const double&,const double&);
 double fNKcyl		(const double&,const double&);
 double fNKcone		(const double&,const double&);
 
-#endif  __fNBorKernel_H
+#endif  // __fNBorKernel_H

@@ -24,4 +24,4 @@ netvar_t fNActlogS(const netvar_t &dParam);
 netvar_t foNActlog(const netvar_t &dParam);
 netvar_t foNActlogS(const netvar_t &dParam);
 
-#endif  __ACTIVATIONS_H
+#endif  // __ACTIVATIONS_H

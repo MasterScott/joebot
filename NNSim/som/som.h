@@ -4,4 +4,4 @@
 #include "CqSOM2d.h"
 #include "SOMPattern.h"
 
-#endif  __SOM_H
+#endif  // __SOM_H

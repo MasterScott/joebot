@@ -169,4 +169,4 @@ enum OCollLoc{
 	OC_RIGHT = 1
 };
 
-#endif  __BOTNNDEFS_H
+#endif  // __BOTNNDEFS_H

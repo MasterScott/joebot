@@ -6,4 +6,4 @@
 CBaseNeuralNet *LoadNet(CBaseNeuralNet *&pO,const char *szName);
 CBaseNeuralNet *LoadNet(const char *szName);
 
-#endif  __NNSIMSERVICE_H
+#endif  // __NNSIMSERVICE_H

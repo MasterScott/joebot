@@ -75,4 +75,4 @@ protected:
 private:
 };
 
-#endif  __NVEC_H
+#endif  // __NVEC_H

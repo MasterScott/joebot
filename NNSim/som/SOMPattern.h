@@ -46,4 +46,4 @@ protected:
 private:
 };
 
-#endif  __SOMPATTERN_H
+#endif  // __SOMPATTERN_H

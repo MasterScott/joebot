@@ -7,4 +7,4 @@
 
 #include "Genom.h"
 
-#endif  __GA_H
+#endif  // __GA_H

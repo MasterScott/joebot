@@ -26,4 +26,4 @@ protected:
 private:
 };
 
-#endif  __SOMPATTERNELEM_H
+#endif  // __SOMPATTERNELEM_H

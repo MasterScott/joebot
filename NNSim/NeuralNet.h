@@ -7,4 +7,4 @@
 #include "GA.h"
 #include "NNSimService.h"
 
-#endif  __NEURALNET_H
+#endif  // __NEURALNET_H

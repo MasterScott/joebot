@@ -6,4 +6,4 @@
 class IncompatibleVectors{};		// Two vectors have different number of dimensions
 class NoPointInit{};				// Pointer to data hasn't been inited - todo
 
-#endif  __NVECERR_H
+#endif  // __NVECERR_H

@@ -66,4 +66,4 @@ protected:
 private:
 };
 
-#endif  __CQSOM2D_H
+#endif  // __CQSOM2D_H

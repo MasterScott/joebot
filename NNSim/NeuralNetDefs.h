@@ -15,4 +15,4 @@ typedef double netvar_t;
 // define the minimum array sizes for pattern
 #define _ARRAY_SEG_SIZE_PATTERN		64
 
-#endif  __NEURALNETDEFS_H
+#endif  // __NEURALNETDEFS_H
