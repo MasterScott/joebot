@@ -176,7 +176,7 @@ void CBotCS :: Init(void){
 		f_buytime = gpGlobals->time + 90.0;
 	}
 	else
-		f_buytime = gpGlobals->time + RANDOM_FLOAT(0,ffreeze*.9);
+		f_buytime = gpGlobals->time + RANDOM_FLOAT(0,ffreeze/2);
 	f_RWKnife = gpGlobals->time + 120.0;	// just some time
 	f_blinded_time=0;
 	f_gotohostage = 0;
@@ -282,7 +282,7 @@ void CBotCS :: Init(void){
 #define _BUY_SG 59
 
 bool CBotCS :: BuyWeapon(void){	
-	if(f_buytime > gpGlobals->time-2.0f)
+	if(f_buytime > gpGlobals->time-1.0f)
 		return false;
 	
 	f_buytime = gpGlobals->time;
