@@ -46,12 +46,10 @@
 #include "CBotDOD.h"
 #include "Commandfunc.h"
 #include "CSkill.h"
+#include "globalvars.h"
 
 // names ..
 CBotNames Names;
-
-//skill file
-extern CSkill Skill;
 
 // include NNSim
 #include "NeuralNet.h"
@@ -82,8 +80,6 @@ double dCollNNOut	[1];
 #include <sys/stat.h>
 
 extern bot_weapon_t weapon_defs[MAX_WEAPONS];
-extern edict_t *clients[32];
-extern int mod_id;
 extern WAYPOINT waypoints[MAX_WAYPOINTS];
 extern int num_waypoints;  // number of waypoints currently in use
 edict_t *pEdictPlayer=0;
@@ -122,13 +118,10 @@ void InitGlobalRS(void){
 				piDist[ischl][iBotschl] = 10000;
 			}
 		}
-		for(ischl=gpGlobals->maxClients;ischl>=0;ischl--){
-			for(iBotschl=gpGlobals->maxClients;iBotschl>=0;iBotschl--){
-				if(iBotschl > ischl)
-					continue;
-
-				pEBot = INDEXENT(iBotschl);
-				pEnt = INDEXENT(ischl);
+		for(ischl=0;ischl<gpGlobals->maxClients;ischl++){
+			for(iBotschl=0;iBotschl<gpGlobals->maxClients&&iBotschl<ischl;iBotschl++){
+				pEBot = INDEXENT(iBotschl + 1);
+				pEnt = INDEXENT(ischl + 1);
 
 				if(pEBot && pEnt && (!pEBot->free) && (!pEnt->free)){
 					piDist[ischl][iBotschl] = int((pEBot->v.origin-pEnt->v.origin).Length());
@@ -138,7 +131,7 @@ void InitGlobalRS(void){
 		}
 
 		for(ischl=0;ischl<gpGlobals->maxClients;ischl++){
-			pEBot = INDEXENT(ischl);
+			pEBot = INDEXENT(ischl + 1);
 			iBotschl = UTIL_GetBotIndex(pEBot);
 			if(iBotschl != -1){
 				if(iRoamteamA[ischl] > 0)		// that means some bot is already following
@@ -149,10 +142,10 @@ void InitGlobalRS(void){
 				pNot = pEBot;
 				
 				lCount = 0;
-				for (i = gpGlobals->maxClients; i ; i--){
+				for (i = 0; i < gpGlobals->maxClients; i++){
 					if(piDist[i][ischl] > 400)
 						continue;
-					pEnt = INDEXENT(i);
+					pEnt = INDEXENT(i + 1);
 					if ((pEnt) && (!pEnt->free) && (pEnt != pNot)){
 						if(!IsAlive(pEnt))
 							continue;
@@ -163,10 +156,10 @@ void InitGlobalRS(void){
 						if(UTIL_GetTeam(pEBot) != UTIL_GetTeam(pEnt))
 							continue;
 						
-						int i = UTIL_GetBotIndex(pEnt);
-						if(i != -1){
-							if(((CBotCS*)bots[i])->Task.SearchP(pNot) != -1
-								|| ((CBotCS*)bots[i])->Task.SearchT( BT_COVER|BT_ROAMTEAM ) != -1){
+						CBotBase *pB = UTIL_GetBotPointer(pEnt);
+						if(pB){
+							if(pB->Task.SearchP(pNot) != -1
+								|| pB->Task.SearchT( BT_COVER|BT_ROAMTEAM ) != -1){
 								continue;
 							}
 						}
@@ -241,6 +234,7 @@ void BotCreate( edict_t *pPlayer, const char *szTeam, const char *szClass,const 
 	////////////////////////////
 	pName = Names.getName();					// get name from list
 	strcpy(szNameThis,pName->m_szName);
+	
 	index = 0;
 	while ((bots[index]) && (index < 32))
 		index++;
@@ -251,21 +245,20 @@ void BotCreate( edict_t *pPlayer, const char *szTeam, const char *szClass,const 
 	}
 	
 	if(mod_id == CSTRIKE_DLL||mod_id == CSCLASSIC_DLL){
-		bots[index] = new CBotCS;
+		pBot = new CBotCS;
 	}
 	else if(mod_id == DOD_DLL){
-		bots[index] = new CBotDOD;
+		pBot = new CBotDOD;
 	}
 	
-	pBot = bots[index];
-	
-	if(!szName || strlen(szName)<2 || FStrEq(szName,"default")|| FStrEq(szName,"unnamed")){}
+	if(!szName || strlen(szName)<2 || FStrEq(szName,"default")|| FStrEq(szName,"unnamed")){
+	}
 	else{
 		strcpy(szNameThis,szName);
 	}
 	
-	strcpy(bots[index]->name,szNameThis);
-	bots[index]->Personality.Load(bots[index]->name);
+	strcpy(pBot->name,szNameThis);
+	pBot->Personality.Load(pBot->name);
 	
 	pBot->d_Manner = pBot->Personality.fAggressiveness;
 	
@@ -287,23 +280,18 @@ void BotCreate( edict_t *pPlayer, const char *szTeam, const char *szClass,const 
 		pBot->bot_skill = iSkill;
 	
 	if(!szName || strlen(szName)<2 || FStrEq(szName,"default")|| FStrEq(szName,"unnamed")){// name is default or no specified, get it from bot_names.txt
-		CBotBase :: MakeName(szTempName,pName->m_szName,pBot->bot_skill,bots[index]->d_Manner);
+		CBotBase :: MakeName(szTempName,pName->m_szName,pBot->bot_skill,pBot->d_Manner);
 	}
 	else{
-		CBotBase :: MakeName(szTempName,szName,pBot->bot_skill,bots[index]->d_Manner);
+		CBotBase :: MakeName(szTempName,szName,pBot->bot_skill,pBot->d_Manner);
 		strcpy(szNameThis,szName);
-		strcpy(bots[index]->name,szNameThis);
+		strcpy(pBot->name,szNameThis);
 	}
 	
 	BotEnt = CREATE_FAKE_CLIENT( szTempName );
 		
-	//strcpy(bots[index]->name,szTempName);
-	
 	if (FNullEnt( BotEnt )){
-		if(index != -1 && index < 32){
-			delete bots[index];
-			bots[index] = 0;
-		}
+		delete pBot;
 		if (pPlayer){
 			UTIL_ConsoleMessage( pPlayer, "Max players reached; can't create bot!\n");
 		}
@@ -312,15 +300,17 @@ void BotCreate( edict_t *pPlayer, const char *szTeam, const char *szClass,const 
 	{
 		char ptr[128];  // allocate space for message from ClientConnect
 		char *infobuffer;
-		int clientIndex;
+		int clientIndex = ENTINDEX( BotEnt );
 		
 		if (IS_DEDICATED_SERVER())
 			LOG_MESSAGE(PLID, "Creating bot...");
 		else if (pPlayer)
 			UTIL_ConsoleMessage( pPlayer, "Creating bot...\n");
 
-		//FREE_PRIVATE(BotEnt);
-		//BotEnt->pvPrivateData = 0;
+		if (BotEnt->pvPrivateData != NULL)
+			FREE_PRIVATE(BotEnt);
+		BotEnt->pvPrivateData = NULL;
+		BotEnt->v.frags = 0;
 		
 		// create the player entity by calling MOD's player function
 		// (from LINK_ENTITY_TO_CLASS for player object)
@@ -328,7 +318,6 @@ void BotCreate( edict_t *pPlayer, const char *szTeam, const char *szClass,const 
 		CALL_GAME_ENTITY(PLID, "player", VARS(BotEnt));
 		
 		infobuffer = GET_INFOKEYBUFFER( BotEnt );
-		clientIndex = ENTINDEX( BotEnt );
 		
 		SET_CLIENT_KEYVALUE( clientIndex, infobuffer, "model", "gina" );
 		
@@ -348,12 +337,7 @@ void BotCreate( edict_t *pPlayer, const char *szTeam, const char *szClass,const 
 #ifdef USE_METAMOD
 		MDLL_ClientConnect( BotEnt, "joebot", "127.0.0.1", ptr );
 
-		int i = 0;
-		while ((i < 32) && (clients[i] != NULL))
-			i++;
-
-		if (i < 32)
-			clients[i] = BotEnt; // store this clients edict in the clients array
+		clients[clientIndex - 1] = BotEnt;
 
 		MDLL_ClientPutInServer( BotEnt );
 #else
@@ -364,9 +348,9 @@ void BotCreate( edict_t *pPlayer, const char *szTeam, const char *szClass,const 
 		BotEnt->v.flags |= FL_THIRDPARTYBOT;
 
 		// initialize all the variables for this bot...
-		SBInfo[index].respawn_state = RESPAWN_IDLE;
-		SBInfo[index].kick_time  = 0;
-		//bots[index]->name[0] = 0;  // name not set by server yet
+		SBInfo[clientIndex - 1].respawn_state = RESPAWN_IDLE;
+		SBInfo[clientIndex - 1].kick_time  = 0;
+		//pBot->name[0] = 0;  // name not set by server yet
 
 		pBot->pEdict = BotEnt;
 		pBot->iEIndex = clientIndex;
@@ -383,6 +367,8 @@ void BotCreate( edict_t *pPlayer, const char *szTeam, const char *szClass,const 
 				((CBotDOD*)(pBot))->Chat.b1337chat = (pBot->Personality.iSpeakLeet==1);
 			}
 		}
+
+		bots[clientIndex - 1] = pBot;
 		
 		pBot->Init();
 		
@@ -425,8 +411,8 @@ void BotCreate( edict_t *pPlayer, const char *szTeam, const char *szClass,const 
 				}
 			}
 			else{
-				if(bots[index]->Personality.iPrefClass != -1){
-					bots[index]->bot_class = bots[index]->Personality.iPrefClass;
+				if(pBot->Personality.iPrefClass != -1){
+					pBot->bot_class = pBot->Personality.iPrefClass;
 				}
 			}
 		}
