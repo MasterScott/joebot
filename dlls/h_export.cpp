@@ -133,7 +133,7 @@ extern "C" DLLEXPORT void GiveFnptrsToDll( enginefuncs_t* pengfuncsFromEngine, g
 	   if (pos == 0)
 	   {
 		   // Error getting directory name!
-		   ALERT( at_error, "JoeBot - Error determining MOD directory name!" );
+		   ALERT( at_error, "JoeBOT - Error determining MOD directory name!" );
 	   }
 	   pos++;
    }
@@ -226,7 +226,7 @@ extern "C" DLLEXPORT void GiveFnptrsToDll( enginefuncs_t* pengfuncsFromEngine, g
    {
       // Directory error or Unsupported MOD!
 
-		ALERT( at_error, "JoeBot - MOD dll not found (or unsupported MOD)!" );
+		ALERT( at_error, "JoeBOT - MOD dll not found (or unsupported MOD)!" );
 
       return;
    }
@@ -245,7 +245,7 @@ extern "C" DLLEXPORT void GiveFnptrsToDll( enginefuncs_t* pengfuncsFromEngine, g
    {
       // Can't find GetEntityAPI!
 
-		ALERT( at_error, "JoeBot - Can't get MOD's GetEntityAPI!" );
+		ALERT( at_error, "JoeBOT - Can't get MOD's GetEntityAPI!" );
    }
 
    other_GetNewDLLFunctions = (GETNEWDLLFUNCTIONS)GetProcAddress(h_Library, "GetNewDLLFunctions");
@@ -254,7 +254,7 @@ extern "C" DLLEXPORT void GiveFnptrsToDll( enginefuncs_t* pengfuncsFromEngine, g
 //   {
 //      // Can't find GetNewDLLFunctions!
 //
-//		ALERT( at_error, "JoeBot - Can't get MOD's GetNewDLLFunctions!" );
+//		ALERT( at_error, "JoeBOT - Can't get MOD's GetNewDLLFunctions!" );
 //   }
 
    other_GiveFnptrsToDll = (GIVEFNPTRSTODLL)GetProcAddress(h_Library, "GiveFnptrsToDll");
@@ -263,7 +263,7 @@ extern "C" DLLEXPORT void GiveFnptrsToDll( enginefuncs_t* pengfuncsFromEngine, g
    {
       // Can't find GiveFnptrsToDll!
 
-		ALERT( at_error, "JoeBot - Can't get MOD's GiveFnptrsToDll!" );
+		ALERT( at_error, "JoeBOT - Can't get MOD's GiveFnptrsToDll!" );
    }
 
 
