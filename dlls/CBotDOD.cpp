@@ -422,12 +422,12 @@ void CBotDOD :: UpdateSkill(void){
 	char *infobuffer;
 	int clientIndex;
 	
-	infobuffer = GET_INFOBUFFER( pEdict );
+	infobuffer = GET_INFOKEYBUFFER( pEdict );
 	clientIndex = ENTINDEX( pEdict );
 	
 	MakeName(szName,name,bot_skill,f_Aggressivity);
 	
-	SET_CLIENT_KEY_VALUE( clientIndex, infobuffer, "name", szName );
+	SET_CLIENT_KEYVALUE( clientIndex, infobuffer, "name", szName );
 }
 
 long CBotDOD :: WeaponModel2ID(const char *szModel){
@@ -1120,7 +1120,7 @@ void CBotDOD :: Think5th(void){
 		&&!(Task.current && Task.current->lType & BT_HOLDPOS)){
 		edict_t *pNearest;
 		int iTm8;
-		iTm8 = UTIL_FightingAgainst(pEdict,bot_teamnm==CT?TE:CT,&pNearest,true);		// only duckin bots
+		iTm8 = UTIL_FightingAgainst(pEdict,bot_teamnm==CS_TEAM_CT?CS_TEAM_TE:CS_TEAM_CT,&pNearest,true);		// only duckin bots
 		if(iTm8>1){
 			if(f_UsedRadio < gpGlobals->time - _RADIO_FREQ
 				&&bool(jb_msgradio->value)
@@ -1319,7 +1319,7 @@ void CBotDOD :: Think(void){
 	{
 		HandleMenu();
 		
-		g_engfuncs.pfnRunPlayerMove( pEdict, pEdict->v.v_angle, 0.0,
+		RUN_PLAYER_MOVE( pEdict, pEdict->v.v_angle, 0.0,
 			0, 0, pEdict->v.button, 0, byte(g_msecval));
 		
 		FixIdealYaw();				// this fixes a bug, which does onl occurr in de_dust, cs_gamma_assault etc.
@@ -1340,7 +1340,7 @@ void CBotDOD :: Think(void){
 		if (need_to_initialize)
 			SpawnInit();
 		
-		g_engfuncs.pfnRunPlayerMove( pEdict, pEdict->v.v_angle, f_move_speed,
+		RUN_PLAYER_MOVE( pEdict, pEdict->v.v_angle, f_move_speed,
 			0, 0, lButton, 0, byte(g_msecval));
 		
 		return;
@@ -1831,7 +1831,7 @@ void CBotDOD :: Think(void){
 	// copying lButton from bot_t to pEdict->v.button
 	pEdict->v.button = lButton;			// copy the new pressed buttons to the right location
 	
-	g_engfuncs.pfnRunPlayerMove( pEdict, pEdict->v.v_angle, f_move_speed,
+	RUN_PLAYER_MOVE( pEdict, pEdict->v.v_angle, f_move_speed,
 		f_strafe, 0, pEdict->v.button, 0, byte(g_msecval));
 	
 	//BotFixIdealYaw(pEdict);
@@ -1890,7 +1890,7 @@ if (not_started)
 {
 HandleMenu();
 
-g_engfuncs.pfnRunPlayerMove( pEdict, pEdict->v.v_angle, 0.0,
+RUN_PLAYER_MOVE( pEdict, pEdict->v.v_angle, 0.0,
 0, 0, pEdict->v.button, 0, msecval);
 
 FixIdealYaw();				// this fixes a bug, which does onl occurr in de_dust, cs_gamma_assault etc.
@@ -1912,7 +1912,7 @@ SpawnInit();
 if (RANDOM_LONG(1, 100) > 50)
 lButton = IN_ATTACK;
 
-g_engfuncs.pfnRunPlayerMove( pEdict, pEdict->v.v_angle, f_move_speed,
+RUN_PLAYER_MOVE( pEdict, pEdict->v.v_angle, f_move_speed,
 0, 0, lButton, 0, msecval);
 
 return;
@@ -2596,7 +2596,7 @@ prev_speed = f_move_speed;
 // copying lButton from bot_t to pEdict->v.button
 pEdict->v.button = lButton;			// copy the new pressed buttons to the right location
 
-g_engfuncs.pfnRunPlayerMove( pEdict, pEdict->v.v_angle, f_move_speed,
+RUN_PLAYER_MOVE( pEdict, pEdict->v.v_angle, f_move_speed,
 f_strafe, 0, pEdict->v.button, 0, msecval);
 
 //BotFixIdealYaw(pEdict);
