@@ -308,21 +308,17 @@ void CBotBase :: KilledSO(edict_t *pEdictKilled,long lWeaponKiller){
 
 bool CBotBase :: Jump(void){
 
-	if (f_end_freezetime > gpGlobals->time)	// don't jump during freeze time
+	if(f_NJumpTill < gpGlobals->time &&
+		g_fFreezeTimeEnd < gpGlobals->time)	// don't jump during freeze time
 	{
-		return false;
-	}
-
-	if(f_NJumpTill < gpGlobals->time){
 		lButton |= IN_JUMP;
 		
 		f_NJumpTill = gpGlobals->time + f_TimeBJumps;
 		
 		return true;
 	}
-	else{
-		return false;
-	}
+
+	return false;
 }
 
 bool CBotBase :: Wander(void){
@@ -340,9 +336,7 @@ bool CBotBase :: Wander(void){
 	
 	if(v_diff.Length() > 2){
 		VRunningTo = pEdict->v.origin - v_diff_norm * 1000;
-#ifdef DEBUGMESSAGES
-		WaypointDrawBeam(listenserver_edict,pEdict->v.origin,VRunningTo,2,2,200,200,200,200,0);
-#endif
+		DEBUG_DRAWBEAM(listenserver_edict,pEdict->v.origin,VRunningTo,2,2,200,200,200,200,0);
 		HeadToward(VRunningTo);
 	}
 	
@@ -351,18 +345,18 @@ bool CBotBase :: Wander(void){
 		&& (f_dont_check_stuck < gpGlobals->time)
 		&& f_Pause < gpGlobals->time-.5){// running against wall etc.
 		//f_old_direction = (pEdict->v.angles.y - v_diff_angles.y - 8);
-		//FakeClientCommand(pEdict,"say muh die kuh");
+		//DEBUG_CLIENTCOMMAND(pEdict,"say muh die kuh");
 		if(l_cState==0){		// crashed into wall for the first time ...
 			l_cState ++;
 			
 			if(RANDOM_LONG(0,100) < 80){		// .. so jump
-				//FakeClientCommand(pEdict,"say no waypoint found and jumping cause of wall");
+				//DEBUG_CLIENTCOMMAND(pEdict,"say no waypoint found and jumping cause of wall");
 				Jump();
 				f_ducktill = gpGlobals->time + .4f;
 			}
 		}
 		else if(l_cState == 1){			// ... or turn later
-			/*FakeClientCommand(pEdict,"say collision (%f)",moved_distance);*/
+			/*DEBUG_CLIENTCOMMAND(pEdict,"say collision (%f)",moved_distance);*/
 			v_diff_angles = UTIL_VecToAngles(v_diff);
 			pEdict->v.ideal_yaw = v_diff_angles.y + RANDOM_LONG(-20,20);
 			
@@ -466,7 +460,7 @@ void CBotBase :: PreprocessTasks(void){
 			iGoal=-1;
 
 		if(Task.current->lType & BT_HUNT){
-			//FakeClientCommand(pEdict,"say hunt");
+			//DEBUG_CLIENTCOMMAND(pEdict,"say hunt");
 			if(FNullEnt(Task.current->p)){
 				Task.NextTask();
 				//return false;
@@ -497,7 +491,7 @@ void CBotBase :: PreprocessTasks(void){
 			}
 		}
 		else if(Task.current->lType & BT_COVER){
-			//FakeClientCommand(pEdict,"say cover");
+			//DEBUG_CLIENTCOMMAND(pEdict,"say cover");
 			if(FNullEnt(Task.current->p)){
 				Task.NextTask();
 			}
@@ -537,9 +531,9 @@ void CBotBase :: PreprocessTasks(void){
 						lNum ++;
 					}
 				}
-				//FindWayWP(pEdict,iIndices[RANDOM_LONG(0,lNum)],FW_Cur,WayDecideShortest);
+				//FindWayWP(pEdict,iIndices[RANDOM_LONG(0,lNum-1)],FW_Cur,WayDecideShortest);
 				if(lNum > 1)
-					iFarGoal = iIndices[RANDOM_LONG(1,lNum)-1];
+					iFarGoal = iIndices[RANDOM_LONG(0,lNum-1)];
 				if(iFarGoal == WaypointFindNearest(pEdict,400,bot_teamnm,0,false,false,false)
 					|| RANDOM_LONG(0,100) < 10){
 					f_Pause = gpGlobals->time + 1.f;
@@ -589,10 +583,10 @@ void CBotBase :: PreprocessTasks(void){
 			//return true;
 		}
 		else if(Task.current->lType & BT_ROAMTEAM){
-			//FakeClientCommand(pEdict,"say roamteam");
+			//DEBUG_CLIENTCOMMAND(pEdict,"say roamteam");
 			
-			if(f_timesrs < 7)
-				Task.AddTask(BT_CAMP,gpGlobals->time + 7.25 - f_timesrs,0,0,0);
+			if(g_fRoundTime < 7)
+				Task.AddTask(BT_CAMP,gpGlobals->time + 7.25 - g_fRoundTime,0,0,0);
 			else{
 				
 				if(FNullEnt(Task.current->p)){		// no edict ?
@@ -624,7 +618,7 @@ void CBotBase :: PreprocessTasks(void){
 								Task.NextTask();
 								return;
 								//cout << "fuckin roamteam" << endl;
-								//FakeClientCommand(pEdict,"say fuckin roamteam");
+								//DEBUG_CLIENTCOMMAND(pEdict,"say fuckin roamteam");
 							}
 						}
 						else
@@ -647,10 +641,8 @@ void CBotBase :: PreprocessTasks(void){
 					}
 					
 					if(iWP != -1){
-#ifdef DEBUGMESSAGES
-						WaypointDrawBeam(listenserver_edict,pEdict->v.origin,waypoints[iWP].origin,10,0,0,250,0,200,10);
-						WaypointDrawBeam(listenserver_edict,Task.current->p->v.origin,waypoints[iWP].origin,10,0,0,250,0,200,10);
-#endif
+						DEBUG_DRAWBEAM(listenserver_edict,pEdict->v.origin,waypoints[iWP].origin,10,0,0,250,0,200,10);
+						DEBUG_DRAWBEAM(listenserver_edict,Task.current->p->v.origin,waypoints[iWP].origin,10,0,0,250,0,200,10);
 						iGoal = iFarGoal = iWP;
 						Task.AddTask(BT_GOTO|BT_TMP,gpGlobals->time + 20.f,iWP,(void *) 0/*iWantedDiv*/,0);
 					}
@@ -707,9 +699,9 @@ void CBotBase :: PreprocessTasks(void){
 					lNum ++;
 				}
 			}
-			//FindWayWP(pEdict,iIndices[RANDOM_LONG(0,lNum)],FW_Cur,WayDecideShortest);
+			//FindWayWP(pEdict,iIndices[RANDOM_LONG(0,lNum-1)],FW_Cur,WayDecideShortest);
 			if(lNum > 1)
-				iFarGoal = iIndices[RANDOM_LONG(1,lNum)-1];
+				iFarGoal = iIndices[RANDOM_LONG(0,lNum-1)];
 			
 			/*if(FVisible(VToGuard,pEdict)
 				&&f_noCamp < gpGlobals->time +5){
@@ -766,7 +758,7 @@ bool CBotBase :: AvoidStuck(void){
 			// sometimes jump
 			if(RANDOM_LONG(0,100) > 50){
 				Jump();
-				//FakeClientCommand(pEdict,"say wpstuckducktill");
+				//DEBUG_CLIENTCOMMAND(pEdict,"say wpstuckducktill");
 				f_ducktill = gpGlobals->time +.4f;
 			}
 			else{		// why ?
@@ -786,7 +778,7 @@ bool CBotBase :: AvoidStuck(void){
 					if(iDest != -1){
 						Task.AddTask(BT_GOTO|BT_GOBUTTON,-1,iDest,pEnt,0);
 					}
-					//FakeClientCommand(pEdict,"say asd");
+					//DEBUG_CLIENTCOMMAND(pEdict,"say asd");
 					return false;
 				}
 				
@@ -914,9 +906,7 @@ bool CBotBase :: AvoidStuck(void){
 							}
 							if(iWPB != -1){
 								i_CurrWP = iWPB;
-#ifdef DEBUGMESSAGES
-								WaypointDrawBeam(listenserver_edict,pEdict->v.origin,waypoints[iWPB].origin,30,0,250,0,0,250,0);
-#endif
+								DEBUG_DRAWBEAM(listenserver_edict,pEdict->v.origin,waypoints[iWPB].origin,30,0,250,0,0,250,0);
 								f_D2C1 = f_D2C2 = 10000.0;
 							}
 						}
@@ -1015,7 +1005,7 @@ bool CBotBase :: AvoidCollision(void){
 						}
 						else{
 							if(tr.flFraction*_CAL < 20.0){
-								//f_move_speed = -f_max_speed;
+								//f_move_speed = -pEdict->v.maxspeed;
 							}
 							//pEdict->v.angles.y = pEdict->v.v_angle.y;
 							if(!PauseShoot()){ //BotFireWeapon(tr.pHit->v.origin,pBot);
@@ -1031,7 +1021,7 @@ bool CBotBase :: AvoidCollision(void){
 						}
 					}
 				}
-				//FakeClientCommand(pEdict,"say func_breakable");
+				//DEBUG_CLIENTCOMMAND(pEdict,"say func_breakable");
 			}
 		}
 		
@@ -1089,9 +1079,7 @@ bool CBotBase :: AvoidCollision(void){
 				v_avoid = g_vecZero;
 		}
 	}
-#ifdef DEBUGMESSAGES
-	//WaypointDrawBeam(listenserver_edict,pEdict->v.origin+Vector(0,0,30),pEdict->v.origin+Vector(0,0,30)+v_avoid * 100,3,0,0,0,255,255,0);
-#endif
+	//DEBUG_DRAWBEAM(listenserver_edict,pEdict->v.origin+Vector(0,0,30),pEdict->v.origin+Vector(0,0,30)+v_avoid * 100,3,0,0,0,255,255,0);
 	// check if the way to the next wp is blocked by a breakable ent ...
 	if(i_CurrWP != -1){
 		Vector VEndWP = waypoints[i_CurrWP].origin;
@@ -1116,7 +1104,7 @@ bool CBotBase :: AvoidCollision(void){
 					}
 					else{
 						if(tr.flFraction*_CAL < 20.0){
-							f_move_speed = -f_max_speed;
+							f_move_speed = -pEdict->v.maxspeed;
 						}
 						if(current_weapon.iAmmo1 == 0){
 							Change2Weapon(HasKnife());
@@ -1324,7 +1312,7 @@ void CBotBase :: TestOnButtonWay(CWay &pWay,edict_t **pToUse){
 				if(iOCount){
 					iFarGoal = -1;
 					iGoal = -1;
-					//FakeClientCommand(pEdict,"say no poss to get there");
+					//DEBUG_CLIENTCOMMAND(pEdict,"say no poss to get there");
 				}
 				//if(pEdictPlayer)WaypointDrawBeam(pEdictPlayer,waypoints[pWay->iIndices[i]].origin,waypoints[pWay->iIndices[is]].origin,10,10,255,255,100,10,10);
 			}
@@ -1428,9 +1416,7 @@ void CBotBase :: ShootAtEnemy( void ){
 			}*/
 			f_Delay = gpGlobals->time + .01;
 
-#ifdef DEBUGMESSAGES
-			//WaypointDrawBeam(listenserver_edict,pEdict->v.origin,pEdict->v.origin + Vector(40,40,100),10,0,255,0,255,255,0);
-#endif
+			//DEBUG_DRAWBEAM(listenserver_edict,pEdict->v.origin,pEdict->v.origin + Vector(40,40,100),10,0,255,0,255,255,0);
 		}
 		if(i_FOV <90){	// do some stuff about second zooming state or ...
 		}
@@ -1442,17 +1428,13 @@ void CBotBase :: ShootAtEnemy( void ){
 					current_weapon.iId == CS_WEAPON_SG550){
 					if(f_Delay < gpGlobals->time - 1.f){
 						f_Delay = gpGlobals->time + .2f;
-#ifdef DEBUGMESSAGES
-			//WaypointDrawBeam(listenserver_edict,pEdict->v.origin,pEdict->v.origin + Vector(40,40,50),10,0,255,0,255,255,0);
-#endif
+			//DEBUG_DRAWBEAM(listenserver_edict,pEdict->v.origin,pEdict->v.origin + Vector(40,40,50),10,0,255,0,255,255,0);
 					}
 				}
 				else{
 					if(f_Delay < gpGlobals->time - 1.f){
 						f_Delay = gpGlobals->time + .1f;
-#ifdef DEBUGMESSAGES
-		//	WaypointDrawBeam(listenserver_edict,pEdict->v.origin,pEdict->v.origin + Vector(40,40,150),10,0,255,0,255,255,0);
-#endif
+		//	DEBUG_DRAWBEAM(listenserver_edict,pEdict->v.origin,pEdict->v.origin + Vector(40,40,150),10,0,255,0,255,255,0);
 					}
 				}
 			}
@@ -1468,9 +1450,7 @@ void CBotBase :: ShootAtEnemy( void ){
 			f_Delay = gpGlobals->time + .01;
 		}
 
-#ifdef DEBUGMESSAGES
-			//WaypointDrawBeam(listenserver_edict,pEdict->v.origin,pEdict->v.origin + Vector(40,40,150),10,0,255,255,255,255,0);
-#endif
+			//DEBUG_DRAWBEAM(listenserver_edict,pEdict->v.origin,pEdict->v.origin + Vector(40,40,150),10,0,255,255,255,255,0);
 	}
 	// select the best weapon to use at this distance and fire...
 	FireWeapon( v_enemy );
@@ -1586,7 +1566,7 @@ bool CBotBase :: FireWeapon( Vector &v_enemy )
 		return false;
 	
 	lButton |= IN_ATTACK;
-	return TRUE;
+	return true;
 }
 
 long CBotBase :: IsCWeaponPrimary(void){
@@ -1732,10 +1712,10 @@ bool CBotBase :: GotoHidingPlace(void){
 	if(fDotProduct == 0.0f){// is zero ... don't do anything for this time ...
 	}
 	else if(fDotProduct < 0.0f){	// pos -> go forward ...
-		f_move_speed = f_max_speed / 1.5f;
+		f_move_speed = pEdict->v.maxspeed / 1.5f;
 	}
 	else{							// neg -> go backward ...
-		f_move_speed = -f_max_speed / 1.5f;
+		f_move_speed = -pEdict->v.maxspeed / 1.5f;
 	}
 	
 	if(VCrossProduct.z == 0.0f){		// seems to be pretty near ...
@@ -1908,8 +1888,8 @@ int CBotBase :: SearchHidingWP(edict_t *pEnemy,int iL){
 				iNTemp = index;
 			}
 		}
-#ifdef DEBUGMESSAGES
-		if(iNIVWP != -1 && iNTemp != -1)WaypointDrawBeamDebug(listenserver_edict,waypoints[iNIVWP].origin+Vector(0,0,bot_teamnm*10),waypoints[iNTemp].origin+Vector(0,0,bot_teamnm*10),20,0,200,0,bot_teamnm*200,200,20);
+#ifdef _DEBUG
+		if(iNIVWP != -1 && iNTemp != -1){DEBUG_DRAWBEAM(listenserver_edict,waypoints[iNIVWP].origin+Vector(0,0,bot_teamnm*10),waypoints[iNTemp].origin+Vector(0,0,bot_teamnm*10),20,0,200,0,bot_teamnm*200,200,20);}
 #endif
 		if(iNTemp == -1)
 			break;
@@ -1979,7 +1959,7 @@ float CBotBase :: ChangeBodyPitch( void )
 	
 	current += fAngleSpeedPitch * 1.0f * (g_msecval/50.0f);
 	
-	//FakeClientCommand(pEdict,"say %f",current);
+	//DEBUG_CLIENTCOMMAND(pEdict,"say %f",current);
 	
 	// check for wrap around of angle...
 	while (current > 180)
@@ -2006,16 +1986,16 @@ float CBotBase :: ChangeYaw( void ){
 	
 	ideal = pEdict->v.ideal_yaw;
 
-/*#ifdef DEBUGMESSAGES
+/*#ifdef _DEBUG
 	if(pBotEnemy){
 		Vector VT;
 		VT.x = VT.y = VT.z = 0;
 		VT.y = current;
 		UTIL_MakeVectors(VT);
-		WaypointDrawBeam(listenserver_edict,pEdict->v.origin,pEdict->v.origin+gpGlobals->v_forward*100,8,0,000,200,0,200,0);
+		DEBUG_DRAWBEAM(listenserver_edict,pEdict->v.origin,pEdict->v.origin+gpGlobals->v_forward*100,8,0,000,200,0,200,0);
 		UTIL_MakeVectors(VT);
 		VT.y = ideal;
-		WaypointDrawBeam(listenserver_edict,pEdict->v.origin,pEdict->v.origin+gpGlobals->v_forward*100,8,0,200,000,0,200,0);
+		DEBUG_DRAWBEAM(listenserver_edict,pEdict->v.origin,pEdict->v.origin+gpGlobals->v_forward*100,8,0,200,000,0,200,0);
 	}
 #endif*/
 	
@@ -2069,16 +2049,16 @@ float CBotBase :: ChangeBodyYaw( void ){
 
 	ideal = fIdealAngleYaw;
 	
-/*#ifdef DEBUGMESSAGES
+/*#ifdef _DEBUG
 	if(pBotEnemy){
 		Vector VT;
 		VT.x = VT.y = VT.z = 0;
 		VT.y = current;
 		UTIL_MakeVectors(VT);
-		WaypointDrawBeam(listenserver_edict,pEdict->v.origin,pEdict->v.origin+gpGlobals->v_forward*100,8,0,0,0,200,200,0);
+		DEBUG_DRAWBEAM(listenserver_edict,pEdict->v.origin,pEdict->v.origin+gpGlobals->v_forward*100,8,0,0,0,200,200,0);
 		UTIL_MakeVectors(VT);
 		VT.y = ideal;
-		WaypointDrawBeam(listenserver_edict,pEdict->v.origin,pEdict->v.origin+gpGlobals->v_forward*100,8,0,0,200,0,200,0);
+		DEBUG_DRAWBEAM(listenserver_edict,pEdict->v.origin,pEdict->v.origin+gpGlobals->v_forward*100,8,0,0,200,0,200,0);
 	}
 #endif*/
 	
@@ -2340,7 +2320,7 @@ bool CBotBase :: SearchForIL(void){			// searchin for an intersesting lcoation, 
 				if(f_LookTo < gpGlobals->time-2.5f){
 					VLookTo = waypoints[iMaxFDWP].origin;
 					f_LookTo = gpGlobals->time + 1.0;
-					//FakeClientCommand(pEdict,"say sfai");
+					//DEBUG_CLIENTCOMMAND(pEdict,"say sfai");
 				}
 			}
 			if(fMaxFInd > f_IOrigD*2.5f){
@@ -2429,7 +2409,7 @@ bool CBotBase :: HandleNearWP(int iNearWP, bool &bReturn){
 						HeadToward(waypoints[iNearWP].origin);
 						VRunningTo = waypoints[iNearWP].origin;
 						if(!(pEdict->v.button&IN_DUCK)){
-							f_move_speed = f_max_speed / 1.5;
+							f_move_speed = pEdict->v.maxspeed / 1.5;
 						}
 						prev_speed = 0;		// ... to make other routines not to think, that bot is stuck
 						f_dont_avoid = gpGlobals->time + 1.0f;
@@ -2513,7 +2493,7 @@ bool CBotBase :: HandleNearWP(int iNearWP, bool &bReturn){
 						if((pEdict->v.origin - VLadderOrigin).Length2D() > fDNear){	// bot isn't the nearest
 							f_Pause = f_ducktill = gpGlobals->time + .5f;
 							
-							/*FakeClientCommand(pEdict,"say stopping %s;%f-%f",STRING(pNearestEdict->v.netname),fDNear,(pEdict->v.origin - VLadderOrigin).Length2D());*/
+							/*DEBUG_CLIENTCOMMAND(pEdict,"say stopping %s;%f-%f",STRING(pNearestEdict->v.netname),fDNear,(pEdict->v.origin - VLadderOrigin).Length2D());*/
 						}
 						else{			// no changes
 						}
@@ -2565,11 +2545,11 @@ void CBotBase :: AdjustLadder( void ){
 		if(fabs(VCross.z)>0){
 			if(VCross.z>0){
 				f_strafe=_MAXSTRAFE;
-				//FakeClientCommand(pEdict,"say right");
+				//DEBUG_CLIENTCOMMAND(pEdict,"say right");
 			}
 			else{
 				f_strafe=-_MAXSTRAFE;
-				//FakeClientCommand(pEdict,"say left");
+				//DEBUG_CLIENTCOMMAND(pEdict,"say left");
 			}
 		}
 	}
@@ -2689,7 +2669,7 @@ void CBotBase :: OnLadder( void )
 	
 	// added by @$3.1415rin - to be perpendicular to the middle of the ladder
 	if(pELadder){
-		//FakeClientCommand(pEdict,"say ladderstuffnew");
+		//DEBUG_CLIENTCOMMAND(pEdict,"say ladderstuffnew");
 		
 		//BotAdjustLadder();
 		/*Vector ladderLeft = pELadder->v.absmin;
@@ -2700,7 +2680,7 @@ void CBotBase :: OnLadder( void )
 		ladderLeft.z = ladderRight.z;
 		Vector ladderSide = ladderLeft - ladderRight;
 		//Vector normal = CrossProduct( ladderSide, Vector(0,0,1) );
-		//FakeClientCommand(pEdict,"say --%.2f - %.2f",fLength,fabs(LadderMiddle.z-pEdict->v.origin.z));
+		//DEBUG_CLIENTCOMMAND(pEdict,"say --%.2f - %.2f",fLength,fabs(LadderMiddle.z-pEdict->v.origin.z));
 		
 		  if(fabs(pELadder->v.absmin.z-pEdict->v.origin.z) > 30
 		  &&fabs(pELadder->v.absmax.z-pEdict->v.origin.z) > 30){	// don't do this @ the end of the ladder				
@@ -2733,7 +2713,7 @@ void CBotBase :: OnLadder( void )
 			UTIL_TraceLine(VStart, VEndMiddle, dont_ignore_monsters,pEdict->v.pContainingEntity, &tr);
 			if(tr.flFraction*100.0 < 20){	// if there's a wall nearby
 				Jump();
-				//FakeClientCommand(pEdict,"say getting off top");
+				//DEBUG_CLIENTCOMMAND(pEdict,"say getting off top");
 			}
 		}
 		// end check
@@ -2765,7 +2745,7 @@ void CBotBase :: OnLadder( void )
 		UTIL_TraceLine(pEdict->v.origin,pEdict->v.origin+Vector(0,0,-100),dont_ignore_monsters,pEdict,&tr);
 		if(tr.flFraction * 100.0 < 50.0f){
 			Jump();
-			//FakeClientCommand(pEdict,"say getting off");
+			//DEBUG_CLIENTCOMMAND(pEdict,"say getting off");
 		}
 		
 		// check if the bot hasn't moved much since the last location...
@@ -2864,7 +2844,7 @@ bool CBotBase :: Camp(void){
 				Ordered.lAction=0;
 			}
 		}
-		if (g_iTypeoM == MT_AS
+		if (g_iMapType == MT_AS
 			&&g_pVIP){		// stop camping on as maps as CT when the VIP is far away or not visible
 			if(Task.current && Task.current->lType & BT_IGNOREENEMY){
 				if(bot_teamnm == CS_TEAM_CT){
@@ -2909,8 +2889,9 @@ bool CBotBase :: Camp(void){
 		else{
 			if(WLookTo.iNum){
 				if(f_CaLooktoWP < gpGlobals->time){
-					if(fabs(sLookToChange) != 1)
-						FakeClientCommand(pEdict,"say asd---");
+					if(fabs(sLookToChange) != 1){
+						DEBUG_CLIENTCOMMAND(pEdict,"say asd---");
+					}
 					int iNewCWP = WLookTo.FindItem(i_CurrWP);
 					if(iNewCWP == -1){
 						// not in way ...
@@ -3044,10 +3025,10 @@ void CBotBase :: HandleGOrder(void){
 				if(fDistance>800)fDistance=800;
 				else if(fDistance<200)fDistance=200;
 				
-				v_nvelocity = VecCheckThrow(&pEdict->v,pEdict->v.origin,GOrder.VAim,fDistance,g_GRAVITYADJ);
+				v_nvelocity = VecCheckThrow(&pEdict->v,pEdict->v.origin,GOrder.VAim,fDistance,g_fGravityAdj);
 			}
 			else{
-				v_nvelocity = VecCheckToss(&pEdict->v,pEdict->v.origin,GOrder.VAim,g_GRAVITYADJ);
+				v_nvelocity = VecCheckToss(&pEdict->v,pEdict->v.origin,GOrder.VAim,g_fGravityAdj);
 			}
 			if(v_nvelocity.Length() < 10){
 				GOrder.lState = GO_QUIT;
@@ -3071,12 +3052,11 @@ void CBotBase :: HandleGOrder(void){
 			while(pent = UTIL_FindEntityByClassname(pent,"grenade")){
 				if(pent->v.owner){
 					if(pent->v.owner == pEdict){
-#ifdef DEBUGMESSAGES
-						WaypointDrawBeamDebug(listenserver_edict,GOrder.VAim,pent->v.origin,15,10,200,200,0,200,10);
-						if(listenserver_edict)
-							WaypointDrawBeamDebug(listenserver_edict,listenserver_edict->v.origin,pent->v.origin,10,0,200,200,200,200,10);
-						WaypointDrawBeamDebug(listenserver_edict,pEdict->v.origin,pent->v.origin,10,0,0,0,200,200,10);
-#endif
+						DEBUG_DRAWBEAM(listenserver_edict,GOrder.VAim,pent->v.origin,15,10,200,200,0,200,10);
+						if(listenserver_edict){
+							DEBUG_DRAWBEAM(listenserver_edict,listenserver_edict->v.origin,pent->v.origin,10,0,200,200,200,200,10);
+						}
+						DEBUG_DRAWBEAM(listenserver_edict,pEdict->v.origin,pent->v.origin,10,0,0,0,200,200,10);
 						
 						// set the wanted velocity of the grenade :)
 						Vector v_nvelocity;
@@ -3086,17 +3066,15 @@ void CBotBase :: HandleGOrder(void){
 							if(fDistance>700)fDistance=700;
 							else if(fDistance<200)fDistance=200;
 							
-							v_nvelocity = VecCheckThrow(&pent->v,pent->v.origin,GOrder.VAim,fDistance,g_GRAVITYADJ);
+							v_nvelocity = VecCheckThrow(&pent->v,pent->v.origin,GOrder.VAim,fDistance,g_fGravityAdj);
 						}
 						else{
-							v_nvelocity = VecCheckToss(&pent->v,pent->v.origin,GOrder.VAim,g_GRAVITYADJ);
+							v_nvelocity = VecCheckToss(&pent->v,pent->v.origin,GOrder.VAim,g_fGravityAdj);
 						}
 						if(v_nvelocity.Length() > 10){
 							pent->v.velocity = v_nvelocity;
 							GrenadeThrown();
-#ifdef DEBUGMESSAGES
-							WaypointDrawBeamDebug(listenserver_edict,pEdict->v.origin,pEdict->v.origin+v_nvelocity,10,0,0,200,0,200,10);
-#endif
+							DEBUG_DRAWBEAM(listenserver_edict,pEdict->v.origin,pEdict->v.origin+v_nvelocity,10,0,0,200,0,200,10);
 						}
 						GOrder.lState = GO_QUIT;
 						break;
@@ -3127,7 +3105,7 @@ void CBotBase :: HandleReplay(void){
 		int i = 0,i2 = 0;
 		float fTimeDiff;
 		float fPart;
-#ifdef DEBUGMESSAGES
+#ifdef _DEBUG
 		FILE *fhds;fhds=fopen("rec_move_a.txt","a");
 		if(fhds){
 			fprintf(fhds,"%f - %i\n",fOffset,pWPAMPlay->iNum);
@@ -3146,9 +3124,9 @@ void CBotBase :: HandleReplay(void){
 
 				// copy stuff from recorded data to bot
 				if(pWPAMPlay->Rec[i].lButton&IN_DUCK){
-					//FakeClientCommand(pEdict,"say duckin from advm");
+					//DEBUG_CLIENTCOMMAND(pEdict,"say duckin from advm");
 				}
-				//FakeClientCommand(pEdict,"say -");
+				//DEBUG_CLIENTCOMMAND(pEdict,"say -");
 				lButton = pWPAMPlay->Rec[i].lButton;
 				if(pWPAMPlay->Rec[i].v_origin.Length() < .1 || pWPAMPlay->Rec[i2].v_origin.Length() < .1)
 					break;
@@ -3176,7 +3154,7 @@ void CBotBase :: HandleReplay(void){
 				else if(lButton & IN_MOVERIGHT){
 					f_strafe = 200;
 				}
-#ifdef DEBUGMESSAGES
+#ifdef _DEBUG
 				FILE *fhds;fhds=fopen("rec_move.txt","a");
 				if(fhds){fprintf(fhds,"%i - %f - %f\n",\
 					pWPAMPlay->iNum,fOffset,pWPAMPlay->Rec[i].fTime);fclose(fhds);}
@@ -3186,11 +3164,9 @@ void CBotBase :: HandleReplay(void){
 			i++;
 		}
 		if(i >= pWPAMPlay->iNum){
-			//FakeClientCommand(pEdict,"say stoppin advm");
+			//DEBUG_CLIENTCOMMAND(pEdict,"say stoppin advm");
 			/*if((pWPAMPlay->Rec[pWPAMPlay->iNum].v_origin - pEdict->v.origin).Length()>50.f){
-#ifdef DEBUGMESSAGES
-				FakeClientCommand(pEdict,"say fuck, hasnt worked this time neither");
-#endif
+				DEBUG_CLIENTCOMMAND(pEdict,"say fuck, hasnt worked this time neither");
 				ResetWPlanning();
 				f_Pause = gpGlobals->time + .6f;
 			}*/
