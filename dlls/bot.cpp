@@ -58,7 +58,10 @@ CBotNames Names;
 // array for fnctions to buy weapons
 void (*Buy[32])(CBotBase *);
 
-int iGlobalRSCount;		// setting to number of bots on roundstart. every init of bot result in decrementing this variable. if it is 0 and it hasn't been called this rs, a global init function is called :D
+// setting to number of bots on roundstart. every init of bot result in
+// decrementing this variable. if it is 0 and it hasn't been called this rs,
+// a global init function is called :D
+bool g_bInitRoundStart = false;
 float fLGlobalRSInit = -1000;
 
 // include defs for NN
@@ -93,19 +96,39 @@ bool bNNInitError;
 SInfo SBInfo[32];
 CBotBase *bots[32];   // max of 32 bots in a game
 
-bool   need_init = true;
+bool need_init = true;
 
-bool g_bBombPlanted;		// bomb has been planted
-float g_iBombExplode;
-bool g_bBombDropped;
+bool g_bBombPlanted = false;		// bomb has been planted
+float g_fBombExplode = -1;
+bool g_bBombDropped = false;
 
 void InitGlobalRS(void){
-	if(!iGlobalRSCount){
-		//if(fabs(fLGlobalRSInit - gpGlobals->time) > 30){
-		fLGlobalRSInit = gpGlobals->time;
+
+	if(g_bInitRoundStart && 
+		gpGlobals->time > g_fFreezeTimeStart &&
+		gpGlobals->time < g_fFreezeTimeEnd)
+	{
+		g_bInitRoundStart = false;		// do not execute this a second time this round
 		
-		iGlobalRSCount = 1;		// do not execute this a second time this round
-		
+		g_pVIP = 0;
+		g_bBombPlanted = false;
+		g_bBombDropped = false;
+
+		switch(g_iMapType){
+			case MT_AS:
+				fM[CS_TEAM_TE] = RANDOM_FLOAT(-1,jb_campprobability->value/1.5);
+				fM[CS_TEAM_CT] = RANDOM_FLOAT(-1,jb_campprobability->value);
+				break;
+			case MT_DE:
+				fM[CS_TEAM_TE] = RANDOM_FLOAT(-1,jb_campprobability->value);
+				fM[CS_TEAM_CT] = RANDOM_FLOAT(-1,jb_campprobability->value/1.2);
+				break;
+			case MT_CS:
+			default:
+				fM[CS_TEAM_TE] = RANDOM_FLOAT(-1,jb_campprobability->value/1.5);
+				fM[CS_TEAM_CT] = RANDOM_FLOAT(-1,jb_campprobability->value);
+		};
+
 		int iRoamteamA[32];		// roamteam aischlm -> how many bots are already followischlng thischls player ?
 		memset(iRoamteamA,0,sizeof(int)*32);
 		
