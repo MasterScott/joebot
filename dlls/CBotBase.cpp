@@ -307,6 +307,10 @@ void CBotBase :: KilledSO(edict_t *pEdictKilled,long lWeaponKiller){
 }
 
 bool CBotBase :: Jump(void){
+
+	if (f_start_round > gpGlobals->time)	// don't jump during freeze time
+		return false;
+
 	if(f_NJumpTill < gpGlobals->time){
 		lButton |= IN_JUMP;
 		

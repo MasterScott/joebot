@@ -292,7 +292,7 @@ bool bDedicatedWelcome = false;
 int g_iTypeoM;
 
 float f_round_start;	// time of roundstart
-float f_start_round;	// when to start after freeze time
+float f_start_round = 0.0;	// when to start after freeze time
 float f_timesrs = 1000;		// time since round start	->	updated every frame by start frame
 
 extern bool bNNInit;
