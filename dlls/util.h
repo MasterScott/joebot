@@ -569,6 +569,12 @@ float UTIL_WeaponTimeBase( void );
 #define CS_TEAM_TE 0
 #define CS_TEAM_CT 1
 
+typedef enum {
+	COUNT_ALL = 0,
+	COUNT_HUMAN,
+	COUNT_FAKE
+} count_t;
+
 #ifdef DEBUGENGINE
 void UTIL_BotLog(const char *fnName, const char *str);
 #define BOT_LOG(fnName, s) UTIL_BotLog(fnName, s)
@@ -606,8 +612,7 @@ class CBotBase;
 CBotBase  *UTIL_GetBotPointer(const edict_t *pEdict);
 bool FInViewCone(Vector *pOrigin, edict_t *pEdict);
 bool TEq(float f1,float f2,float fD);
-int UTIL_ClientsInGame( void );
-int UTIL_HumansInGame( void );
+int UTIL_PlayerCount( count_t countType );
 long UTIL_FightingAgainst(edict_t *pEdictToBeSeen,int iTeam,edict_t **pNearest,bool bDuckOnly=false);
 Vector GetGunPosition(edict_t *pEdict);
 Vector VecBModelOrigin(edict_t *pEdict);

@@ -57,7 +57,7 @@ void CBotDOD :: HandleMenu( void )
 	char c_class[32];
 	
 	if (start_action == MSG_DOD_IDLE){
-		if (bot_team == 3 && UTIL_HumansInGame())
+		if (bot_team == 3 && UTIL_PlayerCount(COUNT_HUMAN))
 			FakeClientCommand(pEdict, "changeteam");
 	}
 	else if (start_action == MSG_DOD_TEAM_SELECT){
@@ -68,7 +68,7 @@ void CBotDOD :: HandleMenu( void )
 		{
 			if (!CVAR_BOOL(jb_jointeam))
 			{
-				bot_team = UTIL_HumansInGame() ? 5 : 3;
+				bot_team = UTIL_PlayerCount(COUNT_HUMAN) ? 5 : 3;
 			}
 			else
 				bot_team = 5; // auto-assign if invalid

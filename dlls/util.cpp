@@ -568,53 +568,36 @@ bool TEq(float f1,float f2,float fD){
 		return false;
 }
 
-int UTIL_ClientsInGame( void )
+int UTIL_PlayerCount(count_t countType)
 {
-    int iCount = 0;
-
-    for ( int iIndex = 0; iIndex < gpGlobals->maxClients; iIndex++ )
-	{
-        edict_t * pPlayer = INDEXENT( iIndex + 1 );
-
-        if ( pPlayer == NULL )
-            continue;
-
-        if ( FNullEnt( pPlayer ) )
-            continue;
-
-        if ( FStrEq( STRING( pPlayer->v.netname ), "" ) )
-            continue;
-
-        iCount++;
-    }
-
-    return iCount;
-}
-
-int UTIL_HumansInGame( void )
-{
-    int iCount = 0;
+	int iCount = 0;
 
     for ( int iIndex = 0; iIndex < gpGlobals->maxClients; iIndex++ )
 	{
         edict_t *pPlayer = INDEXENT( iIndex + 1 );
 
-        if ( pPlayer == NULL )
-            continue;
+        if ( pPlayer == NULL ) continue;
+        if ( FNullEnt( pPlayer ) ) continue;
+        if ( FStrEq( STRING( pPlayer->v.netname ), "" ) ) continue;
 
-        if ( FNullEnt( pPlayer ) )
-            continue;
+		switch (countType)
+		{
+			case COUNT_FAKE:
+				if ( pPlayer->v.flags & FL_FAKECLIENT ) iCount++;
+				break;
+			case COUNT_HUMAN:
+				if ( pPlayer->v.flags & FL_FAKECLIENT ) continue;
+				iCount++;
+				break;
+			case COUNT_ALL:
+				iCount++;
+				break;
+			default:
+				;
+		}
+	}
 
-        if ( FStrEq( STRING( pPlayer->v.netname ), "" ) )
-            continue;
-
-        if ( pPlayer->v.flags & FL_FAKECLIENT )
-            continue;
-
-        iCount++;
-    }
-
-    return iCount;
+	return iCount;
 }
 
 long UTIL_FightingAgainst(edict_t *pEdictToBeSeen,int iTeam,edict_t **pNearest,bool bDuckOnly){		// team -> what teammembers should be counted, which can view pEdictToBeSeen ??

@@ -53,7 +53,7 @@ void CBotCS :: HandleMenu( void )
 	switch (start_action)
 	{
 		case MSG_CS_IDLE:
-			if (bot_team == 6 && UTIL_HumansInGame())
+			if (bot_team == 6 && UTIL_PlayerCount(COUNT_HUMAN))
 				FakeClientCommand(pEdict, "chooseteam");
 			break;
 
@@ -62,7 +62,7 @@ void CBotCS :: HandleMenu( void )
 			{
 				if (!CVAR_BOOL(jb_jointeam))
 				{
-					if (UTIL_HumansInGame())
+					if (UTIL_PlayerCount(COUNT_HUMAN))
 						bot_team = 5;
 					else if (CVAR_GET_FLOAT("allow_spectators") > 0.f)
 						bot_team = 6;
