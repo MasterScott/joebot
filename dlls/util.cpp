@@ -237,12 +237,29 @@ void UTIL_HostSay( edict_t *pEntity, int teamonly, char *message )
 	// turn on color set 2  (color on,  no sound)
 	if(IsAlive(pEntity))
 		if ( teamonly )
-			sprintf( text, "%c(TEAM) %s: ", 2, STRING( pEntity->v.netname ) );
+			if(mod_id != CSTRIKE_DLL)
+				sprintf( text, "%c(TEAM) %s: ", 2, STRING( pEntity->v.netname ) );
+			else{
+				if(UTIL_GetTeam(pEntity) == CT){
+					sprintf( text, "%c(Counter-Terrorist) %s: ", 2, STRING( pEntity->v.netname ) );
+				}
+				else
+					sprintf( text, "%c(Terrorist) %s: ", 2, STRING( pEntity->v.netname ) );
+			}
 		else
 			sprintf( text, "%c%s: ", 2, STRING( pEntity->v.netname ) );
 	else
 		if ( teamonly )
-			sprintf( text, "%c*DEAD*(TEAM) %s: ", 2, STRING( pEntity->v.netname ) );
+			if(mod_id != CSTRIKE_DLL)
+				sprintf( text, "%c*DEAD*(TEAM) %s: ", 2, STRING( pEntity->v.netname ) );
+			else{
+				if(UTIL_GetTeam(pEntity) == CT){
+					sprintf( text, "%c*DEAD*(Counter-Terrorist) %s: ", 2, STRING( pEntity->v.netname ) );
+				}
+				else{
+					sprintf( text, "%c*DEAD*(Terrorist) %s: ", 2, STRING( pEntity->v.netname ) );
+				}
+			}
 		else
 			sprintf( text, "%c*DEAD*%s: ", 2, STRING( pEntity->v.netname ) );
 	
