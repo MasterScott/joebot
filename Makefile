@@ -40,7 +40,7 @@ release_rebuild:
 	$(MAKE) rebuild OPT=debug DLLTYPE=mm
 	$(MAKE) rebuild OPT=debug DLLTYPE=std
 
-debug_rebuild::
+debug_rebuild:
 	$(MAKE) rebuild OPT=debug DLLTYPE=mm
 	$(MAKE) rebuild OPT=debug DLLTYPE=std
 
