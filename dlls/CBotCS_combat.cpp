@@ -163,7 +163,7 @@ void CBotCS :: Fight( void ){
 		
 		// check ammo
 		if(!IsCWeaponGrenade()){		// don't check ammo with grenades - lol
-			if((m_rgAmmo[current_weapon.iAmmo1]+current_weapon.iClip) == 0){// if ya clip  and ya reserve is empty
+			if((m_rgAmmo[weapon_defs[current_weapon.iId].iAmmo1]+current_weapon.iClip) == 0){// if ya clip  and ya reserve is empty
 				ChangeToLWeapon();
 				if(f_UsedRadio < gpGlobals->time - _RADIO_FREQ
 					&&g_bUseRadio){
