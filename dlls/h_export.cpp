@@ -56,10 +56,6 @@ enginefuncs_t g_engfuncs;
 globalvars_t  *gpGlobals;
 char *g_argv;
 
-#ifdef DEBUGENGINE
-static FILE *fp;
-#endif
-
 GETENTITYAPI other_GetEntityAPI = NULL;
 GETNEWDLLFUNCTIONS other_GetNewDLLFunctions = NULL;
 GIVEFNPTRSTODLL other_GiveFnptrsToDll = NULL;
