@@ -1,7 +1,7 @@
 #ifndef __NEURALNETDEFS_H
 #define __NEURALNETDEFS_H
 
-#define __NNSIM_TEXT
+//#define __NNSIM_TEXT
 
 // which type of variable should be used for the data ?
 typedef double netvar_t;
