@@ -143,7 +143,7 @@ int CChatBot :: Talk(CBotBase *pBBot){
 		
 		l_ChatEvent = 0;			// reset chat event flag
 		
-		if(pBBot->bot_teamnm == CT){
+		if(pBBot->bot_teamnm == CS_TEAM_CT){
 			iTeam=0;
 		}
 		else{

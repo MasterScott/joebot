@@ -144,7 +144,7 @@ bool CBotCS :: HeadTowardSpEnt(void){
 		strcpy( szClassname , STRING(pEnt->v.classname) );
 
 		if (FStrEq(szClassname,"hostage_entity")){		// hostages
-			if(bot_teamnm == CT){
+			if(bot_teamnm == CS_TEAM_CT){
 				if(fPDistance > 300						// don't 'steal' hostages
 					&& GetHosVel(pEnt) < 1.f
 					&& i_UsedHostages < _MAXHOSTAGES			// don't take more than _MAXHOSTAGES
@@ -156,7 +156,7 @@ bool CBotCS :: HeadTowardSpEnt(void){
 					}
 					if(f_gotohostage + 10.0f < gpGlobals->time){	// new try to get hostage
 						//FakeClientCommand(pEdict,"say_team got hostage");
-						if(bot_teamnm==CT)UTIL_HostSay(pEdict,1,"got hostage");
+						if(bot_teamnm==CS_TEAM_CT)UTIL_HostSay(pEdict,1,"got hostage");
 						f_gotohostage = gpGlobals->time;
 					}
 					
@@ -218,7 +218,7 @@ bool CBotCS :: HeadTowardSpEnt(void){
 							long lWeaponID = WeaponClass2ID(szClassname);
 							
 							if(lWeaponID == CS_WEAPON_C4){
-								if(bot_teamnm == TE){		//te
+								if(bot_teamnm == CS_TEAM_TE){		//te
 									Goto(pEnt->v.owner->v.origin);	// problem offset between old owner and current position
 									return true;
 								}
@@ -279,7 +279,7 @@ bool CBotCS :: HeadTowardSpEnt(void){
 			}
 		}
 		else if(FStrEq(szClassname,"grenade")){
-			if(bot_teamnm == CT){
+			if(bot_teamnm == CS_TEAM_CT){
 				if(FStrEq(STRING(pEnt->v.model),"models/w_c4.mdl")){	// only planted c4
 					// is the origin of player 45 units above the ground ??
 					//fRDistance = Vector(pEnt->v.origin - (pEdict->v.origin - Vector(0,0,45))).Length();
@@ -332,7 +332,7 @@ bool CBotCS :: HeadTowardSpEnt(void){
 			}
 		}
 		else if(FStrEq(szClassname,"item_thighpack")){
-			if(bot_teamnm == CT
+			if(bot_teamnm == CS_TEAM_CT
 				&& !(Action.lAction & BA_DEFKIT)){
 				Goto(pEnt->v.origin);
 			}
@@ -455,7 +455,7 @@ bool CBotCS :: DistanceSight(void){
 						long lWeaponID = WeaponClass2ID(szClassname);
 						
 						if(lWeaponID == CS_WEAPON_C4){
-							if(bot_teamnm == TE){		//te
+							if(bot_teamnm == CS_TEAM_TE){		//te
 								lDestination = WaypointFindNearest(pEnt->v.owner,500,bot_teamnm,fN,true,false);
 								if(lDestination != -1
 									&& Task.SearchT(BT_PICKUP) == -1){
@@ -518,7 +518,7 @@ bool CBotCS :: DistanceSight(void){
 			}
 		}
 		else if (FStrEq(szClassname,"hostage_entity")){		// hostages
-			if(bot_teamnm == CT){
+			if(bot_teamnm == CS_TEAM_CT){
 				if(fDistance > 400 &&						// don't 'steal' hostages
 					fPDistance > 400 &&
 					GetHosVel(pEnt) < 1.f&&
@@ -541,7 +541,7 @@ bool CBotCS :: DistanceSight(void){
 			}
 		}
 		/*else if(FStrEq(szClassname,"item_thighpack")){
-		if(bot_teamnm == CT
+		if(bot_teamnm == CS_TEAM_CT
 		&& FVisible(pEnt->v.origin,pEdict)
 		&& !(Action.lAction & BA_DEFKIT)){
 		fN = 0;
@@ -554,7 +554,7 @@ bool CBotCS :: DistanceSight(void){
 		}
 		}*/
 		else if(FStrEq(szClassname,"grenade")){
-			if(bot_teamnm == CT){
+			if(bot_teamnm == CS_TEAM_CT){
 				if(FStrEq(STRING(pEnt->v.model),"models/w_c4.mdl")){	// only planted c4
 					fDistance = Vector(pEnt->v.origin - pEdict->v.origin).Length2D();
 					
@@ -717,7 +717,7 @@ bool CBotCS :: HandleNearWP(int iNearWP, bool &bReturn){
 			if(strncmp(STRING(gpGlobals->mapname),"cs",sizeof(char)*2) == 0){			// cs
 			}
 			else if(strncmp(STRING(gpGlobals->mapname),"de",sizeof(char)*2) == 0){		// de
-				if(bot_teamnm == TE){												// te - planting
+				if(bot_teamnm == CS_TEAM_TE){												// te - planting
 					if( bot_weapons & (1<<CS_WEAPON_C4)){// test if the bot has c4
 						if(current_weapon.iId == CS_WEAPON_C4){		// already changed to c4 ??
 							//bPlantDefBomb = true;			// set flag that bot's currently planting bomb
@@ -779,7 +779,7 @@ bool CBotCS :: HandleNearWP(int iNearWP, bool &bReturn){
 		
 		if(waypoints[iNearWP].flags & W_FL_FLAG_GOAL){			// just say, no hostage
 			if(i_UsedHostages
-				&& bot_teamnm == CT){
+				&& bot_teamnm == CS_TEAM_CT){
 				Task.AddTask(BT_CAMP, gpGlobals->time + 5.0,0,0,0);
 				if(RANDOM_LONG(0,100) < 70)
 					Jump();
@@ -1597,7 +1597,7 @@ bool CBotCS :: DecideOnWay(void){
 		
 		if (g_iTypeoM == MT_CS){		// cs
 			//FakeClientCommand(pEdict,"say cs");
-			if(bot_teamnm == TE){								// te
+			if(bot_teamnm == CS_TEAM_TE){								// te
 				if(f_timesrs < 20
 					&& RANDOM_LONG(0,100) < 20
 					&&!HasSniper()){
@@ -1707,7 +1707,7 @@ bool CBotCS :: DecideOnWay(void){
 		}
 		else if (g_iTypeoM == MT_DE){	// de
 			//FakeClientCommand(pEdict,"say de");
-			if(bot_teamnm == TE){								// te
+			if(bot_teamnm == CS_TEAM_TE){								// te
 				if(HasSniper()			// go to sniper point, if ya've a good sniper weapon
 					&& RANDOM_LONG(0,100) < 50
 					&& !(bot_weapons & 1<<CS_WEAPON_C4)){
@@ -1874,7 +1874,7 @@ bool CBotCS :: DecideOnWay(void){
 	}
 	else if(g_iTypeoM == MT_AS){
 		//if(RANDOM_LONG(0,100) < 10)FakeClientCommand(pEdict,"say ---------------");
-		if(bot_teamnm == CT){
+		if(bot_teamnm == CS_TEAM_CT){
 			if(bot_vip){
 				lDestination = WaypointFindRandomGoal(pEdict->v.origin,pEdict,100000,bot_teamnm,W_FL_VIP_RESCUE);
 				iWantedDiv = 1;
