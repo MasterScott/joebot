@@ -287,7 +287,7 @@ CBotWPDir g_WPDir;
 
 char welcome_msg[200];
 char _JOEBOTVERSION[80];
-char _JOEBOTVERSIONWOOS[80]= "1.6.3";
+char _JOEBOTVERSIONWOOS[80]= "1.6.5";
 bool bDedicatedWelcome = false;
 int g_iTypeoM;
 
@@ -385,11 +385,18 @@ void GameDLLInit( void )
 	WeaponDefs.Init();
 
 	g_bMyBirthday = MyBirthday();
-	
+#ifdef USE_METAMOD
+#ifdef _WIN32
+	sprintf(_JOEBOTVERSION,"%smm (win32)",_JOEBOTVERSIONWOOS);
+#else
+	sprintf(_JOEBOTVERSION,"%smm (linux)",_JOEBOTVERSIONWOOS);
+#endif
+#else
 #ifdef _WIN32
 	sprintf(_JOEBOTVERSION,"%s (win32)",_JOEBOTVERSIONWOOS);
 #else
 	sprintf(_JOEBOTVERSION,"%s (linux)",_JOEBOTVERSIONWOOS);
+#endif
 #endif
 #ifdef _DEBUG
 	strcat(_JOEBOTVERSION," DBGV");
