@@ -22,7 +22,7 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#if !defined(__CHATBOT_H)
+#ifndef __CHATBOT_H
 #define __CHATBOT_H
 
 class CBotBase;
@@ -47,4 +47,4 @@ public:
 	float f_SayTime;			// ..
 };
 
-#endif // !defined(__CHATBOT_H)
+#endif //__CHATBOT_H
