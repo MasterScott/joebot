@@ -303,7 +303,7 @@ void BotClient_Valve_SayText(void *p, int bot_index){
 				else if (!strncmp(szFormat + 9, "Name_Change", 11)) {
 					return; // ignore message
 				}
-				// ... Chat_[CT,T,CT_Dead,T_Deac,Spec]
+				// ... Chat_[CT,T,CT_Dead,T_Dead,Spec]
 				else {
 					return; // ignore messages
 				}
@@ -663,7 +663,7 @@ void BotClient_CS_TextMsg(void *p, int bot_index){
 	if ((msg_state - 1) < 10)
 		strcpy(szTextMsg[msg_state-1],(char*)p);		// copy string
 
-		LOG_RADIO(UTIL_VarArgs("%s\n",szTextMsg[msg_state-1]));
+	LOG_DEBUG(UTIL_VarArgs("%d, %s",msg_state,szTextMsg[msg_state-1]));
 
 	if (msg_state == 1){
 		LOG_RADIO(UTIL_VarArgs("--------------------"));
@@ -693,7 +693,7 @@ void BotClient_CS_TextMsg(void *p, int bot_index){
 			strcpy(szTextMsg[msg_state-1],(char*)p);		// copy string
 	}
 	else if (msg_state == 2){
-		if(FStrEq(szTextMsg[0], "#Game_teammate_attack")) {
+		if(FStrEq(szTextMsg[msg_state-2], "#Game_teammate_attack")) {
 			// get edict of radio using player
 			edict_t *pEnt = 0;
 			CBotCS *pBot = ((CBotCS*)(bots[bot_index]));
@@ -722,8 +722,8 @@ void BotClient_CS_TextMsg(void *p, int bot_index){
 		else
 			strcpy(szTextMsg[msg_state-1],(char*)p);		// copy string
 	}
-	else if (msg_state == 3){
-		if(FStrEq(szTextMsg[0],"#Game_radio")){
+	else if (msg_state == 3 || msg_state == 4){
+		if(FStrEq(szTextMsg[msg_state-3],"#Game_radio")){
 			// get edict of radio using player
 			edict_t *pEnt = 0;
 			CBotCS *pBot = ((CBotCS*)(bots[bot_index]));
@@ -743,7 +743,7 @@ void BotClient_CS_TextMsg(void *p, int bot_index){
 				{
 					if(!IsAlive(pEnt))
 						continue;
-					if(FStrEq(szTextMsg[1],STRING(pEnt->v.netname))){// if found ent with that name
+					if(FStrEq(szTextMsg[msg_state - 2],STRING(pEnt->v.netname))){// if found ent with that name
 						pBot->bot_IRadioM.pECalling = pEnt;					// copy pointer to ent
 						
 						pBot->bot_IRadioM.f_Time = gpGlobals->time + RANDOM_FLOAT(.75,2.0);		// this random stuff for faking kind of reaction time to radio commands
@@ -797,7 +797,7 @@ void BotClient_CS_TextMsg(void *p, int bot_index){
 							pBot->bot_IRadioM.lMessage = RC_HOSTAGE_DOWN;
 						else{
 							pBot->bot_IRadioM.lMessage = 0;
-							LOG_RADIO(UTIL_VarArgs("Unknown: %s\n",szTextMsg[msg_state-1]));
+							LOG_RADIO(UTIL_VarArgs("Unknown: %s",szTextMsg[msg_state-1]));
 						}
 						break;
 					}
