@@ -21,6 +21,8 @@ Current Developer on Sourceforge/joebot
 -- This Bot is based on botman's HPB_bot - template code - http://planethalflife.com/botman --
 ----------------------------------------------------------------------------------------------
 
+- Fixed problems with min_bots
+
 JoeBOT 1.6.1 - october 15th, 2002
 - FIXED problems with
 - - joinwhuman_res on/off
