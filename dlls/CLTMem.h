@@ -64,4 +64,4 @@ protected:
 private:
 };
 
-#endif  __CLTMEM_H
+#endif //__CLTMEM_H

@@ -47,4 +47,4 @@ protected:
 private:
 };
 
-#endif  __CPERSONALITY_H
+#endif //__CPERSONALITY_H
