@@ -42,6 +42,7 @@ clean:
 	$(MAKE) -C NNSim $@
 	$(MAKE) -C NNSim/som $@
 	-$(RM) $(DLL)
+	-$(RM) $(DLLNAME)_mingw.def
 
 rebuild: clean all
 
