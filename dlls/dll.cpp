@@ -2334,10 +2334,11 @@ int EXPORT GetEntityAPI( DLL_FUNCTIONS *pFunctionTable, int interfaceVersion )
 extern "C" EXPORT int GetEntityAPI( DLL_FUNCTIONS *pFunctionTable, int interfaceVersion )
 #endif
 {
+#ifndef USE_METAMOD
 	// check if engine's pointer is valid and version is correct...
-	
 	if ( !pFunctionTable || interfaceVersion != INTERFACE_VERSION )
 		return FALSE;
+#endif
 	
 	// pass engine callback function table to engine...
 	memcpy( pFunctionTable, &gFunctionTable, sizeof( DLL_FUNCTIONS ) );
