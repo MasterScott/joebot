@@ -47,18 +47,21 @@ void CBotDOD :: HandleMenu( void )
 	char c_team[32];
 	char c_class[32];
 	
-	if (start_action == MSG_DOD_IDLE){}
-	if (start_action == MSG_DOD_TEAM_SELECT){
-		start_action = MSG_DOD_CLASS_SELECT;  // switch back to idle
+	if (start_action == MSG_DOD_IDLE){
+	}
+	else if (start_action == MSG_DOD_TEAM_SELECT){
+		//start_action = MSG_DOD_CLASS_SELECT;  // switch back to idle
+		start_action = MSG_DOD_IDLE;  // switch back to idle
 		
 		if ((bot_team != 1) && (bot_team != 2) && (bot_team != 5))
 			bot_team = -1;
-		if (bot_team == -1)
-			bot_team = RANDOM_LONG(1,2);
 		
 		// select the team the bot wishes to join...
-		if (bot_team == 1) strcpy(c_team, "1");
-		else if (bot_team == 2) strcpy(c_team, "2");
+		if (bot_team == 1){strcpy(c_team, "1");
+		}
+		else if (bot_team == 2){
+			strcpy(c_team, "2");
+		}
 		else strcpy(c_team, "5");
 		
 		FakeClientCommand(pEdict, "jointeam", c_team, NULL);
@@ -66,7 +69,7 @@ void CBotDOD :: HandleMenu( void )
 		return;
 	}
 	
-	if (start_action == MSG_DOD_CLASS_SELECT)
+	else if (start_action == MSG_DOD_CLASS_SELECT_AL)
 	{
 		start_action = MSG_DOD_IDLE;  // switch back to idle
 		//create_time = gpGlobals->time;  // reset
@@ -74,55 +77,173 @@ void CBotDOD :: HandleMenu( void )
 		if ((bot_class < 1) || (bot_class > 5))
 			bot_class = -1;  // use random if invalid
 		
-		if (bot_class == -1)
-			bot_class = RANDOM_LONG(1,5);
-		
+		/*if (bot_class == -1)
+			bot_class = RANDOLONG(1,5);*/
+
 		// select the class the bot wishes to use...
-		if (bot_class == 1 && bot_team == 1)
+		if (bot_class == 1)
 			strcpy(c_class, "lightinf");
-		else if (bot_class == 2 && bot_team == 1)
+		else if (bot_class == 2)
 			strcpy(c_class, "assaultinf");
-		else if (bot_class == 3 && bot_team == 1)
+		else if (bot_class == 3)
 			strcpy(c_class, "sniper");
-		else if (bot_class == 4 && bot_team == 1)
+		else if (bot_class == 4)
 			strcpy(c_class, "heavyweapons");
-		else if (bot_class == 5 && bot_team == 1)
+		else if (bot_class == 5)
 			strcpy(c_class, "machinegunner");
-		else if (bot_class == 1 && bot_team == 2)
-			strcpy(c_class, "leichtinf");
-		else if (bot_class == 2 && bot_team == 2)
-			strcpy(c_class, "sturmtrup");
-		else if (bot_class == 3 && bot_team == 2)
-			strcpy(c_class, "germansniper");
-		else if (bot_class == 4 && bot_team == 2)
-			strcpy(c_class, "heavyweaponsger");
-		else if (bot_class == 5 && bot_team == 2)
-			strcpy(c_class, "machinegunnerger");
-		
+		else if (bot_class == -1)
+			strcpy(c_class, "randompc");
+
 		FakeClientCommand(pEdict, c_class, NULL,NULL);
 		//sprintf(c_class,"%i",bot_class);
 		//FakeClientCommand(pEdict, "menuselect", c_class, NULL);
 		
 		// bot has now joined the game (doesn't need to be started)
-		not_started = 0;
+		//not_started = 0;
 		return;
 	}
-	
-	if (start_action == MSG_DOD_WPN_SELECT_SERGEANT)
+	else if (start_action == MSG_DOD_CLASS_SELECT_AX)
 	{
-		if(RANDOM_LONG(0,100) < 50){
-			FakeClientCommand(pEdict,"selectwpn1",0,0);
-		}
-		else
-			FakeClientCommand(pEdict,"selectwpn2",0,0);
+		start_action = MSG_DOD_IDLE;  // switch back to idle
+		//create_time = gpGlobals->time;  // reset
+		// select the class the bot wishes to use...
+		if ((bot_class < 1) || (bot_class > 5))
+			bot_class = -1;  // use random if invalid
+
+		// select the class the bot wishes to use...
+		if (bot_class == 1)
+			strcpy(c_class, "leichtinf");
+		else if (bot_class == 2)
+			strcpy(c_class, "sturmtrup");
+		else if (bot_class == 3)
+			strcpy(c_class, "germansniper");
+		else if (bot_class == 4)
+			strcpy(c_class, "heavyweaponsger");
+		else if (bot_class == 5)
+			strcpy(c_class, "machinegunnerger");
+		else if (bot_class == -1)
+			strcpy(c_class, "randompc");
+
+		FakeClientCommand(pEdict, c_class, NULL,NULL);
+		//sprintf(c_class,"%i",bot_class);
+		//FakeClientCommand(pEdict, "menuselect", c_class, NULL);
+		
+		// bot has now joined the game (doesn't need to be started)
+		//not_started = 0;
+		return;
 	}
-	if (start_action == MSG_DOD_WPN_SELECT_MACHINE)
+
+	else if (start_action == MSG_DOD_CLASS_SELECT_AL_PARA)
+	{
+		start_action = MSG_DOD_IDLE;  // switch back to idle
+		//create_time = gpGlobals->time;  // reset
+		// select the class the bot wishes to use...
+		if ((bot_class < 1) || (bot_class > 7))
+			bot_class = -1;  // use random if invalid
+		
+		// select the class the bot wishes to use...
+		if (bot_class == 1)
+			strcpy(c_class, "para_garand");
+		else if (bot_class == 2)
+			strcpy(c_class, "para_carbine");
+		else if (bot_class == 3)
+			strcpy(c_class, "para_thompson");
+		else if (bot_class == 4)
+			strcpy(c_class, "para_greasegun");
+		else if (bot_class == 5)
+			strcpy(c_class, "para_spring");
+		else if (bot_class == 6)
+			strcpy(c_class, "para_bar");
+		else if (bot_class == 7)
+			strcpy(c_class, "para_30cal");
+		else if (bot_class == -1)
+			strcpy(c_class, "para_random");
+
+		FakeClientCommand(pEdict, c_class, NULL,NULL);
+		
+		// bot has now joined the game (doesn't need to be started)
+		//not_started = 0;
+		return;
+	}
+	else if (start_action == MSG_DOD_CLASS_SELECT_AX_PARA)
+	{
+		start_action = MSG_DOD_IDLE;  // switch back to idle
+		//create_time = gpGlobals->time;  // reset
+		// select the class the bot wishes to use...
+		if ((bot_class < 1) || (bot_class > 8))
+			bot_class = -1;  // use random if invalid
+
+		// select the class the bot wishes to use...
+		if (bot_class == 1)
+			strcpy(c_class, "para_kar");
+		else if (bot_class == 2)
+			strcpy(c_class, "para_k43");
+		else if (bot_class == 3)
+			strcpy(c_class, "para_scopedkar");
+		else if (bot_class == 4)
+			strcpy(c_class, "para_mp40");
+		else if (bot_class == 5)
+			strcpy(c_class, "para_mp44");
+		else if (bot_class == 6)
+			strcpy(c_class, "para_fg42");
+		else if (bot_class == 7)
+			strcpy(c_class, "para_mg34");
+		else if (bot_class == 8)
+			strcpy(c_class, "para_mg42");
+		else if (bot_class == -1)
+			strcpy(c_class, "para_random");
+
+		FakeClientCommand(pEdict, c_class, NULL,NULL);
+		
+		// bot has now joined the game (doesn't need to be started)
+		//not_started = 0;
+		return;
+	}
+
+	else if (start_action == MSG_DOD_WPN_SELECT_SERGEANT)
 	{
 		if(RANDOM_LONG(0,100) < 50){
 			FakeClientCommand(pEdict,"selectwpn1",0,0);
 		}
 		else
 			FakeClientCommand(pEdict,"selectwpn2",0,0);
+		start_action = MSG_DOD_IDLE;  // switch back to idle
+	}
+	else if (start_action == MSG_DOD_WPN_SELECT_MACHINE)
+	{
+		if(RANDOM_LONG(0,100) < 50){
+			FakeClientCommand(pEdict,"selectwpn1",0,0);
+		}
+		else
+			FakeClientCommand(pEdict,"selectwpn2",0,0);
+		start_action = MSG_DOD_IDLE;  // switch back to idle
+	}
+	else if (start_action == MSG_DOD_WPN_SELECT_GRENADIER)
+	{
+		if(RANDOM_LONG(0,100) < 50){
+			FakeClientCommand(pEdict,"selectwpn1",0,0);
+		}
+		else
+			FakeClientCommand(pEdict,"selectwpn2",0,0);
+		start_action = MSG_DOD_IDLE;  // switch back to idle
+	}
+	else if (start_action == MSG_DOD_WPN_SELECT_RIFLEMAN)
+	{
+		if(RANDOM_LONG(0,100) < 50){
+			FakeClientCommand(pEdict,"selectwpn1",0,0);
+		}
+		else
+			FakeClientCommand(pEdict,"selectwpn2",0,0);
+		start_action = MSG_DOD_IDLE;  // switch back to idle
+	}
+	else if (start_action == MSG_DOD_WPN_SELECT_FG42)
+	{
+		if(RANDOM_LONG(0,100) < 50){
+			FakeClientCommand(pEdict,"selectwpn1",0,0);
+		}
+		else
+			FakeClientCommand(pEdict,"selectwpn2",0,0);
+		start_action = MSG_DOD_IDLE;  // switch back to idle
 	}
 }
 

@@ -83,16 +83,30 @@ void BotClient_DOD_VGUI(void *p, int bot_index,int iAdd)
 			bots[bot_index]->start_action = MSG_DOD_TEAM_SELECT;
 		
 		else if ((*(int *)p) == 10)  // is is a class selection axis menu?
-			bots[bot_index]->start_action = MSG_DOD_CLASS_SELECT;
+			bots[bot_index]->start_action = MSG_DOD_CLASS_SELECT_AX;
 		
-		else if ((*(int *)p) == 9)  // is is a class selection axis menu?
-			bots[bot_index]->start_action = MSG_DOD_CLASS_SELECT;
+		else if ((*(int *)p) == 9)  // is is a class selection allies menu?
+			bots[bot_index]->start_action = MSG_DOD_CLASS_SELECT_AL;
 
-		else if ((*(int *)p) == 19)  // is is a class selection axis menu?
+		else if ((*(int *)p) == 21)  // is is a class selection allies menu?	// para
+			bots[bot_index]->start_action = MSG_DOD_CLASS_SELECT_AL_PARA;	
+		else if ((*(int *)p) == 22)  // is is a class selection axis menu?		// para
+			bots[bot_index]->start_action = MSG_DOD_CLASS_SELECT_AX_PARA;
+		
+		else if ((*(int *)p) == 19)  // is is a class selection allies menu of the sergeant?
 			bots[bot_index]->start_action = MSG_DOD_WPN_SELECT_SERGEANT;
 
-		else if ((*(int *)p) == 20)  // is is a class selection axis menu?
+		else if ((*(int *)p) == 20)  // is is a class selection axis menu for machinegunners ?
 			bots[bot_index]->start_action = MSG_DOD_WPN_SELECT_MACHINE;
+
+		else if ((*(int *)p) == 23)  // is is a class selection axis menu for fg42 ?
+			bots[bot_index]->start_action = MSG_DOD_WPN_SELECT_FG42;
+
+		else if ((*(int *)p) == 24)  // is is a class selection axis menu for riflemen ?
+			bots[bot_index]->start_action = MSG_DOD_WPN_SELECT_RIFLEMAN;
+
+		else if ((*(int *)p) == 25)  // is is a class selection axis menu for grenadiers ?
+			bots[bot_index]->start_action = MSG_DOD_WPN_SELECT_GRENADIER;
 	}
 }
 
