@@ -3,20 +3,7 @@
 # ---------------------------------------------------------------------------
 include ../Config.mk
 
-ifeq ($(OPT),debug)
- OBJDIR = $(OBJDIR_DEBUG)
-else
- OBJDIR = $(OBJDIR_RELEASE)
-endif
-
-# build external source list
-include ../NNSim/som/Config.mk
-SRC_SOM := $(SRC:%.cpp=../NNSim/som/%.cpp)
-OBJ_SOM := $(SRC:%.cpp=../NNSim/som/$(OBJDIR)/%.o)
-include ../NNSim/Config.mk
-SRC_NNSIM := $(SRC:%.cpp=../NNSim/%.cpp)
-OBJ_NNSIM := $(SRC:%.cpp=../NNSim/$(OBJDIR)/%.o)
-
+# build object path
 ifeq ($(DLLTYPE),std)
  DLLNAME = joebot
  ifeq ($(OPT),debug)
@@ -32,6 +19,14 @@ else
   OBJDIR = $(OBJDIR_RELEASE_MM)
  endif
 endif
+
+# build external source list
+include ../NNSim/som/Config.mk
+SRC_SOM := $(SRC:%.cpp=../NNSim/som/%.cpp)
+OBJ_SOM := $(SRC:%.cpp=../NNSim/som/$(OBJDIR)/%.o)
+include ../NNSim/Config.mk
+SRC_NNSIM := $(SRC:%.cpp=../NNSim/%.cpp)
+OBJ_NNSIM := $(SRC:%.cpp=../NNSim/$(OBJDIR)/%.o)
 
 # build source list
 include Config.mk
@@ -51,6 +46,7 @@ BASECFLAGS = -I$(JOEBOTDIR)/engine -I$(JOEBOTDIR)/common\
 
 BASECFLAGS += $(EXTRA_CFLAGS)
 
+# compiler flags
 ifeq ($(OPT),debug)
  CFLAGS = $(BASECFLAGS) -g
 else
@@ -63,6 +59,7 @@ else
  endif
 endif
 
+# linker flags
 ifeq ($(OS),Windows_NT)
  DLL = $(DLLNAME).dll
  LD = dllwrap
