@@ -18,28 +18,33 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 ******************************************************************************/
+#include <iostream.h>
+
+#include "extdll.h"
+#include "util.h"
+
 #include "bot_wpstat.h"
 
+#include "bot.h"
 #include "bot_func.h"
-#include "NeuralNet.h"
-#include "som.h"
-#include "NNWeapon.h"
-#include "CRadio.h"
-#include "CSkill.h"
-#include "CSTMem.h"
+#include "bot_names.h"
+#include "bot_wpdir.h"
+#include "bot_globaldefs.h"
 #include "CLTMem.h"
 #include "CState.h"
 #include "CTask.h"
 #include "CPersonality.h"
-#include "bot_names.h"
-#include "bot_wpdir.h"
+#include "CRadio.h"
 #include "CSDecals.h"
+#include "CSkill.h"
+#include "CSTMem.h"
 #include "Commandfunc.h"
-
-#include "bot_globaldefs.h"
 #include "globalvars.h"
+#include "NNWeapon.h"
 
-#include <iostream.h>
+#include "NeuralNet.h"
+#include "som.h"
+
 // statistical information based on wps
 CWPStat WPStat;
 
@@ -236,7 +241,7 @@ int CWPStat::Load(void){
 	strcpy(filename, dirname);
 	strcat(filename,"routes");
 
-#ifndef __linux__
+#ifdef _WIN32
 	strcat(filename, "\\");
 #else
 	strcat(filename, "/");
@@ -246,7 +251,7 @@ int CWPStat::Load(void){
 	strcat(filename, ".wst");
 	if(fhd = fopen(filename,"rb")){
 		fread(&wpsHeaderLoad,sizeof(WPSHEADER),1,fhd);
-		if(strcmp(wpsHeaderLoad.szFTName,_FTNAME)){
+		if(!FStrEq(wpsHeaderLoad.szFTName,_FTNAME)){
 			bright = false;
 		}
 		if(wpsHeaderLoad.lVersion != _WPSVERSION){
@@ -319,7 +324,7 @@ int CWPStat::Save(void){
 	
 	strcpy(filename, dirname);
 	strcat(filename,"routes");
-#ifndef __linux__
+#ifdef _WIN32
 	strcat(filename, "\\");
 #else
 	strcat(filename, "/");
@@ -546,7 +551,7 @@ bool CWPStat :: GetWayInfo(CWay &Way,WAYINFO &wayinfo){
 WPStatITEM &CWPStat :: operator [] (long lI){
 	return ((WPStatITEM &)(d.FItem[lI]));
 }
-void FakeClientCommand(edict_t *pBot, char *arg1, char *arg2, char *arg3);
+
 void CWPStat ::CalcSlice(void){
 	long lschl;
 
@@ -572,8 +577,7 @@ void CWPStat ::CalcSlice(void){
 		fclose(fp);*/
 
 		//pWPV = (long*)malloc(lNWPfWPV*(lNWPfWPV/16) * sizeof(long));
-		//sprintf(szTemp,"%li",lNWPfWPV);
-		//if(listenserver_edict)FakeClientCommand(listenserver_edict,"say",szTemp,0);
+		//if(listenserver_edict)FakeClientCommand(listenserver_edict,"say %li",lNWPfWPV);
 		memset(pWPV,0,(lNWPfWPV*lNWPfWPV/16+16) * sizeof(long));
 
 		for(lschl = 0;lschl < num_waypoints;lschl++){
