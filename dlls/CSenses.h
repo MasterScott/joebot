@@ -21,7 +21,6 @@
 #ifndef __CSENSES_H
 #define __CSENSES_H
 
-//#include "CBotBase.h"
 class CBotBase;
 
 class CSenses{
@@ -35,4 +34,4 @@ private:
 	CBotBase *pBot;
 };
 
-#endif  __CSENSES_H
+#endif //__CSENSES_H

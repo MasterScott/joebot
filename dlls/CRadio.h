@@ -22,9 +22,6 @@
 #define __CBOTRADIO_H
 
 #include "extdll.h"
-#include "util.h"
-#include "cbase.h"
-#include "weaponinfo.h"
 
 class CRadio{
 public:
@@ -38,4 +35,4 @@ protected:
 private:
 };
 
-#endif  __CBOTRADIO_H
+#endif //__CBOTRADIO_H

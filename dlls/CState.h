@@ -21,9 +21,7 @@
 #ifndef __CSTATE_H
 #define __CSTATE_H
 
-#include "bot_globaldefs.h"
-
-#include "basemem.h"
+#include "extdll.h"
 
 class CState {
 public:
@@ -39,4 +37,4 @@ protected:
 private:
 };
 
-#endif  __CSTATE_H
+#endif //__CSTATE_H

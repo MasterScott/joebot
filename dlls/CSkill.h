@@ -22,11 +22,6 @@
 #define __CSKILL_H
 
 #include "CParser.h"
-#include "iostream.h"
-
-#include "extdll.h"
-#include "enginecallback.h"
-#include "util.h"
 
 struct CSkillItem{
 	int iSkill;				// related skill
@@ -56,4 +51,4 @@ protected:
 private:
 };
 
-#endif
+#endif //__CSKILL_H

@@ -21,10 +21,6 @@
 #ifndef __CHAT_H
 #define __CHAT_H
 
-#include <stdio.h>
-#include <string.h>
-#include <iostream.h>
-
 #include "CBotBase.h"
 #include "CParser.h"
 
@@ -130,4 +126,4 @@ private:
 	CChatIElem *pIChatData;
 };
 
-#endif __BOT_CHAT_H
+#endif //__BOT_CHAT_H

@@ -21,10 +21,6 @@
 #ifndef __CPARSER_H
 #define __CPARSER_H
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 class CParser{
 public:
 	CParser();
@@ -37,4 +33,4 @@ protected:
 private:
 };
 
-#endif	__CPARSER_H
+#endif //__CPARSER_H

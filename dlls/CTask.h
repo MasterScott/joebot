@@ -21,15 +21,7 @@
 #ifndef __CTASK_H
 #define __CTASK_H
 
-#include <iostream.h>
-
-#include "bot_globaldefs.h"
-
 #include "extdll.h"
-#include "util.h"
-#include "cbase.h"
-#include "weaponinfo.h"
-#include "limits.h"
 #include "waypoint.h"
 
 #define _MAX_TASKS 20
@@ -116,4 +108,4 @@ private:
 #define BT_TMP			(1<<30)
 #define BT_DEL			(1<<31)
 
-#endif  __CTASK_H
+#endif //__CTASK_H
