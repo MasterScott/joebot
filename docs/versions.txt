@@ -23,7 +23,6 @@ Current Developer on Sourceforge/joebot
 
 JoeBOT 1.6.5.2
 - Added : preliminary shield support
-- fixed : CS 1.6 waypoints
 - fixed : awp weapon select conflict with waypoint command
 - fixed : entity indexing
 - fixed : index range errors with max players/bots
