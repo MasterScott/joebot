@@ -1318,6 +1318,36 @@ void CBotBase :: TestOnButtonWay(CWay &pWay,edict_t **pToUse){
 	}
 }
 
+bool CBotBase :: BoolTestOnButtonWay(int iNearWP,int iGoal){
+	CWay pWay;
+	ConvertFloyd2Way(bot_teamnm,iNearWP,iGoal,&pWay);		// convert to way
+	return BoolTestOnButtonWay(pWay,iNearWP,iGoal);
+}
+
+bool CBotBase :: BoolTestOnButtonWay(CWay &pWay,int iNearWP,int iGoal){
+	// look if there is something (door lift etc) in between which has to be opened 
+	// by a button etc
+	int i,is;
+	edict_t *pEnt;
+	TraceResult tr;
+	Vector entity_origin;
+	//char szClassname[100];
+	
+	for(i=0,is=1;is < pWay.iNum;i++,is++){
+		/*if(WPStat.GetVisible(pWay.iIndices[i],pWay.iIndices[is]))
+			continue;*/
+
+		UTIL_TraceLine(waypoints[pWay.iIndices[i]].origin,waypoints[pWay.iIndices[is]].origin,ignore_monsters,0,&tr);
+		
+		if(tr.pHit != 0){		// hit an ent
+			pEnt = UTIL_FindEntityByString( 0, "target", STRING( tr.pHit->v.targetname ) ); // todo
+			if(pEnt)
+				return false;
+		}
+	}
+	return true;
+}
+
 long CBotBase :: Change2Weapon(const long lWeapon){
 	if(f_DenyWChange < gpGlobals->time && lWeapon < 32&& lWeapon >= 0){
 		FakeClientCommand(pEdict, weapon_defs[lWeapon].szClassname,0,0);
@@ -1486,36 +1516,6 @@ Vector CBotBase :: BodyTarget( edict_t *pBotEnemy){
 	target = pBotEnemy->v.origin + pBotEnemy->v.view_ofs * (.5+f_AimHead/2.0);
 	
 	return target;
-}
-
-bool CBotBase :: BoolTestOnButtonWay(int iNearWP,int iGoal){
-	CWay pWay;
-	ConvertFloyd2Way(bot_teamnm,iNearWP,iGoal,&pWay);		// convert to way
-	return BoolTestOnButtonWay(pWay,iNearWP,iGoal);
-}
-
-bool CBotBase :: BoolTestOnButtonWay(CWay &pWay,int iNearWP,int iGoal){
-	// look if there is something (door lift etc) in between which has to be opened 
-	// by a button etc
-	int i,is;
-	edict_t *pEnt;
-	TraceResult tr;
-	Vector entity_origin;
-	//char szClassname[100];
-	
-	for(i=0,is=1;is < pWay.iNum;i++,is++){
-		/*if(WPStat.GetVisible(pWay.iIndices[i],pWay.iIndices[is]))
-			continue;*/
-
-		UTIL_TraceLine(waypoints[pWay.iIndices[i]].origin,waypoints[pWay.iIndices[is]].origin,ignore_monsters,0,&tr);
-		
-		if(tr.pHit != 0){		// hit an ent
-			pEnt = UTIL_FindEntityByString( 0, "target", STRING( tr.pHit->v.targetname ) ); // todo
-			if(pEnt)
-				return false;
-		}
-	}
-	return true;
 }
 
 bool CBotBase :: PauseShoot(void){
@@ -1925,7 +1925,7 @@ float CBotBase :: ChangePitch( void )
 	idealSpeed = (ideal - current);
 	idealSpeed = idealSpeed*c;
 	aNow = exp(log(a) * g_msecval / 50.f);
-	fViewSpeedPitch = fViewSpeedPitch*aNow + idealSpeed*(1.f-aNow);	// a+b=1, etwa a = 0.8, b=0.2
+	fViewSpeedPitch = fViewSpeedPitch*aNow + idealSpeed*(1.f-aNow);	
 	
 	current += fViewSpeedPitch * 1/*pEdict->v.pitch_speed*/ * (g_msecval/50.f);
 	
@@ -1963,7 +1963,7 @@ float CBotBase :: ChangeBodyPitch( void )
 	idealSpeed = (ideal - current);
 	idealSpeed = idealSpeed*c;
 	aNow = exp(log(a) * g_msecval / 50.0f);
-	fAngleSpeedPitch = fAngleSpeedPitch*aNow + idealSpeed*(1.0f-aNow);	// a+b=1, etwa a = 0.8, b=0.2
+	fAngleSpeedPitch = fAngleSpeedPitch*aNow + idealSpeed*(1.0f-aNow);	
 	
 	current += fAngleSpeedPitch * 1.0f * (g_msecval/50.0f);
 	
@@ -2025,7 +2025,7 @@ float CBotBase :: ChangeYaw( void ){
 	idealSpeed = (ideal - current);
 	idealSpeed = idealSpeed*c;
 	aNow = exp(log(a) * g_msecval / 50.0f);
-	fViewSpeedYaw = fViewSpeedYaw*aNow + idealSpeed*(1.0f-aNow);	// a+b=1, etwa a = 0.8, b=0.2
+	fViewSpeedYaw = fViewSpeedYaw*aNow + idealSpeed*(1.0f-aNow);	
 	
 	current += fViewSpeedYaw * /*pEdict->v.yaw_speed*/1.0f * (g_msecval/50.0f);
 	
@@ -2089,7 +2089,7 @@ float CBotBase :: ChangeBodyYaw( void ){
 	idealSpeed = (ideal - current);
 	idealSpeed = idealSpeed*c;
 	aNow = exp(log(a) * g_msecval / 50.0f);
-	fAngleSpeedYaw = fAngleSpeedYaw*aNow + idealSpeed*(1.0f-aNow);	// a+b=1, etwa a = 0.8, b=0.2
+	fAngleSpeedYaw = fAngleSpeedYaw*aNow + idealSpeed*(1.0f-aNow);
 	
 	current += fAngleSpeedYaw * 1.0f * (g_msecval/50.0f);
 	
