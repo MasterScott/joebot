@@ -193,9 +193,9 @@ clean:
 	-$(RM) $(DLL)
 
 install:
-	$(CP) $(DLL) $(CSDIR)\$(DLLNAME).dll
-	$(CP) $(DLL) $(SERVERDIR)\$(DLLNAME).dll
-	$(CP) $(DLL) $(SERVERDIR_CS15)\$(DLLNAME).dll
+	$(CP) $(DLL) "$(CSDIR)\$(DLLNAME).dll"
+	$(CP) $(DLL) "$(SERVERDIR)\$(DLLNAME).dll"
+	$(CP) $(DLL) "$(SERVERDIR_CS15)\$(DLLNAME).dll"
 
 # ---------------------------------------------------------------------------
 # Rules
