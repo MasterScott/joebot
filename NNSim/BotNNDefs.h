@@ -35,6 +35,8 @@ const double dr_weapon_xm1014		=- .4;		// 2 2
 const double dr_weapon_fiveseven	= -.2;		// 1 5 ct
 const double dr_weapon_sg550		=  .9;		// 4 8
 const double dr_weapon_ump45		=  .4;		// 3 5
+const double dr_weapon_galil		=  .0;
+const double dr_weapon_famas		=  .1;
 
 // indices for layers of nn
 
