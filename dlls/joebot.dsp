@@ -56,6 +56,27 @@ BSC32=bscmake.exe
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /machine:I386 /def:"joebot.def"
 # ADD LINK32 /nologo /dll /map /machine:I386 /def:"joebot.def"
+# Begin Custom Build
+TargetPath=.\release\win32\std\joebot.dll
+TargetName=joebot
+InputPath=.\release\win32\std\joebot.dll
+SOURCE="$(InputPath)"
+
+BuildCmds= \
+	copy $(TargetPath) "C:\Program Files\Steam\SteamApps\cruft@hotmail.com\counter-strike\cstrike\joebot" \
+	copy $(TargetPath) "C:\Program Files\Half-Life\cstrike\joebot" \
+	copy $(TargetPath) "C:\HLServer\cstrike\joebot" \
+	
+
+"C:\Program Files\Steam\SteamApps\cruft@hotmail.com\counter-strike\cstrike\joebot\$(TargetName).dll" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+   $(BuildCmds)
+
+"C:\Program Files\Half-Life\cstrike\joebot\$(TargetName).dll" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+   $(BuildCmds)
+
+"C:\HLServer\cstrike\joebot\$(TargetName).dll" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+   $(BuildCmds)
+# End Custom Build
 
 !ELSEIF  "$(CFG)" == "joebot - Win32 Debug"
 
@@ -83,6 +104,27 @@ LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /debug /machine:I386 /def:"joebot.def" /pdbtype:sept
 # ADD LINK32 /nologo /dll /map /debug /machine:I386 /def:"joebot.def" /pdbtype:sept
 # SUBTRACT LINK32 /profile /nodefaultlib
+# Begin Custom Build
+TargetPath=.\debug\win32\std\joebot.dll
+TargetName=joebot
+InputPath=.\debug\win32\std\joebot.dll
+SOURCE="$(InputPath)"
+
+BuildCmds= \
+	copy $(TargetPath) "C:\Program Files\Steam\SteamApps\cruft@hotmail.com\counter-strike\cstrike\joebot" \
+	copy $(TargetPath) "C:\Program Files\Half-Life\cstrike\joebot" \
+	copy $(TargetPath) "C:\HLServer\cstrike\joebot" \
+	
+
+"C:\Program Files\Steam\SteamApps\cruft@hotmail.com\counter-strike\cstrike\joebot\$(TargetName).dll" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+   $(BuildCmds)
+
+"C:\Program Files\Half-Life\cstrike\joebot\$(TargetName).dll" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+   $(BuildCmds)
+
+"C:\HLServer\cstrike\joebot\$(TargetName).dll" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+   $(BuildCmds)
+# End Custom Build
 
 !ELSEIF  "$(CFG)" == "joebot - Win32 Release_mm"
 
@@ -110,6 +152,27 @@ BSC32=bscmake.exe
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /machine:I386 /def:"joebot.def"
 # ADD LINK32 /nologo /dll /map /machine:I386 /def:"joebot.def" /out:"release/win32/mm/joebot_mm.dll"
+# Begin Custom Build
+TargetPath=.\release\win32\mm\joebot_mm.dll
+TargetName=joebot_mm
+InputPath=.\release\win32\mm\joebot_mm.dll
+SOURCE="$(InputPath)"
+
+BuildCmds= \
+	copy $(TargetPath) "C:\Program Files\Steam\SteamApps\cruft@hotmail.com\counter-strike\cstrike\joebot" \
+	copy $(TargetPath) "C:\Program Files\Half-Life\cstrike\joebot" \
+	copy $(TargetPath) "C:\HLServer\cstrike\joebot" \
+	
+
+"C:\Program Files\Steam\SteamApps\cruft@hotmail.com\counter-strike\cstrike\joebot\$(TargetName).dll" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+   $(BuildCmds)
+
+"C:\Program Files\Half-Life\cstrike\joebot\$(TargetName).dll" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+   $(BuildCmds)
+
+"C:\HLServer\cstrike\joebot\$(TargetName).dll" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+   $(BuildCmds)
+# End Custom Build
 
 !ELSEIF  "$(CFG)" == "joebot - Win32 Debug_mm"
 
@@ -139,6 +202,27 @@ LINK32=link.exe
 # SUBTRACT BASE LINK32 /profile
 # ADD LINK32 /nologo /dll /map /debug /machine:I386 /def:"joebot.def" /out:"debug/win32/mm/joebot_mm.dll" /pdbtype:sept
 # SUBTRACT LINK32 /profile
+# Begin Custom Build
+TargetPath=.\debug\win32\mm\joebot_mm.dll
+TargetName=joebot_mm
+InputPath=.\debug\win32\mm\joebot_mm.dll
+SOURCE="$(InputPath)"
+
+BuildCmds= \
+	copy $(TargetPath) "C:\Program Files\Steam\SteamApps\cruft@hotmail.com\counter-strike\cstrike\joebot" \
+	copy $(TargetPath) "C:\Program Files\Half-Life\cstrike\joebot" \
+	copy $(TargetPath) "C:\HLServer\cstrike\joebot" \
+	
+
+"C:\Program Files\Steam\SteamApps\cruft@hotmail.com\counter-strike\cstrike\joebot\$(TargetName).dll" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+   $(BuildCmds)
+
+"C:\Program Files\Half-Life\cstrike\joebot\$(TargetName).dll" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+   $(BuildCmds)
+
+"C:\HLServer\cstrike\joebot\$(TargetName).dll" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+   $(BuildCmds)
+# End Custom Build
 
 !ENDIF 
 
