@@ -32,6 +32,7 @@
 
 #include "bot.h"
 #include "bot_wpstat.h"
+#include "Commandfunc.h"
 #include "globalvars.h"
 
 bool CBotDOD :: GoToSpEnt(void){
@@ -236,7 +237,7 @@ bool CBotDOD :: HeadTowardWaypoint(void){
 							Task.AddTask(BT_CAMP,fDuration,0,0,0);
 							//FakeClientCommand(pEdict,"say %f",Task.current->fAdd);
 							InitCamp();
-							if(g_bUseRadio && Task.current->p){
+							if(bool(jb_msgradio->value) && Task.current->p){
 								SendRadioCommand(RADIO_IM_IN_POSITION);
 							}
 							if(f_RWKnife > gpGlobals->time)
@@ -316,7 +317,7 @@ bool CBotDOD :: HeadTowardWaypoint(void){
 						}
 					}
 					
-					if(iNextWP == -1
+					if(iNextWP == WAYPOINT_UNREACHABLE
 						|| iNextWP == iNearWP
 						|| iNextWP > WAYPOINT_UNREACHABLE/2){
 #ifdef DEBUGMESSAGES

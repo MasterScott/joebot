@@ -992,7 +992,7 @@ bool CBotCS :: HeadTowardWaypoint( void ){
 						}
 					}
 					
-					if(iNextWP == -1
+					if(iNextWP == WAYPOINT_UNREACHABLE
 						|| iNextWP == iNearWP
 						|| iNextWP > WAYPOINT_UNREACHABLE/2){
 #ifdef DEBUGMESSAGES
