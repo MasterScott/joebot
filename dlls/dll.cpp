@@ -32,18 +32,15 @@
 //
 
 #include <iostream.h>
+#include <time.h>
 
 #include "extdll.h"
 #include "util.h"
 #include "cbase.h"
 #include "entity_state.h"
 
-#ifdef _WIN32
-#include <time.h>
-#endif
-
 #ifdef USE_METAMOD
-//#define SDK_UTIL_H  // util.h already included
+#define SDK_UTIL_H  // util.h already included
 #include "meta_api.h"
 #endif /* USE_METAMOD */
 
@@ -66,13 +63,13 @@
 
 CWorldGnome CWG;
 
+#define JOEBOT_VERSION "1.6.5"
 #define _MAXCFGLINESPERFRAME 5
 
 #ifndef USE_METAMOD
 extern GETENTITYAPI other_GetEntityAPI;
 extern GETNEWDLLFUNCTIONS other_GetNewDLLFunctions;
 #endif /* not USE_METAMOD */
-extern enginefuncs_t g_engfuncs;
 #ifdef DEBUGENGINE
 extern int debug_engine;
 #endif
@@ -95,7 +92,7 @@ static META_FUNCTIONS gMetaFunctionTable = {
 plugin_info_t Plugin_info = {
 	META_INTERFACE_VERSION,	// ifvers
 	"JoeBOT",	// name
-	"1.6.3",	// version
+	JOEBOT_VERSION,	// version
 	"2001/04/01",	// date
 	"@$3.1415rin <as3.1415rin@bots-united.com>",	// author
 	"http://joebot.bots-united.com/",	// url
@@ -287,12 +284,12 @@ CBotWPDir g_WPDir;
 
 char welcome_msg[200];
 char _JOEBOTVERSION[80];
-char _JOEBOTVERSIONWOOS[80]= "1.6.5";
+char _JOEBOTVERSIONWOOS[80]= JOEBOT_VERSION;
 bool bDedicatedWelcome = false;
 int g_iTypeoM;
 
 float f_round_start;	// time of roundstart
-float f_start_round = 0.0;	// when to start after freeze time
+float f_end_freezetime = 0.0;	// when to start after freeze time
 float f_timesrs = 1000;		// time since round start	->	updated every frame by start frame
 
 extern bool bNNInit;
@@ -360,27 +357,20 @@ void CalcDistances(void){
 	}
 }
 
-void JBServerCmd(void)
+void JBServerCommand(void)
 {
 	bool bCmdOK = Commands.Exec(NULL, CM_DEDICATED, CMD_ARGV(1), CMD_ARGV(2), CMD_ARGV(3), CMD_ARGV(4), CMD_ARGV(5));
 	if (!bCmdOK)
-#ifdef USE_METAMOD
 		SERVER_PRINT("Unrecognized joebot server command\n");
-#else /* not USE_METAMOD */
-		(*g_engfuncs.pfnServerPrint)("Unrecognized joebot server command\n");
-#endif /* USE_METAMOD */
 }
 
 void GameDLLInit( void )
 {
 	long lschl;
-	printf("JoeBOT: Launching DLL (CBB%liCBC%liCBD%li%li@%s)\n",sizeof(CBotBase),sizeof(CBotCS),sizeof(CBotDOD),time(NULL),"---");
-#ifdef USE_METAMOD
-	REG_SVR_COMMAND("joebot", JBServerCmd);
-#else /* not USE_METAMOD */
-	(*g_engfuncs.pfnAddServerCommand)("joebot", JBServerCmd);
-#endif /* USE_METAMOD */
-	JBRegCvars();
+	LOG_MESSAGE(PLID, "Launching DLL (CBB%liCBC%liCBD%li%li@%s)",sizeof(CBotBase),sizeof(CBotCS),sizeof(CBotDOD),time(NULL),"---");
+	REG_SVR_COMMAND("joebot", JBServerCommand);
+	RegisterCvars();
+	SERVER_COMMAND("exec joebot/joebot.cfg\n");
 
 	WeaponDefs.Init();
 
@@ -439,6 +429,10 @@ void GameDLLInit( void )
 	}
 	
 	g_WPDir.Init();
+	if (bool(jb_wploadrandom->value)){
+		g_WPDir.MixIt();
+	}
+
 	Skill.Load();
 	Names.init();
 	UpdateLanguage();
@@ -486,16 +480,16 @@ void GameDLLInit( void )
 		NNCombat = (CBaseNeuralNetFF *)NNCombatP;
 		if (IS_DEDICATED_SERVER())
 			if(NNCombat)
-				printf("JoeBOT: loading neural network: %s\n", szFileNameNN);
+				LOG_MESSAGE(PLID, "Loading neural network: %s", szFileNameNN);
 			else
-				printf("JoeBOT: error loading neural network: %s\n", szFileNameNN);
+				LOG_MESSAGE(PLID, "Error loading neural network: %s", szFileNameNN);
 			if(!NNCombat)
 				NNCombat = new CNeuralNetBProp;
 			
 			bNNInitError = false;
 			/*}catch(...){		// just create a fuckin' NN to avoid any unforseen consequences
 			if (IS_DEDICATED_SERVER())
-			printf("JoeBOT : %s - havn't found NN - creating fake ones, to prevent crashing\n",szFileNameNN);
+			LOG_MESSAGE(PLID, "%s - haven't found NN - creating fake ones, to prevent crashing",szFileNameNN);
 			NNCombat->SetLayerNum(4);
 			NNCombat->SetNNeuronsOnLayer(0,IEND);
 			NNCombat->SetNNeuronsOnLayer(1,7);
@@ -515,16 +509,16 @@ void GameDLLInit( void )
 				NNColl = (CBaseNeuralNetFF *)NNCollP;
 				if (IS_DEDICATED_SERVER())
 					if(NNColl)
-						printf("JoeBOT: loading neural network: %s\n", szFileNameNN);
+						LOG_MESSAGE(PLID, "Loading neural network: %s", szFileNameNN);
 					else
-						printf("JoeBOT: error loading neural network: %s\n", szFileNameNN);
+						LOG_MESSAGE(PLID, "Error loading neural network: %s", szFileNameNN);
 					if(!NNColl)
 						NNColl = new CNeuralNetBProp;
 					
 					bNNInitError = false;
 			}catch(...){		// just create a fuckin' NN to avoid any unforseen consequences
 				if (IS_DEDICATED_SERVER())
-					printf("JoeBOT: %s - havn't found NN - creating fake ones, to prevent crashing\n",szFileNameNN);
+					LOG_MESSAGE(PLID, "%s - haven't found NN - creating fake ones to prevent crashing",szFileNameNN);
 				NNColl = new CNeuralNetBProp;
 				NNCombat = new CNeuralNetBProp;
 				bNNInitError = true;
@@ -538,7 +532,7 @@ void GameDLLInit( void )
 	NNColl->Propagate();
 
 	if (IS_DEDICATED_SERVER())
-		printf("JoeBOT: 'Precaching' nets\n");
+		LOG_MESSAGE(PLID, "'Precaching' nets");
 	
 #ifdef USE_METAMOD
 	RETURN_META(MRES_IGNORED);
@@ -556,7 +550,7 @@ int DispatchSpawn( edict_t *pent )
 	{
 		char *pClassname = (char *)STRING(pent->v.classname);
 		
-		BOT_LOG("DispatchSpawn", "pent=%x, classname=%s, model=%s", pent, pClassname, pent->v.model ? STRING(pent->v.model) : "");
+		BOT_LOG("DispatchSpawn", ("pent=%x, classname=%s, model=%s", pent, pClassname, pent->v.model ? STRING(pent->v.model) : ""));
 		
 		if (FStrEq(pClassname, "worldspawn"))
 		{
@@ -672,7 +666,7 @@ void DispatchBlocked( edict_t *pentBlocked, edict_t *pentOther )
 
 void DispatchKeyValue( edict_t *pentKeyvalue, KeyValueData *pkvd )
 {
-	//BOT_LOG("DispatchKeyValue", "pentKeyvalue=%x, %s=%s", pentKeyvalue, pkvd->szKeyName, pkvd->szValue);
+	//BOT_LOG("DispatchKeyValue", ("pentKeyvalue=%x, %s=%s", pentKeyvalue, pkvd->szKeyName, pkvd->szValue));
 	(*other_gFunctionTable.pfnKeyValue)(pentKeyvalue, pkvd);
 }
 
@@ -724,7 +718,7 @@ BOOL ClientConnect( edict_t *pEntity, const char *pszName, const char *pszAddres
 		int i;
 		int count = 0;
 		
-		BOT_LOG("ClientConnect", "pEntity=%x, pszName=%s", pEntity, pszName);
+		BOT_LOG("ClientConnect", ("pEntity=%x, pszName=%s", pEntity, pszName));
 		
 		// check if this client is the listen server client
 		if (FStrEq(pszAddress, "loopback"))
@@ -754,10 +748,7 @@ BOOL ClientConnect( edict_t *pEntity, const char *pszName, const char *pszAddres
 			{
 				for (i=0; i < 32; i++){
 					if (bots[i]){  // is this slot used?
-						sprintf(szTemp, "kick \"%s\"\n", STRING(bots[i]->pEdict->v.netname));
-						
-						SERVER_COMMAND(szTemp);  // kick the bot using (kick "name")
-						
+						SERVER_COMMAND(UTIL_VarArgs("kick \"%s\"\n", STRING(bots[i]->pEdict->v.netname)));  // kick the bot using (kick "name")
 						break;
 					}
 				}
@@ -792,7 +783,7 @@ void ClientDisconnect( edict_t *pEntity )
 	if (gpGlobals->deathmatch)
 	{
 		int i;
-		BOT_LOG("ClientDisconnect", "pEntity=%x", pEntity);
+		BOT_LOG("ClientDisconnect", ("pEntity=%x", pEntity));
 		
 		i = 0;
 		while ((i < 32) && (clients[i] != pEntity))
@@ -839,7 +830,7 @@ void ClientDisconnect( edict_t *pEntity )
 
 void ClientKill( edict_t *pEntity )
 {
-	BOT_LOG("ClientKill", "pEntity=%x", pEntity);
+	BOT_LOG("ClientKill", ("pEntity=%x", pEntity));
 #ifdef USE_METAMOD
 	RETURN_META(MRES_IGNORED);
 #else /* not USE_METAMOD */
@@ -849,7 +840,7 @@ void ClientKill( edict_t *pEntity )
 
 void ClientPutInServer( edict_t *pEntity )
 {
-	BOT_LOG("ClientPutInServer", "pEntity=%x", pEntity);
+	BOT_LOG("ClientPutInServer", ("pEntity=%x", pEntity));
 	
 	int i = 0;
 	
@@ -874,10 +865,7 @@ void ClientPutInServer( edict_t *pEntity )
 		{
 			for (i=0; i < 32; i++){
 				if (bots[i]){  // is this slot used?
-					sprintf(szTemp, "kick \"%s\"\n", STRING(bots[i]->pEdict->v.netname));
-
-					SERVER_COMMAND(szTemp);  // kick the bot using (kick "name")
-					
+					SERVER_COMMAND(UTIL_VarArgs("kick \"%s\"\n", STRING(bots[i]->pEdict->v.netname)));  // kick the bot using (kick "name")
 					break;
 				}
 			}
@@ -913,8 +901,8 @@ FILL_FULL
 				char *infobuffer; 
 				char cl_name[128]; 
 				cl_name[0]='\0'; 
-				infobuffer = (*g_engfuncs.pfnGetInfoKeyBuffer)(pEnt); 
-				strcpy(cl_name,g_engfuncs.pfnInfoKeyValue(infobuffer, "name")); 
+				infobuffer = GET_INFOKEYBUFFER(pEnt); 
+				strcpy(cl_name,INFOKEY_VALUE(infobuffer, "name")); 
 				if(cl_name[0]!='\0') 
 				{ 
 					iPAll ++;
@@ -986,16 +974,15 @@ void KickBots(edict_t *pEntity,int iTeam,int iAll){
 	char szName[100];
 	for(i=0;i<32;i++){
 		if(bots[i]){
-			sprintf(szName, "kick \"%s\"\n", STRING(bots[i]->pEdict->v.netname));
 			if(iTeam != -1){
 				if((iTeam ? 2 : 1) == bots[i]->bot_team){
-					SERVER_COMMAND(szName);
+					SERVER_COMMAND( UTIL_VarArgs("kick \"%s\"\n", STRING(bots[i]->pEdict->v.netname)) );
 					if(!iAll)
 						return;
 				}
 			}
 			else{
-				SERVER_COMMAND(szName);
+				SERVER_COMMAND( UTIL_VarArgs("kick \"%s\"\n", STRING(bots[i]->pEdict->v.netname)) );
 				if(!iAll)
 					return;
 			}
@@ -1025,7 +1012,6 @@ sprintf(szDir,"dod/joebot/");
 }
 char szLoadText[80];
 char szSave[80];
-char msg[200];
 strcpy(szLoadText,szDir);
 strcat(szLoadText,"nntrain.pta");
 strcpy(szSave,szDir);
@@ -1036,12 +1022,10 @@ strcat(szSave,"nntrain.ptt");
 	NNCPattern.LoadText(szLoadText);
 	}
 	catch(...){
-	sprintf(msg,"Error loading %s\n",szLoadText);
-	ClientPrint( VARS(pEntity), HUD_PRINTNOTIFY, msg);
+	UTIL_ConsoleMessage(pEntity, "Error loading %s\n",szLoadText);
 	return;
 	}	
-	sprintf(msg,"Sucessfully loading %s\n",szLoadText);
-	ClientPrint( VARS(pEntity), HUD_PRINTNOTIFY, msg);
+	UTIL_ConsoleMessage(pEntity, "Sucessfully loading %s\n",szLoadText);
 	NNCPattern.Save(szSave);
 	NNCPattern.SetNN(NNCombat);
 	
@@ -1063,15 +1047,13 @@ strcat(szSave,"nntrain.ptt");
 	  if(lschl >= MAX_TRIES){
 	  lEpoch = 0;
 	  NNCombat->InitConnections(-.3,.3);
-	  sprintf(msg,"%i.after %i epochs the net could not be trained to a max error of %.2f, it's %.2f - resetting nn and trying again\n",lloop,MAX_TRIES, _MAXERROR,dError);
-	  ClientPrint( VARS(pEntity), HUD_PRINTNOTIFY, msg);
+	  UTIL_ConsoleMessage(pEntity, "%i.after %i epochs the net could not be trained to a max error of %.2f, it's %.2f - resetting nn and trying again\n",lloop,MAX_TRIES, _MAXERROR,dError);
 	  }
 	  else{
 	  bflag = false;
 	  }
 	  if(lloop>10){
-	  sprintf(msg,"%i. after %i epochs the net could be trained to a max error of %.2f - canceling training and reloading",lloop,MAX_TRIES, _MAXERROR);
-	  ClientPrint( VARS(pEntity), HUD_PRINTNOTIFY, msg);
+	  UTIL_ConsoleMessage(pEntity, "%i. after %i epochs the net could be trained to a max error of %.2f - canceling training and reloading\n",lloop,MAX_TRIES, _MAXERROR);
 	  char filename[80];
 	  UTIL_BuildFileName(filename,"joebot","nn.br3");
 	  NNCombat->Save(filename);
@@ -1079,8 +1061,7 @@ strcat(szSave,"nntrain.ptt");
 	  }
 	  }
 	  if(dError < _MAXERROR){
-	  sprintf(msg,"after %i epochs the net could be trained to a max error of %.2f\nNow you can test the net and if u wish to save it, do 'savenn'\n",lloop, _MAXERROR);
-	  ClientPrint( VARS(pEntity), HUD_PRINTNOTIFY, msg);
+	  UTIL_ConsoleMessage(pEntity, "after %i epochs the net could be trained to a max error of %.2f\nNow you can test the net and if u wish to save it, do 'savenn'\n",lloop, _MAXERROR);
 }*/
 }
 
@@ -1108,7 +1089,7 @@ void ClientCommand( edict_t *pEntity )
 	if ((gpGlobals->deathmatch) && (!IS_DEDICATED_SERVER()) &&
 		(pEntity == listenserver_edict))
 	{
-		BOT_LOG("ClientCommand", "g_argv=%s", g_argv);
+		BOT_LOG("ClientCommand", ("g_argv=%s", g_argv));
 		if (Commands.Exec(pEntity, CM_CONSOLE, CMD_ARGV(0), CMD_ARGV(1), CMD_ARGV(2), CMD_ARGV(3), CMD_ARGV(4)))
 #ifdef USE_METAMOD
 			RETURN_META(MRES_SUPERCEDE);
@@ -1127,7 +1108,7 @@ void ClientCommand( edict_t *pEntity )
 #ifndef USE_METAMOD
 void ClientUserInfoChanged( edict_t *pEntity, char *infobuffer )
 {
-	BOT_LOG("ClientUserInfoChanged", "pEntity=%x, infobuffer=%s", pEntity, infobuffer);
+	BOT_LOG("ClientUserInfoChanged", ("pEntity=%x, infobuffer=%s", pEntity, infobuffer));
 	(*other_gFunctionTable.pfnClientUserInfoChanged)(pEntity, infobuffer);
 }
 
@@ -1453,9 +1434,7 @@ void StartFrame( void )
 			
 			if ((bot_cfg_fp = fopen(filename, "r")) != NULL)
 			{
-				sprintf(msg, "JoeBOT: Executing %s\n", filename);
-				ALERT( at_console, msg );
-				printf(msg);
+				UTIL_ConsoleMessage( NULL, "Executing %s\n", filename);
 				
 				/*for (index = 0; index < 32; index++)
 				{
@@ -1855,8 +1834,7 @@ void StartFrame( void )
 					bots[bot_index]->bot_team > 0 &&
 					!UTIL_HumansInGame())
 				{
-					sprintf(szTemp, "kick \"%s\"\n", STRING(bots[bot_index]->pEdict->v.netname));
-					SERVER_COMMAND(szTemp);
+					SERVER_COMMAND(UTIL_VarArgs("kick \"%s\"\n", STRING(bots[bot_index]->pEdict->v.netname)));
 				}
 
 				bots[bot_index]->Think();
@@ -1920,21 +1898,18 @@ void StartFrame( void )
 				
 				if ((bot_cfg_fp = fopen(filename, "r")) != NULL)
 				{
-					sprintf(msg, "JoeBOT: Executing %s\n", filename);
-					ALERT( at_console, msg );
-					printf(msg);
+					UTIL_ConsoleMessage( NULL, "Executing %s\n", filename);
 				}
 				else
 				{
 					UTIL_BuildFileName(filename, "bot.cfg", NULL);
 					
-					sprintf(msg, "JoeBOT: Executing %s\n", filename);
-					ALERT( at_console, msg );
+					UTIL_ConsoleMessage( NULL, "Executing %s\n", filename);
 					
 					bot_cfg_fp = fopen(filename, "r");
 					
 					if (bot_cfg_fp == NULL)
-						ALERT( at_console, "bot.cfg file not found\n" );
+						UTIL_ConsoleMessage( NULL, "bot.cfg file not found\n" );
 				}
 				
 				if (IS_DEDICATED_SERVER())
@@ -2058,10 +2033,7 @@ void StartFrame( void )
 					{
 						for (i=0; i < 32; i++){
 							if (bots[i]){  // is this slot used?
-								sprintf(szTemp, "kick \"%s\"\n", STRING(bots[i]->pEdict->v.netname));
-								
-								SERVER_COMMAND(szTemp);  // kick the bot using (kick "name")
-								
+								SERVER_COMMAND(UTIL_VarArgs("kick \"%s\"\n", STRING(bots[i]->pEdict->v.netname)));  // kick the bot using (kick "name")
 								break;
 							}
 						}
@@ -2125,7 +2097,7 @@ const char *GetGameDescription( void )
 
 void PlayerCustomization( edict_t *pEntity, customization_t *pCust )
 {
-	BOT_LOG("PlayerCustomization", "pEntity=%x", pEntity);
+	BOT_LOG("PlayerCustomization", ("pEntity=%x", pEntity));
 	(*other_gFunctionTable.pfnPlayerCustomization)(pEntity, pCust);
 }
 
@@ -2221,7 +2193,7 @@ void CreateInstancedBaselines( void )
 
 int InconsistentFile( const edict_t *player, const char *filename, char *disconnect_message )
 {
-	BOT_LOG("InconsistentFile", "player=%x, filename=%s", player, filename);
+	BOT_LOG("InconsistentFile", ("player=%x, filename=%s", player, filename));
 	return (*other_gFunctionTable.pfnInconsistentFile)(player, filename, disconnect_message);
 }
 
@@ -2675,11 +2647,10 @@ void ProcessBotCfgFile(void)
 		if(Commands.Exec(0,CM_SCRIPT,cmd,arg1,arg2,arg3,arg4))
 			continue;
 		
-		//sprintf(msg, "JoeBOT : executing server command: %s - is the syntax right ?\n", server_cmd);
-		//ALERT( at_console, msg );
+		//UTIL_ConsoleMessage( NULL, "Executing server command: %s - is the syntax right?\n", server_cmd);
 		
 		/*if (IS_DEDICATED_SERVER())
-		printf(msg);*/
+			LOG_MESSAGE("Executing server command: %s - is the syntax right?", server_cmd);*/
 		
 		SERVER_COMMAND(server_cmd);
 	}
