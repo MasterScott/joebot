@@ -97,6 +97,7 @@ BOOL WINAPI DllMain(
 extern "C" DLLEXPORT void EXPORT GiveFnptrsToDll( enginefuncs_t* pengfuncsFromEngine, globalvars_t *pGlobals )
 #else
 void DLLEXPORT GiveFnptrsToDll( enginefuncs_t* pengfuncsFromEngine, globalvars_t *pGlobals )
+//extern "C" EXPORT void GiveFnptrsToDll( enginefuncs_t* pengfuncsFromEngine, globalvars_t *pGlobals )
 #endif
 #else
 extern "C" DLLEXPORT void GiveFnptrsToDll( enginefuncs_t* pengfuncsFromEngine, globalvars_t *pGlobals )
@@ -271,10 +272,6 @@ extern "C" DLLEXPORT void GiveFnptrsToDll( enginefuncs_t* pengfuncsFromEngine, g
    LoadSymbols(game_dll_filename);  // Load exported symbol table
 #endif
 
-   pengfuncsFromEngine->pfnCmd_Args = pfnCmd_Args;
-   pengfuncsFromEngine->pfnCmd_Argv = pfnCmd_Argv;
-   pengfuncsFromEngine->pfnCmd_Argc = pfnCmd_Argc;
-
    pengfuncsFromEngine->pfnPrecacheModel = pfnPrecacheModel;
    pengfuncsFromEngine->pfnPrecacheSound = pfnPrecacheSound;
    pengfuncsFromEngine->pfnSetModel = pfnSetModel;
@@ -336,6 +333,8 @@ extern "C" DLLEXPORT void GiveFnptrsToDll( enginefuncs_t* pengfuncsFromEngine, g
    pengfuncsFromEngine->pfnCVarGetString = pfnCVarGetString;
    pengfuncsFromEngine->pfnCVarSetFloat = pfnCVarSetFloat;
    pengfuncsFromEngine->pfnCVarSetString = pfnCVarSetString;
+   pengfuncsFromEngine->pfnAlertMessage = pfnAlertMessage;
+   pengfuncsFromEngine->pfnEngineFprintf = pfnEngineFprintf;
    pengfuncsFromEngine->pfnPvAllocEntPrivateData = pfnPvAllocEntPrivateData;
    pengfuncsFromEngine->pfnPvEntPrivateData = pfnPvEntPrivateData;
    pengfuncsFromEngine->pfnFreeEntPrivateData = pfnFreeEntPrivateData;
@@ -355,6 +354,9 @@ extern "C" DLLEXPORT void GiveFnptrsToDll( enginefuncs_t* pengfuncsFromEngine, g
    pengfuncsFromEngine->pfnNameForFunction = pfnNameForFunction;
    pengfuncsFromEngine->pfnClientPrintf = pfnClientPrintf;
    pengfuncsFromEngine->pfnServerPrint = pfnServerPrint;
+   pengfuncsFromEngine->pfnCmd_Args = pfnCmd_Args;
+   pengfuncsFromEngine->pfnCmd_Argv = pfnCmd_Argv;
+   pengfuncsFromEngine->pfnCmd_Argc = pfnCmd_Argc;
    pengfuncsFromEngine->pfnGetAttachment = pfnGetAttachment;
    pengfuncsFromEngine->pfnCRC32_Init = pfnCRC32_Init;
    pengfuncsFromEngine->pfnCRC32_ProcessBuffer = pfnCRC32_ProcessBuffer;
@@ -413,6 +415,26 @@ extern "C" DLLEXPORT void GiveFnptrsToDll( enginefuncs_t* pengfuncsFromEngine, g
    pengfuncsFromEngine->pfnForceUnmodified = pfnForceUnmodified;
    pengfuncsFromEngine->pfnGetPlayerStats = pfnGetPlayerStats;
    pengfuncsFromEngine->pfnAddServerCommand = pfnAddServerCommand;
+
+   // hl1108
+   pengfuncsFromEngine->pfnVoice_GetClientListening = pfnVoice_GetClientListening;
+   pengfuncsFromEngine->pfnVoice_SetClientListening = pfnVoice_SetClientListening;
+
+   // hl1109
+   pengfuncsFromEngine->pfnGetPlayerAuthId = pfnGetPlayerAuthId;
+
+   // 2003/11/10
+   pengfuncsFromEngine->pfnSequenceGet = pfnSequenceGet;
+   pengfuncsFromEngine->pfnSequencePickSentence = pfnSequencePickSentence;
+   pengfuncsFromEngine->pfnGetFileSize = pfnGetFileSize;
+   pengfuncsFromEngine->pfnGetApproxWavePlayLen = pfnGetApproxWavePlayLen;
+   pengfuncsFromEngine->pfnIsCareerMatch = pfnIsCareerMatch;
+   pengfuncsFromEngine->pfnGetLocalizedStringLength = pfnGetLocalizedStringLength;
+   pengfuncsFromEngine->pfnRegisterTutorMessageShown = pfnRegisterTutorMessageShown;
+   pengfuncsFromEngine->pfnGetTimesTutorMessageShown = pfnGetTimesTutorMessageShown;
+   pengfuncsFromEngine->pfnProcessTutorMessageDecayBuffer = pfnProcessTutorMessageDecayBuffer;
+   pengfuncsFromEngine->pfnConstructTutorMessageDecayBuffer = pfnConstructTutorMessageDecayBuffer;
+   pengfuncsFromEngine->pfnResetTutorMessageDecayData = pfnResetTutorMessageDecayData;
 
    // give the engine functions to the other DLL...
    (*other_GiveFnptrsToDll)(pengfuncsFromEngine, pGlobals);

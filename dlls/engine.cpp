@@ -615,6 +615,30 @@ void pfnCVarSetString(const char *szVarName, const char *szValue)
 	//BOT_LOG("pfnCVarSetString", (""));
 	(*g_engfuncs.pfnCVarSetString)(szVarName, szValue);
 }
+void pfnAlertMessage(ALERT_TYPE atype, char *szFmt, ...)
+{
+	BOT_LOG("pfnAlertMessage", (""));
+	va_list		argptr;
+	static char		string[1024];
+
+	va_start ( argptr, szFmt );
+	vsnprintf ( string, sizeof(string), szFmt, argptr );
+	va_end   ( argptr );
+
+	(*g_engfuncs.pfnAlertMessage)(atype, string);
+}
+void pfnEngineFprintf(FILE *pfile, char *szFmt, ...)
+{
+	BOT_LOG("pfnEngineFprintf", (""));
+	va_list		argptr;
+	static char		string[1024];
+
+	va_start ( argptr, szFmt );
+	vsnprintf ( string, sizeof(string), szFmt, argptr );
+	va_end   ( argptr );
+
+	(*g_engfuncs.pfnEngineFprintf)(pfile, string);
+}
 void* pfnPvAllocEntPrivateData(edict_t *pEdict, int32 cb)
 {
 	BOT_LOG("pfnPvAllocEntPrivateData", (""));
@@ -1144,7 +1168,7 @@ int pfnGetLocalizedStringLength(const char *label)
 }
 void pfnRegisterTutorMessageShown(int mid)
 {
-	return (*g_engfuncs.pfnRegisterTutorMessageShown)(mid);
+	(*g_engfuncs.pfnRegisterTutorMessageShown)(mid);
 }
 int pfnGetTimesTutorMessageShown(int mid)
 {
@@ -1152,15 +1176,15 @@ int pfnGetTimesTutorMessageShown(int mid)
 }
 void pfnProcessTutorMessageDecayBuffer(int *buffer, int bufferLength)
 {
-	return (*g_engfuncs.pfnProcessTutorMessageDecayBuffer)(buffer, bufferLength);
+	(*g_engfuncs.pfnProcessTutorMessageDecayBuffer)(buffer, bufferLength);
 }
 void pfnConstructTutorMessageDecayBuffer(int *buffer, int bufferLength)
 {
-	return (*g_engfuncs.pfnConstructTutorMessageDecayBuffer)(buffer, bufferLength);
+	(*g_engfuncs.pfnConstructTutorMessageDecayBuffer)(buffer, bufferLength);
 }
 void pfnResetTutorMessageDecayData(void)
 {
-	return (*g_engfuncs.pfnResetTutorMessageDecayData)();
+	(*g_engfuncs.pfnResetTutorMessageDecayData)();
 }
 #endif /* not USE_METAMOD */
 
@@ -1351,7 +1375,7 @@ enginefuncs_t meta_engfuncs = {
 
 	NULL,			// pfnVoice_GetClientListening()
 	NULL,			// pfnVoice_SetClientListening()
-	NULL,			// pfnGetPlayerAuthID()
+	NULL,			// pfnGetPlayerAuthId()
 
 	NULL,			// pfnSequenceGet()
 	NULL,			// pfnSequencePickSentence()

@@ -175,7 +175,7 @@ void pfnAddServerCommand( char *cmd_name, void (*function) (void) );
 
 qboolean pfnVoice_GetClientListening(int iReceiver, int iSender);
 qboolean pfnVoice_SetClientListening(int iReceiver, int iSender, qboolean bListen);
-const char *pfnGetPlayerAuthID(edict_t *e);
+const char *pfnGetPlayerAuthId(edict_t *e);
 
 void *pfnSequenceGet(const char* fileName, const char* entryName);
 void *pfnSequencePickSentence(const char* groupName, int pickMethod, int *picked);
