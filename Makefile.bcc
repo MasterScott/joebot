@@ -177,6 +177,14 @@ debug_mm:
 debug_std:
 	$(BINDIR)\$(MAKE) -f Makefile.bcc "CFG=debug_std"
 
+release_install:
+	$(BINDIR)\$(MAKE) -f Makefile.bcc "CFG=release_mm" install
+	$(BINDIR)\$(MAKE) -f Makefile.bcc "CFG=release_std" install
+
+debug_install:
+	$(BINDIR)\$(MAKE) -f Makefile.bcc "CFG=debug_mm" install
+	$(BINDIR)\$(MAKE) -f Makefile.bcc "CFG=debug_std" install
+
 release_clean:
 	$(BINDIR)\$(MAKE) -f Makefile.bcc "CFG=release_mm" clean
 	$(BINDIR)\$(MAKE) -f Makefile.bcc "CFG=release_std" clean
@@ -192,7 +200,7 @@ clean:
 	-$(RM) $(OBJDIR)\$(DLLNAME).tds
 	-$(RM) $(DLL)
 
-install:
+install: $(CFG)
 	$(CP) $(DLL) "$(CSDIR)\$(DLLNAME).dll"
 	$(CP) $(DLL) "$(SERVERDIR)\$(DLLNAME).dll"
 	$(CP) $(DLL) "$(SERVERDIR_CS15)\$(DLLNAME).dll"

@@ -3,10 +3,14 @@
 # ---------------------------------------------------------------------------
 include Config.mk
 
+ifndef $(OPT)
+ OPT = release
+endif
+
 # ---------------------------------------------------------------------------
 # Targets
 # ---------------------------------------------------------------------------
-all: release
+all: $(OPT)
 
 release:
 	$(MAKE) -C dlls OPT=release DLLTYPE=mm
@@ -15,6 +19,14 @@ release:
 debug:
 	$(MAKE) -C dlls OPT=debug DLLTYPE=mm
 	$(MAKE) -C dlls OPT=debug DLLTYPE=std
+
+release_install:
+	$(MAKE) -C dlls install OPT=release DLLTYPE=mm
+	$(MAKE) -C dlls install OPT=release DLLTYPE=std
+
+debug_install:
+	$(MAKE) -C dlls install OPT=debug DLLTYPE=mm 
+	$(MAKE) -C dlls install OPT=debug DLLTYPE=std
 
 release_clean:
 	$(MAKE) clean OPT=release DLLTYPE=mm
@@ -31,6 +43,9 @@ release_rebuild:
 debug_rebuild::
 	$(MAKE) rebuild OPT=debug DLLTYPE=mm
 	$(MAKE) rebuild OPT=debug DLLTYPE=std
+
+install: $(OPT)
+	$(MAKE) -C dlls $@
 
 clean:
 	$(MAKE) -C dlls $@
