@@ -22,6 +22,7 @@
 #define __CBOTBASE_H
 
 #include "extdll.h"
+#include "studio.h"
 
 #include "bot_globaldefs.h"
 #include "bot_weapons.h"
@@ -45,8 +46,9 @@
 #ifndef USE_METAMOD
 typedef int (FAR *GETENTITYAPI)(DLL_FUNCTIONS *, int);
 typedef int (FAR *GETNEWDLLFUNCTIONS)(NEW_DLL_FUNCTIONS *, int *);
-typedef void (WINAPI *GIVEFNPTRSTODLL)(enginefuncs_t *, globalvars_t *);
 typedef void (DLLEXPORT *GIVEFNPTRSTODLL)(enginefuncs_t *, globalvars_t *);
+// Typedef for Server_GetBlendingInterface() from Eric Smith on the hlcoders mailing list.
+typedef int (FAR *SERVER_GETBLENDINGINTERFACE)(int version, struct sv_blending_interface_s **ppinterface,struct engine_studio_api_s *pstudio,float (*rotationmatrix)[3][4], float (*bonetransform)[MAXSTUDIOBONES][3][4]);
 #endif /* not USE_METAMOD */
 typedef void (FAR *LINK_ENTITY_FUNC)(entvars_t *);
 
@@ -61,6 +63,7 @@ typedef int BOOL;
 typedef int (*GETENTITYAPI)(DLL_FUNCTIONS *, int);
 typedef int (*GETNEWDLLFUNCTIONS)(NEW_DLL_FUNCTIONS *, int *);
 typedef void (*GIVEFNPTRSTODLL)(enginefuncs_t *, globalvars_t *);
+typedef int (*SERVER_GETBLENDINGINTERFACE)(int version, struct sv_blending_interface_s **ppinterface,struct engine_studio_api_s *pstudio,float (*rotationmatrix)[3][4], float (*bonetransform)[MAXSTUDIOBONES][3][4]);
 #endif /* not USE_METAMOD */
 typedef void (*LINK_ENTITY_FUNC)(entvars_t *);
 
@@ -452,6 +455,8 @@ public:
 
 	CPersonality Personality;
 	CChatBot Chat;
+
+	char m_szDebugMsg[1024];
 protected:
 private:
 };
