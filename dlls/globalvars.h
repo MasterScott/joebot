@@ -163,7 +163,7 @@ extern bool g_b5th;
 
 extern char szWPCreator[80];
 
-extern bool g_bInitRoundStart;
+extern bool g_bInitRoundStart;	 // setting to number of bots on roundstart. every init of bot result in decrementing this variable. if it is 0 and it hasn't been called this rs, a global init function is called :D
 
 extern bool bLoadedLPB;
 
