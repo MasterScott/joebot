@@ -557,8 +557,10 @@ bool CBotCS :: BuyWeapon(void){
 		
 		if(bot_armor<50
 			&& RANDOM_LONG(0,100) < 50){
-			BotBuy_CS_WEAPON_Kevlar(this);
-			BotBuy_CS_WEAPON_KevlarHelmet(this);
+			if (ibot_money > 1000)
+				BotBuy_CS_WEAPON_KevlarHelmet(this);
+			else
+				BotBuy_CS_WEAPON_Kevlar(this);
 		}
 		return true;
 	}
@@ -2681,6 +2683,26 @@ long CBotCS :: WeaponModel2ID(const char *szModel){
 		return CS_WEAPON_GALIL;
 	if(FStrEq(szModel,"models/p_famas.mdl"))
 		return CS_WEAPON_FAMAS;
+
+	if(FStrEq(szModel,"models/shield/p_shield_deagle.mdl"))
+		return CS_WEAPON_DEAGLE;
+	if(FStrEq(szModel,"models/shield/p_shield_fiveseven.mdl"))
+		return CS_WEAPON_FIVESEVEN;
+	if(FStrEq(szModel,"models/shield/p_shield_flashbang.mdl"))
+		return CS_WEAPON_FLASHBANG;
+	if(FStrEq(szModel,"models/shield/p_shield_glock18.mdl"))
+		return CS_WEAPON_GLOCK18;
+	if(FStrEq(szModel,"models/shield/p_shield_hegrenade.mdl"))
+		return CS_WEAPON_HEGRENADE;
+	if(FStrEq(szModel,"models/shield/p_shield_knife.mdl"))
+		return CS_WEAPON_KNIFE;
+	if(FStrEq(szModel,"models/shield/p_shield_p228.mdl"))
+		return CS_WEAPON_P228;
+	if(FStrEq(szModel,"models/shield/p_shield_smokegrenade.mdl"))
+		return CS_WEAPON_SMOKEGRENADE;
+	if(FStrEq(szModel,"models/shield/p_shield_usp.mdl"))
+		return CS_WEAPON_USP;
+
 	return -1;
 }
 
