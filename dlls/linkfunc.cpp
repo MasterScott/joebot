@@ -452,11 +452,6 @@ LINK_ENTITY_TO_FUNC(weapon_usp);
 LINK_ENTITY_TO_FUNC(weapon_ump45);
 LINK_ENTITY_TO_FUNC(weapon_xm1014);
 
-// cs 1.6 - well, just adding some stuff here, still gotta test if it works if cs1.6 is available
-LINK_ENTITY_TO_FUNC(weapon_galil);
-//	LINK_ENTITY_TO_FUNC(weapon_famas);		already in flf linkfuncs
-LINK_ENTITY_TO_FUNC(weapon_shield);
-
 // 1.3
 
 //LINK_ENTITY_TO_FUNC(Server_GetBlendingInterface);

@@ -81,8 +81,8 @@ CPersonality :: ~CPersonality(){
 }
 
 void CPersonality :: Load(char *szName){
-	char szFilename[256];
-	char szWFilename[256];
+	char szFilename[32];
+	char szWFilename[32];
 	char *szFile,*szAct;
 	FILE *fhd;
 	

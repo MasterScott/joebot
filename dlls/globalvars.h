@@ -37,7 +37,7 @@ extern CBaseNeuralNetFF *NNCombat;
 extern CBaseNeuralNetFF *NNColl;
 class NNWeapon;
 extern NNWeapon WeaponDefs;
-extern void (*Buy[32])(CBotBase *);
+extern void (*Buy[2][32])(CBotBase *);
 
 /*extern edict_t *pSmokeG[_MAXGRENADEREC];
 extern bool bSmokeG[_MAXGRENADEREC];

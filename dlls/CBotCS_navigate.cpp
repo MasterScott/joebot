@@ -1724,12 +1724,7 @@ bool CBotCS :: DecideOnWay(void){
 					}
 				}
 				else if(bot_weapons & 1<<CS_WEAPON_C4					// if ya've c4 and U#ve already played some time ...
-					&& RANDOM_LONG(0,100) < 50){
-					lDestination = WaypointFindRandomGoal(pEdict->v.origin,pEdict,100000,bot_teamnm,W_FL_FLAG);
-					iWantedDiv = 0;
-				}
-				else if(bot_weapons & 1<<CS_WEAPON_C4					// if ya've c4 and U#ve already played some time ...
-					&&f_timesrs > 60.0f){
+					&& f_timesrs > 60.0f){
 					lDestination = WaypointFindNearestGoal(pEdict->v.origin,pEdict,100000,bot_teamnm,W_FL_FLAG);
 					iWantedDiv = 0;
 				}
@@ -1774,9 +1769,14 @@ bool CBotCS :: DecideOnWay(void){
 					//FindWayFlag(pEdict,W_FL_FLAG,FW_Cur,WayDecideShortest);
 					if(iNearWP == -1)
 						iNearWP = WaypointFindNearest(pEdict,5000,bot_teamnm);
-
+					int iCount =0;
 					lDestination = WaypointFindNearestGoal(pEdict->v.origin,pEdict,100000,bot_teamnm,W_FL_FLAG,400);		// todo ... IMPROVE !!!!
-
+					while(WaypointDistanceFromTo(iNearWP,lDestination,bot_teamnm) < 300){
+						lDestination = WaypointFindRandomGoal(pEdict->v.origin,pEdict,100000,bot_teamnm,W_FL_FLAG);
+						iCount ++;
+						if(iCount > 10)		// just to prevent hanging
+							break;
+					}
 					if(lDestination != -1){
 						Task.AddTask(BT_GOTO,0,lDestination,(void *) iWantedDiv,0);
 						return true;

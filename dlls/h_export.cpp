@@ -109,27 +109,22 @@ extern "C" DLLEXPORT void GiveFnptrsToDll( enginefuncs_t* pengfuncsFromEngine, g
 
    memcpy(&g_engfuncs, pengfuncsFromEngine, sizeof(enginefuncs_t));
    gpGlobals = pGlobals;
-   
+
    // find the directory name of the currently running MOD...
    (*g_engfuncs.pfnGetGameDir)(game_dir);
-   
-   pos = 0;
-   
-   // copied from botman's board ( well, just one line, but giving credits is something you gotta do :D )
-   if (strstr(game_dir, "/") != NULL){
-	   pos = strlen(game_dir) - 1;
-	   
-	   // scan backwards till first directory separator...
-	   while ((pos) && (game_dir[pos] != '/'))
-		   pos--;
-	   
-	   if (pos == 0)
-	   {
-		   // Error getting directory name!
-		   ALERT( at_error, "JoeBot - Error determining MOD directory name!" );
-	   }
-	   pos++;
+
+   pos = strlen(game_dir) - 1;
+
+   // scan backwards till first directory separator...
+   while ((pos) && (game_dir[pos] != '/'))
+      pos--;
+
+   if (pos == 0)
+   {
+      // Error getting directory name!
+		ALERT( at_error, "JoeBot - Error determining MOD directory name!" );
    }
+   pos++;
    strcpy(mod_name, &game_dir[pos]);
 
    game_dll_filename[0] = 0;

@@ -67,7 +67,7 @@ CWPStat :: CWPStat(){
 }
 
 CWPStat :: ~CWPStat(){
-	//Save();			// thx to wookie
+	Save();
 
 	if(pWPV){
 		delete [] pWPV;

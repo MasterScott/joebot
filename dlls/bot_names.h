@@ -18,11 +18,19 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 ******************************************************************************/
+#ifndef __BOT_NAMES_H
+#define __BOT_NAMES_H
 
-#if !defined(__NAMES_H)
-#define __NAMES_H
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <iostream.h>
 
-#include <list>
+#include "extdll.h"
+#include "util.h"
+#include "cbase.h"
+#include "weaponinfo.h"
+//#include "bot.h"
 
 #include "CParser.h"
 
@@ -33,33 +41,28 @@
 #define BN_PERS_NOR 2
 #define BN_PERS_AGG 3
 
-class CBotNamesItem{
-public:
-	CBotNamesItem();
-	~CBotNamesItem();
-	//const CBotNamesItem &operator=(const CBotNamesItem &);
+//long WeaponClass2ID(const char *szClassname);		// in bot_combat.h
 
-	char m_szName[32];
+typedef struct{
+	char szName[BN_MAXNAMELENGTH];
+} Name;
 
-	// maybe we somewhen can extend this class for using personalities, personal NN files, whatever
-};
-
-class CBotNames:private CParser  
-{
+class CBotNames : private CParser{
 public:
 	CBotNames();
-	virtual ~CBotNames();
+	~CBotNames();
 
-	int init(void);
-
-	bool load(const char *);
-	void mixIt(void);
-	const CBotNamesItem *getName(void);
-
+	int Init(void);
+	int Load(const char *);
+	void MixIt(void);
+	Name *GetName(void);
+protected:
+private:
+	//char szNames[BN_MAXNAMES][BN_MAXNAMELENGTH];
+	Name Names[BN_MAXNAMES];
+	long lNum;
+	long lLReturn;
 	bool bInited;
-
-	std::list<CBotNamesItem> m_LNames;
-	std::list<CBotNamesItem>::iterator m_ICName;		// iterator for m_LNames, so you can go thru the names
 };
 
-#endif // !defined(__NAMES_H)
+#endif __BOT_NAMES_H

@@ -393,7 +393,7 @@ CBotWPDir g_WPDir;
 
 char welcome_msg[200];
 char _JOEBOTVERSION[80];
-char _JOEBOTVERSIONWOOS[80]= "1.6.3";
+char _JOEBOTVERSIONWOOS[80]= "1.6.2";
 bool bDedicatedWelcome = false;
 int g_iTypeoM;
 int g_iLanguage;
@@ -519,12 +519,14 @@ void GameDLLInit( void )
 #ifdef _DEBUG
 	strcat(_JOEBOTVERSION," DBGV");
 #endif
-	
+
 	sprintf(welcome_msg,"----- JoeBot %s by @$3.1415rin { http://www.joebot.net }; -----\n\0",_JOEBOTVERSION);
-	
+
 	for (int i=0; i<32; i++){
 		clients[i] = NULL;
-		Buy[i] = 0;
+		for(int ii=0; ii<2; ii++){
+			Buy[ii][i] = 0;
+		}
 		bWelcome[i] = false;
 		welcome_time[i] = 5;
 		bDedicatedWelcome = false;
@@ -558,40 +560,69 @@ void GameDLLInit( void )
 	
 	g_WPDir.Init();
 	Skill.Load();
-	Names.init();
+	Names.Init();
 	UpdateLanguage();
 	// precaching chat files - at least the standard file :)
 	g_ChatHost.GetChat("texts.txt");
 	
 	// init func table for buying weapons
-	Buy[CS_WEAPON_P228]			= BotBuy_CS_WEAPON_P228;
-	Buy[CS_WEAPON_SCOUT]		= BotBuy_CS_WEAPON_SCOUT;
-	Buy[CS_WEAPON_HEGRENADE]	= BotBuy_CS_WEAPON_HEGRENADE;
-	Buy[CS_WEAPON_XM1014]		= BotBuy_CS_WEAPON_XM1014;
-	Buy[CS_WEAPON_MAC10]		= BotBuy_CS_WEAPON_MAC10;
-	Buy[CS_WEAPON_AUG]			= BotBuy_CS_WEAPON_AUG;
-	Buy[CS_WEAPON_SMOKEGRENADE] = BotBuy_CS_WEAPON_SMOKEGRENADE;
-	Buy[CS_WEAPON_ELITE]		= BotBuy_CS_WEAPON_ELITE;
-	Buy[CS_WEAPON_FIVESEVEN]	= BotBuy_CS_WEAPON_FIVESEVEN;
-	Buy[CS_WEAPON_UMP45]		= BotBuy_CS_WEAPON_UMP45;
-	Buy[CS_WEAPON_SG550]		= BotBuy_CS_WEAPON_SG550;
-	Buy[CS_WEAPON_USP]			= BotBuy_CS_WEAPON_USP;
-	Buy[CS_WEAPON_GLOCK18]		= BotBuy_CS_WEAPON_GLOCK18;
-	Buy[CS_WEAPON_AWP]			= BotBuy_CS_WEAPON_AWP;
-	Buy[CS_WEAPON_MP5NAVY]		= BotBuy_CS_WEAPON_MP5NAVY;
-	Buy[CS_WEAPON_M249]			= BotBuy_CS_WEAPON_M249;
-	Buy[CS_WEAPON_M3]			= BotBuy_CS_WEAPON_M3;
-	Buy[CS_WEAPON_M4A1]			= BotBuy_CS_WEAPON_M4A1;
-	Buy[CS_WEAPON_TMP]			= BotBuy_CS_WEAPON_TMP;
-	Buy[CS_WEAPON_G3SG1]		= BotBuy_CS_WEAPON_G3SG1;
-	Buy[CS_WEAPON_FLASHBANG]	= BotBuy_CS_WEAPON_FLASHBANG;
-	Buy[CS_WEAPON_DEAGLE]		= BotBuy_CS_WEAPON_DEAGLE;
-	Buy[CS_WEAPON_SG552]		= BotBuy_CS_WEAPON_SG552;
-	Buy[CS_WEAPON_AK47]			= BotBuy_CS_WEAPON_AK47;
-	Buy[CS_WEAPON_P90]			= BotBuy_CS_WEAPON_P90;
-	Buy[CS_WEAPON_HEGRENADE]	= BotBuy_CS_WEAPON_HE;
-	Buy[CS_WEAPON_FLASHBANG]	= BotBuy_CS_WEAPON_FL;
-	Buy[CS_WEAPON_SMOKEGRENADE]	= BotBuy_CS_WEAPON_SG;
+	Buy[TE][CS_WEAPON_P228]			= BotBuy_CS_WEAPON_P228_T;
+	Buy[TE][CS_WEAPON_SCOUT]		= BotBuy_CS_WEAPON_SCOUT_T;
+	Buy[TE][CS_WEAPON_HEGRENADE]	= BotBuy_CS_WEAPON_HEGRENADE_T;
+	Buy[TE][CS_WEAPON_XM1014]		= BotBuy_CS_WEAPON_XM1014_T;
+	Buy[TE][CS_WEAPON_MAC10]		= BotBuy_CS_WEAPON_MAC10_T;
+	Buy[TE][CS_WEAPON_AUG]			= BotBuy_CS_WEAPON_AUG_T;
+	Buy[TE][CS_WEAPON_SMOKEGRENADE] = BotBuy_CS_WEAPON_SMOKEGRENADE_T;
+	Buy[TE][CS_WEAPON_ELITE]		= BotBuy_CS_WEAPON_ELITE_T;
+	Buy[TE][CS_WEAPON_FIVESEVEN]	= BotBuy_CS_WEAPON_FIVESEVEN_T;
+	Buy[TE][CS_WEAPON_UMP45]		= BotBuy_CS_WEAPON_UMP45_T;
+	Buy[TE][CS_WEAPON_SG550]		= BotBuy_CS_WEAPON_SG550_T;
+	Buy[TE][CS_WEAPON_USP]			= BotBuy_CS_WEAPON_USP_T;
+	Buy[TE][CS_WEAPON_GLOCK18]		= BotBuy_CS_WEAPON_GLOCK18_T;
+	Buy[TE][CS_WEAPON_AWP]			= BotBuy_CS_WEAPON_AWP_T;
+	Buy[TE][CS_WEAPON_MP5NAVY]		= BotBuy_CS_WEAPON_MP5NAVY_T;
+	Buy[TE][CS_WEAPON_M249]			= BotBuy_CS_WEAPON_M249_T;
+	Buy[TE][CS_WEAPON_M3]			= BotBuy_CS_WEAPON_M3_T;
+	Buy[TE][CS_WEAPON_M4A1]			= BotBuy_CS_WEAPON_M4A1_T;
+	Buy[TE][CS_WEAPON_TMP]			= BotBuy_CS_WEAPON_TMP_T;
+	Buy[TE][CS_WEAPON_G3SG1]		= BotBuy_CS_WEAPON_G3SG1_T;
+	Buy[TE][CS_WEAPON_FLASHBANG]	= BotBuy_CS_WEAPON_FLASHBANG_T;
+	Buy[TE][CS_WEAPON_DEAGLE]		= BotBuy_CS_WEAPON_DEAGLE_T;
+	Buy[TE][CS_WEAPON_SG552]		= BotBuy_CS_WEAPON_SG552_T;
+	Buy[TE][CS_WEAPON_AK47]			= BotBuy_CS_WEAPON_AK47_T;
+	Buy[TE][CS_WEAPON_P90]			= BotBuy_CS_WEAPON_P90_T;
+	/*Buy[TE][CS_WEAPON_HEGRENADE]	= BotBuy_CS_WEAPON_HE_T;
+	Buy[TE][CS_WEAPON_FLASHBANG]	= BotBuy_CS_WEAPON_FL_T;
+	Buy[TE][CS_WEAPON_SMOKEGRENADE]	= BotBuy_CS_WEAPON_SG_T;*/
+
+	Buy[CT][CS_WEAPON_P228]			= BotBuy_CS_WEAPON_P228_CT;
+	Buy[CT][CS_WEAPON_SCOUT]		= BotBuy_CS_WEAPON_SCOUT_CT;
+	Buy[CT][CS_WEAPON_HEGRENADE]	= BotBuy_CS_WEAPON_HEGRENADE_CT;
+	Buy[CT][CS_WEAPON_XM1014]		= BotBuy_CS_WEAPON_XM1014_CT;
+	Buy[CT][CS_WEAPON_MAC10]		= BotBuy_CS_WEAPON_MAC10_CT;
+	Buy[CT][CS_WEAPON_AUG]			= BotBuy_CS_WEAPON_AUG_CT;
+	Buy[CT][CS_WEAPON_SMOKEGRENADE] = BotBuy_CS_WEAPON_SMOKEGRENADE_CT;
+	Buy[CT][CS_WEAPON_ELITE]		= BotBuy_CS_WEAPON_ELITE_CT;
+	Buy[CT][CS_WEAPON_FIVESEVEN]	= BotBuy_CS_WEAPON_FIVESEVEN_CT;
+	Buy[CT][CS_WEAPON_UMP45]		= BotBuy_CS_WEAPON_UMP45_CT;
+	Buy[CT][CS_WEAPON_SG550]		= BotBuy_CS_WEAPON_SG550_CT;
+	Buy[CT][CS_WEAPON_USP]			= BotBuy_CS_WEAPON_USP_CT;
+	Buy[CT][CS_WEAPON_GLOCK18]		= BotBuy_CS_WEAPON_GLOCK18_CT;
+	Buy[CT][CS_WEAPON_AWP]			= BotBuy_CS_WEAPON_AWP_CT;
+	Buy[CT][CS_WEAPON_MP5NAVY]		= BotBuy_CS_WEAPON_MP5NAVY_CT;
+	Buy[CT][CS_WEAPON_M249]			= BotBuy_CS_WEAPON_M249_CT;
+	Buy[CT][CS_WEAPON_M3]			= BotBuy_CS_WEAPON_M3_CT;
+	Buy[CT][CS_WEAPON_M4A1]			= BotBuy_CS_WEAPON_M4A1_CT;
+	Buy[CT][CS_WEAPON_TMP]			= BotBuy_CS_WEAPON_TMP_CT;
+	Buy[CT][CS_WEAPON_G3SG1]		= BotBuy_CS_WEAPON_G3SG1_CT;
+	Buy[CT][CS_WEAPON_FLASHBANG]	= BotBuy_CS_WEAPON_FLASHBANG_CT;
+	Buy[CT][CS_WEAPON_DEAGLE]		= BotBuy_CS_WEAPON_DEAGLE_CT;
+	Buy[CT][CS_WEAPON_SG552]		= BotBuy_CS_WEAPON_SG552_CT;
+	Buy[CT][CS_WEAPON_AK47]			= BotBuy_CS_WEAPON_AK47_CT;
+	Buy[CT][CS_WEAPON_P90]			= BotBuy_CS_WEAPON_P90_CT;
+	/*Buy[CT][CS_WEAPON_HEGRENADE]	= BotBuy_CS_WEAPON_HE_CT;
+	Buy[CT][CS_WEAPON_FLASHBANG]	= BotBuy_CS_WEAPON_FL_CT;
+	Buy[CT][CS_WEAPON_SMOKEGRENADE]	= BotBuy_CS_WEAPON_SG_CT;*/
 	
 	if (!bNNInit){
 		// init SOMPattern
@@ -1987,8 +2018,8 @@ void StartFrame( void )
 					sprintf(szTemp, "kick \"%s\"\n", STRING(bots[bot_index]->pEdict->v.netname));
 					SERVER_COMMAND(szTemp);
 				}
-
-				bots[bot_index]->Think();
+				else
+					bots[bot_index]->Think();
 				
 				count++;
 				/*}
@@ -2173,7 +2204,7 @@ void StartFrame( void )
 					
 					// if there are currently less than the maximum number of "players"
 					// then add another bot using the default skill level...
-					if ((count < max_bots) && (max_bots != -1) && (count < gpGlobals->maxClients))
+					if ((count < max_bots) && (max_bots != -1))
 					{
 						//cout << " ------------------- creating bot due to max_bots" << endl;
 						if(!g_bJoinWHumanMAX){

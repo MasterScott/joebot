@@ -350,6 +350,7 @@ void NNWeapon :: LoadFile(const char *szFileName){
 	char *szFileContent,*szAct,szName[200];
 	long lFileSize,lschl;
 	FILE *fhd;
+	//char szType[200],szWeapon[200];
 	
 	if(lFileSize = GetFileSize(szFileName))
 	{
@@ -376,7 +377,9 @@ void NNWeapon :: LoadFile(const char *szFileName){
 				if(strlen(weapon_defs[lschl].szClassname)){
 					if(szAct = strstr(szFileContent,weapon_defs[lschl].szClassname)){
 						sprintf(szName,"%s %%f",weapon_defs[lschl].szClassname);
+						//cout << szName << endl;
 						sscanf(szAct,szName,&fPBuyProb[mod_id][lschl]);
+						//cout << fPBuyProb[mod_id][lschl] << endl;
 					}
 				}
 			}

@@ -58,7 +58,7 @@ extern CSkill Skill;
 #include "som.h"
 
 // array for fnctions to buy weapons
-void (*Buy[32])(CBotBase *);
+void (*Buy[2][32])(CBotBase *);
 
 int iGlobalRSCount;		// setting to number of bots on roundstart. every init of bot result in decrementing this variable. if it is 0 and it hasn't been called this rs, a global init function is called :D
 float fLGlobalRSInit = -1000;
@@ -293,14 +293,14 @@ void BotCreate( edict_t *pPlayer, const char *szTeam, const char *szClass,const 
 		}
 	}
 	
-	const CBotNamesItem *pName = 0;
+	Name *pName = 0;
 	char szNameThis[32];
 	char szTempName[32];
 	int iSkill;
 	
 	////////////////////////////
-	pName = Names.getName();					// get name from list
-	strcpy(szNameThis,pName->m_szName);
+	pName = Names.GetName();					// get name from list
+	strcpy(szNameThis,pName->szName);
 	index = 0;
 	while ((bots[index]) && (index < 32))
 		index++;
@@ -347,7 +347,7 @@ void BotCreate( edict_t *pPlayer, const char *szTeam, const char *szClass,const 
 		pBot->bot_skill = iSkill;
 	
 	if(!szName || strlen(szName)<2 || !strcmp(szName,"default")|| !strcmp(szName,"unnamed")){// name is default or no specified, get it from bot_names.txt
-		CBotBase :: MakeName(szTempName,pName->m_szName,pBot->bot_skill,bots[index]->d_Manner);
+		CBotBase :: MakeName(szTempName,pName->szName,pBot->bot_skill,bots[index]->d_Manner);
 	}
 	else{
 		CBotBase :: MakeName(szTempName,szName,pBot->bot_skill,bots[index]->d_Manner);

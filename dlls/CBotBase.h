@@ -447,7 +447,7 @@ public:
 	float f_IgnoreFall;			// ignore falling down -> at ladder p.ex.
 	int i_FOV;					// current fov ... that obv not the same like pEdict->v.fov
 
-	float fRightDist,fMiddleDist,fLeftDist;	// 'fuehler' des Bots
+	float fRightDist,fMiddleDist,fLeftDist;	// feeler of the bot
 
 	// 'not frontal' collision stuff
 	//float f_old_direction;

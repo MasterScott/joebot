@@ -398,41 +398,23 @@ int UTIL_GetTeam(edict_t *pEntity)
 		infobuffer = (*g_engfuncs.pfnGetInfoKeyBuffer)( pEntity );
 		strcpy(model_name, (g_engfuncs.pfnInfoKeyValue(infobuffer, "model")));
 		
-		/*if ((strcmp(model_name, "terror") == 0) ||  // Phoenix Connektion
+		if ((strcmp(model_name, "terror") == 0) ||  // Phoenix Connektion
 			(strcmp(model_name, "arab") == 0) ||    // L337 Krew
 			(strcmp(model_name, "artic") == 0) ||   // Artic Avenger
 			(strcmp(model_name, "guerilla") == 0))  // Gorilla Warfare
 		{
-			return TE;
+			return 0;
 		}
-		else */if ((strcmp(model_name, "urban") == 0) ||  // Seal Team 6
+		else if ((strcmp(model_name, "urban") == 0) ||  // Seal Team 6
 			(strcmp(model_name, "gsg9") == 0) ||   // German GSG-9
 			(strcmp(model_name, "sas") == 0) ||    // UK SAS
 			(strcmp(model_name, "gign") == 0) ||   // French GIGN
 			(strcmp(model_name, "vip") == 0))      // VIP
 		{
-			return CT;
+			return 1;
 		}
-
-		/*if ( (*(int *)model_name == ('r'<<24+'r'<<16+'e'<<8+'t')) ||
-			(*(int *)model_name == ('b'<<24+'a'<<16+'r'<<8+'a')) ||
-			(*(int *)model_name == ('i'<<24+'t'<<16+'r'<<8+'a')) ||
-			(*(int *)model_name == ('r'<<24+'e'<<16+'u'<<8+'g')) )    
-			return 0;		// it's a terror
-		else
-			return 1;*/
-
-			/*
-
-			if ( (*(int *)model_name == ('r'<<24+'r'<<16+'e'<<8+'t')) ||
-			(*(int *)model_name == ('b'<<24+'a'<<16+'r'<<8+'a')) ||
-			(*(int *)model_name == ('i'<<24+'t'<<16+'r'<<8+'a')) ||
-			(*(int *)model_name == ('r'<<24+'e'<<16+'u'<<8+'g')) )    
-			return 0;		// it's a terror
-			
-			*/
 		
-		return 0;  // return zero ( TE ) otherwise
+		return 0;  // return zero if team is unknown
 	}
 	else
 	{

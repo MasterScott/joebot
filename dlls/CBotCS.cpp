@@ -318,22 +318,22 @@ bool CBotCS :: BuyWeapon(void){
 			if(RANDOM_LONG(0,100) > 90){
 				if(bot_teamnm == TE){
 					if(bot_money > 1100){
-						Buy[CS_WEAPON_ELITE](this);
+						Buy[bot_teamnm][CS_WEAPON_ELITE](this);
 					}
 					else
 						if(RANDOM_LONG(0,100)>30)
-							Buy[CS_WEAPON_DEAGLE](this);
+							Buy[bot_teamnm][CS_WEAPON_DEAGLE](this);
 						else
-							Buy[CS_WEAPON_P228](this);
+							Buy[bot_teamnm][CS_WEAPON_P228](this);
 				}
 				else{		// ct
 					if(RANDOM_LONG(0,100)>50)
-						Buy[CS_WEAPON_DEAGLE](this);
+						Buy[bot_teamnm][CS_WEAPON_DEAGLE](this);
 					else
 						if(RANDOM_LONG(0,100) < 50)
-							Buy[CS_WEAPON_P228](this);
+							Buy[bot_teamnm][CS_WEAPON_P228](this);
 						else
-							Buy[CS_WEAPON_FIVESEVEN](this);
+							Buy[bot_teamnm][CS_WEAPON_FIVESEVEN](this);
 				}
 			}
 			else{
@@ -480,7 +480,7 @@ bool CBotCS :: BuyWeapon(void){
 				}
 				
 				//FakeClientCommand(pEdict,"menuselect","0",0);	//quit fuckin menues
-				Buy[iWeaponDecision](this);
+				Buy[bot_teamnm][iWeaponDecision](this);
 				
 				if(iWeaponDecision == CS_WEAPON_SCOUT || iWeaponDecision == CS_WEAPON_AWP){
 					Task.RemoveT(BT_ROAMTEAM);
@@ -496,13 +496,13 @@ bool CBotCS :: BuyWeapon(void){
 		if(ibot_money > 900 &&
 			HasPrimary()){
 			if(RANDOM_LONG(0,100) > _BUY_HE){
-				Buy[CS_WEAPON_HEGRENADE](this);
+				Buy[bot_teamnm][CS_WEAPON_HEGRENADE](this);
 			}
 			if(RANDOM_LONG(0,100) > _BUY_FL){
-				Buy[CS_WEAPON_FLASHBANG](this);
+				Buy[bot_teamnm][CS_WEAPON_FLASHBANG](this);
 			}
 			if(RANDOM_LONG(0,100) > _BUY_SG){
-				Buy[CS_WEAPON_SMOKEGRENADE](this);
+				Buy[bot_teamnm][CS_WEAPON_SMOKEGRENADE](this);
 			}
 		}
 		
@@ -517,25 +517,25 @@ bool CBotCS :: BuyWeapon(void){
 			&& HasSecondary() != CS_WEAPON_P228){
 			if(bot_teamnm== CT){
 				if(RANDOM_LONG(0,100) < 33){
-					Buy[CS_WEAPON_DEAGLE](this);
+					Buy[bot_teamnm][CS_WEAPON_DEAGLE](this);
 				}
 				if(RANDOM_LONG(0,100) < 50){
-					Buy[CS_WEAPON_FIVESEVEN](this);
+					Buy[bot_teamnm][CS_WEAPON_FIVESEVEN](this);
 				}
 				else{
-					Buy[CS_WEAPON_P228](this);
+					Buy[bot_teamnm][CS_WEAPON_P228](this);
 				}
 				BotBuy_SAmmo(this);
 			}
 			else{
 				if(RANDOM_LONG(0,100) < 33){
-					Buy[CS_WEAPON_DEAGLE](this);
+					Buy[bot_teamnm][CS_WEAPON_DEAGLE](this);
 				}
 				if(RANDOM_LONG(0,100) < 50){
-					Buy[CS_WEAPON_ELITE](this);
+					Buy[bot_teamnm][CS_WEAPON_ELITE](this);
 				}
 				else{
-					Buy[CS_WEAPON_P228](this);
+					Buy[bot_teamnm][CS_WEAPON_P228](this);
 				}
 				BotBuy_SAmmo(this);
 			}
@@ -880,7 +880,7 @@ void CBotCS :: ReactOnRadio(void){
 					&&iFarGoal != -1){
 					if(WaypointDistanceFromTo(iNearWP,iFarGoal,bot_teamnm) < 900){		// i.e. bot is running the same goal as where there isn't anything
 						iGoal = -1;
-						iFarGoal = WaypointFindNearestGoal(pEdict,iNearWP,bot_teamnm,W_FL_FLAG,300,&iNearWP,1);
+						iFarGoal = WaypointFindNearestGoal(pEdict,iNearWP,bot_teamnm,W_FL_FLAG,&iNearWP,1,300);
 						Task.AddTask(BT_GOTO,gpGlobals->time + 60.0,iFarGoal,(void*)1,0);
 						ResetWPlanning();
 					}
@@ -1712,7 +1712,7 @@ void CBotCS :: Think1(void){
 					float fMin = 1250 + RANDOM_FLOAT(0,500);
 					edict_t *pEdictBomb = 0;
 					
-					while(pEdictBomb = UTIL_FindEntityByClassname(pEdictBomb,"grenade")){	// let's cheat .. search the bomb
+					while(pEdictBomb = UTIL_FindEntityByClassname(pEdictBomb,"grenade")){
 						if(!strcmp(STRING(pEdictBomb->v.model),"models/w_c4.mdl")){
 							break;
 						}
@@ -1726,14 +1726,19 @@ void CBotCS :: Think1(void){
 							if(lFleeto != -1){
 								Task.AddTaskI(BT_FLEE,-1,lFleeto,0,0);
 								ResetWPlanning();
+								//FakeClientCommand(pEdict,"say","fleeing from bomb",0);
 							}
+							//else
+							//FakeClientCommand(pEdict,"say","no wp found",0);
 						}
 					}
+					//else
+					//FakeClientCommand(pEdict,"say","no bomb",0);
 				}
 			}
 		}
 		
-		// although it's never used, it should be updated some time
+		// slthough it's never used, it should be updated some time
 		if(bot_team == 5){
 			bot_team = UTIL_GetTeam(pEdict)+1;
 		}

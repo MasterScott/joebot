@@ -1,22 +1,22 @@
 /******************************************************************************
 
-  JoeBOT - a bot for Counter-Strike
-  Copyright (C) 2000-2002  Johannes Lampel
-  
+    JoeBOT - a bot for Counter-Strike
+    Copyright (C) 2000-2002  Johannes Lampel
+
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
     any later version.
-	
-	  This program is distributed in the hope that it will be useful,
-	  but WITHOUT ANY WARRANTY; without even the implied warranty of
-	  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	  GNU General Public License for more details.
-	  
-		You should have received a copy of the GNU General Public License
-		along with this program; if not, write to the Free Software
-		Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-		
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
 ******************************************************************************/
 // JoeBot
 // by Johannes Lampel
@@ -196,12 +196,12 @@ bool bc_botchat(edict_t *pEntity,int iType,const char *arg1,const char *arg2,con
 	if(g_bChat){
 		sprintf(szTemp,"JoeBOT: Bots are chatting @ %fs\n",g_CHATFREQ);
 		/*if(listenserver_edict);
-		(*g_engfuncs.pfnClientCommand)(listenserver_edict,"speak \"talk system is on\"\n");*/
+			(*g_engfuncs.pfnClientCommand)(listenserver_edict,"speak \"talk system is on\"\n");*/
 	}
 	else{
 		sprintf(szTemp,"JoeBOT: The bots are quiet\n");
 		/*if(listenserver_edict);
-		(*g_engfuncs.pfnClientCommand)(listenserver_edict,"speak \"talk system is off\"\n");*/
+			(*g_engfuncs.pfnClientCommand)(listenserver_edict,"speak \"talk system is off\"\n");*/
 	}
 	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp);
 	return true;
@@ -584,10 +584,10 @@ bool bc_search(edict_t *pEntity,int iType,const char *arg1,const char *arg2,cons
 		strcat(item_name,szBuffer);
 		sprintf(szBuffer,"%f\t\0",pent->v.velocity.Length());
 		strcat(item_name,szBuffer);
-		
+
 		if(pent ->v.owner){
-			sprintf(szBuffer," owner : %s\t\0",STRING(pent->v.owner->v.netname));
-			strcat(item_name,szBuffer);
+		sprintf(szBuffer," owner : %s\t\0",STRING(pent->v.owner->v.netname));
+		strcat(item_name,szBuffer);
 		}
 		
 		FILE *fhd;
@@ -1052,27 +1052,27 @@ bool bc_waypoint(edict_t *pEntity,int iType,const char *arg1,const char *arg2,co
 		  else if (FStrEq(arg1, "flood"))
 		  {
 			  edict_t *pent=0;
-			  
+
 			  WaypointFlood(pEntity->v.origin,atoi(arg2));
-			  
+
 			  /*while(pent = UTIL_FindEntityByClassname(pent,"info_player_start")){
-			  if(pent){
-			  WaypointAuto(pent->v.origin,0);
-			  break;
-			  }
+				  if(pent){
+					  WaypointAuto(pent->v.origin,0);
+					  break;
+				  }
 			  }
 			  while(pent = UTIL_FindEntityByClassname(pent,"info_player_deathmatch")){
-			  if(pent){
-			  WaypointAuto(pent->v.origin,0);
-			  break;
-			  }
+				  if(pent){
+					  WaypointAuto(pent->v.origin,0);
+					  break;
+				  }
 			  }
 			  while(pent = UTIL_FindEntityByClassname(pent,"hostage")){
-			  if(pent){
-			  WaypointAuto(pent->v.origin,0);
-			  break;
-			  }
-		  }*/
+				  if(pent){
+					  WaypointAuto(pent->v.origin,0);
+					  break;
+				  }
+			  }*/
 		  }
 		  else if (FStrEq(arg1, "creator"))
 		  {
@@ -1271,11 +1271,6 @@ bool bc_waypoint(edict_t *pEntity,int iType,const char *arg1,const char *arg2,co
 		  }
 		  else
 		  {
-			  if(strlen(arg1)){
-				  sprintf(szTemp,"parameter unknown : %s",arg1);
-				  ClientPrintEx(VARS(pEntity),HUD_PRINTNOTIFY,szTemp);
-			  }
-			  
 			  if (g_waypoint_on)
 				  ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "waypoints are ON\n");
 			  else
@@ -1598,16 +1593,16 @@ bool bc_fillserver(edict_t *pEntity,int iType,const char *arg1,const char *arg2,
 	else if(!strcmp(arg1,"all")){
 		iTeam = FILL_ALL;
 	}
-	
+
 	if(!strcmp(arg2,"full")){
 		iMode = FILL_FULL;
 	}
 	else if(!strcmp(arg2,"half")){
 		iMode = FILL_HALF;
 	}
-	
+
 	FillServer(iTeam,iMode);
-	
+
 	return true;
 }
 
@@ -1705,6 +1700,6 @@ bool bc_botglow(edict_t *pEntity,int iType,const char *arg1,const char *arg2,con
 	return true;
 }
 /*
-bool bc_whatever(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
-}
+  bool bc_whatever(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
+  }
 */
