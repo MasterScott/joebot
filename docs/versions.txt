@@ -4,7 +4,7 @@
 -                                               -
 -  a s 3 . 1 4 1 5 r i n @ j o e b o t . n e t  -
 -                                               -
--             http://www.joebot.net             -
+-        http://joebot.bots-united.com          -
 -                                               -
 -------------------------------------------------
 
@@ -21,17 +21,25 @@ Current Developer on Sourceforge/joebot
 -- This Bot is based on botman's HPB_bot - template code - http://planethalflife.com/botman --
 ----------------------------------------------------------------------------------------------
 
+JoeBOT 1.6.5
+- Metamod plugin dll released
+- CS 1.6 compatible (shield use not implemented yet)
+- CS 1.5 backward compatible (set cvar jb_cstrike 1)
+- Added jb_* cvars to control all global settings
+- Added joebot.cfg cvar config file as alternative to bot.cfg
+- fixed : joebot server command no longer needs '|' delimiter
+- fixed : bots don't jump during freezetime
+- fixed : crash with waypoint unreachable unsigned int range
 
 JoeBOT 1.6.3
 - fixed : compatibility with HL 3.1.1.1/4.1.1.1
 - fixed : crash on exit with some linux+win98 installations
 - number of names in bot_names.txt is now unlimited.
 
-- Watz's fixs
+- Watz's fixes
 - - fixed : crash with too long waypoint file paths+names.
 - - fixed : crash with long names and personality files
 - - fixed : crash with certain weapons with high ammo counts
-
 
 JoeBOT 1.6.2
 - Windows Version is now botmixer compatible too
