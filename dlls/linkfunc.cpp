@@ -26,11 +26,14 @@
 // linkfunc.cpp
 //
 
+#ifndef USE_METAMOD
+
 #include "extdll.h"
 #include "util.h"
 #include "cbase.h"
 
 #include "bot.h"
+#include "CBotBase.h"
 
 #ifdef __BORLANDC__
 extern HINSTANCE _h_Library;
@@ -73,10 +76,7 @@ extern void *h_Library;
 #endif
 
 
-// new stuff for 1.1.0.4 release
-//LINK_ENTITY_TO_FUNC(CreateInterface);
-
-// entities for Valve's hl.dll and Standard SDK...
+// Entities for Valve's hl.dll and Standard SDK...
 LINK_ENTITY_TO_FUNC(aiscripted_sequence);
 LINK_ENTITY_TO_FUNC(ambient_generic);
 LINK_ENTITY_TO_FUNC(ammo_357);
@@ -263,7 +263,6 @@ LINK_ENTITY_TO_FUNC(node_viewer_large);
 LINK_ENTITY_TO_FUNC(path_corner);
 LINK_ENTITY_TO_FUNC(path_track);
 LINK_ENTITY_TO_FUNC(player);
-//LINK_ENTITY_TO_FUNC(_player);
 LINK_ENTITY_TO_FUNC(player_loadsaved);
 LINK_ENTITY_TO_FUNC(player_weaponstrip);
 LINK_ENTITY_TO_FUNC(rpg_rocket);
@@ -323,8 +322,11 @@ LINK_ENTITY_TO_FUNC(xen_spore_medium);
 LINK_ENTITY_TO_FUNC(xen_spore_small);
 LINK_ENTITY_TO_FUNC(xen_tree);
 LINK_ENTITY_TO_FUNC(xen_ttrigger);
+// (3.1.0.4)
+LINK_ENTITY_TO_FUNC(CreateInterface);
+LINK_ENTITY_TO_FUNC(GetChaseOrigin);
 
-// entities for Team Fortress 1.5
+// Entities for Team Fortress (1.5)
 LINK_ENTITY_TO_FUNC(building_dispenser);
 LINK_ENTITY_TO_FUNC(building_sentrygun);
 LINK_ENTITY_TO_FUNC(building_sentrygun_base);
@@ -395,7 +397,8 @@ LINK_ENTITY_TO_FUNC(tf_weapon_supershotgun);
 LINK_ENTITY_TO_FUNC(tf_weapon_tranq);
 LINK_ENTITY_TO_FUNC(timer);
 
-// entities for Counter-Strike (Beta 6.5, 6.6, 7.0, 7.1) & 1.0
+// Entities for Counter-Strike (Beta 6.2a)
+LINK_ENTITY_TO_FUNC(armoury_entity);
 LINK_ENTITY_TO_FUNC(ammo_338magnum);
 LINK_ENTITY_TO_FUNC(ammo_357sig);
 LINK_ENTITY_TO_FUNC(ammo_45acp);
@@ -405,21 +408,15 @@ LINK_ENTITY_TO_FUNC(ammo_556natobox);
 LINK_ENTITY_TO_FUNC(ammo_57mm);
 LINK_ENTITY_TO_FUNC(ammo_762nato);
 LINK_ENTITY_TO_FUNC(ammo_9mm);
-LINK_ENTITY_TO_FUNC(armoury_entity);
 LINK_ENTITY_TO_FUNC(env_bombglow);
 LINK_ENTITY_TO_FUNC(func_bomb_target);
 LINK_ENTITY_TO_FUNC(func_buyzone);
 LINK_ENTITY_TO_FUNC(func_escapezone);
-LINK_ENTITY_TO_FUNC(func_grencatch);
 LINK_ENTITY_TO_FUNC(func_hostage_rescue);
-LINK_ENTITY_TO_FUNC(func_vehicle);
-LINK_ENTITY_TO_FUNC(func_vehiclecontrols);
 LINK_ENTITY_TO_FUNC(func_vip_safetyzone);
-LINK_ENTITY_TO_FUNC(func_weaponcheck);
 LINK_ENTITY_TO_FUNC(hostage_entity);
 LINK_ENTITY_TO_FUNC(info_bomb_target);
 LINK_ENTITY_TO_FUNC(info_hostage_rescue);
-LINK_ENTITY_TO_FUNC(info_map_parameters);
 LINK_ENTITY_TO_FUNC(info_vip_start);
 LINK_ENTITY_TO_FUNC(item_assaultsuit);
 LINK_ENTITY_TO_FUNC(item_kevlar);
@@ -429,8 +426,6 @@ LINK_ENTITY_TO_FUNC(weapon_aug);
 LINK_ENTITY_TO_FUNC(weapon_awp);
 LINK_ENTITY_TO_FUNC(weapon_c4);
 LINK_ENTITY_TO_FUNC(weapon_deagle);
-LINK_ENTITY_TO_FUNC(weapon_elite);
-LINK_ENTITY_TO_FUNC(weapon_fiveseven);
 LINK_ENTITY_TO_FUNC(weapon_flashbang);
 LINK_ENTITY_TO_FUNC(weapon_g3sg1);
 LINK_ENTITY_TO_FUNC(weapon_glock18);
@@ -444,19 +439,33 @@ LINK_ENTITY_TO_FUNC(weapon_mp5navy);
 LINK_ENTITY_TO_FUNC(weapon_p228);
 LINK_ENTITY_TO_FUNC(weapon_p90);
 LINK_ENTITY_TO_FUNC(weapon_scout);
-LINK_ENTITY_TO_FUNC(weapon_sg550);
 LINK_ENTITY_TO_FUNC(weapon_sg552);
-LINK_ENTITY_TO_FUNC(weapon_smokegrenade);
+LINK_ENTITY_TO_FUNC(weapon_shield);
 LINK_ENTITY_TO_FUNC(weapon_tmp);
 LINK_ENTITY_TO_FUNC(weapon_usp);
-LINK_ENTITY_TO_FUNC(weapon_ump45);
 LINK_ENTITY_TO_FUNC(weapon_xm1014);
+// (6.5)
+LINK_ENTITY_TO_FUNC(weapon_smokegrenade);
+LINK_ENTITY_TO_FUNC(info_map_parameters);
+// (b7)
+LINK_ENTITY_TO_FUNC(func_vehicle);
+LINK_ENTITY_TO_FUNC(func_vehiclecontrols);
+LINK_ENTITY_TO_FUNC(weapon_elite);
+// (1.0)
+LINK_ENTITY_TO_FUNC(func_grencatch);
+LINK_ENTITY_TO_FUNC(func_weaponcheck);
+LINK_ENTITY_TO_FUNC(weapon_fiveseven);
+LINK_ENTITY_TO_FUNC(weapon_sg550);
+// (1.3)
+LINK_ENTITY_TO_FUNC(weapon_ump45);
+// (1.6)
+LINK_ENTITY_TO_FUNC(weapon_famas);
+LINK_ENTITY_TO_FUNC(weapon_galil);
+LINK_ENTITY_TO_FUNC(weapon_shieldgun);
+LINK_ENTITY_TO_FUNC(env_rain);
+LINK_ENTITY_TO_FUNC(env_snow);
 
-// 1.3
-
-//LINK_ENTITY_TO_FUNC(Server_GetBlendingInterface);
-
-// entities for Opposing Force
+// Entities for Opposing Force
 LINK_ENTITY_TO_FUNC(ammo_556);
 LINK_ENTITY_TO_FUNC(ammo_762);
 LINK_ENTITY_TO_FUNC(ammo_eagleclip);
@@ -564,7 +573,7 @@ LINK_ENTITY_TO_FUNC(weapon_shockroach);
 LINK_ENTITY_TO_FUNC(weapon_sniperrifle);
 LINK_ENTITY_TO_FUNC(weapon_sporelauncher);
 
-// entities for FrontLineForce (1.0)
+// Entities for FrontLineForce (1.0)
 LINK_ENTITY_TO_FUNC(ammo_ak5);
 LINK_ENTITY_TO_FUNC(ammo_beretta);
 LINK_ENTITY_TO_FUNC(ammo_famas);
@@ -584,7 +593,7 @@ LINK_ENTITY_TO_FUNC(info_player_defender);
 LINK_ENTITY_TO_FUNC(info_player_observer);
 LINK_ENTITY_TO_FUNC(weapon_ak5);
 LINK_ENTITY_TO_FUNC(weapon_beretta);
-LINK_ENTITY_TO_FUNC(weapon_famas);
+//LINK_ENTITY_TO_FUNC(weapon_famas);		// defined above
 LINK_ENTITY_TO_FUNC(weapon_hk21);
 LINK_ENTITY_TO_FUNC(weapon_m4);
 LINK_ENTITY_TO_FUNC(weapon_mk23);
@@ -593,8 +602,8 @@ LINK_ENTITY_TO_FUNC(weapon_mp5sd);
 LINK_ENTITY_TO_FUNC(weapon_msg90);
 LINK_ENTITY_TO_FUNC(weapon_spas12);
 
-// entity for DoD
-//LINK_ENTITY_TO_FUNC(weapon_knife);		// already defined above
+// Entities for DoD (1.x)
+//LINK_ENTITY_TO_FUNC(weapon_knife);		// defined above
 LINK_ENTITY_TO_FUNC(weapon_thompson);
 LINK_ENTITY_TO_FUNC(weapon_garand);
 LINK_ENTITY_TO_FUNC(weapon_gewehr);
@@ -605,7 +614,6 @@ LINK_ENTITY_TO_FUNC(weapon_kar);
 LINK_ENTITY_TO_FUNC(weapon_mp44);
 LINK_ENTITY_TO_FUNC(weapon_mp40);
 LINK_ENTITY_TO_FUNC(weapon_bar);
-
 LINK_ENTITY_TO_FUNC(ammo_thompson);
 LINK_ENTITY_TO_FUNC(ammo_garand);
 LINK_ENTITY_TO_FUNC(ammo_gewehr);
@@ -616,7 +624,7 @@ LINK_ENTITY_TO_FUNC(ammo_kar);
 LINK_ENTITY_TO_FUNC(ammo_mp44);
 LINK_ENTITY_TO_FUNC(ammo_mp40);
 LINK_ENTITY_TO_FUNC(ammo_bar);
-//LINK_ENTITY_TO_FUNC(weapon_handgrenade);		// already defined above
+//LINK_ENTITY_TO_FUNC(weapon_handgrenade);		// defined above
 LINK_ENTITY_TO_FUNC(weapon_handgrenade_ex);
 LINK_ENTITY_TO_FUNC(weapon_stickgrenade);
 LINK_ENTITY_TO_FUNC(weapon_stickgrenade_ex);
@@ -630,19 +638,15 @@ LINK_ENTITY_TO_FUNC(dod_object);
 LINK_ENTITY_TO_FUNC(dod_object_goal);
 LINK_ENTITY_TO_FUNC(dod_score_ent);
 LINK_ENTITY_TO_FUNC(dod_secondary);
-
-// DOD 2.0
-
+// (2.0)
 LINK_ENTITY_TO_FUNC(dod_trigger_sandbag);
 LINK_ENTITY_TO_FUNC(dod_round_timer);
 LINK_ENTITY_TO_FUNC(dod_point_relay);
 LINK_ENTITY_TO_FUNC(dod_capture_area);
-
 LINK_ENTITY_TO_FUNC(ammo_mg34);
 LINK_ENTITY_TO_FUNC(ammo_mg42);
 LINK_ENTITY_TO_FUNC(ammo_30cal);
 LINK_ENTITY_TO_FUNC(ammo_m1carbine);
-
 LINK_ENTITY_TO_FUNC(weapon_mg34);
 LINK_ENTITY_TO_FUNC(weapon_mg42);
 LINK_ENTITY_TO_FUNC(weapon_30cal);
@@ -650,8 +654,7 @@ LINK_ENTITY_TO_FUNC(weapon_amerknife);
 LINK_ENTITY_TO_FUNC(weapon_gerknife);
 LINK_ENTITY_TO_FUNC(weapon_spade);
 LINK_ENTITY_TO_FUNC(weapon_m1carbine);
-
-// DoD 3.0
+// (3.0)
 LINK_ENTITY_TO_FUNC(info_gameplaylogic);
 LINK_ENTITY_TO_FUNC(info_doddetect);		// used in para maps
 LINK_ENTITY_TO_FUNC(para_roundtimer);
@@ -664,9 +667,11 @@ LINK_ENTITY_TO_FUNC(ammo_scopedkar);
 LINK_ENTITY_TO_FUNC(ammo_greasegun);
 LINK_ENTITY_TO_FUNC(ammo_fg42);
 LINK_ENTITY_TO_FUNC(ammo_k43);
-
 LINK_ENTITY_TO_FUNC(env_model);
 LINK_ENTITY_TO_FUNC(env_state);
 LINK_ENTITY_TO_FUNC(dod_camera);
 LINK_ENTITY_TO_FUNC(dod_location);
 
+//LINK_ENTITY_TO_FUNC(Server_GetBlendingInterface);
+
+#endif /* not USE_METAMOD */
