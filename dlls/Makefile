@@ -49,6 +49,7 @@ OBJ = $(OBJ_DLLS) $(OBJ_NNSIM) $(OBJ_SOM) $(OBJ_RES)
 
 CC = gcc
 RC = windres
+CP = cp
 RM = rm -fv
 
 # includes
@@ -88,6 +89,9 @@ endif
 # Targets
 # ---------------------------------------------------------------------------
 all: $(OBJDIR) som NNSim $(OBJDIR)/$(DLL)
+
+install: all
+	$(CP) $(OBJDIR)/$(DLL) $(SERVERDIR)
 
 som:
 	$(MAKE) -C ../NNSim/som OPT=$(OPT)
