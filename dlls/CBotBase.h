@@ -249,7 +249,7 @@ public:
 
 	Vector v_avoid;
 
-	FEItem FFE[33];
+	FEItem FFE[32];
 
 	int iEIndex;
 
