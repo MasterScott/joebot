@@ -206,15 +206,13 @@ void LoadSymbols(char *filename)
 
    if ((bfp=fopen(filename, "rb")) == NULL)
    {
-      sprintf(msg, "DLL file %s not found!", filename);
-      ALERT(at_error, msg);
+      ALERT(at_error, UTIL_VarArgs("DLL file %s not found!", filename));
       return;
    }
 
    if (fread(&dos_header, sizeof(dos_header), 1, bfp) != 1)
    {
-      sprintf(msg, "%s is NOT a valid DLL file!", filename);
-      ALERT(at_error, msg);
+      ALERT(at_error, UTIL_VarArgs("%s is NOT a valid DLL file!", filename));
       return;
    }
 
