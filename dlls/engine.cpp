@@ -109,7 +109,7 @@ void pfnChangeLevel(char* s1, char* s2)
 	gf_5th = 0;
 	
 #ifdef USE_METAMOD
-	RETURN_META(MRES_HANDLED);
+	RETURN_META(MRES_IGNORED);
 #else /* not USE_METAMOD */
 	(*g_engfuncs.pfnChangeLevel)(s1, s2);
 #endif /* USE_METAMOD */
@@ -193,7 +193,7 @@ edict_t* pfnFindEntityByString(edict_t *pEdictStartSearchAfter, const char *pszF
 	
 	//BOT_LOG("pfnFindEntityByString", "pszValue=%s", pszValue);
 #ifdef USE_METAMOD
-	RETURN_META_VALUE(MRES_HANDLED, NULL);
+	RETURN_META_VALUE(MRES_IGNORED, NULL);
 #else /* not USE_METAMOD */
 	return (*g_engfuncs.pfnFindEntityByString)(pEdictStartSearchAfter, pszField, pszValue);
 #endif /* USE_METAMOD */
@@ -347,7 +347,7 @@ void pfnClientCommand(edict_t* pEdict, char* szFmt, ...)
 		va_end(argp);
 	}
 #ifdef USE_METAMOD
-	RETURN_META(MRES_HANDLED);
+	RETURN_META(MRES_IGNORED);
 #else /* not USE_METAMOD */
 	return;
 #endif /* USE_METAMOD */
@@ -413,7 +413,7 @@ void pfnMessageBegin(int msg_dest, int msg_type, const float *pOrigin, edict_t *
 	}
 
 #ifdef USE_METAMOD
-	RETURN_META(MRES_HANDLED);
+	RETURN_META(MRES_IGNORED);
 #else /* not USE_METAMOD */
 	(*g_engfuncs.pfnMessageBegin)(msg_dest, msg_type, pOrigin, ed);
 #endif /* USE_METAMOD */
@@ -436,7 +436,7 @@ void pfnMessageEnd(void)
 	}
 	
 #ifdef USE_METAMOD
-	RETURN_META(MRES_HANDLED);
+	RETURN_META(MRES_IGNORED);
 #else /* not USE_METAMOD */
 	(*g_engfuncs.pfnMessageEnd)();
 #endif /* USE_METAMOD */
@@ -456,7 +456,7 @@ void pfnWriteByte(int iValue)
 	}
 	
 #ifdef USE_METAMOD
-	RETURN_META(MRES_HANDLED);
+	RETURN_META(MRES_IGNORED);
 #else /* not USE_METAMOD */
 	(*g_engfuncs.pfnWriteByte)(iValue);
 #endif /* USE_METAMOD */
@@ -475,7 +475,7 @@ void pfnWriteChar(int iValue)
 	}
 	
 #ifdef USE_METAMOD
-	RETURN_META(MRES_HANDLED);
+	RETURN_META(MRES_IGNORED);
 #else /* not USE_METAMOD */
 	(*g_engfuncs.pfnWriteChar)(iValue);
 #endif /* USE_METAMOD */
@@ -494,7 +494,7 @@ void pfnWriteShort(int iValue)
 	}
 	
 #ifdef USE_METAMOD
-	RETURN_META(MRES_HANDLED);
+	RETURN_META(MRES_IGNORED);
 #else /* not USE_METAMOD */
 	(*g_engfuncs.pfnWriteShort)(iValue);
 #endif /* USE_METAMOD */
@@ -513,7 +513,7 @@ void pfnWriteLong(int iValue)
 	}
 	
 #ifdef USE_METAMOD
-	RETURN_META(MRES_HANDLED);
+	RETURN_META(MRES_IGNORED);
 #else /* not USE_METAMOD */
 	(*g_engfuncs.pfnWriteLong)(iValue);
 #endif /* USE_METAMOD */
@@ -532,7 +532,7 @@ void pfnWriteAngle(float flValue)
 	}
 	
 #ifdef USE_METAMOD
-	RETURN_META(MRES_HANDLED);
+	RETURN_META(MRES_IGNORED);
 #else /* not USE_METAMOD */
 	(*g_engfuncs.pfnWriteAngle)(flValue);
 #endif /* USE_METAMOD */
@@ -551,7 +551,7 @@ void pfnWriteCoord(float flValue)
 	}
 	
 #ifdef USE_METAMOD
-	RETURN_META(MRES_HANDLED);
+	RETURN_META(MRES_IGNORED);
 #else /* not USE_METAMOD */
 	(*g_engfuncs.pfnWriteCoord)(flValue);
 #endif /* USE_METAMOD */
@@ -570,7 +570,7 @@ void pfnWriteString(const char *sz)
 	}
 	
 #ifdef USE_METAMOD
-	RETURN_META(MRES_HANDLED);
+	RETURN_META(MRES_IGNORED);
 #else /* not USE_METAMOD */
 	(*g_engfuncs.pfnWriteString)(sz);
 #endif /* USE_METAMOD */
@@ -589,7 +589,7 @@ void pfnWriteEntity(int iValue)
 	}
 	
 #ifdef USE_METAMOD
-	RETURN_META(MRES_HANDLED);
+	RETURN_META(MRES_IGNORED);
 #else /* not USE_METAMOD */
 	(*g_engfuncs.pfnWriteEntity)(iValue);
 #endif /* USE_METAMOD */
@@ -684,7 +684,7 @@ int pfnRegUserMsg(const char *pszName, int iSize)
 {
 	if (gpGlobals->deathmatch)
 	{
-		int msg = (*g_engfuncs.pfnRegUserMsg)(pszName, iSize);
+		int msg = REG_USER_MSG(pszName, iSize);
 #ifdef DEBUGMESSAGES
 		BOT_LOG("pfnRegUserMsg", "pszName=%s, msg_id=%d", pszName, msg);
 #endif
@@ -883,7 +883,7 @@ void pfnSetClientMaxspeed(const edict_t *pEdict, float fNewMaxspeed)
 	
 	BOT_LOG("pfnSetClientMaxspeed", "pEdict=%x, fNewMaxspeed=%f", pEdict, fNewMaxspeed);
 #ifdef USE_METAMOD
-	RETURN_META(MRES_HANDLED);
+	RETURN_META(MRES_IGNORED);
 #else /* not USE_METAMOD */
 	(*g_engfuncs.pfnSetClientMaxspeed)(pEdict, fNewMaxspeed);
 #endif /* USE_METAMOD */
