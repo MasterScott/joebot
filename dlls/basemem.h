@@ -22,12 +22,6 @@
 #define __BASEMEM_H
 
 #include "extdll.h"
-#include "enginecallback.h"
-#include "util.h"
-#include "cbase.h"
-
-//#include "bot.h"
-#include "waypoint.h"
 
 class CBaseMemItem{
 	friend class CBaseMem;
@@ -54,4 +48,4 @@ protected:
 private:
 };
 
-#endif __BASEMEM_H
+#endif //__BASEMEM_H

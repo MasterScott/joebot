@@ -21,8 +21,6 @@
 #ifndef __NNWEAPON_H
 #define __NNWEAPON_H
 
-#include "BotNNDefs.h"
-
 #include "bot_modid.h"
 #include "CParser.h"
 
@@ -47,4 +45,4 @@ protected:
 private:
 };
 
-#endif
+#endif //__NNWEAPON_H
