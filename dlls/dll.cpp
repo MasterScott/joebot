@@ -1987,8 +1987,8 @@ void StartFrame( void )
 					sprintf(szTemp, "kick \"%s\"\n", STRING(bots[bot_index]->pEdict->v.netname));
 					SERVER_COMMAND(szTemp);
 				}
-				else
-					bots[bot_index]->Think();
+
+				bots[bot_index]->Think();
 				
 				count++;
 				/*}
@@ -2173,7 +2173,7 @@ void StartFrame( void )
 					
 					// if there are currently less than the maximum number of "players"
 					// then add another bot using the default skill level...
-					if ((count < max_bots) && (max_bots != -1))
+					if ((count < max_bots) && (max_bots != -1) && (count < gpGlobals->maxClients))
 					{
 						//cout << " ------------------- creating bot due to max_bots" << endl;
 						if(!g_bJoinWHumanMAX){
