@@ -107,10 +107,8 @@ void BotBuy_CS_WEAPON_ELITE(CBotBase *pBot);
 void BotBuy_CS_WEAPON_FIVESEVEN(CBotBase *pBot);
 void BotBuy_CS_WEAPON_UMP45(CBotBase *pBot);
 void BotBuy_CS_WEAPON_SG550(CBotBase *pBot);
-#ifndef CSTRIKE15
 void BotBuy_CS_WEAPON_GALIL(CBotBase *pBot);
 void BotBuy_CS_WEAPON_FAMAS(CBotBase *pBot);
-#endif /* CSTRIKE15 */
 void BotBuy_CS_WEAPON_USP(CBotBase *pBot);
 void BotBuy_CS_WEAPON_GLOCK18(CBotBase *pBot);
 void BotBuy_CS_WEAPON_AWP(CBotBase *pBot);
@@ -131,8 +129,6 @@ void BotBuy_SAmmo(CBotBase *pBot);
 void BotBuy_CS_WEAPON_Kevlar(CBotBase *pBot);
 void BotBuy_CS_WEAPON_KevlarHelmet(CBotBase *pBot);
 void BotBuy_CS_WEAPON_Defuse(CBotBase *pBot);
-#ifndef CSTRIKE15
 void BotBuy_CS_WEAPON_Shield(CBotBase *pBot);
-#endif /* CSTRIKE15 */
 
 #endif //__CBOTCS_H
