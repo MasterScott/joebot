@@ -38,76 +38,71 @@
 
 #define _CLIENT_END		-1
 
-//void BotClient_TFC_VGUI(void *p, int bot_index);
-void BotClient_CS_VGUI(void *p, int bot_index,int iAdd);
-void BotClient_CS_ShowMenu(void *p, int bot_index,int iAdd);
-
 void BotClient_Valve_WeaponList(void *p, int bot_index,int iAdd);
-//void BotClient_TFC_WeaponList(void *p, int bot_index);
-void BotClient_CS_WeaponList(void *p, int bot_index,int iAdd);
-void BotClient_Gearbox_WeaponList(void *p, int bot_index,int iAdd);
-
 void BotClient_Valve_CurrentWeapon(void *p, int bot_index,int iAdd);
-//void BotClient_TFC_CurrentWeapon(void *p, int bot_index);
-void BotClient_CS_CurrentWeapon(void *p, int bot_index,int iAdd);
-void BotClient_Gearbox_CurrentWeapon(void *p, int bot_index,int iAdd);
-
 void BotClient_Valve_AmmoX(void *p, int bot_index,int iAdd);
-//void BotClient_TFC_AmmoX(void *p, int bot_index,int iAdd);
-void BotClient_CS_AmmoX(void *p, int bot_index,int iAdd);
-void BotClient_Gearbox_AmmoX(void *p, int bot_index,int iAdd);
-
 void BotClient_Valve_SayText(void *p, int bot_index,int iAdd);
-//void BotClient_TFC_SayText(void *p, int bot_index,int iAdd);
-void BotClient_CS_SayText(void *p, int bot_index,int iAdd);
-void BotClient_Gearbox_SayText(void *p, int bot_index,int iAdd);
-
 void BotClient_Valve_AmmoPickup(void *p, int bot_index,int iAdd);
-//void BotClient_TFC_AmmoPickup(void *p, int bot_index);
-void BotClient_CS_AmmoPickup(void *p, int bot_index,int iAdd);
-void BotClient_Gearbox_AmmoPickup(void *p, int bot_index,int iAdd);
-
 void BotClient_Valve_WeaponPickup(void *p, int bot_index,int iAdd);
-//void BotClient_TFC_WeaponPickup(void *p, int bot_index);
-void BotClient_CS_WeaponPickup(void *p, int bot_index,int iAdd);
-void BotClient_Gearbox_WeaponPickup(void *p, int bot_index,int iAdd);
-
 void BotClient_Valve_ItemPickup(void *p, int bot_index,int iAdd);
-//void BotClient_TFC_ItemPickup(void *p, int bot_index);
-void BotClient_CS_ItemPickup(void *p, int bot_index,int iAdd);
-void BotClient_Gearbox_ItemPickup(void *p, int bot_index,int iAdd);
-
 void BotClient_Valve_Health(void *p, int bot_index,int iAdd);
-//void BotClient_TFC_Health(void *p, int bot_index);
-void BotClient_CS_Health(void *p, int bot_index,int iAdd);
-void BotClient_Gearbox_Health(void *p, int bot_index,int iAdd);
-
 void BotClient_Valve_Battery(void *p, int bot_index,int iAdd);
-//void BotClient_TFC_Battery(void *p, int bot_index);
-void BotClient_CS_Battery(void *p, int bot_index,int iAdd);
-void BotClient_Gearbox_Battery(void *p, int bot_index,int iAdd);
-
 void BotClient_Valve_Damage(void *p, int bot_index,int iAdd);
-//void BotClient_TFC_Damage(void *p, int bot_index);
-void BotClient_CS_Damage(void *p, int bot_index,int iAdd);
-void BotClient_Gearbox_Damage(void *p, int bot_index,int iAdd);
+void BotClient_Valve_ScreenFade(void *p, int bot_index,int iAdd);
+void BotClient_Valve_DeathMsg(void *p, int bot_index,int iAdd);
 
-void BotClient_CS_Money(void *p, int bot_index,int iAdd);			// cs specific
+
+/*void BotClient_TFC_VGUI(void *p, int bot_index);
+void BotClient_TFC_WeaponList(void *p, int bot_index);
+void BotClient_TFC_CurrentWeapon(void *p, int bot_index);
+void BotClient_TFC_AmmoX(void *p, int bot_index,int iAdd);
+void BotClient_TFC_SayText(void *p, int bot_index,int iAdd);
+void BotClient_TFC_AmmoPickup(void *p, int bot_index);
+void BotClient_TFC_WeaponPickup(void *p, int bot_index);
+void BotClient_TFC_ItemPickup(void *p, int bot_index);
+void BotClient_TFC_Health(void *p, int bot_index);
+void BotClient_TFC_Battery(void *p, int bot_index);
+void BotClient_TFC_Damage(void *p, int bot_index);
+void BotClient_TFC_ScreenFade(void *p, int bot_index);
+void BotClient_TFC_DeathMsg(void *p, int bot_index);*/
+
+
+void BotClient_CS_VGUI(void *p, int bot_index,int iAdd);
+void BotClient_CS_WeaponList(void *p, int bot_index,int iAdd);
+void BotClient_CS_CurrentWeapon(void *p, int bot_index,int iAdd);
+void BotClient_CS_AmmoX(void *p, int bot_index,int iAdd);
+void BotClient_CS_SayText(void *p, int bot_index,int iAdd);
+void BotClient_CS_AmmoPickup(void *p, int bot_index,int iAdd);
+void BotClient_CS_WeaponPickup(void *p, int bot_index,int iAdd);
+void BotClient_CS_ItemPickup(void *p, int bot_index,int iAdd);
+void BotClient_CS_Health(void *p, int bot_index,int iAdd);
+void BotClient_CS_Battery(void *p, int bot_index,int iAdd);
+void BotClient_CS_Damage(void *p, int bot_index,int iAdd);
+void BotClient_CS_ScreenFade(void *p, int bot_index,int iAdd);
+void BotClient_CS_DeathMsg(void *p, int bot_index,int iAdd);
+// CS specific
+void BotClient_CS_Money(void *p, int bot_index,int iAdd);
+void BotClient_CS_ShowMenu(void *p, int bot_index,int iAdd);
 void BotClient_CS_StatusI(void *p, int bot_index,int iAdd);
 void BotClient_CS_Roundtime(void *p, int bot_index,int iAdd);
 void BotClient_CS_TextMsg(void *p, int bot_index,int iAdd);
 void BotClient_CS_StatusV(void *p, int bot_index,int iAdd);
 void BotClient_CS_SetFOV(void *p, int bot_index,int iAdd);
-
-void BotClient_Valve_ScreenFade(void *p, int bot_index,int iAdd);
-//void BotClient_TFC_ScreenFade(void *p, int bot_index);
-void BotClient_CS_ScreenFade(void *p, int bot_index,int iAdd);
-
-void BotClient_CS_DeathMsg(void *p, int bot_index,int iAdd);
-void BotClient_Valve_DeathMsg(void *p, int bot_index,int iAdd);
+void BotClient_CS_Flashlight(void *p, int bot_index,int iAdd);
 
 
-// dod stuff
+/*void BotClient_Gearbox_WeaponList(void *p, int bot_index,int iAdd);
+void BotClient_Gearbox_CurrentWeapon(void *p, int bot_index,int iAdd);
+void BotClient_Gearbox_AmmoX(void *p, int bot_index,int iAdd);
+void BotClient_Gearbox_SayText(void *p, int bot_index,int iAdd);
+void BotClient_Gearbox_AmmoPickup(void *p, int bot_index,int iAdd);
+void BotClient_Gearbox_WeaponPickup(void *p, int bot_index,int iAdd);
+void BotClient_Gearbox_ItemPickup(void *p, int bot_index,int iAdd);
+void BotClient_Gearbox_Health(void *p, int bot_index,int iAdd);
+void BotClient_Gearbox_Battery(void *p, int bot_index,int iAdd);
+void BotClient_Gearbox_Damage(void *p, int bot_index,int iAdd);*/
+
+
 void BotClient_DOD_VGUI(void *p, int bot_index,int iAdd);
 void BotClient_DOD_WeaponList(void *p, int bot_index,int iAdd);
 void BotClient_DOD_CurrentWeapon(void *p, int bot_index,int iAdd);
@@ -120,10 +115,39 @@ void BotClient_DOD_Battery(void *p, int bot_index,int iAdd);
 void BotClient_DOD_Damage(void *p, int bot_index,int iAdd);
 void BotClient_DOD_DeathMsg(void *p, int bot_index,int iAdd);
 void BotClient_DOD_ScreenFade(void *p, int bot_index,int iAdd);
+// DOD specific
 void BotClient_DOD_Stamina(void *p, int bot_index,int iAdd);
 void BotClient_DOD_Speed(void *p, int bot_index,int iAdd);
 void BotClient_DOD_Slowed(void *p, int bot_index,int iAdd);
 void BotClient_DOD_Bleeding(void *p, int bot_index,int iAdd);
 void BotClient_DOD_Object(void *p, int bot_index,int iAdd);
 
-void BotClient_CS_Flashlight(void *p, int bot_index,int iAdd);
+
+#ifndef USE_METAMOD
+// maximum number of user messages the engine can register (hardcoded in the engine)
+#define MAX_REG_MSGS 256
+
+// user message record structure definition
+typedef struct
+{
+	const char *name; // name of user message as called by the MOD DLL
+	int id; // identification number the engine recorded this user message under
+	int size; // size of this message in packets
+} usermsg_t;
+
+extern usermsg_t usermsgs[MAX_REG_MSGS];
+extern int usermsgs_count;
+
+void AddUserMsg(const char *msgname, int msgid, int size);
+int GetUserMsgId(const char *msgname, int *size);
+const char *GetUserMsgName(int msgid, int *size);
+
+#define PLID NULL
+#define GET_USER_MSG_ID(plid, msgname, size) GetUserMsgId(msgname, size)
+#define GET_USER_MSG_NAME(plid, msgid, size) GetUserMsgName(msgid, size)
+#endif /* USE_METAMOD */
+
+typedef void (*botmsg_t)(void *, int, int);
+extern botmsg_t botmsgs[MAX_REG_MSGS];
+void BotMsgsInit(void);
+extern int msg_state;
