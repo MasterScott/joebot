@@ -62,7 +62,9 @@
 
 #include "NeuralNet.h"
 
+#ifdef USE_GNOME
 CWorldGnome CWG;
+#endif /* USE_GNOME */
 
 #define _MAXCFGLINESPERFRAME 5
 
@@ -228,8 +230,6 @@ DLL_GLOBAL const Vector g_vecZero = Vector(0,0,0);
 
 CChatHost g_ChatHost;
 
-int mod_id = -1;
-char mod_name[32];
 int m_spriteTexture = 0;
 //int default_bot_skill = 2;
 bool isFakeClientCommand = FALSE;
@@ -293,9 +293,6 @@ float f_round_start;	// time of roundstart
 float f_end_freezetime = 0.0;	// when to start after freeze time
 float f_timesrs = 1000;		// time since round start	->	updated every frame by start frame
 
-extern bool bNNInit;
-extern bool bNNInitError;
-
 bool g_bMyBirthday;
 long g_lAge;
 
@@ -334,8 +331,8 @@ void CalcDistances(void){
 
 	memset(pP,0,32*sizeof(edict_t *));
 
-	for (i = 1; i<=gpGlobals->maxClients; i++){
-		pPlayer = INDEXENT(i);
+	for (i = 0; i < gpGlobals->maxClients ; i++){
+		pPlayer = INDEXENT(i + 1);
 		
 		// skip invalid players and skip self (i.e. this bot)
 		if ((pPlayer) && (!pPlayer->free))
@@ -346,7 +343,7 @@ void CalcDistances(void){
 			}
 			pP[i] = pPlayer;
 			
-			for(i2 = i; i2 > 0; i2--){
+			for(i2 = 0; i2 < i; i2++){
 				if(pP[i2]){
 					pfPlayerDistance[i][i2]
 						= pfPlayerDistance[i2][i]
@@ -771,25 +768,15 @@ BOOL ClientConnect( edict_t *pEntity, const char *pszName, const char *pszAddres
 
 void ClientDisconnect( edict_t *pEntity )
 {
+	BOT_LOG("ClientDisconnect", UTIL_VarArgs("pEntity=%x", pEntity));
+
 	if (gpGlobals->deathmatch)
 	{
-		int i;
-		BOT_LOG("ClientDisconnect", UTIL_VarArgs("pEntity=%x", pEntity));
+		int i = ENTINDEX(pEntity) - 1;
+		clients[i] = NULL;
 		
-		i = 0;
-		while ((i < 32) && (clients[i] != pEntity))
-			i++;
-		
-		if (i < 32)
-			clients[i] = NULL;
-		
-		i = UTIL_GetBotIndex(pEntity);
-		if(i!=-1){
-			if ( FBitSet( VARS( pEntity )->flags, FL_THIRDPARTYBOT ) )	// fix by Leon Hartwig
-			{
-				//FREE_PRIVATE( pEntity );
-			}
-			
+		if (bots[i] && bots[i]->pEdict == pEntity)
+		{
 			// someone kicked this bot off of the server...
 			// copy stuff
 			SBInfo[i].bot_class = bots[i]->bot_class;
@@ -808,7 +795,7 @@ void ClientDisconnect( edict_t *pEntity )
 			SBInfo[i].kick_time = gpGlobals->time;  // save the kicked time
 			
 			delete bots[i];
-			bots[i] = 0;
+			bots[i] = NULL;
 		}
 	}
 	
@@ -831,13 +818,8 @@ void ClientPutInServer( edict_t *pEntity )
 {
 	BOT_LOG("ClientPutInServer", UTIL_VarArgs("pEntity=%x", pEntity));
 	
-	int i = 0;
-	
-	while ((i < 32) && (clients[i] != NULL))
-		i++;
-	
-	if (i < 32)
-		clients[i] = pEntity;  // store this clients edict in the clients array
+	int i = ENTINDEX(pEntity) - 1;
+	clients[i] = pEntity;  // store this clients edict in the clients array
 	
 	if ( !(pEntity->v.flags & (FL_FAKECLIENT | FL_THIRDPARTYBOT)) )
 	{
@@ -883,8 +865,8 @@ FILL_FULL
 	
 	int i;
 	edict_t *pEnt;
-	for (i = gpGlobals->maxClients; i; i--){
-		pEnt = INDEXENT(i);
+	for (i = 0; i < gpGlobals->maxClients; i++){
+		pEnt = INDEXENT(i + 1);
 		if (!FNullEnt(pEnt) && (!pEnt->free)){
 			if(!strncmp(STRING(pEnt->v.classname),"player",6)){
 				char *infobuffer; 
@@ -1180,54 +1162,54 @@ void ShowInfo(void){
 				pInfo = GetNearestPlayer(listenserver_edict,-1,fMin,true,true);
 			}
 			if(pInfo){
-				int iBI = UTIL_GetBotIndex(pInfo);
-				if(iBI == -1){
+				CBotBase *pBI = UTIL_GetBotPointer(pInfo);
+				if(pBI){
 				}
 				else{
-					sprintf(szTemp,"%s / %3.0f%% Health / %3.0f(%3.0f) ",STRING(pInfo->v.netname),pInfo->v.health,pInfo->v.velocity.Length(),bots[iBI]->f_max_speed);
-					if(bots[iBI]->HasWeapon(1<<CS_WEAPON_FLASHBANG)){
+					sprintf(szTemp,"%s / %3.0f%% Health / %3.0f(%3.0f) ",STRING(pInfo->v.netname),pInfo->v.health,pInfo->v.velocity.Length(),pBI->f_max_speed);
+					if(pBI->HasWeapon(1<<CS_WEAPON_FLASHBANG)){
 						strcat(szTemp,"F");
 					}
-					if(bots[iBI]->HasWeapon(1<<CS_WEAPON_HEGRENADE)){
+					if(pBI->HasWeapon(1<<CS_WEAPON_HEGRENADE)){
 						strcat(szTemp,"H");
 					}
-					if(bots[iBI]->HasWeapon(1<<CS_WEAPON_SMOKEGRENADE)){
+					if(pBI->HasWeapon(1<<CS_WEAPON_SMOKEGRENADE)){
 						strcat(szTemp,"S");
 					}
-					if(bots[iBI]->bReplay){
+					if(pBI->bReplay){
 						strcat(szTemp," Replay");
 					}
 					strcat(szTemp,"\n");
 					strcat(szText,szTemp);
 					
-					if(bots[iBI]->current_weapon.iId > -1 && bots[iBI]->current_weapon.iId <32){
-						sprintf(szTemp,"%s %i/%0.0lf/%i",weapon_defs[bots[iBI]->current_weapon.iId].szClassname,bots[iBI]->current_weapon.iClip,WeaponDefs.ipClipSize[mod_id][bots[iBI]->current_weapon.iId],bots[iBI]->current_weapon.iAmmo1);
+					if(pBI->current_weapon.iId > -1 && pBI->current_weapon.iId <32){
+						sprintf(szTemp,"%s %i/%0.0lf/%i",weapon_defs[pBI->current_weapon.iId].szClassname,pBI->current_weapon.iClip,WeaponDefs.ipClipSize[mod_id][pBI->current_weapon.iId],pBI->current_weapon.iAmmo1);
 						strcat(szText,szTemp);
-						sprintf(szTemp," - M:%2.2f A:%2.2f AH:%2.2f\n",bots[iBI]->d_Manner,bots[iBI]->f_Aggressivity,bots[iBI]->f_AimHead);
+						sprintf(szTemp," - M:%2.2f A:%2.2f AH:%2.2f\n",pBI->d_Manner,pBI->f_Aggressivity,pBI->f_AimHead);
 						strcat(szText,szTemp);
-						sprintf(szTemp," - OV %.2f %.2f / VA %.0f %.0f --- fLT %.0f\n",bots[iBI]->v_Offset.y,bots[iBI]->v_Offset.x,bots[iBI]->pEdict->v.v_angle.y,bots[iBI]->pEdict->v.v_angle.x,bots[iBI]->f_LookTo - gpGlobals->time);
+						sprintf(szTemp," - OV %.2f %.2f / VA %.0f %.0f --- fLT %.0f\n",pBI->v_Offset.y,pBI->v_Offset.x,pBI->pEdict->v.v_angle.y,pBI->pEdict->v.v_angle.x,pBI->f_LookTo - gpGlobals->time);
 						strcat(szText,szTemp);
-						sprintf(szTemp,"FG:%3.i/G:%3.i/C:%3.i\n",bots[iBI]->iGoal,bots[iBI]->iFarGoal,bots[iBI]->i_CurrWP);
+						sprintf(szTemp,"FG:%3.i/G:%3.i/C:%3.i\n",pBI->iGoal,pBI->iFarGoal,pBI->i_CurrWP);
 						strcat(szText,szTemp);
 					}
 					
-					if(bots[iBI]->f_ducktill > gpGlobals->time){
-						sprintf(szTemp,"ducking: %3.f\n",bots[iBI]->f_ducktill-gpGlobals->time);
+					if(pBI->f_ducktill > gpGlobals->time){
+						sprintf(szTemp,"ducking: %3.f\n",pBI->f_ducktill-gpGlobals->time);
 						strcat(szText,szTemp);
 					}
-					if(bots[iBI]->GOrder.lTypeoG){
-						sprintf(szTemp,"GOrder: State(%i) Type(%s-%i)\n",bots[iBI]->GOrder.lState,weapon_defs[bots[iBI]->GOrder.lTypeoG].szClassname,bots[iBI]->GOrder.lTypeoG);
-						WaypointDrawBeamDebug(listenserver_edict,bots[iBI]->pEdict->v.origin,bots[iBI]->GOrder.VAim,10,0,200,0,0,200,10);
+					if(pBI->GOrder.lTypeoG){
+						sprintf(szTemp,"GOrder: State(%i) Type(%s-%i)\n",pBI->GOrder.lState,weapon_defs[pBI->GOrder.lTypeoG].szClassname,pBI->GOrder.lTypeoG);
+						WaypointDrawBeamDebug(listenserver_edict,pBI->pEdict->v.origin,pBI->GOrder.VAim,10,0,200,0,0,200,10);
 						strcat(szText,szTemp);
 					}
-					sprintf(szTemp,"%i Task(s)\n",bots[iBI]->Task.lNOT);
+					sprintf(szTemp,"%i Task(s)\n",pBI->Task.lNOT);
 					strcat(szText,szTemp);
-					if(bots[iBI]->Task.current){
+					if(pBI->Task.current){
 						CTaskItem *p;
 
 						int i;
-						for(i=bots[iBI]->Task.lNOT-1;i>=0&&i>bots[iBI]->Task.lNOT - 6;i--){
-							p = bots[iBI]->Task.GetTask(i);
+						for(i=pBI->Task.lNOT-1;i>=0&&i>pBI->Task.lNOT - 6;i--){
+							p = pBI->Task.GetTask(i);
 							sprintf(szTemp,"Task(%i): ",i);
 							if(p->lType & BT_COVER){
 								sprintf(szTemp2,"BT_COVER ");
@@ -1528,9 +1510,9 @@ void StartFrame( void )
 				int i;
 				edict_t *pEnt;
 				if(g_bMyBirthday){
-					for (i = gpGlobals->maxClients; i; i--){
+					for (i = 0; i < gpGlobals->maxClients; i++){
 						if(!bWelcome[i]){
-							pEnt = INDEXENT(i);
+							pEnt = INDEXENT(i + 1);
 							
 							// skip invalid players and skip self
 							if ((pEnt) && (!pEnt->free)){
@@ -1619,9 +1601,9 @@ void StartFrame( void )
 					}
 				}
 				else{
-					for (i = gpGlobals->maxClients; i; i--){
+					for (i = 0; i < gpGlobals->maxClients; i++){
 						if(!bWelcome[i]){
-							pEnt = INDEXENT(i);
+							pEnt = INDEXENT(i + 1);
 							
 							// skip invalid players and skip self
 							if ((pEnt) && (!pEnt->free)){
@@ -1777,7 +1759,9 @@ void StartFrame( void )
 			g_b5th=false;
 		}
 		
+#ifdef USE_GNOME
 		CWG.Think();		// let the gnomes be alive :D
+#endif /* USE_GNOME */
 		
 		count = 0;
 		
@@ -1829,9 +1813,9 @@ void StartFrame( void )
 		if (count > num_bots)
 			num_bots = count;
 		
-		for (player_index = 1; player_index <= gpGlobals->maxClients; player_index++)
+		for (player_index = 0; player_index < gpGlobals->maxClients; player_index++)
 		{
-			pPlayer = INDEXENT(player_index);
+			pPlayer = INDEXENT(player_index + 1);
 			
 			if (pPlayer && !pPlayer->free)
 			{
@@ -2360,7 +2344,7 @@ extern "C" EXPORT int GetNewDLLFunctions( NEW_DLL_FUNCTIONS *pFunctionTable, int
 
 void FakeClientCommand (edict_t *pFakeClient, const char *fmt, ...)
 {
-   // this function is from Pierre-Marie Baty's RACC 
+   // Adapted from Pierre-Marie Baty's RACC 
 
    // the purpose of this function is to provide fakeclients (bots) with the same client
    // command-scripting advantages (putting multiple commands in one line between semicolons)
@@ -2436,7 +2420,7 @@ void FakeClientCommand (edict_t *pFakeClient, const char *fmt, ...)
 
 const char *GetField (const char *string, int field_number)
 {
-   // this function is from Pierre-Marie Baty's RACC 
+   // Adapted from Pierre-Marie Baty's RACC 
 
    // This function gets and returns a particuliar field in a string where several fields are
    // concatenated. Fields can be words, or groups of words between quotes ; separators may be
