@@ -35,6 +35,7 @@ class CChatHost;
 extern CChatHost g_ChatHost;
 
 extern int mod_id;
+extern char mod_name[];
 
 extern bool g_b5th;
 extern float gf_5thd;
