@@ -646,7 +646,7 @@ void pfnAlertMessage(ALERT_TYPE atype, char *szFmt, ...)
 }
 
 #ifndef USE_METAMOD
-void pfnEngineFprintf(FILE *pfile, char *szFmt, ...)
+void pfnEngineFprintf(void *pfile, char *szFmt, ...)
 {
 	BOT_LOG("pfnEngineFprintf", "");
 	va_list		argptr;
