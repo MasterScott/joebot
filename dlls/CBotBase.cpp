@@ -18,7 +18,17 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 ******************************************************************************/
+#include "extdll.h"
+#include "util.h"
+
 #include "CBotBase.h"
+
+#include "bot.h"
+#include "bot_modid.h"
+#include "globalvars.h"
+
+#include "NeuralNet.h"
+#include "nVec.h"
 
 //#define __COLLLINE
 
@@ -334,19 +344,18 @@ bool CBotBase :: Wander(void){
 		&& (f_dont_check_stuck < gpGlobals->time)
 		&& f_Pause < gpGlobals->time-.5){// running against wall etc.
 		//f_old_direction = (pEdict->v.angles.y - v_diff_angles.y - 8);
-		//FakeClientCommand(pEdict,"say","muh die kuh",0);
+		//FakeClientCommand(pEdict,"say muh die kuh");
 		if(l_cState==0){		// crashed into wall for the first time ...
 			l_cState ++;
 			
 			if(RANDOM_LONG(0,100) < 80){		// .. so jump
-				//FakeClientCommand(pEdict,"say","no waypoint found and jumping cause of wall",0);
+				//FakeClientCommand(pEdict,"say no waypoint found and jumping cause of wall");
 				Jump();
 				f_ducktill = gpGlobals->time + .4f;
 			}
 		}
 		else if(l_cState == 1){			// ... or turn later
-										/*sprintf(item_name,"collision (%f)",moved_distance);
-			FakeClientCommand(pEdict,"say",item_name,0);*/
+			/*FakeClientCommand(pEdict,"say collision (%f)",moved_distance);*/
 			v_diff_angles = UTIL_VecToAngles(v_diff);
 			pEdict->v.ideal_yaw = v_diff_angles.y + RANDOM_LONG(-20,20);
 			
@@ -451,7 +460,7 @@ void CBotBase :: PreprocessTasks(void){
 			iGoal=-1;
 
 		if(Task.current->lType & BT_HUNT){
-			//FakeClientCommand(pEdict,"say","hunt",0);
+			//FakeClientCommand(pEdict,"say hunt");
 			if(FNullEnt(Task.current->p)){
 				Task.NextTask();
 				//return false;
@@ -482,7 +491,7 @@ void CBotBase :: PreprocessTasks(void){
 			}
 		}
 		else if(Task.current->lType & BT_COVER){
-			//FakeClientCommand(pEdict,"say","cover",0);
+			//FakeClientCommand(pEdict,"say cover");
 			if(FNullEnt(Task.current->p)){
 				Task.NextTask();
 			}
@@ -574,7 +583,7 @@ void CBotBase :: PreprocessTasks(void){
 			//return true;
 		}
 		else if(Task.current->lType & BT_ROAMTEAM){
-			//FakeClientCommand(pEdict,"say","roamteam",0);
+			//FakeClientCommand(pEdict,"say roamteam");
 			
 			if(f_timesrs < 7)
 				Task.AddTask(BT_CAMP,gpGlobals->time + 7.25 - f_timesrs,0,0,0);
@@ -609,7 +618,7 @@ void CBotBase :: PreprocessTasks(void){
 								Task.NextTask();
 								return;
 								//cout << "fuckin roamteam" << endl;
-								//FakeClientCommand(pEdict,"say","fuckin roamteam",0);
+								//FakeClientCommand(pEdict,"say fuckin roamteam");
 							}
 						}
 						else
@@ -751,7 +760,7 @@ bool CBotBase :: AvoidStuck(void){
 			// sometimes jump
 			if(RANDOM_LONG(0,100) > 50){
 				Jump();
-				//FakeClientCommand(pEdict,"say","wpstuckducktill",0);
+				//FakeClientCommand(pEdict,"say wpstuckducktill");
 				f_ducktill = gpGlobals->time +.4f;
 			}
 			else{		// why ?
@@ -771,7 +780,7 @@ bool CBotBase :: AvoidStuck(void){
 					if(iDest != -1){
 						Task.AddTask(BT_GOTO|BT_GOBUTTON,-1,iDest,pEnt,0);
 					}
-					//FakeClientCommand(pEdict,"say","asd",0);
+					//FakeClientCommand(pEdict,"say asd");
 					return false;
 				}
 				
@@ -836,7 +845,7 @@ bool CBotBase :: AvoidStuck(void){
 						Vector VDiffBothN = VDiffBoth.Normalize();
 						// is it not a bot ? then go back
 						// is the number of the other bot higher than mine ? then go back
-						if(!(pNearestPT->v.flags & FL_FAKECLIENT)
+						if(!(pNearestPT->v.flags & FL_THIRDPARTYBOT)
 							|| ENTINDEX(pEdict)<ENTINDEX(pNearestPT)){
 							if(iNearWP == -1){
 								iNearWP = WaypointFindNearest(pEdict,1000,bot_teamnm,0,false,false,false);
@@ -983,7 +992,7 @@ bool CBotBase :: AvoidCollision(void){
 		// is the middle trace blocked by a breakable ent ???
 		if(fMiddleDist!=1.0){
 			if(f_LastFight+1.0f < gpGlobals->time){
-				if(!strcmp(STRING(tr.pHit->v.classname),"func_breakable")){
+				if(FStrEq(STRING(tr.pHit->v.classname),"func_breakable")){
 					if(tr.pHit->v.takedamage == DAMAGE_YES){		// boxes in dust ?
 						if(IsCWeaponGrenade()){	//dont try to destroy func_breakable with grenades - can be unhealthy ( wooden boxes )
 							if(HasSecondary()		// try first with secondary
@@ -1016,7 +1025,7 @@ bool CBotBase :: AvoidCollision(void){
 						}
 					}
 				}
-				//FakeClientCommand(pEdict,"say","func_breakable",0);
+				//FakeClientCommand(pEdict,"say func_breakable");
 			}
 		}
 		
@@ -1084,7 +1093,7 @@ bool CBotBase :: AvoidCollision(void){
 		UTIL_TraceLine(VStart, VEndWP, ignore_monsters,pEdict->v.pContainingEntity, &tr);
 		
 		if(f_LastFight+1.0f < gpGlobals->time){
-			if(strcmp(STRING(tr.pHit->v.classname),"func_breakable") == 0){
+			if(FStrEq(STRING(tr.pHit->v.classname),"func_breakable")){
 				if(tr.pHit->v.takedamage == DAMAGE_YES){		// boxes in dust ?
 					if(IsCWeaponGrenade()){	//dont try to destroy func_breakable with grenades - can be unhealthy ( wooden boxes )
 						if(HasSecondary()		// try first with secondary
@@ -1282,7 +1291,7 @@ void CBotBase :: TestOnButtonWay(CWay &pWay,edict_t **pToUse){
 			iCount = 0;
 			pEnt = 0;
 			while(pEnt = UTIL_FindEntityByString( pEnt, "target", STRING( tr.pHit->v.targetname ) )){	// look for sth which has this as target
-				//if(!strcmp(STRING(pEnt<->v.classname),"func_button")){		// only buttons
+				//if(FStrEq(STRING(pEnt<->v.classname),"func_button")){		// only buttons
 				iNWP = WaypointFindNearest(VecBModelOrigin(VARS(pEnt)),pEdict,300,bot_teamnm);
 
 				distance[iCount] = WaypointDistanceFromTo(iNearWP,iNWP,bot_teamnm);
@@ -1310,7 +1319,7 @@ void CBotBase :: TestOnButtonWay(CWay &pWay,edict_t **pToUse){
 				if(iOCount){
 					iFarGoal = -1;
 					iGoal = -1;
-					//FakeClientCommand(pEdict,"say","no poss to get there ",0);
+					//FakeClientCommand(pEdict,"say no poss to get there");
 				}
 				//if(pEdictPlayer)WaypointDrawBeam(pEdictPlayer,waypoints[pWay->iIndices[i]].origin,waypoints[pWay->iIndices[is]].origin,10,10,255,255,100,10,10);
 			}
@@ -1320,7 +1329,7 @@ void CBotBase :: TestOnButtonWay(CWay &pWay,edict_t **pToUse){
 
 long CBotBase :: Change2Weapon(const long lWeapon){
 	if(f_DenyWChange < gpGlobals->time && lWeapon < 32&& lWeapon >= 0){
-		FakeClientCommand(pEdict, weapon_defs[lWeapon].szClassname,0,0);
+		FakeClientCommand(pEdict, "%s", weapon_defs[lWeapon].szClassname);
 		return lWeapon;
 	}
 	else{
@@ -1337,7 +1346,7 @@ long CBotBase :: ChangeToLWeapon(void){
 	}
 	else{
 		if(!IsCWeaponKnife())	// if current weapon secondary switch to knife
-			FakeClientCommand(pEdict,"weapon_knife",0,0);
+			FakeClientCommand(pEdict,"weapon_knife");
 	}
 	return 0;
 }
@@ -1967,7 +1976,7 @@ float CBotBase :: ChangeBodyPitch( void )
 	
 	current += fAngleSpeedPitch * 1.0f * (g_msecval/50.0f);
 	
-	//char szTest[100];sprintf(szTest,"%f",current);FakeClientCommand(pEdict,"say",szTest,0);
+	//FakeClientCommand(pEdict,"say %f",current);
 	
 	// check for wrap around of angle...
 	while (current > 180)
@@ -2328,7 +2337,7 @@ bool CBotBase :: SearchForIL(void){			// searchin for an intersesting lcoation, 
 				if(f_LookTo < gpGlobals->time-2.5f){
 					VLookTo = waypoints[iMaxFDWP].origin;
 					f_LookTo = gpGlobals->time + 1.0;
-					//FakeClientCommand(pEdict,"say","sfai",0);
+					//FakeClientCommand(pEdict,"say sfai");
 				}
 			}
 			if(fMaxFInd > f_IOrigD*2.5f){
@@ -2427,10 +2436,8 @@ bool CBotBase :: HandleNearWP(int iNearWP, bool &bReturn){
 							ResetWPlanning();
 							Task.AddTask(BT_CAMP,gpGlobals->time + _CAMPTIME * RANDOM_FLOAT(.5,2),0,0,0);
 							InitCamp();
-							if(g_bUseRadio){
-								FakeClientCommand(pEdict,"radio3",0,0);
-								FakeClientCommand(pEdict,"menuselect","5",0);
-							}
+							if(g_bUseRadio)
+								FakeClientCommand(pEdict,"radio3;menuselect 5");
 							if(f_RWKnife > gpGlobals->time)
 								f_RWKnife = gpGlobals->time;
 							f_UsedRadio = gpGlobals->time;
@@ -2461,7 +2468,7 @@ bool CBotBase :: HandleNearWP(int iNearWP, bool &bReturn){
 			}
 			if(!pELadder){
 				while(pELadder = UTIL_FindEntityInSphere(pELadder,pEdict->v.origin,(waypoints[iNearWP].origin - pEdict->v.origin).Length()+50.0f)){
-					if(!strcmp(STRING(pELadder->v.classname),"func_ladder"))
+					if(FStrEq(STRING(pELadder->v.classname),"func_ladder"))
 						break;
 				}
 			}
@@ -2502,8 +2509,7 @@ bool CBotBase :: HandleNearWP(int iNearWP, bool &bReturn){
 						if((pEdict->v.origin - VLadderOrigin).Length2D() > fDNear){	// bot isn't the nearest
 							f_Pause = f_ducktill = gpGlobals->time + .5f;
 							
-							/*char szBuffer[200];sprintf(szBuffer,"%s;%f-%f",STRING(pNearestEdict->v.netname),fDNear,(pEdict->v.origin - VLadderOrigin).Length2D());
-							FakeClientCommand(pEdict,"say","stopping",szBuffer);*/
+							/*FakeClientCommand(pEdict,"say stopping %s;%f-%f",STRING(pNearestEdict->v.netname),fDNear,(pEdict->v.origin - VLadderOrigin).Length2D());*/
 						}
 						else{			// no changes
 						}
@@ -2555,11 +2561,11 @@ void CBotBase :: AdjustLadder( void ){
 		if(fabs(VCross.z)>0){
 			if(VCross.z>0){
 				f_strafe=_MAXSTRAFE;
-				//FakeClientCommand(pEdict,"say","right",0);
+				//FakeClientCommand(pEdict,"say right");
 			}
 			else{
 				f_strafe=-_MAXSTRAFE;
-				//FakeClientCommand(pEdict,"say","left",0);
+				//FakeClientCommand(pEdict,"say left");
 			}
 		}
 	}
@@ -2576,7 +2582,7 @@ void CBotBase :: OnLadder( void )
 	// get entity of ladder, if not done ...
 	if(!pELadder){
 		while(pELadder = UTIL_FindEntityInSphere(pELadder,pEdict->v.origin,100)){
-			if(!strcmp(STRING(pELadder->v.classname),"func_ladder"))
+			if(FStrEq(STRING(pELadder->v.classname),"func_ladder"))
 				break;
 		}
 	}
@@ -2606,7 +2612,7 @@ void CBotBase :: OnLadder( void )
 			
 			if (tr.flFraction < 1.0)  // hit something?
 			{
-				if (strcmp("func_wall", STRING(tr.pHit->v.classname)) == 0)
+				if (FStrEq("func_wall", STRING(tr.pHit->v.classname)))
 				{
 					// square up to the wall...
 					view_angles = UTIL_VecToAngles(tr.vecPlaneNormal);
@@ -2645,7 +2651,7 @@ void CBotBase :: OnLadder( void )
 				
 				if (tr.flFraction < 1.0)  // hit something?
 				{
-					if (strcmp("func_wall", STRING(tr.pHit->v.classname)) == 0)
+					if (FStrEq("func_wall", STRING(tr.pHit->v.classname)))
 					{
 						// square up to the wall...
 						view_angles = UTIL_VecToAngles(tr.vecPlaneNormal);
@@ -2679,7 +2685,7 @@ void CBotBase :: OnLadder( void )
 	
 	// added by @$3.1415rin - to be perpendicular to the middle of the ladder
 	if(pELadder){
-		//FakeClientCommand(pEdict,"say","ladderstuffnew",0);
+		//FakeClientCommand(pEdict,"say ladderstuffnew");
 		
 		//BotAdjustLadder();
 		/*Vector ladderLeft = pELadder->v.absmin;
@@ -2690,9 +2696,7 @@ void CBotBase :: OnLadder( void )
 		ladderLeft.z = ladderRight.z;
 		Vector ladderSide = ladderLeft - ladderRight;
 		//Vector normal = CrossProduct( ladderSide, Vector(0,0,1) );
-		//char szBuffer[200];
-		//sprintf(szBuffer,"%.2f - %.2f",fLength,fabs(LadderMiddle.z-pEdict->v.origin.z));
-		//FakeClientCommand(pEdict,"say","--",szBuffer);
+		//FakeClientCommand(pEdict,"say --%.2f - %.2f",fLength,fabs(LadderMiddle.z-pEdict->v.origin.z));
 		
 		  if(fabs(pELadder->v.absmin.z-pEdict->v.origin.z) > 30
 		  &&fabs(pELadder->v.absmax.z-pEdict->v.origin.z) > 30){	// don't do this @ the end of the ladder				
@@ -2725,7 +2729,7 @@ void CBotBase :: OnLadder( void )
 			UTIL_TraceLine(VStart, VEndMiddle, dont_ignore_monsters,pEdict->v.pContainingEntity, &tr);
 			if(tr.flFraction*100.0 < 20){	// if there's a wall nearby
 				Jump();
-				//FakeClientCommand(pEdict,"say","getting off top",0);
+				//FakeClientCommand(pEdict,"say getting off top");
 			}
 		}
 		// end check
@@ -2757,7 +2761,7 @@ void CBotBase :: OnLadder( void )
 		UTIL_TraceLine(pEdict->v.origin,pEdict->v.origin+Vector(0,0,-100),dont_ignore_monsters,pEdict,&tr);
 		if(tr.flFraction * 100.0 < 50.0f){
 			Jump();
-			//FakeClientCommand(pEdict,"say","getting off",0);
+			//FakeClientCommand(pEdict,"say getting off");
 		}
 		
 		// check if the bot hasn't moved much since the last location...
@@ -2812,7 +2816,7 @@ bool CBotBase :: DecideOnWay(void){
 long CBotBase :: WeaponClass2ID(const char *szClassname){
 	long lschl;
 	for(lschl=0;lschl < 32;lschl ++){
-		if(!strcmp(szClassname,weapon_defs[lschl].szClassname)){
+		if(FStrEq(szClassname,weapon_defs[lschl].szClassname)){
 			return lschl;
 		}
 	}
@@ -2902,7 +2906,7 @@ bool CBotBase :: Camp(void){
 			if(WLookTo.iNum){
 				if(f_CaLooktoWP < gpGlobals->time){
 					if(fabs(sLookToChange) != 1)
-						FakeClientCommand(pEdict,"say","asd---",0);
+						FakeClientCommand(pEdict,"say asd---");
 					int iNewCWP = WLookTo.FindItem(i_CurrWP);
 					if(iNewCWP == -1){
 						// not in way ...
@@ -2970,7 +2974,7 @@ void CBotBase :: HandleGOrder(void){
 			lButton &=~ IN_ATTACK;
 			if(GOrder.lTypeoG
 				&& (bot_weapons & (1<<GOrder.lTypeoG))){
-				FakeClientCommand(pEdict,weapon_defs[GOrder.lTypeoG].szClassname,0,0);
+				FakeClientCommand(pEdict,"%s",weapon_defs[GOrder.lTypeoG].szClassname);
 				f_DenyWChange = gpGlobals->time + 3.0;
 				GOrder.lState ++;
 			}
@@ -3138,9 +3142,9 @@ void CBotBase :: HandleReplay(void){
 
 				// copy stuff from recorded data to bot
 				if(pWPAMPlay->Rec[i].lButton&IN_DUCK){
-					//FakeClientCommand(pEdict,"say","duckin from advm",0);
+					//FakeClientCommand(pEdict,"say duckin from advm");
 				}
-				//FakeClientCommand(pEdict,"say","-",0);
+				//FakeClientCommand(pEdict,"say -");
 				lButton = pWPAMPlay->Rec[i].lButton;
 				if(pWPAMPlay->Rec[i].v_origin.Length() < .1 || pWPAMPlay->Rec[i2].v_origin.Length() < .1)
 					break;
@@ -3178,10 +3182,10 @@ void CBotBase :: HandleReplay(void){
 			i++;
 		}
 		if(i >= pWPAMPlay->iNum){
-			//FakeClientCommand(pEdict,"say","stoppin advm",0);
+			//FakeClientCommand(pEdict,"say stoppin advm");
 			/*if((pWPAMPlay->Rec[pWPAMPlay->iNum].v_origin - pEdict->v.origin).Length()>50.f){
 #ifdef DEBUGMESSAGES
-				FakeClientCommand(pEdict,"say","fuck, hasnt worked this time neither",0);
+				FakeClientCommand(pEdict,"say fuck, hasnt worked this time neither");
 #endif
 				ResetWPlanning();
 				f_Pause = gpGlobals->time + .6f;
