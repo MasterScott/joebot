@@ -1967,7 +1967,16 @@ void StartFrame( void )
 				(SBInfo[bot_index].respawn_state == RESPAWN_IDLE))  // not respawning
 			{
 				//try{
-				bots[bot_index]->Think();
+				if (g_bJoinWHumanRES &&
+					bots[bot_index]->bot_team != 6 &&
+					bots[bot_index]->bot_team > 0 &&
+					!UTIL_HumansInGame())
+				{
+					sprintf(szTemp, "kick \"%s\"\n", STRING(bots[bot_index]->pEdict->v.netname));
+					SERVER_COMMAND(szTemp);
+				}
+				else
+					bots[bot_index]->Think();
 				
 				count++;
 				/*}
