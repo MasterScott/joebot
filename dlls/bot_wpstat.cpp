@@ -53,7 +53,6 @@
 // statistical information based on wps
 CWPStat WPStat;
 
-extern float f_timesrs;
 bool FVisible( const Vector &vecOrigin, edict_t *pEdict );
 
 #define AVERAGE_C_DIST 10.0
