@@ -48,8 +48,6 @@
 #include "globalvars.h"
 
 extern enginefuncs_t g_engfuncs;
-//extern bot_t bots[32];
-extern int mod_id;
 
 void (*botMsgFunction)(void *, int, int) = NULL;
 int botMsgIndex;
@@ -910,12 +908,12 @@ void pfnFadeClientVolume(const edict_t *pEdict, int fadePercent, int fadeOutSeco
 
 void pfnSetClientMaxspeed(const edict_t *pEdict, float fNewMaxspeed)
 {
-	int index = -1;
-	index = UTIL_GetBotIndex(pEdict);
-	if(index !=-1){
-		bots[index]->f_max_speed = fNewMaxspeed;
+	CBotBase *pB = UTIL_GetBotPointer(pEdict);
+
+	if(pB){
+		pB->f_max_speed = fNewMaxspeed;
 		if(mod_id == DOD_DLL){
-			bots[index]->f_max_speed /= 2;		// cause the other is sprinting speed
+			pB->f_max_speed /= 2;		// cause the other is sprinting speed
 		}
 	}
 	
@@ -989,7 +987,7 @@ int pfnGetPlayerUserId(edict_t *e )
 		if (mod_id == GEARBOX_DLL)
 		{
 			// is this edict a bot?
-			if (UTIL_GetBotPointer( e ))
+			if (UTIL_GetBotIndex( e ) > -1)
 #ifdef USE_METAMOD
 				RETURN_META_VALUE(MRES_SUPERCEDE, 0);
 #else /* not USE_METAMOD */
