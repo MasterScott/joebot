@@ -170,7 +170,7 @@ void CBotNames::mixIt(void){
 
 const CBotNamesItem *CBotNames::getName(void){
 	//cout << m_LNames.size() << " names"<<endl;
-	if(m_LNames.size()){
+	if(!m_LNames.empty()){
 		m_ICName++;
 		if(m_ICName == m_LNames.end()){
 			m_ICName = m_LNames.begin();
