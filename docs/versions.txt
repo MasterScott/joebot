@@ -12,6 +12,13 @@
 -- This Bot is based on botman's HPB_bot - template code - http://planethalflife.com/botman --
 ----------------------------------------------------------------------------------------------
 
+JoeBOT 1.6.1
+- FIXED problems with
+- - joinwhuman_res on/off
+- - compensating recoil
+- - team specific chat message ( they are ignored for the interactive chat )
+- - some other little bugs
+
 JoeBOT 1.6 - July 2002
 - FIXED : Problems with min_bots
 - FIXED : Problems with names in chat
