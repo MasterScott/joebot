@@ -1,3 +1,25 @@
+/******************************************************************************   
+    
+     JoeBOT - a bot for Counter-Strike   
+     Copyright (C) 2000-2002  Johannes Lampel   
+    
+     This program is free software; you can redistribute it and/or modify   
+     it under the terms of the GNU General Public License as published by   
+     the Free Software Foundation; either version 2 of the License, or   
+     any later version.   
+    
+     This program is distributed in the hope that it will be useful,   
+     but WITHOUT ANY WARRANTY; without even the implied warranty of   
+     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the   
+     GNU General Public License for more details.   
+    
+     You should have received a copy of the GNU General Public License   
+     along with this program; if not, write to the Free Software   
+     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA   
+    
+ ******************************************************************************/ 
+
+
 //
 // HPB bot - botman's High Ping Bastard bot
 //
@@ -19,7 +41,7 @@
 HINSTANCE h_Library = NULL;
 HGLOBAL h_global_argv = NULL;
 void FreeNameFuncGlobals(void);
-void LoadSymbols(char *filename);
+void LoadSymbols(char *filenme);
 
 #else
 
@@ -33,8 +55,6 @@ globalvars_t  *gpGlobals;
 char *g_argv;
 
 static FILE *fp;
-char z_welcome_msg[] = "HPB bot - http://planethalflife.com/botman";
-
 
 GETENTITYAPI other_GetEntityAPI = NULL;
 GETNEWDLLFUNCTIONS other_GetNewDLLFunctions = NULL;
@@ -102,10 +122,8 @@ extern "C" DLLEXPORT void GiveFnptrsToDll( enginefuncs_t* pengfuncsFromEngine, g
    if (pos == 0)
    {
       // Error getting directory name!
-
-		ALERT( at_error, "HPB_bot - Error determining MOD directory name!" );
+		ALERT( at_error, "JoeBot - Error determining MOD directory name!" );
    }
-
    pos++;
    strcpy(mod_name, &game_dir[pos]);
 
@@ -138,6 +156,24 @@ extern "C" DLLEXPORT void GiveFnptrsToDll( enginefuncs_t* pengfuncsFromEngine, g
       strcpy(game_dll_filename, "cstrike/dlls/cs_i386.so");
 #endif
    }
+   else if (strcmpi(mod_name, "retrocs") == 0)
+   {
+      mod_id = CSTRIKE_DLL;
+#ifndef __linux__
+      strcpy(game_dll_filename, "retrocs\\dlls\\mp.dll");
+#else
+      strcpy(game_dll_filename, "retrocs/dlls/cs_i386.so");
+#endif
+   }
+   else if (strcmpi(mod_name, "csclassic") == 0)
+   {
+      mod_id = CSCLASSIC_DLL;
+#ifndef __linux__
+      strcpy(game_dll_filename, "csclassic\\dlls\\mp.dll");
+#else
+      strcpy(game_dll_filename, "csclassic/dlls/cs_i386.so");
+#endif
+   }
    else if (strcmpi(mod_name, "gearbox") == 0)
    {
       mod_id = GEARBOX_DLL;
@@ -145,6 +181,15 @@ extern "C" DLLEXPORT void GiveFnptrsToDll( enginefuncs_t* pengfuncsFromEngine, g
       strcpy(game_dll_filename, "gearbox\\dlls\\opfor.dll");
 #else
       strcpy(game_dll_filename, "gearbox/dlls/opfor_i386.so");
+#endif
+   }
+   else if (strcmpi(mod_name, "dod") == 0)
+   {
+      mod_id = DOD_DLL;
+#ifndef __linux__
+      strcpy(game_dll_filename, "dod\\dlls\\dod.dll");
+#else
+      strcpy(game_dll_filename, "dod/dlls/dod_i386.so");
 #endif
    }
    else if (strcmpi(mod_name, "frontline") == 0)
@@ -169,7 +214,7 @@ extern "C" DLLEXPORT void GiveFnptrsToDll( enginefuncs_t* pengfuncsFromEngine, g
    {
       // Directory error or Unsupported MOD!
 
-		ALERT( at_error, "HPB_bot - MOD dll not found (or unsupported MOD)!" );
+		ALERT( at_error, "JoeBot - MOD dll not found (or unsupported MOD)!" );
 
       return;
    }
@@ -187,7 +232,7 @@ extern "C" DLLEXPORT void GiveFnptrsToDll( enginefuncs_t* pengfuncsFromEngine, g
    {
       // Can't find GetEntityAPI!
 
-		ALERT( at_error, "HPB_bot - Can't get MOD's GetEntityAPI!" );
+		ALERT( at_error, "JoeBot - Can't get MOD's GetEntityAPI!" );
    }
 
    other_GetNewDLLFunctions = (GETNEWDLLFUNCTIONS)GetProcAddress(h_Library, "GetNewDLLFunctions");
@@ -196,7 +241,7 @@ extern "C" DLLEXPORT void GiveFnptrsToDll( enginefuncs_t* pengfuncsFromEngine, g
 //   {
 //      // Can't find GetNewDLLFunctions!
 //
-//		ALERT( at_error, "HPB_bot - Can't get MOD's GetNewDLLFunctions!" );
+//		ALERT( at_error, "JoeBot - Can't get MOD's GetNewDLLFunctions!" );
 //   }
 
    other_GiveFnptrsToDll = (GIVEFNPTRSTODLL)GetProcAddress(h_Library, "GiveFnptrsToDll");
@@ -205,7 +250,7 @@ extern "C" DLLEXPORT void GiveFnptrsToDll( enginefuncs_t* pengfuncsFromEngine, g
    {
       // Can't find GiveFnptrsToDll!
 
-		ALERT( at_error, "HPB_bot - Can't get MOD's GiveFnptrsToDll!" );
+		ALERT( at_error, "JoeBot - Can't get MOD's GiveFnptrsToDll!" );
    }
 
 
@@ -359,4 +404,3 @@ extern "C" DLLEXPORT void GiveFnptrsToDll( enginefuncs_t* pengfuncsFromEngine, g
    // give the engine functions to the other DLL...
    (*other_GiveFnptrsToDll)(pengfuncsFromEngine, pGlobals);
 }
-
