@@ -43,7 +43,6 @@ extern enginefuncs_t g_engfuncs;
 //extern bot_t bots[32];
 extern int mod_id;
 
-
 int debug_engine = 0;
 
 void (*botMsgFunction)(void *, int,int) = NULL;

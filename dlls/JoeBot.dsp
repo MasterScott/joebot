@@ -327,6 +327,10 @@ SOURCE=.\LListElem.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\namefunc.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\NNSim\NeuralNetBProp.cpp
 # End Source File
 # Begin Source File
