@@ -16,6 +16,16 @@ debug:
 	$(MAKE) -C dlls debug_mm
 	$(MAKE) -C dlls debug_std
 
+clean:
+	$(MAKE) -C dlls $@
+	$(MAKE) -C NNSim $@
+	$(MAKE) -C NNSim/som $@
+
+rebuild:
+	$(MAKE) -C dlls $@
+	$(MAKE) -C NNSim $@
+	$(MAKE) -C NNSim/som $@
+
 # ---------------------------------------------------------------------------
 # Rules
 # ---------------------------------------------------------------------------
