@@ -23,7 +23,7 @@ CCommand.obj CSDecals.obj basemem.obj ..\NNSim\Activations.obj ..\NNSim\BaseLink
 ..\NNSim\BaseWeight.obj ..\NNSim\BaseWeightFF.obj ..\NNSim\LinkBProp.obj ..\NNSim\LinkBPropM.obj \
 ..\NNSim\NeuralNetBProp.obj ..\NNSim\NeuralNetBPropM.obj ..\NNSim\NeuronBProp.obj ..\NNSim\NeuronBPropM.obj \
  ..\NNSim\NNSimService.obj ..\NNSim\PatternBProp.obj ..\NNSim\PatternElemBProp.obj ..\NNSim\WeightBProp.obj \
-..\NNSim\WeightBPropM.obj ..\NNSim\GenomToken.obj ..\NNSim\Genom.obj Gnome.obj WorldGnome.obj LListElem.obj
+..\NNSim\WeightBPropM.obj ..\NNSim\GenomToken.obj ..\NNSim\Genom.obj Gnome.obj WorldGnome.obj LListElem.obj namefunc.obj
 
 
 joebot.dll:	${OBJ} linkfunc.obj
