@@ -77,8 +77,8 @@ CCommands ::CCommands(){
 	AddCommand("trainnn",		"",			(void*)bc_trainnn,CM_ALL);
 	AddCommand("botshoot",		"bot_shoot",(void*)bc_botshoot,CM_ALL);
 	AddCommand("bottkpunish",	"",			(void*)bc_bottkpunish,CM_ALL);
+#ifdef _DEBUG
 	AddCommand("showen",		"",			(void*)bc_showen,CM_ALL);
-#ifdef DEBUGENGINE
 	AddCommand("debug_engine",	"de",		(void*)bc_debug_engine,CM_ALL);
 #endif
 	AddCommand("setp",			"",			(void*)bc_setp,CM_ALL);
@@ -106,10 +106,10 @@ CCommands ::CCommands(){
 	AddCommand("bot_spraying","botspraying",(void*)bc_bot_spraying,CM_ALL);
 	AddCommand("bot_spray","botspray",(void*)bc_bot_spraying,CM_ALL);
 	AddCommand("botusespray","botsusespray",(void*)bc_bot_spraying,CM_ALL);
-
+#ifdef USE_GNOME
 	AddCommand("startgnome","stag",(void*)bc_startgnome,CM_CONSOLE);
 	AddCommand("stopgnome","stog",(void*)bc_stopgnome,CM_CONSOLE);
-
+#endif /* USE_GNOME */
 	AddCommand("loadbuyprob","lbp",(void*)bc_loadbuyprob,CM_ALL);
 
 	AddCommand("botglow","bg",(void*)bc_botglow,CM_ALL);
