@@ -38,9 +38,7 @@
 
 void CBotCS :: Fight( void ){
 	//try{
-#ifdef DEBUGMESSAGES
-	WaypointDrawBeam(listenserver_edict,pEdict->v.origin,pEdict->v.origin + Vector(0,0,50),10,0,200,000,000,200,10);
-#endif
+	DEBUG_DRAWBEAM(listenserver_edict,pEdict->v.origin,pEdict->v.origin + Vector(0,0,50),10,0,200,000,000,200,10);
 	bool bDefensive = false;
 	edict_t *pFlashbang=0;
 	Vector v_enemy = pBotEnemy->v.origin - pEdict->v.origin;	// difference vector from en and bot
@@ -132,9 +130,10 @@ void CBotCS :: Fight( void ){
 		f_NNNUpdate = gpGlobals->time + (1.0f / jb_nnupdaterate->value);
 		// collect data for SOM
 		/*if(dCombatNNIn[IAmmo] <= 1
-		&& dCombatNNIn[IAmmo] >= -1){
-		SP.AddPattern(dCombatNNIn);
-	}*/
+			&& dCombatNNIn[IAmmo] >= -1)
+		{
+			SP.AddPattern(dCombatNNIn);
+		}*/
 		
 		// log nn vars for reinforcement learning
 		/*memcpy(sbNNLog.dppNet[_LOGNETINPUT][sbNNLog.lAct],dCombatNNIn,sizeof(double)*IEND);
@@ -142,8 +141,8 @@ void CBotCS :: Fight( void ){
 		sbNNLog.lNum ++;
 		sbNNLog.lAct ++;
 		if(sbNNLog.lAct >= _MAXNNLOG){
-		sbNNLog.lAct = 0;
-	}*/		
+			sbNNLog.lAct = 0;
+		}*/		
 		// stop hiding, when seeing en
 		/*if(f_Hide > gpGlobals->time)
 			f_Hide = gpGlobals->time;*/
@@ -206,7 +205,7 @@ void CBotCS :: Fight( void ){
 			}
 			
 			else if(current_weapon.iId == CS_WEAPON_GLOCK18){
-				if(bGlockBurst){
+				if(m_bGlockBurst){
 					if(fEnemyDist > 400){
 						lButton |= IN_ATTACK2;
 					}
@@ -218,243 +217,251 @@ void CBotCS :: Fight( void ){
 				}
 			}
 		}
-		}
-		// ODuck
-		if(dCombatNNOut[ODuck] > 0.5){
-			//lButton |= IN_DUCK;
-			f_ducktill = gpGlobals->time +.5;
-		}
-		// OJump
-		//cout << dCombatNNOut[OJump] << endl;
-		if(dCombatNNOut[OJump] > 0.75){
-			//FakeClientCommand(pEdict,"say NNJUMP");
-			if(!(pEdict->v.button & IN_JUMP)
-				&& RANDOM_LONG(0,100) > 50
-				&& f_move_speed > 1.0)
-				//lButton |= IN_JUMP;
-				Jump();
-		}
-		
-		// OHide
-		if(dCombatNNOut[OHide] > .65
-			|| IsCWeaponKnife()){
-			bDefensive=true;
-		}
+	}
+	// ODuck
+	if(dCombatNNOut[ODuck] > 0.5){
+		//lButton |= IN_DUCK;
+		f_ducktill = gpGlobals->time +.5;
+	}
+	// OJump
+	//cout << dCombatNNOut[OJump] << endl;
+	if(dCombatNNOut[OJump] > 0.75){
+		//DEBUG_CLIENTCOMMAND(pEdict,"say NNJUMP");
+		if(!(pEdict->v.button & IN_JUMP)
+			&& RANDOM_LONG(0,100) > 50
+			&& f_move_speed > 1.0)
+			//lButton |= IN_JUMP;
+			Jump();
+	}
+	
+	// OHide
+	if(dCombatNNOut[OHide] > .65
+		|| IsCWeaponKnife()){
+		bDefensive=true;
+	}
 
-		//bDefensive = true;
-		
-		// OMoveType
-		if(!IsCWeaponKnife()){
-			if(dCombatNNOut[OMoveType] > 0.5){
-				// do nothing cause default is max speed
-			}
-			if(dCombatNNOut[OMoveType] < 0.5
-				&&dCombatNNOut[OMoveType] > -0.5){
-				// walk ??
-			}
-			if(dCombatNNOut[OMoveType] <-0.5){
-				f_move_speed = 0;
-			}
+	//bDefensive = true;
+	
+	// OMoveType
+	if(!IsCWeaponKnife()){
+		if(dCombatNNOut[OMoveType] > 0.5){
+			// do nothing cause default is max speed
 		}
-		else{
-			// handle stuff with runnign with knife
-			if(f_RWKnife > gpGlobals->time - 1.3){
-				if(f_RWKnife > gpGlobals->time){
-					if(!IsCWeaponPrimary() && !IsCWeaponSecondary()){
-						if(HasPrimary()){
-							Change2Weapon(HasPrimary());
-							
-							f_RWKnife = gpGlobals->time-1.1;
-							f_DenyWChange = gpGlobals -> time + 1.0f;
-						}
-						else if(HasSecondary()){
-							Change2Weapon(HasSecondary());
-							
-							f_RWKnife = gpGlobals->time-1.1;
-							f_DenyWChange = gpGlobals -> time + 1.0f;
-						}
+		if(dCombatNNOut[OMoveType] < 0.5
+			&&dCombatNNOut[OMoveType] > -0.5){
+			// walk ??
+		}
+		if(dCombatNNOut[OMoveType] <-0.5){
+			f_move_speed = 0;
+		}
+	}
+	else{
+		// handle stuff with runnign with knife
+		if(f_RWKnife > gpGlobals->time - 1.3){
+			if(f_RWKnife > gpGlobals->time){
+				if(!IsCWeaponPrimary() && !IsCWeaponSecondary()){
+					if(HasPrimary()){
+						Change2Weapon(HasPrimary());
+						
+						f_RWKnife = gpGlobals->time-1.1;
+						f_DenyWChange = gpGlobals -> time + 1.0f;
+					}
+					else if(HasSecondary()){
+						Change2Weapon(HasSecondary());
+						
+						f_RWKnife = gpGlobals->time-1.1;
+						f_DenyWChange = gpGlobals -> time + 1.0f;
 					}
 				}
+			}
+			bDefensive = false;
+		}
+	}
+	
+	// OStrafe
+	if(dCombatNNOut[OStrafe] > 0.5){
+		f_strafe += _MAXSTRAFE;
+	}
+	else if(dCombatNNOut[OStrafe] <-0.5){
+		f_strafe -= _MAXSTRAFE;
+	}
+	
+	// ct bots shouldn't hide when the VIP is near to them
+	if(bDefensive && g_iMapType == MT_AS){
+		if(g_pVIP){
+			if((pEdict->v.origin-g_pVIP->v.origin).Length() < 400.0)
 				bDefensive = false;
-			}
 		}
-		
-		// OStrafe
-		if(dCombatNNOut[OStrafe] > 0.5){
-			f_strafe += _MAXSTRAFE;
-		}
-		else if(dCombatNNOut[OStrafe] <-0.5){
-			f_strafe -= _MAXSTRAFE;
-		}
-		
-		// ct bots shouldn't hide when the VIP is near to them
-		if(bDefensive && g_iTypeoM == MT_AS){
-			if(g_pVIP){
-				if((pEdict->v.origin-g_pVIP->v.origin).Length() < 400.0)
-					bDefensive = false;
-			}
-		}
+	}
 
-		if (pEdict->v.movetype == MOVETYPE_FLY)		// if on ladder, try to get away from there
-			bDefensive = true;
-		
-		pFlashbang = 0;
-		if(RANDOM_LONG(0,100) < 20){
-			long lNumF=0;
-			while(gFlash[lNumF].bUsed && lNumF<_MAXGRENADEREC){
-				if(FNullEnt(gFlash[lNumF].p))
-					gFlash[lNumF].p = 0;
-				if(gFlash[lNumF].p){
-					if(FVisible(gFlash[lNumF].VOrigin,pEdict)){
-						pFlashbang = gFlash[lNumF].p;
-						break;
-					}
-				}
-				lNumF++;
-			}
-		}
-		
-		// check if bot's trying to get to a safer or better location
-		//if(f_GotoHidingPlace > gpGlobals->time){
-		if(Task.current&&Task.current->lType & BT_HIDE){
-			// copy point to edict hiding from to bot_t.pHidefrom;
-			//if(pEdictPlayer)WaypointDrawBeam(pEdictPlayer,pEdict->v.origin,VHidingPlace,100,10,255,255,255,100,50);
-			//FakeClientCommand(pEdict,"say hiding ...");
-			// sometimes jump
-			if(RANDOM_LONG(0,100) < 8
-				&&moved_distance > 8.0f
-				&&!(Action.lAction & BA_TKAVOID) ){		// only jump when avoiding tks when nn wants it
-				//lButton |= IN_JUMP;
-				Jump();
-			}
-			//GotoHidingPlace();
-		}
-		else{
-			// bot's not trying to reach a safe place - but just test now if it would be better if he does ...
-			//bDefensive = BotCheckDefensive(pBot);
-			if(bDefensive											// is it important to get into a more defensive mode ?
-				|| pFlashbang
-				//&& f_Hide < gpGlobals->time - 5.0f	// don't play hide and seek for hours
-				/*&&f_GotoHidingPlace > gpGlobals->time+.5*/
-				&&f_HidingTime < gpGlobals->time - 1.f){	// just wait one sec between two hidings to shoot shortly at the enemy
-				edict_t *pHidefrom;
-				if(!pFlashbang)
-					pHidefrom = pBotEnemy;
-				else
-					pHidefrom = pFlashbang;
-				int iDest;
-				if((iDest=SearchHidingWP(pHidefrom))!=-1){	// then search for a good place
-					// do some checking concerning where to run.
-					i_CurrWP = iNearWP;
-					Vector VToC = waypoints[i_CurrWP].origin - pEdict->v.origin;
-					int iNext = WaypointRouteFromTo(i_CurrWP,iDest,bot_teamnm);
-					if(iNext != WAYPOINT_UNREACHABLE){
-						Vector VCToN = waypoints[iNext].origin - waypoints[i_CurrWP].origin;
-						if(DotProduct(VToC,VCToN) < 0){
-							// i.e. the bot would have to run forward to reach the
-							// nearest waypoint and then backwards to hide.
-							// to save time ( and time is precious in this situation )
-							// take the next waypoint on ya route to get out of there !
-							i_CurrWP = iNext;
-						}
-					}
-					// set VRunningTo to next location so you dun have to wait for headtowardwp
-					if(i_CurrWP != -1)
-						VRunningTo = waypoints[i_CurrWP].origin;
-					f_HidingTime = gpGlobals->time;
-					// found a nice place to camp for a while ...
-					// set camp time based on current nn output
-					//f_HidingTime = (dCombatNNOut[OHide]-.25) * 1.6 * _HIDECAMPTIME;
-					//					f_GotoHidingPlace = gpGlobals->time + 2.0;
-					//Task.AddTask(BT_HIDE, gpGlobals->time + 2.0, 0, pBotEnemy,0);
-					if(Task.current&&!(Task.current->lType & BT_HIDE)){
-						if(dCombatNNIn[IAmmo] < -.5f
-							&&Task.SearchT(BT_RELOAD) == -1){
-							Task.AddTask(BT_RELOAD,gpGlobals->time + 30.f,0,0,0);
-						}
-						Task.AddTask(BT_GOTO|BT_CAMPATGOAL|BT_IGNOREENEMY|BT_HIDE|BT_LOCKED, gpGlobals->time + 10.0, iDest, pBotEnemy,4);
-						ResetWPlanning();
-					}
-					//					pHidefrom = pBotEnemy;
-					//FakeClientCommand(pEdict,"say hiding cause of shitty circumstances ....");
+	if (pEdict->v.movetype == MOVETYPE_FLY)		// if on ladder, try to get away from there
+		bDefensive = true;
+	
+	pFlashbang = 0;
+	if(RANDOM_LONG(0,100) < 20){
+		long lNumF=0;
+		while(gFlash[lNumF].bUsed && lNumF<_MAXGRENADEREC){
+			if(FNullEnt(gFlash[lNumF].p))
+				gFlash[lNumF].p = 0;
+			if(gFlash[lNumF].p){
+				if(FVisible(gFlash[lNumF].VOrigin,pEdict)){
+					pFlashbang = gFlash[lNumF].p;
+					break;
 				}
 			}
+			lNumF++;
 		}
-		
-		double dAngle = (fabs(pEdict->v.punchangle.y) + fabs(pEdict->v.punchangle.x)) / 360.f * 3.14159265358979;		// not 180, but 360, because (2 x angles) / 2 / 180 *pi
-		if(tan(dAngle) * fEnemyDist > f_MaxRecoil){		//  test the amount of recoil
-			if(f_PauseShoot < gpGlobals->time-.4)
-				f_PauseShoot = gpGlobals->time + WeaponDefs.dpWeaponPauseTime[mod_id][current_weapon.iId];
-#ifdef DEBUGMESSAGES
-			WaypointDrawBeam(listenserver_edict,pEdict->v.origin,pEdict->v.origin+Vector(50,50,50),10,40,255,255,255,200,1);
-#endif
+	}
+	
+	// check if bot's trying to get to a safer or better location
+	//if(f_GotoHidingPlace > gpGlobals->time){
+	if(Task.current&&Task.current->lType & BT_HIDE){
+		// copy point to edict hiding from to bot_t.pHidefrom;
+		//if(pEdictPlayer)WaypointDrawBeam(pEdictPlayer,pEdict->v.origin,VHidingPlace,100,10,255,255,255,100,50);
+		//DEBUG_CLIENTCOMMAND(pEdict,"say hiding ...");
+		// sometimes jump
+		if(RANDOM_LONG(0,100) < 8
+			&&moved_distance > 8.0f
+			&&!(Action.lAction & BA_TKAVOID) ){		// only jump when avoiding tks when nn wants it
+			//lButton |= IN_JUMP;
+			Jump();
 		}
-		
-		if(!bMeIVC// enemy doesn't see current bot
-			&&!(pBotEnemy->v.button&IN_ATTACK)
-			//&& !IsCWeaponSniper(pBot)						// don't try to hide with sniper weapon
-			//&& bDefensive									// bot's defensive
-			&& dCombatNNIn[IDistance]>0.0				// when near, attack in evry case
-			&& f_AimHead < .8							// begin to shoot when accurate
-			&& !IsCWeaponGrenade()){					// don't wait throwing grenades
-			f_Delay = gpGlobals->time +.001f;		// don't shoot this time ...
-			
-			/*float ffps = g_fps;
-			if(ffps > 60)
-				ffps = 60;*/
-			//f_AimHead = pow(f_AimHead,dsqrt(ffps/75.0));
-			if(f_AimHead < 1.0){
-				f_AimHead += gpGlobals->frametime;
-			}
+		//GotoHidingPlace();
+	}
+	else{
+		// bot's not trying to reach a safe place - but just test now if it would be better if he does ...
+		//bDefensive = BotCheckDefensive(pBot);
+		if(bDefensive											// is it important to get into a more defensive mode ?
+			|| pFlashbang
+			//&& f_Hide < gpGlobals->time - 5.0f	// don't play hide and seek for hours
+			/*&&f_GotoHidingPlace > gpGlobals->time+.5*/
+			&&f_HidingTime < gpGlobals->time - 1.f){	// just wait one sec between two hidings to shoot shortly at the enemy
+			edict_t *pHidefrom;
+			if(!pFlashbang)
+				pHidefrom = pBotEnemy;
 			else
-				f_AimHead = 1.0;
-			f_move_speed /= 1.5f;						// slow down to be less obvious ...
-			//FakeClientCommand(pEdict,"say aiming");
+				pHidefrom = pFlashbang;
+			int iDest;
+			if((iDest=SearchHidingWP(pHidefrom))!=-1){	// then search for a good place
+				// do some checking concerning where to run.
+				i_CurrWP = iNearWP;
+				Vector VToC = waypoints[i_CurrWP].origin - pEdict->v.origin;
+				int iNext = WaypointRouteFromTo(i_CurrWP,iDest,bot_teamnm);
+				if(iNext != WAYPOINT_UNREACHABLE){
+					Vector VCToN = waypoints[iNext].origin - waypoints[i_CurrWP].origin;
+					if(DotProduct(VToC,VCToN) < 0){
+						// i.e. the bot would have to run forward to reach the
+						// nearest waypoint and then backwards to hide.
+						// to save time ( and time is precious in this situation )
+						// take the next waypoint on ya route to get out of there !
+						i_CurrWP = iNext;
+					}
+				}
+				// set VRunningTo to next location so you dun have to wait for headtowardwp
+				if(i_CurrWP != -1)
+					VRunningTo = waypoints[i_CurrWP].origin;
+				f_HidingTime = gpGlobals->time;
+				// found a nice place to camp for a while ...
+				// set camp time based on current nn output
+				//f_HidingTime = (dCombatNNOut[OHide]-.25) * 1.6 * _HIDECAMPTIME;
+				//					f_GotoHidingPlace = gpGlobals->time + 2.0;
+				//Task.AddTask(BT_HIDE, gpGlobals->time + 2.0, 0, pBotEnemy,0);
+				if(Task.current&&!(Task.current->lType & BT_HIDE)){
+					if(dCombatNNIn[IAmmo] < -.5f
+						&&Task.SearchT(BT_RELOAD) == -1){
+						Task.AddTask(BT_RELOAD,gpGlobals->time + 30.f,0,0,0);
+					}
+					Task.AddTask(BT_GOTO|BT_CAMPATGOAL|BT_IGNOREENEMY|BT_HIDE|BT_LOCKED, gpGlobals->time + 10.0, iDest, pBotEnemy,4);
+					ResetWPlanning();
+				}
+				//					pHidefrom = pBotEnemy;
+				//DEBUG_CLIENTCOMMAND(pEdict,"say hiding cause of shitty circumstances ....");
+			}
+		}
+	}
+	
+	double dAngle = (fabs(pEdict->v.punchangle.y) + fabs(pEdict->v.punchangle.x)) / 360.f * 3.14159265358979;		// not 180, but 360, because (2 x angles) / 2 / 180 *pi
+	if(tan(dAngle) * fEnemyDist > f_MaxRecoil){		//  test the amount of recoil
+		if(f_PauseShoot < gpGlobals->time-.4)
+			f_PauseShoot = gpGlobals->time + WeaponDefs.dpWeaponPauseTime[mod_id][current_weapon.iId];
+		DEBUG_DRAWBEAM(listenserver_edict,pEdict->v.origin,pEdict->v.origin+Vector(50,50,50),10,40,255,255,255,200,1);
+	}
+	
+	if(!bMeIVC// enemy doesn't see current bot
+		&&!(pBotEnemy->v.button&IN_ATTACK)
+		//&& !IsCWeaponSniper(pBot)						// don't try to hide with sniper weapon
+		//&& bDefensive									// bot's defensive
+		&& dCombatNNIn[IDistance]>0.0				// when near, attack in evry case
+		&& f_AimHead < .8							// begin to shoot when accurate
+		&& !IsCWeaponGrenade()){					// don't wait throwing grenades
+		f_Delay = gpGlobals->time +.001f;		// don't shoot this time ...
+		
+		/*float ffps = g_fps;
+		if(ffps > 60)
+			ffps = 60;*/
+		//f_AimHead = pow(f_AimHead,dsqrt(ffps/75.0));
+		if(f_AimHead < 1.0){
+			f_AimHead += gpGlobals->frametime;
 		}
 		else
-			if(bMeIVC){
-				f_AimHead -= g_msecval*.004 * f_AimHead;
+			f_AimHead = 1.0;
+		f_move_speed /= 1.5f;						// slow down to be less obvious ...
+		//DEBUG_CLIENTCOMMAND(pEdict,"say aiming");
+	}
+	else
+		if(bMeIVC){
+			f_AimHead -= g_msecval*.004 * f_AimHead;
+		}
+		
+	if (HasShieldDrawn()){ // if shield drawn
+		lButton |= IN_ATTACK2; // withdraw it
+		if (f_Delay < gpGlobals->time)
+			f_Delay = gpGlobals->time + .001f; // can't shoot this time
+	}
+
+	// shoot at aim
+	if(CVAR_BOOL(jb_shoot)){		// the friendly mode
+		if(IsCWeaponKnife()){
+			if(dCombatNNIn[IDistance] < -.5){
+				ShootAtEnemy();			// attack enemy with knife only when near
 			}
-			
-			// shoot at aim
-			if(CVAR_BOOL(jb_shoot)){		// the friendly mode
-				if(IsCWeaponKnife()){
-					if(dCombatNNIn[IDistance] < -.5){
-						ShootAtEnemy();			// attack enemy with knife only when near
-					}	
-				}
-				else{
-					if(!PauseShoot()){			// look at ya type of weapon and decide to pause sometimes
-						ShootAtEnemy();			// attack enemy
-					}
-					else{
-						//FakeClientCommand(pEdict,"say Paused weapon");		// sometimes the bots don't shoot after a map change - Why ??
-					}
-				}
+		}
+		else{
+			if(!PauseShoot()){			// look at ya type of weapon and decide to pause sometimes
+				ShootAtEnemy();			// attack enemy
 			}
 			else{
-				//FakeClientCommand(pEdict,"say bots are friendly");
+				//DEBUG_CLIENTCOMMAND(pEdict,"say Paused weapon");		// sometimes the bots don't shoot after a map change - Why ??
 			}
-			
-			/*FILE *fhd = fopen("punchangle.txt","a");fprintf(fhd,"%s\t%f\n",STRING(pEdict->v.netname),(pEdict->v.punchangle).Length());fclose(fhd);
-			if ((pEdict->v.punchangle).Length() > .1)
-			FakeClientCommand(pEdict,"say %f",(pEdict->v.punchangle).Length());*/
-			/*	}
-			catch(...){
-			FakeClientCommand(pEdict,"say asdlkjglkjjljkglkjgljk");
-			FILE *fhd = fopen("scheisse.txt","a");fprintf(fhd,"scheisse in combat\n");fclose(fhd);
+		}
+
+		if (HasShield() && !HasShieldDrawn() &&
+			!(lButton & IN_ATTACK) && Task.IsCurrent(BT_HIDE))
+		{
+			lButton |= IN_ATTACK2;
+		}
+	}
+	else{
+		//DEBUG_CLIENTCOMMAND(pEdict,"say bots are friendly");
+	}
+	
+	/*FILE *fhd = fopen("punchangle.txt","a");fprintf(fhd,"%s\t%f\n",STRING(pEdict->v.netname),(pEdict->v.punchangle).Length());fclose(fhd);
+	if ((pEdict->v.punchangle).Length() > .1)
+		DEBUG_CLIENTCOMMAND(pEdict,"say %f",(pEdict->v.punchangle).Length());*/
+
+	/*} catch(...){
+		DEBUG_CLIENTCOMMAND(pEdict,"say asdlkjglkjjljkglkjgljk");
+		FILE *fhd = fopen("scheisse.txt","a");fprintf(fhd,"scheisse in combat\n");fclose(fhd);
 	}*/
 }
 
-bool CBotCS :: FireWeapon( Vector &v_enemy )
+bool CBotCS :: FireWeapon( Vector &vEnemy )
 {
 	// Use the Vector argument of the emeny to aim at the enemy and fire
-	// here.  Return TRUE if bot fired weapon (enough ammo, etc.) otherwise
-	// return FALSE to indicate failure (maybe bot would runaway then).
+	// here.  Return true if bot fired weapon (enough ammo, etc.) otherwise
+	// return false to indicate failure (maybe bot would runaway then).
 	if(f_Delay > gpGlobals->time){
-#ifdef DEBUGMESSAGES
-		WaypointDrawBeam(listenserver_edict,pEdict->v.origin+Vector(-20,0,50),pEdict->v.origin+Vector(20,0,50),10,40,255,0,0,200,1);
-#endif
+		DEBUG_DRAWBEAM(listenserver_edict,pEdict->v.origin+Vector(-20,0,50),pEdict->v.origin+Vector(20,0,50),10,40,255,0,0,200,1);
 		return false;
 	}
 	
@@ -481,13 +488,11 @@ bool CBotCS :: FireWeapon( Vector &v_enemy )
 			tr.pHit
 			&& UTIL_ClientIndex(tr.pHit) != -1
 			&& (tr.pHit != pBotEnemy)){// line is probably fract by enemy
-			f_strafe += i_avoidstrafe * f_max_speed;
+			f_strafe += i_avoidstrafe * pEdict->v.maxspeed;
 			f_Delay = gpGlobals->time + gf_5thd + .1f;
 			Action.lAction |= BA_TKAVOID;			// set flag for only short hiding or stop hiding when no teamm8 is in sight
-#ifdef DEBUGMESSAGES
-			WaypointDrawBeam(listenserver_edict,pEdict->v.origin,pEdict->v.origin + Vector(40,40,150),10,0,0,0,255,255,0);
-#endif
-			return FALSE;
+			DEBUG_DRAWBEAM(listenserver_edict,pEdict->v.origin,pEdict->v.origin + Vector(40,40,150),10,0,0,0,255,255,0);
+			return false;
 		}
 		else
 			Action.lAction &=~ BA_TKAVOID;
@@ -495,19 +500,13 @@ bool CBotCS :: FireWeapon( Vector &v_enemy )
 	if(Action.lAction & BA_TKAVOID){	
 		// bot's currently avoid a team attack, but now he can shoot without hurting team8s
 	}
-	else{
-		if (IsShieldDrawn())
-			lButton |= IN_ATTACK2;
-
+	else
 		lButton |= IN_ATTACK;
-	}
 
 	if(g_b5th
 		&& RANDOM_LONG(0,100) < i_ITP){
-		VATurnTo(v_enemy);
-#ifdef DEBUGMESSAGES
-		//WaypointDrawBeam(listenserver_edict,pEdict->v.origin,pEdict->v.origin + Vector(40,40,0),10,0,255,0,0,255,0);
-#endif
+		VATurnTo(vEnemy);
+		//DEBUG_DRAWBEAM(listenserver_edict,pEdict->v.origin,pEdict->v.origin + Vector(40,40,0),10,0,255,0,0,255,0);
 	}
-	return TRUE;
+	return true;
 }
