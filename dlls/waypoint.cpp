@@ -31,25 +31,25 @@
 // waypoint.cpp
 //
 
-#ifndef __linux__
+#include <iostream.h>
+
+#ifdef _WIN32
 #include <io.h>
 #endif
 #include <fcntl.h>
-#ifndef __linux__
-#include <sys\stat.h>
-#else
-#include <unistd.h>
 #include <sys/stat.h>
+#ifdef __linux__
+#include <unistd.h>
 #endif
 
-#include "extdll.h"
-#include "enginecallback.h"
-#include "util.h"
-#include "cbase.h"
-
-#include "bot.h"
-#include "bot_wpstat.h"
 #include "waypoint.h"
+
+#include "extdll.h"
+#include "util.h"
+#include "globalvars.h"
+
+#include "bot_modid.h"
+#include "CBotBase.h"
 
 extern int mod_id;
 extern int m_spriteTexture;
@@ -717,7 +717,7 @@ int WaypointFindNearest(Vector v_src, edict_t *pEntity, float range, int team,bo
 
 // find the goal nearest to the player matching the "flags" bits and return
 // the index of that waypoint...
-int WaypointFindNearestGoal(edict_t *pEntity, int src, int team, int flags)
+/*int WaypointFindNearestGoal(edict_t *pEntity, int src, int team, int flags)
 {
 	int index, min_index;
 	int distance, min_distance;
@@ -759,9 +759,9 @@ int WaypointFindNearestGoal(edict_t *pEntity, int src, int team, int flags)
 	}
 	
 	return min_index;
-}
+}*/
 
-int WaypointFindNearestGoal(edict_t *pEntity, int src, int team, int flags,int*iField,int iNumField,float fMin)
+int WaypointFindNearestGoal(edict_t *pEntity, int src, int team, int flags,float fMin,int*piField,int iNumField)
 {
 	int index, min_index;
 	int distance, min_distance,i;
@@ -793,11 +793,11 @@ int WaypointFindNearestGoal(edict_t *pEntity, int src, int team, int flags,int*i
 		
 		if ((waypoints[index].flags & flags) != flags)
 			continue;  // skip this waypoint if the flags don't match
-
+		
 		bAvoid=false;
-		if(iField){
+		if(piField){
 			for(i=0;i<iNumField;i++){
-				if(iField[i]==index)
+				if(piField[i]==index)
 					bAvoid=true;
 			}
 		}
@@ -809,8 +809,7 @@ int WaypointFindNearestGoal(edict_t *pEntity, int src, int team, int flags,int*i
 		if(distance < fMin)
 			continue;
 		
-		if (distance < min_distance)
-		{
+		if (distance < min_distance){
 			min_index = index;
 			min_distance = distance;
 		}
@@ -1252,13 +1251,13 @@ long WaypointAdd(Vector &VOrigin,long lFlag,bool bpaths,bool bSEnt){
 		while ((pent = UTIL_FindEntityInSphere( pent, VOrigin, 75 )) != NULL){
 			strcpy(item_name, STRING(pent->v.classname));
 			
-			if (strcmp("hostage_entity", item_name) == 0){							// hostages
+			if (FStrEq("hostage_entity", item_name)){							// hostages
 				waypoints[index].flags |= W_FL_FLAG;
 			}
-			if (strcmp("func_hostage_rescue", item_name) == 0){						// rescue zone
+			if (FStrEq("func_hostage_rescue", item_name)){						// rescue zone
 				waypoints[index].flags |= W_FL_FLAG_GOAL;
 			}
-			if (strcmp("func_bomb_target", item_name) == 0){						// bomb target
+			if (FStrEq("func_bomb_target", item_name)){						// bomb target
 				waypoints[index].flags |= W_FL_FLAG;
 			}
 		}
@@ -1330,15 +1329,15 @@ int WaypointAddStuff(void){
 	{
 		strcpy(item_name, STRING(pent->v.classname));
 		
-		if (strcmp("hostage_entity", item_name) == 0){							// hostages
+		if (FStrEq("hostage_entity", item_name)){							// hostages
 			lflag |= W_FL_FLAG;
 			bSet = true;
 		}
-		if (strcmp("func_hostage_rescue", item_name) == 0){						// rescue zone
+		if (FStrEq("func_hostage_rescue", item_name)){						// rescue zone
 			lflag |= W_FL_FLAG_GOAL;
 			bSet = true;
 		}
-		if (strcmp("func_bomb_target", item_name) == 0){						// bomb target
+		if (FStrEq("func_bomb_target", item_name)){						// bomb target
 			lflag |= W_FL_FLAG;
 			bSet = true;
 		}
@@ -1421,15 +1420,15 @@ int WaypointAdd(edict_t *pEntity)
 	{
 		strcpy(item_name, STRING(pent->v.classname));
 		
-		if (strcmp("hostage_entity", item_name) == 0){							// hostages
+		if (FStrEq("hostage_entity", item_name)){							// hostages
 			ClientPrint(&pEntity->v, HUD_PRINTCONSOLE, "hostage_entity\n");
 			waypoints[index].flags |= W_FL_FLAG;
 		}
-		if (strcmp("func_hostage_rescue", item_name) == 0){						// rescue zone
+		if (FStrEq("func_hostage_rescue", item_name)){						// rescue zone
 			ClientPrint(&pEntity->v, HUD_PRINTCONSOLE, "func_hostage_rescue\n");
 			waypoints[index].flags |= W_FL_FLAG_GOAL;
 		}
-		if (strcmp("func_bomb_target", item_name) == 0){						// bomb target
+		if (FStrEq("func_bomb_target", item_name)){						// bomb target
 			ClientPrint(&pEntity->v, HUD_PRINTCONSOLE, "func_bomb_target\n");
 			waypoints[index].flags |= W_FL_FLAG;
 		}
@@ -1853,14 +1852,14 @@ bool WaypointLoad(edict_t *pEntity, const char *szDir)
 	}
 	else{
 		if(mod_id == CSTRIKE_DLL){
-#ifndef __linux__
+#ifdef _WIN32
 			strcpy(dirname, "cstrike\\joebot\\wpjs\\");
 #else
 			strcpy(dirname, "cstrike/joebot/wpjs/");
 #endif
 		}
 		else if(mod_id == DOD_DLL){
-#ifndef __linux__
+#ifdef _WIN32
 			strcpy(dirname, "dod\\joebot\\wpjs\\");
 #else
 			strcpy(dirname, "dod/joebot/wpjs/");
@@ -1869,7 +1868,7 @@ bool WaypointLoad(edict_t *pEntity, const char *szDir)
 		
 		strcat(dirname, szDir);
 		
-#ifndef __linux__
+#ifdef _WIN32
 		strcat(dirname, "\\");
 #else
 		strcat(dirname, "/");
@@ -1891,7 +1890,7 @@ bool WaypointLoad(edict_t *pEntity, const char *szDir)
 		fread(&header, sizeof(header), 1, bfp);
 		
 		header.filetype[7] = 0;
-		if (strcmp(header.filetype, _WPFILEDESC) == 0)
+		if (FStrEq(header.filetype, _WPFILEDESC))
 		{
 			if (header.waypoint_file_version == 1)
 			{
@@ -1904,7 +1903,7 @@ bool WaypointLoad(edict_t *pEntity, const char *szDir)
 				
 				header.mapname[31] = 0;
 				
-				if (strcmp(header.mapname, STRING(gpGlobals->mapname)))
+				if (!FStrEq(header.mapname, STRING(gpGlobals->mapname)))
 				{
 					if (pEntity)
 					{
@@ -1920,6 +1919,10 @@ bool WaypointLoad(edict_t *pEntity, const char *szDir)
 					if(waypoints[i].origin.Length() == 0){
 						waypoints[i].flags |= W_FL_DELETED;
 					}
+#ifndef CSTRIKE15
+// HACK: compensate for cs1.6 origin
+waypoints[i].origin = waypoints[i].origin - Vector(1150.0,0.0,0.0);
+#endif
 					num_waypoints++;
 				}
 				
@@ -1940,7 +1943,7 @@ bool WaypointLoad(edict_t *pEntity, const char *szDir)
 			else if (header.waypoint_file_version == 2){
 				header.mapname[31] = 0;
 				
-				if (strcmp(header.mapname, STRING(gpGlobals->mapname)))
+				if (!FStrEq(header.mapname, STRING(gpGlobals->mapname)))
 				{
 					if (pEntity)
 					{
@@ -2049,14 +2052,14 @@ bool WaypointSave(edict_t *pEntity,const char *szDir)
 	
 	if(szDir && strlen(szDir)){
 		if(mod_id == CSTRIKE_DLL){
-#ifndef __linux__
+#ifdef _WIN32
 			strcpy(dirname, "cstrike\\joebot\\wpjs\\");
 #else
 			strcpy(dirname, "cstrike/joebot/wpjs/");
 #endif
 		}
 		else if(mod_id == DOD_DLL){
-#ifndef __linux__
+#ifdef _WIN32
 			strcpy(dirname, "dod\\joebot\\wpjs\\");
 #else
 			strcpy(dirname, "dod/joebot/wpjs/");
@@ -2065,7 +2068,7 @@ bool WaypointSave(edict_t *pEntity,const char *szDir)
 		
 		strcat(dirname, szDir);
 		
-#ifndef __linux__
+#ifdef _WIN32
 		strcat(dirname, "\\");
 #else
 		strcat(dirname, "/");
@@ -2087,6 +2090,10 @@ bool WaypointSave(edict_t *pEntity,const char *szDir)
 		// write the waypoint data to the file...
 		for (index=0; index < num_waypoints; index++)
 		{
+#ifndef CSTRIKE15
+// HACK: compensate for cs1.6 origin
+waypoints[index].origin = waypoints[index].origin + Vector(1150.0,0.0,0.0);
+#endif
 			fwrite(&waypoints[index], sizeof(waypoints[0]), 1, bfp);
 		}
 		
@@ -2204,13 +2211,13 @@ PATH *p;
 			strcat(mapname, ".wpj");
 			
 			  if(szDir && strlen(szDir)){
-			  #ifndef __linux__
+			  #ifdef _WIN32
 			  strcpy(dirname, "cstrike\\joebot\\wpjs\\");
 			  #else
 			  strcpy(dirname, "cstrike/joebot/wpjs/");
 			  #endif
 			  strcat(dirname, szDir);
-			  #ifndef __linux__
+			  #ifdef _WIN32
 			  strcat(dirname, "\\");
 			  #else
 			  strcat(dirname, "/");
@@ -3559,21 +3566,21 @@ bool WaypointGetDir(char *szFile,char *szDest){
 	*szDest=0;
 	
 	if (mod_id == CSTRIKE_DLL){
-#ifndef __linux__
+#ifdef _WIN32
 		strcpy(szBaseDir, "cstrike\\joebot\\wpjs\\");
 #else
 		strcpy(szBaseDir, "cstrike/joebot/wpjs/");
 #endif
 	}
 	else if (mod_id == DOD_DLL){
-#ifndef __linux__
+#ifdef _WIN32
 		strcpy(szBaseDir, "dod\\joebot\\wpjs\\");
 #else
 		strcpy(szBaseDir, "dod/joebot/wpjs/");
 #endif
 	}
 	else{
-#ifndef __linux__
+#ifdef _WIN32
 		strcpy(szBaseDir, "valve\\maps\\");
 #else
 		strcpy(szBaseDir, "valve/maps/");
@@ -3583,7 +3590,7 @@ bool WaypointGetDir(char *szFile,char *szDest){
 	while(g_WPDir.szPDir[iDir].szDir[0]){
 		strcpy(szDir,szBaseDir);
 		strcat(szDir,g_WPDir.szPDir[iDir].szDir);
-#ifndef __linux__
+#ifdef _WIN32
 		strcat(szDir, "\\");
 #else
 		strcat(szDir, "/");
@@ -3600,7 +3607,7 @@ bool WaypointGetDir(char *szFile,char *szDest){
 	}
 	strcpy(szDir,szBaseDir);
 	strcat(szDir,"std");
-#ifndef __linux__
+#ifdef _WIN32
 	strcat(szDir, "\\");
 #else
 	strcat(szDir, "/");
@@ -3622,7 +3629,7 @@ void WaypointRouteInit(void)
 	unsigned int a, b;
 	float distance;
 	unsigned short *pShortestPath, *pFromTo;
-	char msg[256];
+	char msg[256];				// thx to Watz for pointing out that 80 chars might be too little ... 256 should be enough though
 	unsigned int num_items;
 	FILE *bfp;
 	char filename[256];
@@ -3651,7 +3658,7 @@ void WaypointRouteInit(void)
 	WaypointGetDir(mapname,szRoutes);
 	
 	strcat(szRoutes,"routes");
-#ifndef __linux__
+#ifdef _WIN32
 	strcat(szRoutes, "\\");
 #else
 	strcat(szRoutes, "/");
@@ -3741,7 +3748,7 @@ void WaypointRouteInit(void)
 
 						num_items = fread(shortest_path[matrix], sizeof(unsigned short), array_size, bfp);
 						
-						if (num_items != array_size || strcmp(route_hdr.filetype,DEFAULT_ROUTE_HDR))
+						if (num_items != array_size || !FStrEq(route_hdr.filetype,DEFAULT_ROUTE_HDR))
 						{
 							// if couldn't read enough data, free memory to recalculate it
 							
