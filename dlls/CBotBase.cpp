@@ -731,7 +731,7 @@ bool CBotBase :: AvoidStuck(void){
 	if (!bReplay
 		&&((moved_distance < 1.0 && !(pEdict->v.button&IN_DUCK))
 			||(moved_distance < .1 && (pEdict->v.button&IN_DUCK) )  )
-		&& (prev_speed > 1.5)// stopped, cause the speed was high last time
+		&& (prev_speed > 20)// stopped, cause the speed was high last time
 		&& (f_dont_check_stuck < gpGlobals->time)
 		&& f_Pause < gpGlobals->time-.5
 		&& fViewSpeedYaw < 3)
