@@ -3,11 +3,11 @@
 # ---------------------------------------------------------------------------
 DLLNAME = joebot_mm
 #DLLNAME = joebot
-DLL = $(DLLNAME)_bcc.dll
+DLL = $(DLLNAME).dll
 
 SDKDIR = U:\netgames\install\hl\sdk\multiplayer
-JOEBOTDIR = U:\netgames\install\hl\bots\joebot
-MMDIR = U:\netgames\install\hl\server\metamod-1.17
+JOEBOTDIR = U:\netgames\install\hl\bots\joebot\src
+MMDIR = U:\netgames\install\hl\server\metamod\src\1.17
 
 BCCDIR = c:\tools\borland\bcc55
 LD = $(BCCDIR)\bin\ilink32
@@ -21,12 +21,12 @@ BASECFLAGS = -I$(JOEBOTDIR)\engine -I$(JOEBOTDIR)\common\
  -I$(JOEBOTDIR)\NNSim -I$(JOEBOTDIR)\dlls -I$(BCCDIR)\Include
 
 # uncomment to compile metamod plugin
-EXTRA_CFLAGS += -DUSE_METAMOD
+EXTRA_CFLAGS = $(EXTRA_CFLAGS) -DUSE_METAMOD
 
 # uncomment to compile debug code
-#EXTRA_CFLAGS += -DDEBUGENGINE
-#EXTRA_CFLAGS += -DDEBUGMESSAGES
-#EXTRA_CFLAGS += -D_DEBUG
+#EXTRA_CFLAGS = $(EXTRA_CFLAGS) -DDEBUGENGINE
+#EXTRA_CFLAGS = $(EXTRA_CFLAGS) -DDEBUGMESSAGES
+#EXTRA_CFLAGS = $(EXTRA_CFLAGS) -D_DEBUG
 
 CFLAGS = -4 $(BASECFLAGS) $(EXTRA_CFLAGS)
 
