@@ -5,7 +5,7 @@
 
 // def values for every weapon
 
-// low range  -> -1
+// low range  -> -1 (-> knife);
 // high range ->  1 (-> awp);
 
 const double dr_weapon_ak47			=   0;		// 4 1
@@ -16,7 +16,7 @@ const double dr_weapon_deagle		=  .0;		// 1 3
 const double dr_weapon_elite		=  .1;		// 1 5 t
 const double dr_weapon_flashbang	=- .5;		//
 const double dr_weapon_g3sg1		=  .9;		// 4 7
-const double dr_weapon_glock18		= -.5;		// 1 2 t
+const double dr_weapon_glock18		=- .5;		// 1 2 t
 const double dr_weapon_hegrenade	=- .5;		//
 const double dr_weapon_knife		=-1.0;
 const double dr_weapon_m249			=- .3;		// 5 1
@@ -24,19 +24,20 @@ const double dr_weapon_m3			=- .2;		// 2 1
 const double dr_weapon_m4a1			=  .6;		// 4 3
 const double dr_weapon_mac10		=- .1;		// 3 4 t
 const double dr_weapon_mp5navy		=  .2;		// 3 1
-const double dr_weapon_p228			= -.2;		// 1 4
+const double dr_weapon_p228			=- .2;		// 1 4
 const double dr_weapon_p90			=  .1;		// 3 3
 const double dr_weapon_tmp			=  .3;		// 3 2
-const double dr_weapon_usp			= -.6;		// 1 1 ct
+const double dr_weapon_usp			=- .6;		// 1 1 ct
 const double dr_weapon_scout		=  .9;		// 4 5
 const double dr_weapon_sg552		=  .4;		// 4 2
 const double dr_weapon_smokegrenade	=- .5;		//
 const double dr_weapon_xm1014		=- .4;		// 2 2
-const double dr_weapon_fiveseven	= -.2;		// 1 5 ct
+const double dr_weapon_fiveseven	=- .2;		// 1 5 ct
 const double dr_weapon_sg550		=  .9;		// 4 8
 const double dr_weapon_ump45		=  .4;		// 3 5
 const double dr_weapon_galil		=  .0;
 const double dr_weapon_famas		=  .1;
+const double dr_weapon_shield		=-1.0;
 
 // indices for layers of nn
 
