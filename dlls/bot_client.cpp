@@ -54,10 +54,6 @@
 	DMG_NERVEGAS | DMG_RADIATION | DMG_DROWNRECOVER | \
 	DMG_ACID | DMG_SLOWBURN | DMG_SLOWFREEZE)
 
-extern int mod_id;
-//extern bot_t bots[32];
-extern int num_waypoints;
-
 float f_LastRadio;
 char szLastSayText[80];				// if somebody answered this, set szLastSayText[0] = 0;
 int iLastSayClient;
@@ -79,9 +75,9 @@ void BotClient_CS_VGUIMenu(void *p, int bot_index,int iAdd){
 	if(iAdd != _CLIENT_END){
 		if ((*(int *)p) == 2)  // is it a team select menu?
 			bots[bot_index]->start_action = MSG_CS_TEAM_SELECT;
-		else if ((*(int *)p) == 26)  // is is a terrorist model select menu?
+		else if ((*(int *)p) == 26)  // is it a terrorist model select menu?
 			bots[bot_index]->start_action = MSG_CS_T_SELECT;
-		else if ((*(int *)p) == 27)  // is is a counter-terrorist model select menu?	
+		else if ((*(int *)p) == 27)  // is it a counter-terrorist model select menu?	
 			bots[bot_index]->start_action = MSG_CS_CT_SELECT;
 	}
 }
@@ -827,8 +823,8 @@ void BotClient_CS_TextMsg(void *p, int bot_index,int iAdd){
 			pBot->bot_IRadioM.pECalling = 0;		// resetting calling edict
 			pBot->bot_IRadioM.lMessage = 0;
 			
-			for (i = gpGlobals->maxClients; i ; i--){
-				pEnt = INDEXENT(i);
+			for (i = 0; i < gpGlobals->maxClients; i++){
+				pEnt = INDEXENT(i + 1);
 				
 				// skip invalid players and skip self (i.e. this bot)
 				if ((pEnt) && (!pEnt->free) && (pEnt != pEdict))
@@ -857,8 +853,8 @@ void BotClient_CS_TextMsg(void *p, int bot_index,int iAdd){
 			pBot->bot_IRadioM.pECalling = 0;		// resetting calling edict
 			pBot->bot_IRadioM.lMessage = 0;
 			
-			for (i = gpGlobals->maxClients; i ; i--){
-				pEnt = INDEXENT(i);
+			for (i = 0; i < gpGlobals->maxClients; i++){
+				pEnt = INDEXENT(i + 1);
 				
 				// skip invalid players and skip self (i.e. this bot)
 				if ((pEnt) && (!pEnt->free) && (pEnt != pEdict))
@@ -1417,7 +1413,7 @@ void JBRegMsgs(void)
 #ifndef USE_METAMOD
 void AddUserMsg(const char *msgname, int msgid, int size)
 {
-	// this function is from Pierre-Marie Baty's RACC 
+	// Adapted from Pierre-Marie Baty's RACC 
 
 	int i;
 
@@ -1438,7 +1434,7 @@ void AddUserMsg(const char *msgname, int msgid, int size)
 
 int GetUserMsgId(const char *msgname, int *size)
 {
-	// this function is from Pierre-Marie Baty's RACC 
+	// Adapted from Pierre-Marie Baty's RACC 
 
 	// this function returns the user message id of the recorded message named msgname. Local
 	// variables have been made static to speedup recurrent calls of this function.
@@ -1484,7 +1480,7 @@ int GetUserMsgId(const char *msgname, int *size)
 
 const char *GetUserMsgName(int msgid, int *size)
 {
-	// this function is from Pierre-Marie Baty's RACC 
+	// Adapted from Pierre-Marie Baty's RACC 
 
 	// this function returns the user message name of the recorded message index msgid. Local
 	// variables have been made static to speedup recurrent calls of this function.
