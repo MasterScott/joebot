@@ -8,6 +8,15 @@
 -                                               -
 -------------------------------------------------
 
+Current Lead Developer on Sourceforge/joebot
+
+- @$3.1415rin
+
+
+Current Developer on Sourceforge/joebot
+
+- cruft
+
 ----------------------------------------------------------------------------------------------
 -- This Bot is based on botman's HPB_bot - template code - http://planethalflife.com/botman --
 ----------------------------------------------------------------------------------------------
@@ -18,6 +27,17 @@ JoeBOT 1.6.1
 - - compensating recoil
 - - team specific chat message ( they are ignored for the interactive chat )
 - - some other little bugs
+- - faster buying
+
+/*********************************************************************************************
+**********************************************************************************************
+** 
+** From Version 1.6.1. on JoeBOT isnt only developed by @$3.1415rin. The project has been
+** moved to http://sourceforge.net/projects/joebot
+** So if you have anything important to add and know how to code, apply for developer status :)
+**
+**********************************************************************************************
+*********************************************************************************************/
 
 JoeBOT 1.6 - July 2002
 - FIXED : Problems with min_bots
