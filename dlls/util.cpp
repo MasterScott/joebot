@@ -282,17 +282,17 @@ void UTIL_HostSay( edict_t *pEntity, int teamonly, char *message )
 		if ( teamonly && (sender_team != player_team) )
 			continue;
 		
-		pfnMessageBegin( MSG_ONE, gmsgSayText, NULL, client );
-		pfnWriteByte( ENTINDEX(pEntity) );
-		pfnWriteString( text );
-		pfnMessageEnd();
+		MESSAGE_BEGIN( MSG_ONE, gmsgSayText, NULL, client );
+			WRITE_BYTE( ENTINDEX(pEntity) );
+			WRITE_STRING( text );
+		MESSAGE_END();
 	}
 	
 	// print to the sending client
-	pfnMessageBegin( MSG_ONE, gmsgSayText, NULL, pEntity );
-	pfnWriteByte( ENTINDEX(pEntity) );
-	pfnWriteString( text );
-	pfnMessageEnd();
+	MESSAGE_BEGIN( MSG_ONE, gmsgSayText, NULL, pEntity );
+		WRITE_BYTE( ENTINDEX(pEntity) );
+		WRITE_STRING( text );
+	MESSAGE_END();
 }
 
 void UTIL_SayText( const char *pText, edict_t *pEdict )
@@ -301,10 +301,8 @@ void UTIL_SayText( const char *pText, edict_t *pEdict )
 		gmsgSayText = REG_USER_MSG( "SayText", -1 );
 	
 	MESSAGE_BEGIN( MSG_ONE, gmsgSayText, NULL, pEdict );
-	
-	WRITE_BYTE( ENTINDEX(pEdict) );
-	WRITE_STRING( pText );
-	
+		WRITE_BYTE( ENTINDEX(pEdict) );
+		WRITE_STRING( pText );
 	MESSAGE_END();
 }
 
@@ -479,14 +477,12 @@ void UTIL_ShowMenu( edict_t *pEdict, int slots, int displaytime, bool needmore, 
    if (gmsgShowMenu == 0)
       gmsgShowMenu = REG_USER_MSG( "ShowMenu", -1 );
 
-   pfnMessageBegin( MSG_ONE, gmsgShowMenu, NULL, pEdict );
-
-   pfnWriteShort( slots );
-   pfnWriteChar( displaytime );
-   pfnWriteByte( needmore );
-   pfnWriteString( pText );
-
-   pfnMessageEnd();
+   MESSAGE_BEGIN( MSG_ONE, gmsgShowMenu, NULL, pEdict );
+	   WRITE_SHORT( slots );
+	   WRITE_CHAR( displaytime );
+	   WRITE_BYTE( needmore );
+	   WRITE_STRING( pText );
+   MESSAGE_END();
 }
 
 static unsigned short FixedUnsigned16( float value, float scale )
