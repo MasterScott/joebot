@@ -199,7 +199,6 @@ void LoadSymbols(char *filename)
    char function_name[256];
    int i, index;
    BOOL error;
-   char msg[80];
 
    for (i=0; i < num_ordinals; i++)
       p_FunctionNames[i] = NULL;
