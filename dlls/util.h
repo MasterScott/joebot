@@ -646,6 +646,8 @@ qboolean UTIL_CallGameEntity(const char *entStr, entvars_t *pev);
 
 #endif /* USE_METAMOD */
 
+#include <ctype.h> // isupper, tolower
+
 // Adapted from metamod
 #ifdef __linux__
 #define UTIL_normalize_pathname(s)
