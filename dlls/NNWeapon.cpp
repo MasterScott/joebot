@@ -43,7 +43,6 @@
 
 #include "BotNNDefs.h"
 
-//char szLPBFile[80];
 bool bLoadedLPB = false;
 
 extern int mod_id;
