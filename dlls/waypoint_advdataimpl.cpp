@@ -18,20 +18,14 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 ******************************************************************************/
-#ifndef __linux__
+#ifdef _WIN32
 #include <io.h>
 #endif
 #include <fcntl.h>
-#ifndef __linux__
-#include <sys\stat.h>
-#else
 #include <sys/stat.h>
-#endif
 
 #include "extdll.h"
-#include "enginecallback.h"
 #include "util.h"
-#include "cbase.h"
 
 #include "bot.h"
 #include "bot_wpstat.h"
