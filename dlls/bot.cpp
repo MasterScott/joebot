@@ -169,7 +169,7 @@ void InitGlobalRS(void){
 				}
 				
 				if(lCount){
-					lreturn=RANDOM_LONG(1,lCount)-1;
+					lreturn=RANDOM_LONG(0,lCount - 1);
 					p = pFE[lreturn];
 				}
 				else
@@ -213,9 +213,6 @@ void BotCreate( edict_t *pPlayer, const char *szTeam, const char *szClass,const 
 {
 	gf_5th = 0;
 	//cout << "botcreate" << endl;
-	edict_t *BotEnt = 0;
-	CBotBase *pBot;
-	int index; // index of pointer to bot ( bot[] )
 	
 	// initialize the bots array of structures if first time here...
 	if (need_init)
@@ -226,44 +223,47 @@ void BotCreate( edict_t *pPlayer, const char *szTeam, const char *szClass,const 
 		}
 	}
 	
-	const CBotNamesItem *pName = NULL;
-	char szNameThis[32];
-	char szTempName[32];
-	int iSkill;
-	
 	////////////////////////////
-	pName = Names.getName();					// get name from list
-	strcpy(szNameThis,pName->m_szName);
 	
-	index = 0;
+	int index = 0; // index of pointer to bot ( bot[] )
 	while ((bots[index]) && (index < 32))
 		index++;
 	
 	if (index == 32){
-		UTIL_ConsoleMessage( pPlayer, "Can't create bot!\n");
+		UTIL_ConsoleMessage( pPlayer, "Max bots reached; can't create bot!\n");
 		return;
 	}
 	
-	if(mod_id == CSTRIKE_DLL||mod_id == CSCLASSIC_DLL){
-		pBot = new CBotCS;
+	CBotBase *pBot;
+
+	switch (mod_id){
+		case CSTRIKE_DLL:
+		case CSCLASSIC_DLL:
+			pBot = new CBotCS;
+			break;
+		case DOD_DLL:
+			pBot = new CBotDOD;
+			break;
+		default:
+			UTIL_ConsoleMessage( pPlayer, "Unsupported game; can't create bot!\n");
+			return;
 	}
-	else if(mod_id == DOD_DLL){
-		pBot = new CBotDOD;
-	}
-	
-	if(!szName || strlen(szName)<2 || FStrEq(szName,"default")|| FStrEq(szName,"unnamed")){
+
+	if(!szName || strlen(szName)<2 || FStrEq(szName,"default")|| FStrEq(szName,"unnamed")){// name is default or none specified, get it from bot_names.txt
+		const CBotNamesItem *pName = Names.getName();					// get name from list
+		strcpy(pBot->name,pName->m_szName);
 	}
 	else{
-		strcpy(szNameThis,szName);
+		strcpy(pBot->name,szName);
 	}
 	
-	strcpy(pBot->name,szNameThis);
 	pBot->Personality.Load(pBot->name);
-	
 	pBot->d_Manner = pBot->Personality.fAggressiveness;
 	
 	////////////////////////////
 	
+	int iSkill;
+
 	if(!szSkill || !strlen(szSkill)){
 		iSkill = RANDOM_LONG(int(jb_skillmin->value),int(jb_skillmax->value));
 	}
@@ -279,22 +279,14 @@ void BotCreate( edict_t *pPlayer, const char *szTeam, const char *szClass,const 
 	else
 		pBot->bot_skill = iSkill;
 	
-	if(!szName || strlen(szName)<2 || FStrEq(szName,"default")|| FStrEq(szName,"unnamed")){// name is default or no specified, get it from bot_names.txt
-		CBotBase :: MakeName(szTempName,pName->m_szName,pBot->bot_skill,pBot->d_Manner);
-	}
-	else{
-		CBotBase :: MakeName(szTempName,szName,pBot->bot_skill,pBot->d_Manner);
-		strcpy(szNameThis,szName);
-		strcpy(pBot->name,szNameThis);
-	}
-	
-	BotEnt = CREATE_FAKE_CLIENT( szTempName );
+	char szDisplayName[32];
+	CBotBase :: MakeName(szDisplayName,pBot->name,pBot->bot_skill,pBot->d_Manner);
+
+	edict_t *BotEnt = CREATE_FAKE_CLIENT( szDisplayName );
 		
 	if (FNullEnt( BotEnt )){
 		delete pBot;
-		if (pPlayer){
-			UTIL_ConsoleMessage( pPlayer, "Max players reached; can't create bot!\n");
-		}
+		UTIL_ConsoleMessage( pPlayer, "Max players reached; can't create bot!\n");
 	}
 	else
 	{
@@ -336,21 +328,33 @@ void BotCreate( edict_t *pPlayer, const char *szTeam, const char *szClass,const 
 		
 #ifdef USE_METAMOD
 		MDLL_ClientConnect( BotEnt, "joebot", "127.0.0.1", ptr );
-
 		clients[clientIndex - 1] = BotEnt;
-
-		MDLL_ClientPutInServer( BotEnt );
 #else
 		ClientConnect( BotEnt, "joebot", "127.0.0.1", ptr );
-		ClientPutInServer( BotEnt ); // Pieter van Dijk - use instead of DispatchSpawn() - Hip Hip Hurray!
-#endif
-		
+#endif /* USE_METAMOD */
+
 		BotEnt->v.flags |= FL_FAKECLIENT;
+
+#ifdef USE_METAMOD
+		MDLL_ClientPutInServer( BotEnt );
+#else
+		ClientPutInServer( BotEnt ); // Pieter van Dijk - use instead of DispatchSpawn() - Hip Hip Hurray!
+#endif /* USE_METAMOD */
+
+		// find the entry that's respawning and swap it with the clientIndex - 1 entry if necessary
+		for (int i = 0; i < 32; i++) {
+			if (SBInfo[i].respawn_state == RESPAWN_IS_RESPAWNING && (clientIndex - 1) != i) {
+				SInfo sTmp;
+				memcpy(&sTmp, &SBInfo[i], sizeof(SInfo));
+				memcpy(&SBInfo[i], &SBInfo[clientIndex - 1], sizeof(SInfo));
+				memcpy(&SBInfo[clientIndex - 1], &sTmp, sizeof(SInfo));
+				break;
+			}
+		}
 
 		// initialize all the variables for this bot...
 		SBInfo[clientIndex - 1].respawn_state = RESPAWN_IDLE;
 		SBInfo[clientIndex - 1].kick_time  = 0;
-		//pBot->name[0] = 0;  // name not set by server yet
 
 		pBot->pEdict = BotEnt;
 		pBot->iEIndex = clientIndex;
@@ -380,14 +384,20 @@ void BotCreate( edict_t *pPlayer, const char *szTeam, const char *szClass,const 
 
 		pBot->not_started = true;  // hasn't joined game yet
 		
-		if (mod_id == TFC_DLL)
-			pBot->start_action = MSG_TFC_IDLE;
-		else if (mod_id == CSTRIKE_DLL||mod_id == CSCLASSIC_DLL)
-			pBot->start_action = MSG_CS_IDLE;
-		else if (mod_id == DOD_DLL)
-			pBot->start_action = MSG_DOD_IDLE;
-		else
-			pBot->start_action = 0;  // not needed for non-team MODs
+		switch (mod_id){
+			case TFC_DLL:
+				pBot->start_action = MSG_TFC_IDLE;
+				break;
+			case CSTRIKE_DLL:
+			case CSCLASSIC_DLL:
+				pBot->start_action = MSG_CS_IDLE;
+				break;
+			case DOD_DLL:
+				break;
+				pBot->start_action = MSG_DOD_IDLE;
+			default:
+				pBot->start_action = 0;  // not needed for non-team MODs
+		}
 		
 		pBot->SpawnInit();
 		
