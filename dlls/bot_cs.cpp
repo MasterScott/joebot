@@ -277,25 +277,25 @@ void BotBuy_SAmmo(CBotBase *pBot){
 	FakeClientCommand(pEdict,"buy;menuselect 7");
 }
 
-void BotBuy_CS_WEAPON_Kevlar(CBotBase *pBot){
+void BotBuy_Kevlar(CBotBase *pBot){
 	edict_t *pEdict = pBot->pEdict;
 	
 	FakeClientCommand(pEdict,"buyequip;menuselect 1");
 }
 
-void BotBuy_CS_WEAPON_KevlarHelmet(CBotBase *pBot){
+void BotBuy_KevlarHelmet(CBotBase *pBot){
 	edict_t *pEdict = pBot->pEdict;
 	
 	FakeClientCommand(pEdict,"buyequip;menuselect 2");
 }
 
-void BotBuy_CS_WEAPON_Defuse(CBotBase *pBot){
+void BotBuy_Defuse(CBotBase *pBot){
 	edict_t *pEdict = pBot->pEdict;
 	
 	FakeClientCommand(pEdict,"buyequip;menuselect 6");
 }
 
-void BotBuy_CS_WEAPON_NightVision(CBotBase *pBot){
+void BotBuy_NightVision(CBotBase *pBot){
 	edict_t *pEdict = pBot->pEdict;
 	
 	if (CVAR_BOOL(jb_cstrike15))
@@ -314,7 +314,7 @@ void BotBuy_CS_WEAPON_NightVision(CBotBase *pBot){
 	}
 }
 
-void BotBuy_CS_WEAPON_Shield(CBotBase *pBot){
+void BotBuy_Shield(CBotBase *pBot){
 	edict_t *pEdict = pBot->pEdict;
 	
 	FakeClientCommand(pEdict,"buyequip;menuselect 8");
