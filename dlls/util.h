@@ -630,10 +630,12 @@ void UTIL_strlwr(char *p);
 void UTIL_LogPrintf(const char *fmt, ...);
 void UTIL_LogMessage(const char *plid, const char *fmt, ...);
 void UTIL_ConsoleMessage(edict_t *pEdict, const char *fmt, ...);
+qboolean UTIL_CallGameEntity(const char *entStr, entvars_t *pev);
 
 #ifndef USE_METAMOD
 #define PLID NULL
 #define LOG_MESSAGE UTIL_LogMessage
+#define CALL_GAME_ENTITY(plid, entStr, pev) UTIL_CallGameEntity(entStr, pev)
 #ifdef _WIN32
 #define vsnprintf _vsnprintf
 #endif

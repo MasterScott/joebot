@@ -64,6 +64,12 @@
 #include "Commandfunc.h"
 #include "globalvars.h"
 
+#ifdef _WIN32
+extern HINSTANCE h_Library;
+#else
+extern void * h_Library;
+#endif
+
 extern int mod_id;
 
 int gmsgTextMsg = 0;
@@ -1237,6 +1243,18 @@ void UTIL_ConsoleMessage( edict_t *pEdict, const char* fmt, ... )
 		CLIENT_PRINTF( listenserver_edict, print_console, string );
 	else if (IS_DEDICATED_SERVER())
 		SERVER_PRINT( string );
+}
+
+qboolean UTIL_CallGameEntity( const char *entStr, entvars_t *pev)
+{
+	LINK_ENTITY_FUNC pfnEntity = NULL;
+
+	pfnEntity = (LINK_ENTITY_FUNC)GetProcAddress(h_Library, entStr);
+	if(!pfnEntity)
+		return false;
+
+	(*pfnEntity)(pev);
+	return true;
 }
 
 #ifdef DEBUGENGINE

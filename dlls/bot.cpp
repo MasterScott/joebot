@@ -106,12 +106,6 @@ bool g_bBombPlanted;		// bomb has been planted
 float g_iBombExplode;
 bool g_bBombDropped;
 
-#ifdef _WIN32
-extern HINSTANCE h_Library;
-#else
-extern void * h_Library;
-#endif
-
 void InitGlobalRS(void){
 	if(!iGlobalRSCount){
 		//if(fabs(fLGlobalRSInit - gpGlobals->time) > 30){
@@ -204,22 +198,6 @@ void InitGlobalRS(void){
 				}
 			}
 		}
-	}
-}
-
-//extern "C"
-//{
-// this is the LINK_ENTITY_TO_CLASS function that creates a player (bot)
-//void player(entvars_t *pev);
-//}
-
-void player( entvars_t *pev )
-{
-	static LINK_ENTITY_FUNC otherClassName = NULL;
-	if (otherClassName == NULL)
-		otherClassName = (LINK_ENTITY_FUNC)GetProcAddress(h_Library, "player");
-	if (otherClassName != NULL){
-		(*otherClassName)(pev);
 	}
 }
 
@@ -353,7 +331,7 @@ void BotCreate( edict_t *pPlayer, const char *szTeam, const char *szClass,const 
 		// create the player entity by calling MOD's player function
 		// (from LINK_ENTITY_TO_CLASS for player object)
 		
-		player( VARS(BotEnt) );
+		CALL_GAME_ENTITY(PLID, "player", VARS(BotEnt));
 		
 		infobuffer = GET_INFOKEYBUFFER( BotEnt );
 		clientIndex = ENTINDEX( BotEnt );
