@@ -54,17 +54,13 @@
 #include "waypoint.h"
 
 #include "bot_modid.h"
+#include "bot_wpdir.h"
 #include "CBotBase.h"
 #include "Commandfunc.h"
 #include "globalvars.h"
 
-extern int mod_id;
 extern int m_spriteTexture;
-//extern bot_t bots[32];
-extern edict_t *pEdictPlayer;
 
-#include "bot_wpdir.h"
-extern CBotWPDir g_WPDir;
 float REACHABLE_RANGE = REACHABLE_RANGE_DEFAULT;
 
 //#define _DEBUG
@@ -2793,7 +2789,7 @@ bool IsConnected(int i1,int i2){
 }
 
 bool EdictJumps(int i){
-	edict_t *pEnt = INDEXENT(i);
+	edict_t *pEnt = INDEXENT(i + 1);
 	if(pEnt->v.button&IN_DUCK){
 		if(AWP_ED[i].fHeight > 18.1f)
 			return true;
@@ -2819,8 +2815,8 @@ void WaypointThink(edict_t *pEntity)
 		int iNearL,iNear,iAdd=-1;
 		TraceResult tr;
 		
-		for (i = gpGlobals->maxClients; i ; i--){
-			pEnt = INDEXENT(i);
+		for (i = 0; i < gpGlobals->maxClients; i++){
+			pEnt = INDEXENT(i + 1);
 			
 			if(!CVAR_BOOL(jb_wpautobots)){		// only humans can autowaypoint
 				if(UTIL_GetBotIndex(pEnt) == -1){
