@@ -23,8 +23,37 @@
 // Johannes.Lampel@gmx.de
 // http://joebot.counter-strike.de
 
-#include "CBotBase.h"
+#include <iostream.h>
+
+#include "extdll.h"
+#include "util.h"
+
 #include "Commandfunc.h"
+
+#include "bot_func.h"
+#include "CBotBase.h"
+#include "globalvars.h"
+#include "WorldGnome.h"
+
+#include "NeuralNet.h"
+#include "som.h"
+
+void ClientPrintEx( entvars_t *client, int msg_dest, const char *msg_name, const char *param1, const char *param2, const char *param3, const char *param4 )
+{
+	if(IS_DEDICATED_SERVER() && client == 0){
+		if(msg_name)	cout << msg_name;
+		if(param1)		cout << param1;
+		if(param2)		cout << param2;
+		if(param3)		cout << param3;
+		if(param4)		cout << param4;
+		cout.flush();
+	}
+	else
+		if(client)
+			ClientPrint(client,msg_dest,msg_name,param1,param2,param3,param4);
+		else if(listenserver_edict)
+			ClientPrint(VARS(listenserver_edict),msg_dest,msg_name,param1,param2,param3,param4);
+}
 
 /*
 
@@ -100,7 +129,7 @@ bool bc_extjoe(edict_t *pEntity,int iType,const char *arg1,const char *arg2,cons
 	else{
 		sprintf(szTemp,"JoeBOT: Names are not extended by : %s:%s,%s\n",szPrefixAgg,szPrefixNor,szPrefixDef);
 	}
-	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp);
+	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
 	return true;
 }
 
@@ -117,7 +146,7 @@ bool bc_extskill(edict_t *pEntity,int iType,const char *arg1,const char *arg2,co
 	else{
 		sprintf(szTemp,"JoeBOT: Names are not extended by (skill)\n");
 	}
-	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp);
+	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
 	return true;
 }
 
@@ -128,7 +157,7 @@ bool bc_min_bots(edict_t *pEntity,int iType,const char *arg1,const char *arg2,co
 		min_bots = 0;
 	
 	sprintf(szTemp, "JoeBOT: min_bots set to %d\n", min_bots);
-	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp);
+	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
 	return true;
 }
 
@@ -139,7 +168,7 @@ bool bc_max_bots(edict_t *pEntity,int iType,const char *arg1,const char *arg2,co
 		max_bots = 0;
 	
 	sprintf(szTemp, "JoeBOT: max_bots set to %d\n", max_bots);
-	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp);
+	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
 	return true;
 }
 
@@ -155,7 +184,7 @@ bool bc_kickbots(edict_t *pEntity,int iType,const char *arg1,const char *arg2,co
 	}
 	else{
 		sprintf(szTemp,"Usage : kickbots [ct/te/all]\n");
-		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp);
+		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
 	}
 	return true;
 }
@@ -168,7 +197,7 @@ bool bc_kickbot(edict_t *pEntity,int iType,const char *arg1,const char *arg2,con
 	}
 	else{
 		sprintf(szTemp,"Usage : kickbot [ct/te/all]\n");
-		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp);
+		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
 	}
 	return true;
 }
@@ -176,7 +205,7 @@ bool bc_kickbot(edict_t *pEntity,int iType,const char *arg1,const char *arg2,con
 bool bc_leetposs(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	g_ileetposs = atoi(arg1);
 	sprintf(szTemp,"JoeBOT: possibility for leet is @ %i\nJoeBOT: note that this has only an effect for bots which will be added later.\n",g_ileetposs);
-	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp);
+	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
 	return true;
 }
 
@@ -203,7 +232,7 @@ bool bc_botchat(edict_t *pEntity,int iType,const char *arg1,const char *arg2,con
 		/*if(listenserver_edict);
 			(*g_engfuncs.pfnClientCommand)(listenserver_edict,"speak \"talk system is off\"\n");*/
 	}
-	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp);
+	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
 	return true;
 }
 
@@ -222,7 +251,7 @@ bool bc_botichat(edict_t *pEntity,int iType,const char *arg1,const char *arg2,co
 	}
 	else{
 		sprintf(szTemp,"bot_ichat usage is : bot_ichat [off/dead/alive/all]\n");
-		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp);
+		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
 	}
 	switch(g_iIChat){
 	case IC_NONE:
@@ -241,7 +270,7 @@ bool bc_botichat(edict_t *pEntity,int iType,const char *arg1,const char *arg2,co
 		sprintf(szTemp,"JoeBOT: Internal error\n");
 		break;
 	}
-	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp);
+	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
 	return true;
 }
 
@@ -258,7 +287,7 @@ bool bc_botuseradio(edict_t *pEntity,int iType,const char *arg1,const char *arg2
 	else{
 		sprintf(szTemp,"Bots are quiet - no radio commands\n");
 	}
-	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp);
+	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
 	return true;
 }
 
@@ -266,11 +295,11 @@ bool bc_botmomentum(edict_t *pEntity,int iType,const char *arg1,const char *arg2
 	if (FStrEq(arg1, "default")){
 		g_fBaseAMomentum = 1.0-(atof (arg2)/100.0);
 		sprintf(szTemp,"Default view momentum is set to %f - for bots already added, there has been no change !\n",100.0-g_fBaseAMomentum*100);
-		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp);
+		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
 	}
 	if (FStrEq(arg1, "getdefault")||FStrEq(arg1, "get")){
 		sprintf(szTemp,"Default view momentum is %f\n",100.0-g_fBaseAMomentum*100);
-		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp);
+		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
 	}
 	else if (FStrEq(arg1, "all")){
 		float f_AMomentum = atof (arg2);
@@ -290,11 +319,11 @@ bool bc_botmomentum(edict_t *pEntity,int iType,const char *arg1,const char *arg2
 			}
 			g_fBaseAMomentum = 1.0-(f_AMomentum/100.0);
 			sprintf(szTemp,"View Momentum is set to %f for all bots and the default.\n",f_AMomentum);
-			ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp);
+			ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
 		}
 		else{
 			sprintf(szTemp,"There has been no changes in terms of accuracy ... the value has to be between 0 and 100\n");
-			ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp);
+			ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
 		}
 	}
 	else{		// arg1 can be a name of a bot ... let's search
@@ -313,19 +342,19 @@ bool bc_botmomentum(edict_t *pEntity,int iType,const char *arg1,const char *arg2
 							}
 							bots[i]->f_AMomentum = 1.0-f_AMomentum/100.0;
 							sprintf(szTemp,"View Momentum is set to %f for %s\n",f_AMomentum,STRING(bots[i]->pEdict->v.netname));
-							ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp);
+							ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
 							break;
 						}
 					}
 					else{
 						sprintf(szTemp,"There has been no changes in terms of accuracy ... the value has to be between 0 and 100\n");
-						ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp);
+						ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
 					}
 				}
 			}
 			if(i==32){	// ... no bot found
 				sprintf(szTemp,"%s wasn't found ... is it a bot ?!\n",arg1);
-				ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp);
+				ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
 			}
 		}
 	}
@@ -336,11 +365,11 @@ bool bc_botvspeed(edict_t *pEntity,int iType,const char *arg1,const char *arg2,c
 	if (FStrEq(arg1, "default")){
 		g_fBaseASpeed = atof (arg2)/100.0;
 		sprintf(szTemp,"Default aiming speed is set to %f - for bots already added, there has been no change !\n",g_fBaseASpeed*100);
-		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp);
+		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
 	}
 	if (FStrEq(arg1, "getdefault")||FStrEq(arg1, "get")){
 		sprintf(szTemp,"Default aiming speed is %f\n",g_fBaseASpeed*100.0);
-		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp);
+		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
 	}
 	else if (FStrEq(arg1, "all")){
 		float f_ASpeed = atof (arg2);
@@ -360,11 +389,11 @@ bool bc_botvspeed(edict_t *pEntity,int iType,const char *arg1,const char *arg2,c
 			}
 			g_fBaseASpeed = f_ASpeed/100.0;
 			sprintf(szTemp,"Aiming speed is set to %f for all bots and the default.\n",f_ASpeed);
-			ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp);
+			ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
 		}
 		else{
 			sprintf(szTemp,"There has been no changes in terms of view speed change ... the value has to be between 0 and 200\n");
-			ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp);
+			ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
 		}
 	}
 	else{		// arg1 can be a name of a bot ... let's search
@@ -383,19 +412,19 @@ bool bc_botvspeed(edict_t *pEntity,int iType,const char *arg1,const char *arg2,c
 							}
 							bots[i]->f_ASpeed = 1.0-f_AMomentum/100.0;
 							sprintf(szTemp,"View change speed is set to %f for %s\n",f_AMomentum,STRING(bots[i]->pEdict->v.netname));
-							ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp);
+							ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
 							break;
 						}
 					}
 					else{
 						sprintf(szTemp,"There has been no changes in terms of accuracy ... the value has to be between 0 and 200\n");
-						ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp);
+						ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
 					}
 				}
 			}
 			if(i==32){	// ... no bot found
 				sprintf(szTemp,"%s wasn't found ... is it a bot ?!\n",arg1);
-				ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp);
+				ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
 			}
 		}
 	}
@@ -406,11 +435,11 @@ bool bc_botskill(edict_t *pEntity,int iType,const char *arg1,const char *arg2,co
 	if (FStrEq(arg1, "default")){
 		g_iBaseSkillMin = atoi (arg2);
 		sprintf(szTemp,"Default skill is set to %i - for bots already added, there has been no change !\n",g_iBaseSkillMin);
-		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp);
+		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
 	}
 	if (FStrEq(arg1, "getdefault")||FStrEq(arg1, "get")){
 		sprintf(szTemp,"Default skill is %i\n",g_iBaseSkillMin);
-		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp);
+		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
 	}
 	else if (FStrEq(arg1, "all")){
 		int i_Skill = atoi (arg2);
@@ -425,11 +454,11 @@ bool bc_botskill(edict_t *pEntity,int iType,const char *arg1,const char *arg2,co
 			}
 			g_iBaseSkillMin = i_Skill;
 			sprintf(szTemp,"Skill is set to %i for all bots and the default.\n",i_Skill);
-			ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp);
+			ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
 		}
 		else{
 			sprintf(szTemp,"There has been no changes in terms of accuracy ... the value has to be between 0 and 100\n");
-			ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp);
+			ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
 		}
 	}
 	else{		// arg1 can be a name of a bot ... let's search
@@ -443,19 +472,19 @@ bool bc_botskill(edict_t *pEntity,int iType,const char *arg1,const char *arg2,co
 							bots[i]->bot_skill = f_AMomentum;
 							bots[i]->UpdateSkill();
 							sprintf(szTemp,"Skill set to %.0f for %s\n",f_AMomentum,STRING(bots[i]->pEdict->v.netname));
-							ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp);
+							ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
 							break;
 						}
 					}
 					else{
 						printf(szTemp,"There has been no changes in terms of accuracy ... the value has to be between 0 and 100");
-						ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp);
+						ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
 					}
 				}
 			}
 			if(i==32){	// ... no bot found
 				sprintf(szTemp,"%s wasn't found ... is it a bot ?!\n",arg1);
-				ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp);
+				ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
 			}
 		}
 	}
@@ -465,7 +494,7 @@ bool bc_botskill(edict_t *pEntity,int iType,const char *arg1,const char *arg2,co
 bool bc_resetstat(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	WPStat.Init();
 	sprintf(szTemp,"JoeBOT: Statistics have been resetted\n");
-	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp);
+	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
 	return true;
 }
 
@@ -478,7 +507,7 @@ bool bc_nnupdate(edict_t *pEntity,int iType,const char *arg1,const char *arg2,co
 		gnn_update = ftemp;
 	
 	sprintf(szTemp,"NNs are now running @ %f updates/s, if the framerate is high enough\n",gnn_update);
-	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp);
+	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
 	return true;
 }
 
@@ -491,35 +520,35 @@ bool bc_campposs(edict_t *pEntity,int iType,const char *arg1,const char *arg2,co
 		g_fCampPoss = ftemp;
 	
 	sprintf(szTemp,"camping possibility is set to %f ( 100 -> very low; 0 -> all the time )\n",g_fCampPoss);
-	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp);
+	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
 	return true;
 }
 
 bool bc_wps(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	sprintf(szTemp,"map    : %s\n",WPStat.wpsHeader.szMapname);
-	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY,szTemp);
+	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY,szTemp, NULL, NULL, NULL, NULL);
 	sprintf(szTemp,"Kill   : %li\n",WPStat.d.lKill);
-	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY,szTemp);
+	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY,szTemp, NULL, NULL, NULL, NULL);
 	sprintf(szTemp,"Killed : %li\n",WPStat.d.lKilled);
-	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY,szTemp);
+	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY,szTemp, NULL, NULL, NULL, NULL);
 	return true;
 }
 
 bool bc_nnstat(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	// combat net
 	sprintf(szTemp,"NNSim Version : %s\n",NNCombat->Version());
-	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY,szTemp);
-	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "------------ CombatNN :\n");
+	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY,szTemp, NULL, NULL, NULL, NULL);
+	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "------------ CombatNN :\n", NULL, NULL, NULL, NULL);
 	sprintf(szTemp,"Prop       : %li\n",NNCombat->m_lNumProp);
-	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY,szTemp);
+	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY,szTemp, NULL, NULL, NULL, NULL);
 	sprintf(szTemp,"BProp      : %li\n",((CNeuralNetBProp *)NNCombat)->m_lNumBProp);
-	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY,szTemp);
+	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY,szTemp, NULL, NULL, NULL, NULL);
 	// collision net
-	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "------------ CollNN :\n");
+	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "------------ CollNN :\n", NULL, NULL, NULL, NULL);
 	sprintf(szTemp,"Prop       : %li\n",NNColl->m_lNumProp);
-	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY,szTemp);
+	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY,szTemp, NULL, NULL, NULL, NULL);
 	sprintf(szTemp,"BProp      : %li\n",((CNeuralNetBProp *)NNColl)->m_lNumBProp);
-	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY,szTemp);
+	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY,szTemp, NULL, NULL, NULL, NULL);
 	
 	return true;
 }
@@ -537,7 +566,7 @@ bool bc_edown(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const
 	else{
 		sprintf(szTemp,"Bots don't report \"Enemy down\"\n");
 	}
-	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp);
+	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
 	return true;
 }
 
@@ -558,7 +587,7 @@ bool bc_search(edict_t *pEntity,int iType,const char *arg1,const char *arg2,cons
 	fhd=fopen("logent  -  search.txt","a");
 	fprintf(fhd,"%s\n",item_name);
 	fclose(fhd);
-	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, item_name);
+	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, item_name, NULL, NULL, NULL, NULL);
 	while ((pent = UTIL_FindEntityInSphere( pent, pEntity->v.origin,300)) != NULL)
 	{
 		float fDistance = (pEntity->v.origin-pent->v.origin).Length();
@@ -594,7 +623,7 @@ bool bc_search(edict_t *pEntity,int iType,const char *arg1,const char *arg2,cons
 		fhd=fopen("logent  -  search.txt","a");
 		fprintf(fhd,"%s\n",item_name);
 		fclose(fhd);
-		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, item_name);
+		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, item_name, NULL, NULL, NULL, NULL);
 	};
 	return true;
 }
@@ -602,7 +631,7 @@ bool bc_search(edict_t *pEntity,int iType,const char *arg1,const char *arg2,cons
 bool bc_savesom(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	SP.Save("combat.spt");
 	sprintf(szTemp,"JoeBOT: som data saved\n");
-	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp);
+	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
 	return true;
 }
 
@@ -624,14 +653,14 @@ bool bc_botshoot(edict_t *pEntity,int iType,const char *arg1,const char *arg2,co
 		bBotsShoot = true;
 		
 		sprintf(szTemp,"Bots shoot\n");
-		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp);
+		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
 	}
 	else if (FStrEq(arg1, "off"))
 	{
 		bBotsShoot = false;
 		
 		sprintf(szTemp,"Bots don't like violence any more\n");
-		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp);
+		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
 	}
 	else{
 		if ( !bBotsShoot ){
@@ -640,7 +669,7 @@ bool bc_botshoot(edict_t *pEntity,int iType,const char *arg1,const char *arg2,co
 		else{
 			sprintf(szTemp,"Bots shoot\n");
 		}
-		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp);
+		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
 	}
 	
 	return true;
@@ -661,14 +690,14 @@ bool bc_bottkpunish(edict_t *pEntity,int iType,const char *arg1,const char *arg2
 	else{
 		sprintf(szTemp,"They won't shoot at teamm8 after tk\n");
 	}
-	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp);
+	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
 	
 	return true;
 }
 
 bool bc_showen(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	sprintf(szTemp,"\"showen\" - This command is only to be used for debugging purposes by the author, %s !\n\0",STRING(pEntity->v.netname));
-	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp);
+	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
 	
 	if (FStrEq(arg1, "on")){
 		g_bshowen = true;
@@ -683,7 +712,7 @@ bool bc_showen(edict_t *pEntity,int iType,const char *arg1,const char *arg2,cons
 bool bc_debug_engine(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	debug_engine = 1;
 	
-	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "debug_engine enabled!\n");
+	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "debug_engine enabled!\n", NULL, NULL, NULL, NULL);
 	
 	return true;
 }
@@ -691,7 +720,7 @@ bool bc_debug_engine(edict_t *pEntity,int iType,const char *arg1,const char *arg
 bool bc_getp(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	sprintf(szTemp,"%.0f,%.0f,%.0f\n",pEntity->v.origin.x,pEntity->v.origin.y,pEntity->v.origin.z);
 	
-	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp);
+	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
 	return true;
 }
 
@@ -706,7 +735,7 @@ bool bc_setp(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const 
 
 bool bc_botmenu(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	if(UTIL_GetBotIndex(pEntity) == -1){
-		//FakeClientCommand(pEntity,"menuselect","0",0);
+		//FakeClientCommand(pEntity,"menuselect 0");
 		int index;
 		
 		index = WaypointFindNearest(pEntity, 100.0, -1);
@@ -772,11 +801,11 @@ bool bc_menuselect(edict_t *pEntity,int iType,const char *arg1,const char *arg2,
 				g_auto_waypoint!=TRUE?g_auto_waypoint=TRUE:g_auto_waypoint=FALSE;
 				if(g_auto_waypoint){
 					if(listenserver_edict)
-						(*g_engfuncs.pfnClientCommand)(listenserver_edict,"speak \"automatic observation system engaged\"\n",0);
+						(*g_engfuncs.pfnClientCommand)(listenserver_edict,"speak \"automatic observation system engaged\"\n");
 				}
 				else{
 					if(listenserver_edict)
-						(*g_engfuncs.pfnClientCommand)(listenserver_edict,"speak \"automatic observation system disengaged\"\n",0);
+						(*g_engfuncs.pfnClientCommand)(listenserver_edict,"speak \"automatic observation system disengaged\"\n");
 				}
 				for(int i=0;i<32;i++){
 					AWP_ED[i].iLastWP = -1;
@@ -805,11 +834,11 @@ bool bc_menuselect(edict_t *pEntity,int iType,const char *arg1,const char *arg2,
 			}
 			else if (FStrEq(arg1, "7")){
 				if(WaypointLoad(pEntity))
-					ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "waypoints loaded\n");
+					ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "waypoints loaded\n", NULL, NULL, NULL, NULL);
 			}
 			else if (FStrEq(arg1, "8")){
 				WaypointSave(pEntity);
-				ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "waypoints saved\n");
+				ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "waypoints saved\n", NULL, NULL, NULL, NULL);
 			}
 			else if (FStrEq(arg1, "9")){
 				g_menu_state = MENU_2b;  // display pathwp menu
@@ -992,7 +1021,7 @@ bool bc_language(edict_t *pEntity,int iType,const char *arg1,const char *arg2,co
 		
 		sprintf(szTemp,"JoeBOT: Unrecognized parameter : The Language of the BotMenu is ENGLISH\n");
 	}
-	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp);
+	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
 	UpdateLanguage();
 	return true;
 }
@@ -1007,7 +1036,7 @@ bool bc_debuggoal(edict_t *pEntity,int iType,const char *arg1,const char *arg2,c
 					  bots[ischl]->Task.AddTask(BT_GOTO,-1,iWP,(void*)atoi(arg2),0);
 				  }
 			  }
-			  ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "All bots got this WP as target to go to.\n");
+			  ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "All bots got this WP as target to go to.\n", NULL, NULL, NULL, NULL);
 		  }
 		  return true;
 }
@@ -1032,13 +1061,13 @@ bool bc_waypoint(edict_t *pEntity,int iType,const char *arg1,const char *arg2,co
 		  {
 			  g_waypoint_on = TRUE;
 			  
-			  ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "waypoints are ON\n");
+			  ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "waypoints are ON\n", NULL, NULL, NULL, NULL);
 		  }
 		  else if (FStrEq(arg1, "off"))
 		  {
 			  g_waypoint_on = FALSE;
 			  
-			  ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "waypoints are OFF\n");
+			  ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "waypoints are OFF\n", NULL, NULL, NULL, NULL);
 		  }
 		  else if (FStrEq(arg1, "addstuff")){
 			  WaypointAddStuff();
@@ -1078,7 +1107,7 @@ bool bc_waypoint(edict_t *pEntity,int iType,const char *arg1,const char *arg2,co
 		  {
 			  strcpy(szWPCreator,arg2);
 			  sprintf(szTemp,"The creator of the waypoints is named : %s\n",szWPCreator);
-			  ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp);
+			  ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
 		  }
 		  else if (FStrEq(arg1, "add"))
 		  {
@@ -1148,15 +1177,15 @@ bool bc_waypoint(edict_t *pEntity,int iType,const char *arg1,const char *arg2,co
 		  else if (FStrEq(arg1, "save"))
 		  {
 			  if(WaypointSave(pEntity,arg2)){
-				  ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "waypoints saved\n");
+				  ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "waypoints saved\n", NULL, NULL, NULL, NULL);
 			  }
 			  else{
-				  ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "Error while processing this directive\n");
+				  ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "Error while processing this directive\n", NULL, NULL, NULL, NULL);
 			  }
 		  }
 		  else if (FStrEq(arg1, "load")){
 			  if (WaypointLoad(pEntity))
-				  ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "waypoints loaded\n");
+				  ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "waypoints loaded\n", NULL, NULL, NULL, NULL);
 		  }
 		  else if (FStrEq(arg1, "info")){
 			  WaypointPrintInfo(pEntity);
@@ -1166,7 +1195,7 @@ bool bc_waypoint(edict_t *pEntity,int iType,const char *arg1,const char *arg2,co
 		  }
 		  else if (FStrEq(arg1, "makepaths")){
 			  //WaypointRouteInit();
-			  ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY,"sorry, this command cannot be used right now without saving the files.\n It'll save the files now and reload them. Then the paths will be remade\n\n\0");
+			  ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY,"sorry, this command cannot be used right now without saving the files.\n It'll save the files now and reload them. Then the paths will be remade\n\n\0", NULL, NULL, NULL, NULL);
 			  WaypointSave(pEntity,"tmp");
 			  WaypointLoad(pEntity,"tmp");
 		  }
@@ -1179,7 +1208,7 @@ bool bc_waypoint(edict_t *pEntity,int iType,const char *arg1,const char *arg2,co
 				  waypoints[i].flags |= TE;
 			  }
 			  else
-				  ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "no near wp found\n");
+				  ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "no near wp found\n", NULL, NULL, NULL, NULL);
 		  }
 		  else if ((FStrEq(arg1, "ct")) || (FStrEq(arg1, "counter")))
 		  {
@@ -1190,7 +1219,7 @@ bool bc_waypoint(edict_t *pEntity,int iType,const char *arg1,const char *arg2,co
 				  waypoints[i].flags |= CT;
 			  }
 			  else
-				  ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "no near wp found\n");
+				  ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "no near wp found\n", NULL, NULL, NULL, NULL);
 		  }
 		  else if ((FStrEq(arg1, "nt")) || (FStrEq(arg1, "noteam")))
 		  {
@@ -1199,7 +1228,7 @@ bool bc_waypoint(edict_t *pEntity,int iType,const char *arg1,const char *arg2,co
 				  waypoints[i].flags &= ~W_FL_TEAM_SPECIFIC;		// clear W_FL_TEAM_SPECIFIC flag
 			  }
 			  else
-				  ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "no near wp found\n");
+				  ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "no near wp found\n", NULL, NULL, NULL, NULL);
 		  }
 		  else if (FStrEq(arg1, "addstdwp")){		// adding standard wp's
 			  WaypointAddStdWP(pEntity);
@@ -1207,82 +1236,75 @@ bool bc_waypoint(edict_t *pEntity,int iType,const char *arg1,const char *arg2,co
 		  else if (FStrEq(arg1,"show")){
 			  int iWp = atoi(arg2);
 			  if(iWp<0||iWp>num_waypoints){
-				  ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "Out of range\n");
+				  ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "Out of range\n", NULL, NULL, NULL, NULL);
 				  return true;
 			  }
 			  if(waypoints[iWp].flags & W_FL_DELETED){
-				  ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "WP is deleted\n");
+				  ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "WP is deleted\n", NULL, NULL, NULL, NULL);
 				  return true;
 			  }
 			  WaypointDrawBeam(pEntity,pEntity->v.origin,waypoints[iWp].origin,100,10,255,255,255,255,100);
 			  return true;
 		  }
-		  if (FStrEq(arg1, "delall")){
-			  ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "All waypoints are deleted in memory, but you can still get the old waypoints as long as you don't save other\n");
+		  else if (FStrEq(arg1, "delall")){
+			  ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "All waypoints are deleted in memory, but you can still get the old waypoints as long as you don't save other\n", NULL, NULL, NULL, NULL);
 			  WaypointInit();
 		  }
-		  if (FStrEq(arg1, "forcestatrecalc")){
+		  else if (FStrEq(arg1, "forcestatrecalc")){
 			  WPStat.InitWP(0);
 			  g_bForceNOStat = FALSE;
 		  }
-		  if (FStrEq(arg1, "forcenostat")){
+		  else if (FStrEq(arg1, "forcenostat")){
 			  if (FStrEq(arg2, "on"))
 			  {
 				  g_bForceNOStat = TRUE;
 				  
-				  ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "Statistics are NOT recalculated on changes\n");
+				  ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "Statistics are NOT recalculated on changes\n", NULL, NULL, NULL, NULL);
 			  }
 			  else if (FStrEq(arg2, "off"))
 			  {
 				  g_bForceNOStat = FALSE;
 				  
-				  ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "Statistics are recalculated on changes\n");
+				  ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "Statistics are recalculated on changes\n", NULL, NULL, NULL, NULL);
 			  }
 			  else{
 				  if(g_bForceNOStat){
-					  ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "Statistics are NOT recalculated on changes\n");
+					  ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "Statistics are NOT recalculated on changes\n", NULL, NULL, NULL, NULL);
 				  }
 				  else{
-					  ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "Statistics are recalculated on changes\n");
+					  ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "Statistics are recalculated on changes\n", NULL, NULL, NULL, NULL);
 				  }
 			  }
 		  }
-		  if (FStrEq(arg1, "sound")){
+		  else if (FStrEq(arg1, "sound")){
 			  if (FStrEq(arg2, "on"))
 			  {
 				  g_waypointsound = TRUE;
 				  
-				  ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "Sound messages for waypointing are ON\n");
+				  ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "Sound messages for waypointing are ON\n", NULL, NULL, NULL, NULL);
 			  }
 			  else if (FStrEq(arg2, "off"))
 			  {
 				  g_waypointsound = FALSE;
 				  
-				  ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "Sound messages for waypointing are OFF\n");
+				  ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "Sound messages for waypointing are OFF\n", NULL, NULL, NULL, NULL);
 			  }
 			  else{
 				  if(g_waypointsound){
-					  ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "Sound messages for waypointing are ON\n");
+					  ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "Sound messages for waypointing are ON\n", NULL, NULL, NULL, NULL);
 				  }
 				  else{
-					  ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "Sound messages for waypointing are OFF\n");
+					  ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "Sound messages for waypointing are OFF\n", NULL, NULL, NULL, NULL);
 				  }
 			  }
 		  }
 		  else
 		  {
 			  if(strlen(arg1)){   
-				  sprintf(szTemp,"parameter unknown : %s",arg1);   
-				  ClientPrintEx(VARS(pEntity),HUD_PRINTNOTIFY,szTemp);   
+				  sprintf(szTemp,"Unrecognized parameter %s\n",arg1);   
+				  ClientPrintEx(VARS(pEntity),HUD_PRINTNOTIFY,szTemp, NULL, NULL, NULL, NULL);   
 			  } 
-
-
-			  if (g_waypoint_on)
-				  ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "waypoints are ON\n");
-			  else
-				  ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "waypoints are OFF\n");
 		  }
-		  
 		  return true;
 }
 
@@ -1313,20 +1335,20 @@ bool bc_autowaypoint(edict_t *pEntity,int iType,const char *arg1,const char *arg
 		{
 			g_bTestJump = TRUE;
 			
-			ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "Testing Jump wp while autowaypoint is ON\n");
+			ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "Testing Jump wp while autowaypoint is ON\n", NULL, NULL, NULL, NULL);
 		}
 		else if (FStrEq(arg2, "off"))
 		{
 			g_bTestJump = FALSE;
 			
-			ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "Testing Jump wp while autowaypoint is OFF\n");
+			ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "Testing Jump wp while autowaypoint is OFF\n", NULL, NULL, NULL, NULL);
 		}
 		else{
 			if(g_bTestJump){
-				ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "Testing Jump wp while autowaypoint is ON\n");
+				ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "Testing Jump wp while autowaypoint is ON\n", NULL, NULL, NULL, NULL);
 			}
 			else{
-				ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "Testing Jump wp while autowaypoint is OFF\n");
+				ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "Testing Jump wp while autowaypoint is OFF\n", NULL, NULL, NULL, NULL);
 			}
 		}
 	}
@@ -1346,17 +1368,17 @@ bool bc_autowaypoint(edict_t *pEntity,int iType,const char *arg1,const char *arg
 	if(g_auto_waypoint){
 		if(listenserver_edict)
 			if(g_bAutowpHuman){
-				(*g_engfuncs.pfnClientCommand)(listenserver_edict,"speak \"automatic observation system engaged with one authorized inspector\"\n",0);
+				(*g_engfuncs.pfnClientCommand)(listenserver_edict,"speak \"automatic observation system engaged with one authorized inspector\"\n");
 			}else{
-				(*g_engfuncs.pfnClientCommand)(listenserver_edict,"speak \"automatic observation system engaged with all\"\n",0);
+				(*g_engfuncs.pfnClientCommand)(listenserver_edict,"speak \"automatic observation system engaged with all\"\n");
 			}
 	}
 	else{
 		if(listenserver_edict)
-			(*g_engfuncs.pfnClientCommand)(listenserver_edict,"speak \"automatic disengaged\"\n",0);
+			(*g_engfuncs.pfnClientCommand)(listenserver_edict,"speak \"automatic disengaged\"\n");
 	}
 	
-	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp);
+	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
 	
 	return true;
 }
@@ -1376,7 +1398,7 @@ bool bc_autowaypointaddjump(edict_t *pEntity,int iType,const char *arg1,const ch
 	else
 		sprintf(szTemp, "g_autowpjump is OFF  -> a jump waypoint is NOT added while autowaypointing for human players\n");
 	
-	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp);
+	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
 	
 	return true;
 }
@@ -1396,7 +1418,7 @@ bool bc_advancedmovements(edict_t *pEntity,int iType,const char *arg1,const char
 	else
 		sprintf(szTemp, "g_waypointadv is OFF  -> advanced movement system is NOT used\n");
 	
-	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp);
+	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
 	
 	return true;
 }
@@ -1416,7 +1438,7 @@ bool bc_autopath(edict_t *pEntity,int iType,const char *arg1,const char *arg2,co
 	else
 		sprintf(szTemp, "g_auto_addpath is OFF\n");
 	
-	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp);
+	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
 	
 	return true;
 }
@@ -1427,13 +1449,13 @@ bool bc_pathwaypoint(edict_t *pEntity,int iType,const char *arg1,const char *arg
 		g_path_waypoint = TRUE;
 		g_waypoint_on = TRUE;  // turn this on just in case
 		
-		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "pathwaypoint is ON\n");
+		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "pathwaypoint is ON\n", NULL, NULL, NULL, NULL);
 	}
 	else if (FStrEq(arg1, "off"))
 	{
 		g_path_waypoint = FALSE;
 		
-		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "pathwaypoint is OFF\n");
+		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, "pathwaypoint is OFF\n", NULL, NULL, NULL, NULL);
 	}
 	else if (FStrEq(arg1, "create1"))
 	{
@@ -1456,26 +1478,26 @@ bool bc_pathwaypoint(edict_t *pEntity,int iType,const char *arg1,const char *arg
 }
 
 bool bc_prefix(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
-	if(strlen(arg1)&&strcmp(arg1,"-")){
+	if(strlen(arg1)&&!FStrEq(arg1,"-")){
 		strcpy(szPrefixAgg,arg1);
 	}
 	else{
 		strcpy(szPrefixAgg,"[JOE]");
 	}
-	if(strlen(arg2)&&strcmp(arg2,"-")){
+	if(strlen(arg2)&&!FStrEq(arg2,"-")){
 		strcpy(szPrefixNor,arg2);
 	}
 	else{
 		strcpy(szPrefixNor,"[JoE]");
 	}
-	if(strlen(arg3)&&strcmp(arg3,"-")){
+	if(strlen(arg3)&&!FStrEq(arg3,"-")){
 		strcpy(szPrefixDef,arg3);
 	}
 	else{
 		strcpy(szPrefixDef,"[J0E]");
 	}
 	sprintf(szTemp,"JoeBOT: Prefixes are now : agg:%s nor:%s def:%s\n",szPrefixAgg,szPrefixNor,szPrefixDef);
-	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp);
+	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
 	return true;
 }
 
@@ -1494,7 +1516,7 @@ bool bc_pistolonly(edict_t *pEntity,int iType,const char *arg1,const char *arg2,
 	else{
 		sprintf(szTemp,"bots buy everything\n");
 	}
-	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp);
+	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY, szTemp, NULL, NULL, NULL, NULL);
 	return true;
 }
 
@@ -1586,24 +1608,24 @@ bool bc_loadbuyprob(edict_t *pEntity,int iType,const char *arg1,const char *arg2
 
 bool bc_fillserver(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	if(!arg1||!*arg1||!arg2||!*arg2){
-		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY,"JoeBOT: The fillserver command needs at least one more additional argument. The syntax is fillserver [all/ct/te/0/1] [full/half]\n");		
+		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY,"JoeBOT: The fillserver command needs at least one more additional argument. The syntax is fillserver [all/ct/te/0/1] [full/half]\n", NULL, NULL, NULL, NULL);		
 		return true;
 	}
 	int iTeam,iMode;
-	if(!strcmp(arg1,"te")||!strcmp(arg1,"0")){
+	if(FStrEq(arg1,"te")||FStrEq(arg1,"0")){
 		iTeam = FILL_0;
 	}
-	else if(!strcmp(arg1,"ct")||!strcmp(arg1,"1")){
+	else if(FStrEq(arg1,"ct")||FStrEq(arg1,"1")){
 		iTeam = FILL_1;
 	}
-	else if(!strcmp(arg1,"all")){
+	else if(FStrEq(arg1,"all")){
 		iTeam = FILL_ALL;
 	}
 
-	if(!strcmp(arg2,"full")){
+	if(FStrEq(arg2,"full")){
 		iMode = FILL_FULL;
 	}
-	else if(!strcmp(arg2,"half")){
+	else if(FStrEq(arg2,"half")){
 		iMode = FILL_HALF;
 	}
 
@@ -1614,66 +1636,66 @@ bool bc_fillserver(edict_t *pEntity,int iType,const char *arg1,const char *arg2,
 
 bool bc_bot_spraying(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	if(!*arg1){
-		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY,"JoeBOT: The syntax is bot_spraying [on/off]\n");
+		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY,"JoeBOT: The syntax is bot_spraying [on/off]\n", NULL, NULL, NULL, NULL);
 		return true;
 	}
-	if(!strcmp(arg1,"on")){
+	if(FStrEq(arg1,"on")){
 		g_bSpray = true;
 	}
-	else if(!strcmp(arg1,"off")){
+	else if(FStrEq(arg1,"off")){
 		g_bSpray = false;
 	}
 	if(g_bSpray){
-		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY,"JoeBOT: The bots use spraypaints\n");
+		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY,"JoeBOT: The bots use spraypaints\n", NULL, NULL, NULL, NULL);
 	}
 	else{
-		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY,"JoeBOT: The bots don't use spraypaints\n");
+		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY,"JoeBOT: The bots don't use spraypaints\n", NULL, NULL, NULL, NULL);
 	}
 	return true;
 }
 
 bool bc_joinwhumanmax(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	if(!*arg1){
-		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY,"JoeBOT: The syntax is joinwhuman_max [on/off]\n");
+		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY,"JoeBOT: The syntax is joinwhuman_max [on/off]\n", NULL, NULL, NULL, NULL);
 		return true;
 	}
-	if(!strcmp(arg1,"on")){
+	if(FStrEq(arg1,"on")){
 		g_bJoinWHumanMAX = true;
 	}
-	else if(!strcmp(arg1,"off")){
+	else if(FStrEq(arg1,"off")){
 		g_bJoinWHumanMAX = false;
 	}
 	if(g_bJoinWHumanMAX){
-		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY,"JoeBOT: Bots will only join when a human is on the server ( max_bots )\n");
+		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY,"JoeBOT: Bots will only join when a human is on the server ( max_bots )\n", NULL, NULL, NULL, NULL);
 	}
 	else{
-		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY,"JoeBOT: Bots will join even if there are no human on the server ( max_bots )\n");
+		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY,"JoeBOT: Bots will join even if there are no human on the server ( max_bots )\n", NULL, NULL, NULL, NULL);
 	}
 	return true;
 }
 
 bool bc_joinwhumanres(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	if(!*arg1){
-		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY,"JoeBOT: The syntax is joinwhuman_res [on/off]\n");
+		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY,"JoeBOT: The syntax is joinwhuman_res [on/off]\n", NULL, NULL, NULL, NULL);
 		return true;
 	}
-	if(!strcmp(arg1,"on")){
+	if(FStrEq(arg1,"on")){
 		g_bJoinWHumanRES = true;
 	}
-	else if(!strcmp(arg1,"off")){
+	else if(FStrEq(arg1,"off")){
 		g_bJoinWHumanRES = false;
 	}
 	if(g_bJoinWHumanRES){
-		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY,"JoeBOT: Bots will only respawn when a human player is on the server\n");
+		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY,"JoeBOT: Bots will only respawn when a human player is on the server\n", NULL, NULL, NULL, NULL);
 	}
 	else{
-		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY,"JoeBOT: Bots will respawn even if there are no human players on the server\n");
+		ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY,"JoeBOT: Bots will respawn even if there are no human players on the server\n", NULL, NULL, NULL, NULL);
 	}
 	return true;
 }
 
 bool bc_randomwpload(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
-	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY,"JoeBOT: Mixing WPDirs ... the order of dir.txt is now of no importance\n");
+	ClientPrintEx( VARS(pEntity), HUD_PRINTNOTIFY,"JoeBOT: Mixing WPDirs ... the order of dir.txt is now of no importance\n", NULL, NULL, NULL, NULL);
 	WPStat.Save();
 	g_WPDir.MixIt();
 	WaypointLoad(pEntity);
@@ -1682,7 +1704,7 @@ bool bc_randomwpload(edict_t *pEntity,int iType,const char *arg1,const char *arg
 }
 
 bool bc_botglow(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
-	if(!strcmp(arg1,"on")){
+	if(FStrEq(arg1,"on")){
 		int i;
 		for(i = 0;i < 32 ; i++){
 			if(bots[i]){
@@ -1695,7 +1717,7 @@ bool bc_botglow(edict_t *pEntity,int iType,const char *arg1,const char *arg2,con
 			}
 		}
 	}
-	else if(!strcmp(arg1,"off")){
+	else if(FStrEq(arg1,"off")){
 		int i;
 		for(i = 0;i < 32 ; i++){
 			if(bots[i]){
