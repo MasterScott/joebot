@@ -310,8 +310,10 @@ cvar_t *jb_entergame;
 cvar_t *jb_jointeam;
 cvar_t *jb_spraypaint;
 cvar_t *jb_buyprobfile;
+#ifdef _DEBUG
 cvar_t *jb_showen;
 cvar_t *jb_debugengine;
+#endif
 
 cvar_t init_jb_cstrike15        = {"jb_cstrike15", "0", 0, 0};
 cvar_t init_jb_mixnames         = {"jb_mixnames", "1", 0, 1};
@@ -356,8 +358,10 @@ cvar_t init_jb_entergame        = {"jb_entergame", "1", 0, 1};
 cvar_t init_jb_jointeam         = {"jb_jointeam", "1", 0, 1};
 cvar_t init_jb_spraypaint       = {"jb_spraypaint", "1", 0, 1};
 cvar_t init_jb_buyprobfile      = {"jb_buyprobfile", "botbuyweapons.cfg", 0, 0};
+#ifdef _DEBUG
 cvar_t init_jb_showen           = {"jb_showen", "0", 0, 0};
 cvar_t init_jb_debugengine      = {"jb_debugengine", "0", 0, 0};
+#endif
 
 void RegisterCvars(void)
 {
@@ -411,8 +415,10 @@ void RegisterCvars(void)
 	CVAR_REGISTER(&init_jb_jointeam);
 	CVAR_REGISTER(&init_jb_spraypaint);
 	CVAR_REGISTER(&init_jb_buyprobfile);
+#ifdef _DEBUG
 	CVAR_REGISTER(&init_jb_showen);
 	CVAR_REGISTER(&init_jb_debugengine);
+#endif
 
 	jb_cstrike15        = CVAR_GET_POINTER("jb_cstrike15");
 	jb_mixnames         = CVAR_GET_POINTER("jb_mixnames");
@@ -457,8 +463,10 @@ void RegisterCvars(void)
 	jb_jointeam         = CVAR_GET_POINTER("jb_jointeam");
 	jb_spraypaint       = CVAR_GET_POINTER("jb_spraypaint");
 	jb_buyprobfile      = CVAR_GET_POINTER("jb_buyprobfile");
+#ifdef _DEBUG
 	jb_showen           = CVAR_GET_POINTER("jb_showen");
 	jb_debugengine      = CVAR_GET_POINTER("jb_debugengine");
+#endif
 
 	bRegDone = true;
 }
@@ -1119,6 +1127,7 @@ bool bc_bottkpunish(edict_t *pEntity,int iType,const char *arg1,const char *arg2
 	return true;
 }
 
+#ifdef _DEBUG
 // wtf was this again ?
 bool bc_showen(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
 	UTIL_ConsoleMessage(pEntity, "\"showen\" - This command is only to be used for debugging purposes by the author, %s !\n\0",pEntity ? STRING(pEntity->v.netname) : "");
@@ -1150,6 +1159,7 @@ bool bc_debug_engine(edict_t *pEntity,int iType,const char *arg1,const char *arg
 	
 	return true;
 }
+#endif
 
 // where are we ?
 bool bc_getp(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
@@ -1983,6 +1993,7 @@ bool bc_pause(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const
 	
 	return true;
 }
+#ifdef USE_GNOME
 extern CWorldGnome CWG;
 
 // just testing some autowaypointing approach
@@ -2035,6 +2046,7 @@ bool bc_stopgnome(edict_t *pEntity,int iType,const char *arg1,const char *arg2,c
 	CWG.next = 0;
 	return true;
 }
+#endif /* USE_GNOME */
 
 // which file should be loaded for weapon buy probabilities ?
 bool bc_loadbuyprob(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
