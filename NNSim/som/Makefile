@@ -18,7 +18,6 @@ BASECFLAGS += $(EXTRA_CFLAGS)
 CFLAGS = $(BASECFLAGS) -w -O2 -march=i586 -O2 -ffast-math -funroll-loops\
  -fomit-frame-pointer -fexpensive-optimizations -malign-loops=2\
  -malign-jumps=2 -malign-functions=2
-CFLAGS = $(BASECFLAGS) -w
 
 OBJ := $(SRC:%.cpp=$(OBJDIR)/%.o)
 
