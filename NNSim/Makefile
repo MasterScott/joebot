@@ -40,12 +40,6 @@ endif
 # ---------------------------------------------------------------------------
 all: $(OBJDIR) $(OBJ)
 
-debug:
-	$(MAKE) OPT=debug
-
-release:
-	$(MAKE)
-
 $(OBJDIR):
 	mkdir -p $(OBJDIR)
 	
