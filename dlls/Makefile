@@ -61,7 +61,7 @@ BASECFLAGS += $(EXTRA_CFLAGS)
 
 # compiler flags
 ifeq ($(OPT),debug)
- CFLAGS = $(BASECFLAGS) -g
+ CFLAGS = -D_DEBUG $(BASECFLAGS) -g
 else
  CFLAGS = $(BASECFLAGS) -O2 -march=i586 -O2 -ffast-math -funroll-loops\
   -fomit-frame-pointer -fexpensive-optimizations
@@ -91,7 +91,9 @@ endif
 all: $(OBJDIR) som NNSim $(OBJDIR)/$(DLL)
 
 install: all
+	$(CP) $(OBJDIR)/$(DLL) $(CSDIR)
 	$(CP) $(OBJDIR)/$(DLL) $(SERVERDIR)
+	$(CP) $(OBJDIR)/$(DLL) $(SERVERDIR_CS15)
 
 som:
 	$(MAKE) -C ../NNSim/som OPT=$(OPT)
