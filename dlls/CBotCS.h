@@ -23,9 +23,13 @@
 
 #include "CBotBase.h"
 
+#define _BUY_HE 50
+#define _BUY_FL 59
+#define _BUY_SG 59
+
 class CBotCS : public CBotBase{
 public:
-bool DistanceSight(void);
+	bool DistanceSight(void);
 
 	CBotCS();
 	~CBotCS();
@@ -56,19 +60,20 @@ bool DistanceSight(void);
 	virtual long IsKnifeWeapon(long lbit);
 	virtual long IsMachineGunWeapon(long lbit);
 	virtual long IsGrenadeWeapon(long lbit);
+	virtual long IsShieldWeapon(long lbit);
 	virtual bool HasShield(void);
-	virtual bool IsShieldDrawn(void);
+	virtual bool HasShieldDrawn(void);
 	virtual long WeaponModel2ID(const char *);
 
 	virtual bool IsWeaponBetterCurrent(long);
 
-	virtual Vector BodyTarget( edict_t *pBotEnemy);
+	virtual Vector BodyTarget( edict_t *pentBotEnemy);
 
 	virtual edict_t *FindEnemy(void);
-	bool IsBehindSG(edict_t *pPlayer);
-	virtual bool FireWeapon( Vector &v_enemy );
+	bool IsBehindSG(edict_t *pentPlayer);
+	virtual bool FireWeapon( Vector &vEnemy );
 
-	virtual bool HasAlreadyHostage(const edict_t *pHostage);
+	virtual bool HasAlreadyHostage(const edict_t *pentHostage);
 
 	virtual bool GoToSpEnt( void );
 	virtual bool HeadTowardSpEnt(void);
@@ -87,18 +92,19 @@ bool DistanceSight(void);
 	virtual void GrenadeThrown(void);
 
 	// data
-	float f_buytime;			// last time of buying
-	int bot_money;
-	bool bot_vip;				// is bot VIP ?
-	bool bGlockBurst;
+	float m_flBuyTime;			// last time of buying
+	int m_iBotMoney;
+	bool m_bIsVIP;				// is bot VIP ?
+	bool m_bGlockBurst;
 	
-	edict_t *pHostages[_MAXHOSTAGES];		// pointer to entities of used hostages
-	int i_UsedHostages;			// number of touched hostages
+	edict_t *m_rgpentHostages[_MAXHOSTAGES];		// pointer to entities of used hostages
+	int m_iHostagesUsed;			// number of touched hostages
 protected:
 private:
 };
 
 void BotBuy_CS_WEAPON_P228(CBotBase *pBot);
+void BotBuy_CS_WEAPON_SHIELD(CBotBase *pBot);
 void BotBuy_CS_WEAPON_SCOUT(CBotBase *pBot);
 void BotBuy_CS_WEAPON_HEGRENADE(CBotBase *pBot);
 void BotBuy_CS_WEAPON_XM1014(CBotBase *pBot);
@@ -132,6 +138,5 @@ void BotBuy_Kevlar(CBotBase *pBot);
 void BotBuy_KevlarHelmet(CBotBase *pBot);
 void BotBuy_Defuse(CBotBase *pBot);
 void BotBuy_NightVision(CBotBase *pBot);
-void BotBuy_Shield(CBotBase *pBot);
 
 #endif //__CBOTCS_H
