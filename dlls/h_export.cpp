@@ -27,16 +27,18 @@
 //
 // h_export.cpp
 //
+#include <sys/stat.h>
 
 #include "extdll.h"
-#include "enginecallback.h"
 #include "util.h"
 #include "cbase.h"
-
-#include "bot.h"
 #include "engine.h"
 
-#ifndef __linux__
+#include "bot_modid.h"
+#include "CBotBase.h"
+#include "globalvars.h"
+
+#ifdef _WIN32
 
 HINSTANCE h_Library = NULL;
 HGLOBAL h_global_argv = NULL;
@@ -54,7 +56,9 @@ enginefuncs_t g_engfuncs;
 globalvars_t  *gpGlobals;
 char *g_argv;
 
+#ifdef DEBUGENGINE
 static FILE *fp;
+#endif
 
 GETENTITYAPI other_GetEntityAPI = NULL;
 GETNEWDLLFUNCTIONS other_GetNewDLLFunctions = NULL;
@@ -63,10 +67,13 @@ GIVEFNPTRSTODLL other_GiveFnptrsToDll = NULL;
 extern int mod_id;
 
 
-#ifndef __linux__
+#ifdef _WIN32
 
 // Required DLL entry point
-BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
+BOOL WINAPI DllMain(
+   HINSTANCE hinstDLL,
+   DWORD fdwReason,
+   LPVOID lpvReserved)
 {
    if (fdwReason == DLL_PROCESS_ATTACH)
    {
@@ -84,15 +91,14 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
          GlobalFree(h_global_argv);
       }
    }
-
    return TRUE;
 }
 
 #endif
 
-#ifndef __linux__
-#ifdef __BORLANDC__
-extern "C" DLLEXPORT void EXPORT GiveFnptrsToDll(enginefuncs_t* pengfuncsFromEngine, globalvars_t *pGlobals)
+#ifdef _WIN32
+#if defined(__BORLANDC__) || defined(__MINGW32__)
+extern "C" DLLEXPORT void EXPORT GiveFnptrsToDll( enginefuncs_t* pengfuncsFromEngine, globalvars_t *pGlobals )
 #else
 void DLLEXPORT GiveFnptrsToDll( enginefuncs_t* pengfuncsFromEngine, globalvars_t *pGlobals )
 #endif
@@ -109,93 +115,103 @@ extern "C" DLLEXPORT void GiveFnptrsToDll( enginefuncs_t* pengfuncsFromEngine, g
 
    memcpy(&g_engfuncs, pengfuncsFromEngine, sizeof(enginefuncs_t));
    gpGlobals = pGlobals;
-
+   
    // find the directory name of the currently running MOD...
    (*g_engfuncs.pfnGetGameDir)(game_dir);
+   
+   // check if we're running under Steam
+   struct stat buf;
+   if (stat("valve/steam.inf", &buf) == 0)
+	   g_bIsSteam = true;
 
-   pos = strlen(game_dir) - 1;
-
-   // scan backwards till first directory separator...
-   while ((pos) && (game_dir[pos] != '/'))
-      pos--;
-
-   if (pos == 0)
-   {
-      // Error getting directory name!
-		ALERT( at_error, "JoeBot - Error determining MOD directory name!" );
+   pos = 0;
+   
+   // copied from botman's board ( well, just one line, but giving credits is something you gotta do :D )
+   if (strstr(game_dir, "/") != NULL){
+	   pos = strlen(game_dir) - 1;
+	   
+	   // scan backwards till first directory separator...
+	   while ((pos) && (game_dir[pos] != '/'))
+		   pos--;
+	   
+	   if (pos == 0)
+	   {
+		   // Error getting directory name!
+		   ALERT( at_error, "JoeBot - Error determining MOD directory name!" );
+	   }
+	   pos++;
    }
-   pos++;
    strcpy(mod_name, &game_dir[pos]);
 
    game_dll_filename[0] = 0;
 
-   if (strcmpi(mod_name, "valve") == 0)
+   if (FStrEq(mod_name, "valve"))
    {
       mod_id = VALVE_DLL;
-#ifndef __linux__
+#ifdef _WIN32
       strcpy(game_dll_filename, "valve\\dlls\\hl.dll");
 #else
       strcpy(game_dll_filename, "valve/dlls/hl_i386.so");
 #endif
    }
-   else if (strcmpi(mod_name, "tfc") == 0)
+   else if (FStrEq(mod_name, "tfc"))
    {
       mod_id = TFC_DLL;
-#ifndef __linux__
+#ifdef _WIN32
       strcpy(game_dll_filename, "tfc\\dlls\\tfc.dll");
 #else
       strcpy(game_dll_filename, "tfc/dlls/tfc_i386.so");
 #endif
    }
-   else if (strcmpi(mod_name, "cstrike") == 0)
+   else if (FStrEq(mod_name, "cstrike"))
    {
       mod_id = CSTRIKE_DLL;
-#ifndef __linux__
+#ifdef _WIN32
       strcpy(game_dll_filename, "cstrike\\dlls\\mp.dll");
 #else
       strcpy(game_dll_filename, "cstrike/dlls/cs_i386.so");
 #endif
    }
-   else if (strcmpi(mod_name, "retrocs") == 0)
+   else if (FStrEq(mod_name, "retrocs"))
    {
       mod_id = CSTRIKE_DLL;
-#ifndef __linux__
+#ifdef _WIN32
       strcpy(game_dll_filename, "retrocs\\dlls\\mp.dll");
 #else
       strcpy(game_dll_filename, "retrocs/dlls/cs_i386.so");
 #endif
    }
-   else if (strcmpi(mod_name, "csclassic") == 0)
+   else if (FStrEq(mod_name, "csclassic"))
    {
       mod_id = CSCLASSIC_DLL;
-#ifndef __linux__
+#ifdef _WIN32
       strcpy(game_dll_filename, "csclassic\\dlls\\mp.dll");
 #else
       strcpy(game_dll_filename, "csclassic/dlls/cs_i386.so");
 #endif
    }
-   else if (strcmpi(mod_name, "gearbox") == 0)
+   else if (FStrEq(mod_name, "gearbox"))
    {
       mod_id = GEARBOX_DLL;
-#ifndef __linux__
+#ifdef _WIN32
       strcpy(game_dll_filename, "gearbox\\dlls\\opfor.dll");
 #else
       strcpy(game_dll_filename, "gearbox/dlls/opfor_i386.so");
 #endif
    }
-   else if (strcmpi(mod_name, "dod") == 0)
+   else if (FStrEq(mod_name, "dod"))
    {
       mod_id = DOD_DLL;
-#ifndef __linux__
+#ifdef _WIN32
       strcpy(game_dll_filename, "dod\\dlls\\dod.dll");
 #else
       strcpy(game_dll_filename, "dod/dlls/dod_i386.so");
 #endif
    }
-   else if (strcmpi(mod_name, "frontline") == 0)
+   else if (FStrEq(mod_name, "frontline"))
    {
       mod_id = FRONTLINE_DLL;
-#ifndef __linux__
+#ifdef _WIN32
       strcpy(game_dll_filename, "frontline\\dlls\\frontline.dll");
 #else
       strcpy(game_dll_filename, "frontline/dlls/front_i386.so");
@@ -204,7 +220,7 @@ extern "C" DLLEXPORT void GiveFnptrsToDll( enginefuncs_t* pengfuncsFromEngine, g
 
    if (game_dll_filename[0])
    {
-#ifndef __linux__
+#ifdef _WIN32
       h_Library = LoadLibrary(game_dll_filename);
 #else
       h_Library = dlopen(game_dll_filename, RTLD_NOW);
@@ -219,13 +235,14 @@ extern "C" DLLEXPORT void GiveFnptrsToDll( enginefuncs_t* pengfuncsFromEngine, g
       return;
    }
 
-#ifndef __linux__
+#ifdef _WIN32
    h_global_argv = GlobalAlloc(GMEM_SHARE, 1024);
    g_argv = (char *)GlobalLock(h_global_argv);
 #else
    g_argv = (char *)h_global_argv;
 #endif
 
+#ifndef USE_METAMOD
    other_GetEntityAPI = (GETENTITYAPI)GetProcAddress(h_Library, "GetEntityAPI");
 
    if (other_GetEntityAPI == NULL)
@@ -254,13 +271,13 @@ extern "C" DLLEXPORT void GiveFnptrsToDll( enginefuncs_t* pengfuncsFromEngine, g
    }
 
 
-#ifndef __linux__
+#ifdef _WIN32
    LoadSymbols(game_dll_filename);  // Load exported symbol table
 #endif
 
-   pengfuncsFromEngine->pfnCmd_Args = Cmd_Args;
-   pengfuncsFromEngine->pfnCmd_Argv = Cmd_Argv;
-   pengfuncsFromEngine->pfnCmd_Argc = Cmd_Argc;
+   pengfuncsFromEngine->pfnCmd_Args = pfnCmd_Args;
+   pengfuncsFromEngine->pfnCmd_Argv = pfnCmd_Argv;
+   pengfuncsFromEngine->pfnCmd_Argc = pfnCmd_Argc;
 
    pengfuncsFromEngine->pfnPrecacheModel = pfnPrecacheModel;
    pengfuncsFromEngine->pfnPrecacheSound = pfnPrecacheSound;
@@ -403,4 +420,5 @@ extern "C" DLLEXPORT void GiveFnptrsToDll( enginefuncs_t* pengfuncsFromEngine, g
 
    // give the engine functions to the other DLL...
    (*other_GiveFnptrsToDll)(pengfuncsFromEngine, pGlobals);
+#endif /* not USE_METAMOD */
 }
