@@ -85,9 +85,7 @@ int CBotWPDir :: Load(const char *szFileName){			// load WPDir into ram ...
 				memset(szName,0,sizeof(char) * 200);
 				lToReadLength = strchr(szAct,'\n') - szAct;
 				strncpy(szName,szAct,sizeof(char) * lToReadLength);
-#ifdef __linux__
-				if (szName[strlen(szName) - 1] == '\r') szName[strlen(szName) - 1] = '\0';
-#endif
+				STRIP_CR(szName);
 				if(strlen(szName) < 20){
 					strcpy(szPDir[lNum].szDir,szName);
 					char szFilePath[256];
