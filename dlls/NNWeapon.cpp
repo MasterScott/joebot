@@ -27,14 +27,23 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "extdll.h"
+#include "util.h"
+
+#ifdef USE_METAMOD
+#define SDK_UTIL_H  // util.h already included
+#include "meta_api.h"
+#endif /* USE_METAMOD */
+
+#include "NNWeapon.h"
+
 #include "bot_weapons.h"
 #include "Commandfunc.h"
 #include "globalvars.h"
-#include "NNWeapon.h"
 
 #include "BotNNDefs.h"
 
-char szLPBFile[80];
+//char szLPBFile[80];
 bool bLoadedLPB = false;
 
 extern int mod_id;
@@ -371,7 +380,7 @@ void NNWeapon :: LoadFile(const char *szFileName){
 		memset(szFileContent,0,sizeof(char)*(lFileSize+1));
 		
 		if(fhd = fopen(szFileName,"r")){
-			printf("JoeBOT : loading weapon buy probabilities from file : %s\n", szFileName);
+			LOG_MESSAGE(PLID, "Loading weapon buy probabilities file: %s", szFileName);
 
 			//fread(szFileContent,sizeof(char),lFileSize,fhd);
 			char *p = szFileContent;
@@ -398,11 +407,11 @@ void NNWeapon :: LoadFile(const char *szFileName){
 			}
 		}
 		else{
-			printf("JoeBOT : problems loading weapon buy probabilities from file : %s\n", szFileName);
+			LOG_MESSAGE(PLID, "Problems loading weapon buy probabilities file: %s", szFileName);
 		}
 		delete [] szFileContent;
 	}
 	else{
-		printf("JoeBOT : problems loading weapon buy probabilities from file : %s\n", szFileName);
+		LOG_MESSAGE(PLID, "Problems loading weapon buy probabilities file: %s", szFileName);
 	}
 }
