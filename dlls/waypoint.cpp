@@ -1836,7 +1836,6 @@ bool WaypointLoad(edict_t *pEntity, const char *szDir)
 	char filename[256];
 	char dirname[80];
 	WAYPOINT_HDR header;
-	char msg[80];
 	int index, i;
 	short int num;
 	short int path_index;
@@ -1917,9 +1916,6 @@ bool WaypointLoad(edict_t *pEntity, const char *szDir)
 					if(waypoints[i].origin.Length() == 0){
 						waypoints[i].flags |= W_FL_DELETED;
 					}
-					// HACK: offset for maps with new origin
-					waypoints[i].origin = waypoints[i].origin - Vector(jb_wpoffsetx->value,jb_wpoffsety->value,jb_wpoffsetz->value);
-
 					num_waypoints++;
 				}
 				
@@ -1952,9 +1948,6 @@ bool WaypointLoad(edict_t *pEntity, const char *szDir)
 				for (i=0; i < header.number_of_waypoints; i++)
 				{
 					fread(&waypoints[i], sizeof(waypoints[0]), 1, bfp);
-					// HACK: offset for maps with new origin
-					waypoints[i].origin = waypoints[i].origin - Vector(jb_wpoffsetx->value,jb_wpoffsety->value,jb_wpoffsetz->value);
-
 					num_waypoints++;
 				}
 				
@@ -3588,7 +3581,6 @@ void WaypointRouteInit(void)
 	unsigned int a, b;
 	float distance;
 	unsigned short *pShortestPath, *pFromTo;
-	char msg[256];				// thx to Watz for pointing out that 80 chars might be too little ... 256 should be enough though
 	unsigned int num_items;
 	FILE *bfp;
 	char filename[256];
