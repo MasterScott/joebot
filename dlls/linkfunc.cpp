@@ -654,6 +654,4 @@ LINK_ENTITY_TO_FUNC(env_state);
 LINK_ENTITY_TO_FUNC(dod_camera);
 LINK_ENTITY_TO_FUNC(dod_location);
 
-//LINK_ENTITY_TO_FUNC(Server_GetBlendingInterface);
-
 #endif /* not USE_METAMOD */
