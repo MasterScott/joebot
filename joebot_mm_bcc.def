@@ -1,4 +1,4 @@
-LIBRARY JoeBOT
+LIBRARY joebot
 EXPORTS
  GetEntityAPI = _GetEntityAPI
  GetEngineFunctions = _GetEngineFunctions
