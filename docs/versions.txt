@@ -21,6 +21,19 @@ Current Developer on Sourceforge/joebot
 -- This Bot is based on botman's HPB_bot - template code - http://planethalflife.com/botman --
 ----------------------------------------------------------------------------------------------
 
+JoeBOT 1.6.5.2
+- Added : preliminary shield support
+- fixed : CS 1.6 waypoints
+- fixed : awp weapon select conflict with waypoint command
+- fixed : entity indexing
+- fixed : index range errors with max players/bots
+- fixed : more round start/end initialization bugs
+- fixed : removed FL_THIRDPARTYBOT fix (no longer needed)
+- fixed : updated engine funcs to match hlsdk
+
+JoeBOT 1.6.5.1
+- fixed : camping bug related to round start/end initialization
+
 JoeBOT 1.6.5
 - Metamod plugin dll released
 - CS 1.6 compatible (shield use not implemented yet)
