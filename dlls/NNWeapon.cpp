@@ -45,8 +45,6 @@
 
 bool bLoadedLPB = false;
 
-extern int mod_id;
-
 #define _DELAY_NONE .3
 
 NNWeapon :: NNWeapon(){
@@ -267,11 +265,8 @@ void NNWeapon :: Init(void){
 	fPBuyProb[CSTRIKE_DLL][CS_WEAPON_AUG]			= 20;
 	fPBuyProb[CSTRIKE_DLL][CS_WEAPON_UMP45]			= 15;
 	fPBuyProb[CSTRIKE_DLL][CS_WEAPON_SG550]			= 5;
-	//if (!CVAR_BOOL(jb_cstrike15))
-	//{
-		fPBuyProb[CSTRIKE_DLL][CS_WEAPON_GALIL]		= 10;
-		fPBuyProb[CSTRIKE_DLL][CS_WEAPON_FAMAS]		= 10;
-	//}
+	fPBuyProb[CSTRIKE_DLL][CS_WEAPON_GALIL]			= 10;
+	fPBuyProb[CSTRIKE_DLL][CS_WEAPON_FAMAS]			= 10;
 	fPBuyProb[CSTRIKE_DLL][CS_WEAPON_AWP]			= 8;
 	fPBuyProb[CSTRIKE_DLL][CS_WEAPON_MP5NAVY]		= 20;
 	fPBuyProb[CSTRIKE_DLL][CS_WEAPON_M249]			= 2;
@@ -289,11 +284,8 @@ void NNWeapon :: Init(void){
 	fPBuyProb[CSTRIKE_DLL][CS_WEAPON_AUG]			= 10;
 	fPBuyProb[CSTRIKE_DLL][CS_WEAPON_UMP45]			= 10;
 	fPBuyProb[CSTRIKE_DLL][CS_WEAPON_SG550]			= 10;
-	if (!CVAR_BOOL(jb_cstrike15))
-	{
-		fPBuyProb[CSTRIKE_DLL][CS_WEAPON_GALIL]		= 10;
-		fPBuyProb[CSTRIKE_DLL][CS_WEAPON_FAMAS]		= 10;
-	}
+	fPBuyProb[CSTRIKE_DLL][CS_WEAPON_GALIL]			= 10;
+	fPBuyProb[CSTRIKE_DLL][CS_WEAPON_FAMAS]			= 10;
 	fPBuyProb[CSTRIKE_DLL][CS_WEAPON_AWP]			= 10;
 	fPBuyProb[CSTRIKE_DLL][CS_WEAPON_MP5NAVY]		= 10;
 	fPBuyProb[CSTRIKE_DLL][CS_WEAPON_M249]			= 10;
