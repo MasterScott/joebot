@@ -71,6 +71,7 @@ CWorldGnome CWG;
 #ifndef USE_METAMOD
 extern GETENTITYAPI other_GetEntityAPI;
 extern GETNEWDLLFUNCTIONS other_GetNewDLLFunctions;
+extern SERVER_GETBLENDINGINTERFACE other_Server_GetBlendingInterface;
 #endif /* not USE_METAMOD */
 extern globalvars_t  *gpGlobals;
 
@@ -96,7 +97,7 @@ plugin_info_t Plugin_info = {
 	VAUTHOR,		// author
 	VURL,			// url
 	VLOGTAG,		// logtag
-	PT_STARTUP,		// (when) loadable
+	PT_CHANGELEVEL,	// (when) loadable
 	PT_ANYPAUSE,	// (when) unloadable
 };
 
@@ -232,7 +233,7 @@ CChatHost g_ChatHost;
 
 int m_spriteTexture = 0;
 //int default_bot_skill = 2;
-bool isFakeClientCommand = FALSE;
+bool g_bFakeClientCommand = false;
 int fake_arg_count;
 float bot_check_time = 2.0;
 int num_bots = 0;
@@ -246,7 +247,6 @@ bool g_bIsSteam = false;
 
 CCommands Commands;
 
-cvar_t *g_sv_maxspeed;		// sv_maxspeed cvar
 cvar_t *g_mp_freezetime;	// mp_freezetime cvar
 
 float gf_5th=0.0;
@@ -287,11 +287,12 @@ char welcome_msg[200];
 char _JOEBOTVERSION[80];
 char _JOEBOTVERSIONWOOS[80]= VVERSION;
 bool bDedicatedWelcome = false;
-int g_iTypeoM;
+int g_iMapType;
 
-float f_round_start;	// time of roundstart
-float f_end_freezetime = 0.0;	// when to start after freeze time
-float f_timesrs = 1000;		// time since round start	->	updated every frame by start frame
+float g_fRoundStart;	// time of roundstart
+float g_fRoundTime = 1000;		// time since round start	->	updated every frame by start frame
+float g_fFreezeTimeStart = 0;
+float g_fFreezeTimeEnd = 0;
 
 bool g_bMyBirthday;
 long g_lAge;
@@ -354,7 +355,7 @@ void CalcDistances(void){
 	}
 }
 
-void JBServerCommand(void)
+void BotServerCommand(void)
 {
 	bool bCmdOK = Commands.Exec(NULL, CM_DEDICATED, CMD_ARGV(1), CMD_ARGV(2), CMD_ARGV(3), CMD_ARGV(4), CMD_ARGV(5));
 	if (!bCmdOK)
@@ -365,7 +366,7 @@ void GameDLLInit( void )
 {
 	long lschl;
 	LOG_MESSAGE(PLID, "Launching DLL (CBB%liCBC%liCBD%li%li@%s)",sizeof(CBotBase),sizeof(CBotCS),sizeof(CBotDOD),time(NULL),"---");
-	REG_SVR_COMMAND("joebot", JBServerCommand);
+	REG_SVR_COMMAND("joebot", BotServerCommand);
 	RegisterCvars();
 	SERVER_COMMAND("exec joebot/joebot.cfg\n");
 
@@ -426,6 +427,7 @@ void GameDLLInit( void )
 	
 	// init func table for buying weapons
 	Buy[CS_WEAPON_P228]			= BotBuy_CS_WEAPON_P228;
+	Buy[CS_WEAPON_SHIELD]		= BotBuy_CS_WEAPON_SHIELD;
 	Buy[CS_WEAPON_SCOUT]		= BotBuy_CS_WEAPON_SCOUT;
 	Buy[CS_WEAPON_HEGRENADE]	= BotBuy_CS_WEAPON_HEGRENADE;
 	Buy[CS_WEAPON_XM1014]		= BotBuy_CS_WEAPON_XM1014;
@@ -472,9 +474,9 @@ void GameDLLInit( void )
 				NNCombat = new CNeuralNetBProp;
 			
 			bNNInitError = false;
-			/*}catch(...){		// just create a fuckin' NN to avoid any unforseen consequences
+		/*}catch(...){		// just create a fuckin' NN to avoid any unforseen consequences
 			if (IS_DEDICATED_SERVER())
-			LOG_MESSAGE(PLID, "%s - haven't found NN - creating fake ones, to prevent crashing",szFileNameNN);
+				LOG_MESSAGE(PLID, "%s - haven't found NN - creating fake ones, to prevent crashing",szFileNameNN);
 			NNCombat->SetLayerNum(4);
 			NNCombat->SetNNeuronsOnLayer(0,IEND);
 			NNCombat->SetNNeuronsOnLayer(1,7);
@@ -485,30 +487,30 @@ void GameDLLInit( void )
 			NNCombat->ConnectLayer(1,2);
 			NNCombat->ConnectLayer(2,3);
 			bNNInitError = true;
-	}*/
-			try{
-				UTIL_BuildFileName(szFileNameNN, sizeof(szFileNameNN), "joebot/nnc.br3");
-				//NNColl.LoadFile(szFileNameNN);
-				CBaseNeuralNet *NNCollP=0;
-				LoadNet(NNCollP,szFileNameNN);
-				NNColl = (CBaseNeuralNetFF *)NNCollP;
-				if (IS_DEDICATED_SERVER())
-					if(NNColl)
-						LOG_MESSAGE(PLID, "Loading neural network: %s", szFileNameNN);
-					else
-						LOG_MESSAGE(PLID, "Error loading neural network: %s", szFileNameNN);
-					if(!NNColl)
-						NNColl = new CNeuralNetBProp;
-					
-					bNNInitError = false;
-			}catch(...){		// just create a fuckin' NN to avoid any unforseen consequences
-				if (IS_DEDICATED_SERVER())
-					LOG_MESSAGE(PLID, "%s - haven't found NN - creating fake ones to prevent crashing",szFileNameNN);
-				NNColl = new CNeuralNetBProp;
-				NNCombat = new CNeuralNetBProp;
-				bNNInitError = true;
-			}
-			bNNInit = true;
+		}*/
+		try{
+			UTIL_BuildFileName(szFileNameNN, sizeof(szFileNameNN), "joebot/nnc.br3");
+			//NNColl.LoadFile(szFileNameNN);
+			CBaseNeuralNet *NNCollP=0;
+			LoadNet(NNCollP,szFileNameNN);
+			NNColl = (CBaseNeuralNetFF *)NNCollP;
+			if (IS_DEDICATED_SERVER())
+				if(NNColl)
+					LOG_MESSAGE(PLID, "Loading neural network: %s", szFileNameNN);
+				else
+					LOG_MESSAGE(PLID, "Error loading neural network: %s", szFileNameNN);
+				if(!NNColl)
+					NNColl = new CNeuralNetBProp;
+				
+				bNNInitError = false;
+		}catch(...){		// just create a fuckin' NN to avoid any unforseen consequences
+			if (IS_DEDICATED_SERVER())
+				LOG_MESSAGE(PLID, "%s - haven't found NN - creating fake ones to prevent crashing",szFileNameNN);
+			NNColl = new CNeuralNetBProp;
+			NNCombat = new CNeuralNetBProp;
+			bNNInitError = true;
+		}
+		bNNInit = true;
 	}
 
 	// prop nets  -  kind of precaching
@@ -535,13 +537,12 @@ int DispatchSpawn( edict_t *pent )
 	{
 		char *pClassname = (char *)STRING(pent->v.classname);
 		
-		BOT_LOG("DispatchSpawn", UTIL_VarArgs("pent=%x, classname=%s, model=%s", pent, pClassname, pent->v.model ? STRING(pent->v.model) : ""));
+		LOG_GAMEDLL(UTIL_VarArgs("DispatchSpawn: pent=%x, classname=%s, model=%s", pent, pClassname, pent->v.model ? STRING(pent->v.model) : ""));
 		
 		if (FStrEq(pClassname, "worldspawn"))
 		{
 			g_bMyBirthday = MyBirthday();		// check if it is my birthday :D
 			
-			g_sv_maxspeed = CVAR_GET_POINTER("sv_maxspeed");
 			g_mp_freezetime = CVAR_GET_POINTER("mp_freezetime");
 
 			// do level initialization stuff here...
@@ -560,21 +561,21 @@ int DispatchSpawn( edict_t *pent )
 			}
 			bDedicatedWelcome = false;
 			
-			// determining g_iTypeoM
+			// determining g_iMapType
 			if(!strncmp(STRING(gpGlobals->mapname),"cs",sizeof(char)*2)){
-				g_iTypeoM = MT_CS;
+				g_iMapType = MT_CS;
 			}
 			else if(!strncmp(STRING(gpGlobals->mapname),"de",sizeof(char)*2)){
-				g_iTypeoM = MT_DE;
+				g_iMapType = MT_DE;
 			}
 			else if(!strncmp(STRING(gpGlobals->mapname),"as",sizeof(char)*2)){
-				g_iTypeoM = MT_AS;
+				g_iMapType = MT_AS;
 			}
 			else if(!strncmp(STRING(gpGlobals->mapname),"es",sizeof(char)*2)){
-				g_iTypeoM = MT_ES;
+				g_iMapType = MT_ES;
 			}
 			else
-				g_iTypeoM = MT_CS;
+				g_iMapType = MT_CS;
 			
 			pent_info_tfdetect = NULL;
 			pent_info_ctfdetect = NULL;
@@ -654,7 +655,7 @@ void DispatchBlocked( edict_t *pentBlocked, edict_t *pentOther )
 
 void DispatchKeyValue( edict_t *pentKeyvalue, KeyValueData *pkvd )
 {
-	//BOT_LOG("DispatchKeyValue", UTIL_VarArgs("pentKeyvalue=%x, %s=%s", pentKeyvalue, pkvd->szKeyName, pkvd->szValue));
+	//LOG_GAMEDLL(UTIL_VarArgs("DispatchKeyValue: pentKeyvalue=%x, %s=%s", pentKeyvalue, pkvd->szKeyName, pkvd->szValue));
 	(*other_gFunctionTable.pfnKeyValue)(pentKeyvalue, pkvd);
 }
 
@@ -703,7 +704,7 @@ BOOL ClientConnect( edict_t *pEntity, const char *pszName, const char *pszAddres
 { 
 	if (gpGlobals->deathmatch)
 	{
-		BOT_LOG("ClientConnect", UTIL_VarArgs("pEntity=%x, pszName=%s", pEntity, pszName));
+		LOG_GAMEDLL(UTIL_VarArgs("ClientConnect: pEntity=%x, pszName=%s", pEntity, pszName));
 		
 		// check if this client is the listen server client
 		if (FStrEq(pszAddress, "loopback"))
@@ -745,7 +746,7 @@ BOOL ClientConnect( edict_t *pEntity, const char *pszName, const char *pszAddres
 
 void ClientDisconnect( edict_t *pEntity )
 {
-	BOT_LOG("ClientDisconnect", UTIL_VarArgs("pEntity=%x", pEntity));
+	LOG_GAMEDLL(UTIL_VarArgs("ClientDisconnect: pEntity=%x", pEntity));
 
 	if (gpGlobals->deathmatch)
 	{
@@ -786,14 +787,14 @@ void ClientDisconnect( edict_t *pEntity )
 #ifndef USE_METAMOD
 void ClientKill( edict_t *pEntity )
 {
-	BOT_LOG("ClientKill", UTIL_VarArgs("pEntity=%x", pEntity));
+	LOG_GAMEDLL(UTIL_VarArgs("ClientKill: pEntity=%x", pEntity));
 	(*other_gFunctionTable.pfnClientKill)(pEntity);
 }
 #endif /* not USE_METAMOD */
 
 void ClientPutInServer( edict_t *pEntity )
 {
-	BOT_LOG("ClientPutInServer", UTIL_VarArgs("pEntity=%x", pEntity));
+	LOG_GAMEDLL(UTIL_VarArgs("ClientPutInServer: pEntity=%x", pEntity));
 	
 	int i = ENTINDEX(pEntity) - 1;
 	clients[i] = pEntity;  // store this clients edict in the clients array
@@ -933,7 +934,7 @@ void KickBots(edict_t *pEntity,int iTeam,int iAll){
 #define MAX_CTRIES 10
 
 void TrainNN(edict_t *pEntity){
-#ifdef ENABLE_TRAINNN
+#ifdef USE_TRAINNN
 	UTIL_BuildFileName(szLoadText, sizeof(szLoadText), "joebot/nntrain.pta");
 	UTIL_BuildFileName(szSave, sizeof(szSave), "joebot/nntrain.ptt");
 
@@ -984,7 +985,7 @@ void TrainNN(edict_t *pEntity){
 	if(dError < _MAXERROR){
 		  UTIL_ConsoleMessage(pEntity, "after %i epochs the net could be trained to a max error of %.2f\nNow you can test the net and if u wish to save it, do 'savenn'\n",lloop, _MAXERROR);
 	}
-#endif /* ENABLE_TRAINNN */
+#endif /* USE_TRAINNN */
 }
 
 void Endround(void){
@@ -1011,7 +1012,7 @@ void ClientCommand( edict_t *pEntity )
 	if ((gpGlobals->deathmatch) && (!IS_DEDICATED_SERVER()) &&
 		(pEntity == listenserver_edict))
 	{
-		BOT_LOG("ClientCommand", UTIL_VarArgs("g_argv=%s", g_argv));
+		LOG_GAMEDLL(UTIL_VarArgs("ClientCommand: g_argv=%s", g_argv));
 		if (Commands.Exec(pEntity, CM_CONSOLE, CMD_ARGV(0), CMD_ARGV(1), CMD_ARGV(2), CMD_ARGV(3), CMD_ARGV(4)))
 #ifdef USE_METAMOD
 			RETURN_META(MRES_SUPERCEDE);
@@ -1030,7 +1031,7 @@ void ClientCommand( edict_t *pEntity )
 #ifndef USE_METAMOD
 void ClientUserInfoChanged( edict_t *pEntity, char *infobuffer )
 {
-	BOT_LOG("ClientUserInfoChanged", UTIL_VarArgs("pEntity=%x, infobuffer=%s", pEntity, infobuffer));
+	LOG_GAMEDLL(UTIL_VarArgs("ClientUserInfoChanged: pEntity=%x, infobuffer=%s", pEntity, infobuffer));
 	(*other_gFunctionTable.pfnClientUserInfoChanged)(pEntity, infobuffer);
 }
 
@@ -1103,210 +1104,215 @@ void SearchEs_CSTRIKE(void){		// search entities
 		gFlash[lNumF].bUsed = false;
 	}
 }
+
 #ifdef _DEBUG
 void ShowInfo(void){
-	if(!IS_DEDICATED_SERVER()){
-		if(listenserver_edict){
-			edict_t *pInfo;
-			char szText[1000];
-			char szTemp[200];
-			char szTemp2[200];
-			float fMin = 10;
+
+	if(!IS_DEDICATED_SERVER() && listenserver_edict){
+		edict_t *pInfo;
+		char szText[1024];
+		char szTemp[256];
+		float fMin = 10;
+	
+		szText[0] = 0;
+		sprintf(szTemp,"Time: %.0f/%.0f\n", gpGlobals->time, g_fRoundTime);
+		strcat(szText,szTemp);
+		pInfo = GetNearestPlayer(listenserver_edict->v.origin+(Vector(0,0,2)),-1,fMin,10,listenserver_edict);
+		fMin = 100000;
+		if(!pInfo)
+			pInfo = GetNearestPlayer(listenserver_edict,-1,fMin,true,true);
+		if(pInfo){
+			CBotBase *pBI = UTIL_GetBotPointer(pInfo);
+			if(pBI){
+				sprintf(szTemp,"%s / %3.0f%% Health / %3.0f(%3.0f) / Grenades: ",STRING(pInfo->v.netname),pInfo->v.health,pInfo->v.velocity.Length(),pBI->pEdict->v.maxspeed);
+				if(pBI->HasWeapon(1<<CS_WEAPON_FLASHBANG)){
+					strcat(szTemp,"F");
+				}
+				if(pBI->HasWeapon(1<<CS_WEAPON_HEGRENADE)){
+					strcat(szTemp,"H");
+				}
+				if(pBI->HasWeapon(1<<CS_WEAPON_SMOKEGRENADE)){
+					strcat(szTemp,"S");
+				}
+				if(pBI->bReplay){
+					strcat(szTemp," / Replay");
+				}
+				strcat(szTemp,"\n");
+				strcat(szText,szTemp);
+				
+				if(pBI->current_weapon.iId > -1 && pBI->current_weapon.iId <32){
+					sprintf(szTemp,"%s %i / %i / %i\n",weapon_defs[pBI->current_weapon.iId].szClassname,pBI->current_weapon.iClip,WeaponDefs.ipClipSize[mod_id][pBI->current_weapon.iId],pBI->current_weapon.iAmmo1);
+					strcat(szText,szTemp);
+					sprintf(szTemp," - M:%2.2f A:%2.2f AH:%2.2f\n",pBI->d_Manner,pBI->f_Aggressivity,pBI->f_AimHead);
+					strcat(szText,szTemp);
+					sprintf(szTemp," - OV %.2f %.2f / VA %3.0f %.0f --- fLT %.0f\n",pBI->v_Offset.y,pBI->v_Offset.x,pBI->pEdict->v.v_angle.y,pBI->pEdict->v.v_angle.x,pBI->f_LookTo - gpGlobals->time);
+					strcat(szText,szTemp);
+					sprintf(szTemp,"FG:%3.i / G:%3.i / C:%3.i\n",pBI->iGoal,pBI->iFarGoal,pBI->i_CurrWP);
+					strcat(szText,szTemp);
+				}
+				else
+					strcat(szText, "\n\n\n\n");
+				
+				if(pBI->f_ducktill > gpGlobals->time){
+					sprintf(szTemp,"Duck: %3.f\n",pBI->f_ducktill-gpGlobals->time);
+					strcat(szText,szTemp);
+				}
+				else
+					strcat(szText,"Duck:\n");
+
+				if(pBI->GOrder.lTypeoG){
+					sprintf(szTemp,"GOrder: State(%i) Type(%s-%i)\n",pBI->GOrder.lState,weapon_defs[pBI->GOrder.lTypeoG].szClassname,pBI->GOrder.lTypeoG);
+					WaypointDrawBeamDebug(listenserver_edict,pBI->pEdict->v.origin,pBI->GOrder.VAim,10,0,200,0,0,200,10);
+					strcat(szText,szTemp);
+				}
+				else
+					strcat(szText,"GOrder:\n");
+
+				if (pBI->Action.lAction){
+					long lAction = pBI->Action.lAction;
+
+					strcat(szText,"Actions: ");
+					if(lAction & BA_DEFUSE)
+						strcat(szText,"BA_DEFUSE/PLANT ");
+					if(lAction & BA_FIGHT)
+						strcat(szText,"BA_FIGHT ");
+					if(lAction & BA_SUSPLOC)
+						strcat(szText,"BA_SUSPLOC ");
+					if(lAction & BA_BUYZONE)
+						strcat(szText,"BA_BUYZONE ");
+					if(lAction & BA_BOMBZONE)
+						strcat(szText,"BA_BOMBZONE ");
+					if(lAction & BA_BOMBPL)
+						strcat(szText,"BA_BOMBPL ");
+					if(lAction & BA_PICKUP)
+						strcat(szText,"BA_PICKUP ");
+					if(lAction & BA_DEFKIT)
+						strcat(szText,"BA_DEFKIT ");
+					if(lAction & BA_TKAVOID)
+						strcat(szText,"BA_TKAVOID ");
+					strcat(szText, "\n");
+
+					strcat(szText,"Orders: ");
+					if(lAction & BO_COVER)
+						strcat(szText,"BO_COVER ");
+					if(lAction & BO_HELP)
+						strcat(szText,"BO_HELP ");
+					if(lAction & BO_FOLLOW)
+						strcat(szText,"BO_FOLLOW ");
+					if(lAction & BO_ROAMTEAM)
+						strcat(szText,"BO_ROAMTEAM ");
+					if(lAction & BO_GUARD)
+						strcat(szText,"BO_GUARD ");
+					if(lAction & BO_CAMPATGOAL)
+						strcat(szText,"BO_CAMPATGOAL/HOLDPOS ");
+					if(lAction & BO_WAIT4TM8)
+						strcat(szText,"BO_WAIT4TM8 ");
+					if(lAction & BO_AFF)
+						strcat(szText,"BO_AFF ");
+					strcat(szText, "\n");
+				}
+				else
+					strcat(szText, "Actions: \nOrders: \n");
+
+				sprintf(szTemp,"%i Task(s)\n",pBI->Task.lNOT);
+				strcat(szText,szTemp);
+				if(pBI->Task.current){
+					char szTask[1024];
+					CTaskItem *p;
+
+					for(int i=pBI->Task.lNOT-1;i>=0&&i>pBI->Task.lNOT - 6;i--){
+						p = pBI->Task.GetTask(i);
+						sprintf(szTask,"Task(%i): ",i);
+						if(p->lType & BT_COVER)
+							strcat(szTask,"BT_COVER ");
+						if(p->lType & BT_HELP)
+							strcat(szTask,"BT_HELP ");
+						if(p->lType & BT_FOLLOW)
+							strcat(szTask,"BT_FOLLOW ");
+						if(p->lType & BT_ROAMTEAM)
+							strcat(szTask,"BT_ROAMTEAM ");
+						if(p->lType & BT_GOTO)
+							strcat(szTask,"BT_GOTO ");
+						if(p->lType & BT_GUARD)
+							strcat(szTask,"BT_GUARD ");
+						if(p->lType & BT_CAMPATGOAL)
+							strcat(szTask,"BT_CAMPATGOAL ");
+						if(p->lType & BT_WAIT4TM8)
+							strcat(szTask,"BT_WAIT4TM8 ");
+						if(p->lType & BT_HOLDPOS)
+							strcat(szTask,"BT_HOLDPOS ");
+						if(p->lType & BT_PICKUP)
+							strcat(szTask,"BT_PICKUP ");
+						if(p->lType & BT_HIDE)
+							strcat(szTask,"BT_HIDE ");
+						if(p->lType & BT_FLEE)
+							strcat(szTask,"BT_FLEE ");
+						if(p->lType & BT_RELOAD)
+							strcat(szTask,"BT_RELOAD ");
+						/*if(p->lType & BT_PAUSE)
+							strcat(szTask,"BT_PAUSE ");*/
+						if(p->lType & BT_GOBUTTON)
+							strcat(szTask,"BT_GOBUTTON ");
+						if(p->lType & BT_HUNT)
+							strcat(szTask,"BT_HUNT ");
+						if(p->lType & BT_CROUCH)
+							strcat(szTask,"BT_CROUCH ");
+						if(p->lType & BT_CAMP)
+							strcat(szTask,"BT_CAMP ");
+						if(p->lType & BT_BLINDED)
+							strcat(szTask,"BT_BLINDED ");
+						if(p->lType & BT_IGNOREENEMY)
+							strcat(szTask,"BT_IGNOREENEMY ");
+						if(p->lType & BT_TMP)
+							strcat(szTask,"BT_TMP ");
+						if(p->lType & BT_DEL)
+							strcat(szTask,"BT_DEL ");
+						if(p->lType & BT_LOCKED)
+							strcat(szTask,"BT_LOCKED ");
+						sprintf(szTemp,"(%2.f)\n",(p->fLive2>0?p->fLive2:p->fLive2+gpGlobals->time - 1)-gpGlobals->time);
+						strcat(szTask,szTemp);
+						int iLen = strlen(szTask);
+						int iBytesLeft = 512 - strlen(szText);
+						if (iBytesLeft < 0)
+							iLen = 0;
+						else if (iLen > iBytesLeft)
+							iLen = iBytesLeft;
+						strncat(szText,szTask,iBytesLeft);
+						szText[512] = 0;
+					}
+				}
+			}
+		}
+		else{
+			strcat(szText,"\n\nno edict to display information about\n");
+		}
+
+		hudtextparms_t message_params;
 		
-			szText[0] = 0;
-			sprintf(szTemp,"time: %.0f/%.0f\n",gpGlobals->time,f_timesrs);
-			strcat(szText,szTemp);
-			pInfo = GetNearestPlayer(listenserver_edict->v.origin+(Vector(0,0,2)),-1,fMin,10,listenserver_edict);
-			fMin = 100000;
-			if(!pInfo){
-				pInfo = GetNearestPlayer(listenserver_edict,-1,fMin,true,true);
-			}
-			if(pInfo){
-				CBotBase *pBI = UTIL_GetBotPointer(pInfo);
-				if(pBI){
-				}
-				else{
-					sprintf(szTemp,"%s / %3.0f%% Health / %3.0f(%3.0f) ",STRING(pInfo->v.netname),pInfo->v.health,pInfo->v.velocity.Length(),pBI->f_max_speed);
-					if(pBI->HasWeapon(1<<CS_WEAPON_FLASHBANG)){
-						strcat(szTemp,"F");
-					}
-					if(pBI->HasWeapon(1<<CS_WEAPON_HEGRENADE)){
-						strcat(szTemp,"H");
-					}
-					if(pBI->HasWeapon(1<<CS_WEAPON_SMOKEGRENADE)){
-						strcat(szTemp,"S");
-					}
-					if(pBI->bReplay){
-						strcat(szTemp," Replay");
-					}
-					strcat(szTemp,"\n");
-					strcat(szText,szTemp);
-					
-					if(pBI->current_weapon.iId > -1 && pBI->current_weapon.iId <32){
-						sprintf(szTemp,"%s %i/%0.0lf/%i",weapon_defs[pBI->current_weapon.iId].szClassname,pBI->current_weapon.iClip,WeaponDefs.ipClipSize[mod_id][pBI->current_weapon.iId],pBI->current_weapon.iAmmo1);
-						strcat(szText,szTemp);
-						sprintf(szTemp," - M:%2.2f A:%2.2f AH:%2.2f\n",pBI->d_Manner,pBI->f_Aggressivity,pBI->f_AimHead);
-						strcat(szText,szTemp);
-						sprintf(szTemp," - OV %.2f %.2f / VA %.0f %.0f --- fLT %.0f\n",pBI->v_Offset.y,pBI->v_Offset.x,pBI->pEdict->v.v_angle.y,pBI->pEdict->v.v_angle.x,pBI->f_LookTo - gpGlobals->time);
-						strcat(szText,szTemp);
-						sprintf(szTemp,"FG:%3.i/G:%3.i/C:%3.i\n",pBI->iGoal,pBI->iFarGoal,pBI->i_CurrWP);
-						strcat(szText,szTemp);
-					}
-					
-					if(pBI->f_ducktill > gpGlobals->time){
-						sprintf(szTemp,"ducking: %3.f\n",pBI->f_ducktill-gpGlobals->time);
-						strcat(szText,szTemp);
-					}
-					if(pBI->GOrder.lTypeoG){
-						sprintf(szTemp,"GOrder: State(%i) Type(%s-%i)\n",pBI->GOrder.lState,weapon_defs[pBI->GOrder.lTypeoG].szClassname,pBI->GOrder.lTypeoG);
-						WaypointDrawBeamDebug(listenserver_edict,pBI->pEdict->v.origin,pBI->GOrder.VAim,10,0,200,0,0,200,10);
-						strcat(szText,szTemp);
-					}
-					sprintf(szTemp,"%i Task(s)\n",pBI->Task.lNOT);
-					strcat(szText,szTemp);
-					if(pBI->Task.current){
-						CTaskItem *p;
+		if(!pInfo)
+			pInfo = listenserver_edict;
+		
+		message_params.x = 0;
+		message_params.y = 0.1;
+		message_params.effect = 0;
+		message_params.r1 = !(UTIL_GetTeam(pInfo))*255;
+		message_params.g1 = 128;
+		message_params.b1 = (UTIL_GetTeam(pInfo))*255;
+		message_params.a1 = 1;
+		message_params.r2 = message_params.r1;
+		message_params.g2 = message_params.g1;
+		message_params.b2 = message_params.b1;
+		message_params.a2 = 1;
+		message_params.fadeinTime = 0.00;
+		message_params.fadeoutTime = 0;
+		message_params.holdTime = gf_5thd+0.02f;
+		message_params.fxTime = 0;
+		message_params.channel = 1;
 
-						int i;
-						for(i=pBI->Task.lNOT-1;i>=0&&i>pBI->Task.lNOT - 6;i--){
-							p = pBI->Task.GetTask(i);
-							sprintf(szTemp,"Task(%i): ",i);
-							if(p->lType & BT_COVER){
-								sprintf(szTemp2,"BT_COVER ");
-								strcat(szTemp,szTemp2);
-							}
-							if(p->lType & BT_HELP){
-								sprintf(szTemp2,"BT_HELP ");
-								strcat(szTemp,szTemp2);
-							}
-							if(p->lType & BT_FOLLOW){
-								sprintf(szTemp2,"BT_FOLLOW ");
-								strcat(szTemp,szTemp2);
-							}
-							if(p->lType & BT_ROAMTEAM){
-								sprintf(szTemp2,"BT_ROAMTEAM ");
-								strcat(szTemp,szTemp2);
-							}
-							if(p->lType & BT_GOTO){
-								sprintf(szTemp2,"BT_GOTO ");
-								strcat(szTemp,szTemp2);
-							}
-							if(p->lType & BT_GUARD){
-								sprintf(szTemp2,"BT_GUARD ");
-								strcat(szTemp,szTemp2);
-							}
-							if(p->lType & BT_CAMPATGOAL){
-								sprintf(szTemp2,"BT_CAMPATGOAL ");
-								strcat(szTemp,szTemp2);
-							}
-							if(p->lType & BT_WAIT4TM8){
-								sprintf(szTemp2,"BT_WAIT4TM8 ");
-								strcat(szTemp,szTemp2);
-							}
-							if(p->lType & BT_HOLDPOS){
-								sprintf(szTemp2,"BT_HOLDPOS ");
-								strcat(szTemp,szTemp2);
-							}
-							if(p->lType & BT_PICKUP){
-								sprintf(szTemp2,"BT_PICKUP ");
-								strcat(szTemp,szTemp2);
-							}
-							if(p->lType & BT_HIDE){
-								sprintf(szTemp2,"BT_HIDE ");
-								strcat(szTemp,szTemp2);
-							}
-							if(p->lType & BT_FLEE){
-								sprintf(szTemp2,"BT_FLEE ");
-								strcat(szTemp,szTemp2);
-							}
-							if(p->lType & BT_RELOAD){
-								sprintf(szTemp2,"BT_RELOAD ");
-								strcat(szTemp,szTemp2);
-							}
-							/*if(p->lType & BT_PAUSE){
-								sprintf(szTemp2,"BT_PAUSE ");
-								strcat(szTemp,szTemp2);
-							}*/
-							if(p->lType & BT_GOBUTTON){
-								sprintf(szTemp2,"BT_GOBUTTON ");
-								strcat(szTemp,szTemp2);
-							}
-							if(p->lType & BT_HUNT){
-								sprintf(szTemp2,"BT_HUNT ");
-								strcat(szTemp,szTemp2);
-							}
-							if(p->lType & BT_CROUCH){
-								sprintf(szTemp2,"BT_CROUCH ");
-								strcat(szTemp,szTemp2);
-							}
-							if(p->lType & BT_CAMP){
-								sprintf(szTemp2,"BT_CAMP ");
-								strcat(szTemp,szTemp2);
-							}
-							if(p->lType & BT_BLINDED){
-								sprintf(szTemp2,"BT_BLINDED ");
-								strcat(szTemp,szTemp2);
-							}
-							if(p->lType & BT_IGNOREENEMY){
-								sprintf(szTemp2,"BT_IGNOREENEMY ");
-								strcat(szTemp,szTemp2);
-							}
-							if(p->lType & BT_TMP){
-								sprintf(szTemp2,"BT_TMP ");
-								strcat(szTemp,szTemp2);
-							}
-							if(p->lType & BT_DEL){
-								sprintf(szTemp2,"BT_DEL ");
-								strcat(szTemp,szTemp2);
-							}
-							if(p->lType & BT_LOCKED){
-								sprintf(szTemp2,"BT_LOCKED ");
-								strcat(szTemp,szTemp2);
-							}
-							sprintf(szTemp2,"(%2.f)\n",(p->fLive2>0?p->fLive2:p->fLive2+gpGlobals->time - 1)-gpGlobals->time);
-							strcat(szTemp,szTemp2);
-							strcat(szText,szTemp);
-							szText[512] = 0;
-						}
-					}
-				}
-			}
-			else{
-				strcat(szText,"\n\nno edict to display information about\n");
-			}
-			
-			hudtextparms_t message_params;
-			
-			if(!pInfo)
-				pInfo = listenserver_edict;
-			
-			message_params.x = 0;
-			message_params.y = 1;
-			message_params.effect = 0;
-			message_params.r1 = !(UTIL_GetTeam(pInfo))*255;
-			message_params.g1 = 128;
-			message_params.b1 = (UTIL_GetTeam(pInfo))*255;
-			message_params.a1 = 1;
-			message_params.r2 = message_params.r1;
-			message_params.g2 = message_params.g1;
-			message_params.b2 = message_params.b1;
-			message_params.a2 = 1;
-			message_params.fadeinTime = 0.00;
-			message_params.fadeoutTime = 0;
-			message_params.holdTime = gf_5thd+0.02f;
-			message_params.fxTime = 0;
-			message_params.channel = 1;
-
-			long lNL = CountLines(szText);
-			lNL = 13 - lNL;
-			for(;lNL;lNL--){
-				strcat(szText,"\n");
-			}
-			
-			UTIL_ShowText(listenserver_edict,message_params,szText);
-			
-			int iWPNear = WaypointFindNearest(listenserver_edict,100,-1,0,false,false,false);
-			if(iWPNear != -1){
+		UTIL_ShowText(listenserver_edict,message_params,szText);
+		
+		int iWPNear = WaypointFindNearest(listenserver_edict,100,-1,0,false,false,false);
+		if(iWPNear != -1){
 			/*int ischl;
 			
 			for(ischl = 0;ischl < num_waypoints;ischl ++){
@@ -1317,11 +1323,10 @@ void ShowInfo(void){
 					WaypointDrawBeam(listenserver_edict,waypoints[ischl].origin,waypoints[iWPNear].origin,5,0,200,200,200,200,2);
 				}
 			}*/
-			}
 		}
 	}
 }
-#endif
+#endif /* _DEBUG */
 
 void StartFrame( void )
 {
@@ -1419,7 +1424,7 @@ void StartFrame( void )
 		if (gf_5th <= gpGlobals->time){								// this is every .2 s the case
 			g_b5th=true;
 			if(mod_id == CSTRIKE_DLL||mod_id == CSCLASSIC_DLL)
-				f_timesrs = gpGlobals->time - f_round_start;
+				g_fRoundTime = gpGlobals->time - g_fRoundStart;
 			//cout << gf_5th << endl;
 			gf_5thd = gpGlobals->time - gf_5th + .2f;
 			gf_5th = gpGlobals->time + 0.2f;
@@ -1439,6 +1444,7 @@ void StartFrame( void )
 			}
 			
 #ifdef _DEBUG
+		if (CVAR_BOOL(jb_showen))
 			ShowInfo();
 #endif
 			
@@ -1581,7 +1587,7 @@ void StartFrame( void )
 									if ((welcome_time[i] > 0.0)
 										&& (welcome_time[i] < gpGlobals->time))
 									{
-										cout << "welcoming " << STRING(pEnt->v.netname) << endl;
+										LOG_MESSAGE(PLID, "Welcoming %s", STRING(pEnt->v.netname));
 										// let's send a welcome message to this client...
 										//UTIL_SayText(welcome_msg, listenserver_edict);
 										
@@ -1763,10 +1769,9 @@ void StartFrame( void )
 				bots[bot_index]->Think();
 				
 				count++;
-				/*}
-				catch(...){
-				FILE *fhd = fopen("scheisse.txt","a");fprintf(fhd,"scheisse in think\n");fclose(fhd);
-			}*/
+				/*} catch(...){
+					FILE *fhd = fopen("scheisse.txt","a");fprintf(fhd,"scheisse in think\n");fclose(fhd);
+				}*/
 			}
 		}
 		
@@ -1990,10 +1995,9 @@ void StartFrame( void )
 	  
       previous_time = gpGlobals->time;
    }
-   /* }
-   catch(...){
-   FILE *fhd = fopen("scheisse.txt","a");fprintf(fhd,"scheisse in startframe\n");fclose(fhd);
-   }*/
+   /*} catch(...){
+		FILE *fhd = fopen("scheisse.txt","a");fprintf(fhd,"scheisse in startframe\n");fclose(fhd);
+	}*/
    
 #ifdef USE_METAMOD
    RETURN_META(MRES_IGNORED);
@@ -2020,7 +2024,7 @@ const char *GetGameDescription( void )
 
 void PlayerCustomization( edict_t *pEntity, customization_t *pCust )
 {
-	BOT_LOG("PlayerCustomization", UTIL_VarArgs("pEntity=%x", pEntity));
+	LOG_GAMEDLL(UTIL_VarArgs("PlayerCustomization: pEntity=%x", pEntity));
 	(*other_gFunctionTable.pfnPlayerCustomization)(pEntity, pCust);
 }
 
@@ -2116,7 +2120,7 @@ void CreateInstancedBaselines( void )
 
 int InconsistentFile( const edict_t *player, const char *filename, char *disconnect_message )
 {
-	BOT_LOG("InconsistentFile", UTIL_VarArgs("player=%x, filename=%s", player, filename));
+	LOG_GAMEDLL(UTIL_VarArgs("InconsistentFile: player=%x, filename=%s", player, filename));
 	return (*other_gFunctionTable.pfnInconsistentFile)(player, filename, disconnect_message);
 }
 
@@ -2300,6 +2304,21 @@ extern "C" EXPORT int GetNewDLLFunctions( NEW_DLL_FUNCTIONS *pFunctionTable, int
 	
 	return TRUE;
 }
+
+#ifdef __BORLANDC__
+//extern "C" DLLEXPORT int EXPORT Server_GetBlendingInterface(int version, struct sv_blending_interface_s **ppinterface,struct engine_studio_api_s *pstudio,float (*rotationmatrix)[3][4], float (*bonetransform)[MAXSTUDIOBONES][3][4])
+int EXPORT Server_GetBlendingInterface(int version, struct sv_blending_interface_s **ppinterface,struct engine_studio_api_s *pstudio,float (*rotationmatrix)[3][4], float (*bonetransform)[MAXSTUDIOBONES][3][4])
+#else
+//int DLLEXPORT Server_GetBlendingInterface(int version, struct sv_blending_interface_s **ppinterface,struct engine_studio_api_s *pstudio,float (*rotationmatrix)[3][4], float (*bonetransform)[MAXSTUDIOBONES][3][4])
+extern "C" EXPORT int Server_GetBlendingInterface(int version, struct sv_blending_interface_s **ppinterface,struct engine_studio_api_s *pstudio,float (*rotationmatrix)[3][4], float (*bonetransform)[MAXSTUDIOBONES][3][4])
+#endif
+{
+	if (other_Server_GetBlendingInterface == NULL)
+		return FALSE;
+	
+	// call blending interface function
+	return ((*other_Server_GetBlendingInterface)(version, ppinterface, pstudio, rotationmatrix, bonetransform));
+}
 #endif /* not USE_METAMOD */
 
 void FakeClientCommand (edict_t *pFakeClient, const char *fmt, ...)
@@ -2324,7 +2343,7 @@ void FakeClientCommand (edict_t *pFakeClient, const char *fmt, ...)
    if ((command == NULL) || (*command == 0))
       return; // if nothing in the command buffer, return
 
-   isFakeClientCommand = TRUE; // set the "fakeclient command" flag
+   g_bFakeClientCommand = true; // set the "fakeclient command" flag
    length = strlen (command); // get the total length of the command string
 
    // process all individual commands (separated by a semicolon) one each a time
@@ -2374,7 +2393,7 @@ void FakeClientCommand (edict_t *pFakeClient, const char *fmt, ...)
    }
 
    g_argv[0] = 0; // when it's done, reset the g_argv field
-   isFakeClientCommand = FALSE; // reset the "fakeclient command" flag
+   g_bFakeClientCommand = false; // reset the "fakeclient command" flag
    fake_arg_count = 0; // and the argument count
 }
 
