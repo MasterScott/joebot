@@ -29,7 +29,10 @@
 #ifndef WAYPOINT_H
 #define WAYPOINT_H
 
-//#include <limits.h>
+#ifdef _WIN32
+#include <limits.h>
+#endif
+
 #include "extdll.h"
 
 #define _MAXTEMPDIVPRE 200
@@ -73,6 +76,13 @@ extern float REACHABLE_RANGE;													// ???? to change some time
 #define W_FL_DELETED     (1<<31) /* used by waypoint allocation code */
 
 #define WAYPOINT_VERSION 2
+
+#ifdef _DEBUG
+#define DEBUG_DRAWBEAM(pEntity,start,end,width,noise,red,green,blue,brightness,speed) \
+	WaypointDrawBeam(pEntity,start,end,width,noise,red,green,blue,brightness,speed)
+#else
+#define DEBUG_DRAWBEAM(pEntity,start,end,width,noise,red,green,blue,brightness,speed) /* */
+#endif
 
 // define the waypoint file header structure...
 typedef struct {
