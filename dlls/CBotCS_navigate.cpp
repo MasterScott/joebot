@@ -49,16 +49,16 @@ bool CBotCS :: GoToSpEnt( void ){
 		return breturn;
 	}
 	f_CheckSpEnt = gpGlobals->time + 1.0;
-	if(bot_vip){
-		//FakeClientCommand(pEdict,"say i'm a vip");
+	if(m_bIsVIP){
+		//DEBUG_CLIENTCOMMAND(pEdict,"say i'm a vip");
 		return breturn;
 	}
 	if(Task.current&&Task.current->lType&BT_IGNOREENEMY){
-		//FakeClientCommand(pEdict,"say ignorenemy is there");
+		//DEBUG_CLIENTCOMMAND(pEdict,"say ignorenemy is there");
 		return breturn;
 	}
 	if(f_LastFight > gpGlobals->time - 1){
-		//FakeClientCommand(pEdict,"say last fight is too near");
+		//DEBUG_CLIENTCOMMAND(pEdict,"say last fight is too near");
 		return breturn;
 	}
 	
@@ -72,10 +72,9 @@ bool CBotCS :: GoToSpEnt( void ){
 	return breturn;
 }
 
-bool CBotCS :: HasAlreadyHostage(const edict_t *pHostage){
-	int ischl;
-	for(ischl=0;ischl < i_UsedHostages;ischl++){
-		if(pHostages[ischl] == pHostage)
+bool CBotCS :: HasAlreadyHostage(const edict_t *pentHostage){
+	for(int ischl=0;ischl < m_iHostagesUsed;ischl++){
+		if(m_rgpentHostages[ischl] == pentHostage)
 			return true;
 	}
 	return false;
@@ -96,9 +95,7 @@ bool CBotCS :: HeadTowardSpEnt(void){
 	if(pEdict->v.movetype == MOVETYPE_FLY)		/// not on ladders
 		return false;
 
-#ifdef DEBUGMESSAGES
-	WaypointDrawBeam(listenserver_edict,pEdict->v.origin,pEdict->v.origin+Vector(0,0,100),5,10,250,250,250,250,50);
-#endif
+	DEBUG_DRAWBEAM(listenserver_edict,pEdict->v.origin,pEdict->v.origin+Vector(0,0,100),5,10,250,250,250,250,50);
 	
 	pEnt = 0;
 	long lNumF=0;
@@ -123,9 +120,7 @@ bool CBotCS :: HeadTowardSpEnt(void){
 					
 					FixIdealYaw();
 					FixIdealPitch();
-#ifdef DEBUGMESSAGES
-					FakeClientCommand(pEdict,"say head away");
-#endif
+					DEBUG_CLIENTCOMMAND(pEdict,"say head away");
 					return true;
 				}
 			}
@@ -138,7 +133,6 @@ bool CBotCS :: HeadTowardSpEnt(void){
 	b_neardoor = false;
 	
 	pEnt = 0;
-	int iWSL = strlen("weapon_");
 	while(pEnt = UTIL_FindEntityInSphere(pEnt,pEdict->v.origin,250)){
 		fDistance = Vector(pEnt->v.origin - pEdict->v.origin).Length2D();
 		strcpy( szClassname , STRING(pEnt->v.classname) );
@@ -147,7 +141,7 @@ bool CBotCS :: HeadTowardSpEnt(void){
 			if(bot_teamnm == CS_TEAM_CT){
 				if(fPDistance > 300						// don't 'steal' hostages
 					&& GetHosVel(pEnt) < 1.f
-					&& i_UsedHostages < _MAXHOSTAGES			// don't take more than _MAXHOSTAGES
+					&& m_iHostagesUsed < _MAXHOSTAGES			// don't take more than _MAXHOSTAGES
 					&& IsAlive(pEnt)						// fix of rescue point bug ???
 					&& FVisible(pEnt->v.origin,pEdict)){	// visible
 					
@@ -155,7 +149,7 @@ bool CBotCS :: HeadTowardSpEnt(void){
 						continue;
 					}
 					if(f_gotohostage + 10.0f < gpGlobals->time){	// new try to get hostage
-						//FakeClientCommand(pEdict,"say_team got hostage");
+						//DEBUG_CLIENTCOMMAND(pEdict,"say_team got hostage");
 						if(bot_teamnm==CS_TEAM_CT)UTIL_HostSay(pEdict,1,"got hostage");
 						f_gotohostage = gpGlobals->time;
 					}
@@ -171,8 +165,8 @@ bool CBotCS :: HeadTowardSpEnt(void){
 							// use hostage
 							lButton |= IN_USE;
 							
-							pHostages[i_UsedHostages] = pEnt;	// add hostage ent
-							i_UsedHostages ++;		// inc number of 'used' hostages
+							m_rgpentHostages[m_iHostagesUsed] = pEnt;	// add hostage ent
+							m_iHostagesUsed ++;		// inc number of 'used' hostages
 							f_gotohostage = 0;						// make this for maing the bot able to go to another hostage
 							
 							ResetWPlanning();
@@ -205,72 +199,70 @@ bool CBotCS :: HeadTowardSpEnt(void){
 		else if(!strncmp(szClassname,"func_door",9*sizeof(char))){
 			b_neardoor = true;
 		}
-		else if(!strncmp(szClassname,"weapon_",iWSL)){
-			if(!(Action.lAction&BA_DEFUSE)){
-				if(pEnt->v.owner){
-					if(FStrEq(STRING(pEnt->v.owner->v.classname),"weaponbox")
-						&& FVisible(pEnt->v.owner->v.origin,pEdict)){
-						fRDistance = (pEnt->v.owner->v.origin - pEdict->v.origin).Length();
-						
-						TraceResult tr;
-						UTIL_TraceLine(pEnt->v.owner->v.origin + Vector(0,0,10),pEnt->v.owner->v.origin + Vector(0,0,75),ignore_monsters,pEnt,&tr);
-						if(tr.flFraction > .99f){
-							long lWeaponID = WeaponClass2ID(szClassname);
-							
-							if(lWeaponID == CS_WEAPON_C4){
-								if(bot_teamnm == CS_TEAM_TE){		//te
-									Goto(pEnt->v.owner->v.origin);	// problem offset between old owner and current position
-									return true;
-								}
-								else{							// ct
-									if(f_noCamp < gpGlobals->time				// is it allowed to sniper
-										&& pNearP
-										&& fPDistance > 300.0f){					// is there already another ct
-										if(f_noCamp < gpGlobals->time){
-											if(Task.SearchT(BT_GUARD) == -1){
-												Task.AddTask(BT_GUARD,gpGlobals->time + 15.0f,0,pNearP,0);
-											}
-										}
-										return false;
-									}
+		else if(!strncmp(szClassname,"weaponbox",strlen("weaponbox")) ||
+			!strncmp(szClassname,"weapon_shield",strlen("weapon_shield")))
+		{
+			if (pEnt->v.effects & EF_NODRAW) // spectator or not drawn?
+				continue;
+
+			if(FVisible(pEnt->v.origin,pEdict) && !(Action.lAction & BA_DEFUSE)){
+				long lWeaponID = WeaponModel2ID(STRING(pEnt->v.model));
+
+				if(lWeaponID == CS_WEAPON_C4){
+					if(bot_teamnm == CS_TEAM_TE){		//te
+						Goto(pEnt->v.origin);	// problem offset between old owner and current position
+						return true;
+					}
+					else{							// ct
+						if(f_noCamp < gpGlobals->time				// is it allowed to sniper
+							&& pNearP
+							&& fPDistance > 300.0f){					// is there already another ct
+							if(f_noCamp < gpGlobals->time){
+								if(Task.SearchT(BT_GUARD) == -1){
+									Task.AddTask(BT_GUARD,gpGlobals->time + 15.0f,0,pNearP,0);
 								}
 							}
-							else{	// other weapons than c4
-								if(lWeaponID != -1){	// only 'see' primaries
-									/*if(!HasPrimary()){				// bot has no primary weapon
-										Goto(pEnt->v.owner->v.origin);	// go there
-										return true;
-									}
-									else*/{		// only drop and pickup weapons when not fighting ...
-										if(f_LastFight+6.0f < gpGlobals->time){
-											if(IsWeaponBetterCurrent(lWeaponID)){			// current weapon is not the favourite one
-												if(f_RWKnife > gpGlobals->time)
-													f_RWKnife = 0;
-												if(!(Action.lAction & BA_PICKUP) ||1){		// first frame
-													if(IsSecondaryWeapon(1<<lWeaponID)){
-														if(HasSecondary() != current_weapon.iId){	// is secondary selected ?? 
-															f_DenyWChange = 0;
-															Change2Weapon(HasSecondary());		// if not change it
-														}
-													}
-													else if(HasPrimary() != current_weapon.iId){	// is primary selected ?? 
-														f_DenyWChange = 0;
-														Change2Weapon(HasPrimary());		// if not change it
-													}
-												}
-												Goto(pEnt->v.owner->v.origin);	// go there
-												Action.lAction |= BA_PICKUP;
-												if(fRDistance < 70.0){
-													if( (IsPrimaryWeapon(1<<lWeaponID) && HasPrimary() == current_weapon.iId)
-														||(IsSecondaryWeapon(1<<lWeaponID) && HasSecondary() == current_weapon.iId)){
-														FakeClientCommand(pEdict,"drop");
-														Action.lAction &=~BA_PICKUP;
-													}
-												}
-												return true;
+							return false;
+						}
+					}
+				}
+				else{	// other weapons than c4
+					if(lWeaponID != -1){	// only 'see' primaries
+						/*if(!HasPrimary()){				// bot has no primary weapon
+							Goto(pEnt->v.origin);	// go there
+							return true;
+						}
+						else*/{		// only drop and pickup weapons when not fighting ...
+							if(f_LastFight+6.0f < gpGlobals->time){
+								if(IsWeaponBetterCurrent(lWeaponID)){			// current weapon is not the favourite one
+									if(f_RWKnife > gpGlobals->time)
+										f_RWKnife = 0;
+									if(!(Action.lAction & BA_PICKUP) ||1){		// first frame
+										if(IsSecondaryWeapon(1<<lWeaponID)){
+											if(HasSecondary() != current_weapon.iId){	// is secondary selected ?? 
+												f_DenyWChange = 0;
+												Change2Weapon(HasSecondary());		// if not change it
 											}
 										}
+										else if(HasPrimary() != current_weapon.iId){	// is primary selected ?? 
+											f_DenyWChange = 0;
+											Change2Weapon(HasPrimary());		// if not change it
+										}
 									}
+									Goto(pEnt->v.origin);	// go there
+									Action.lAction |= BA_PICKUP;
+									if(fDistance < 70.0){
+										if( (IsPrimaryWeapon(1<<lWeaponID) && ( HasPrimary() == current_weapon.iId || HasShield() )) ||
+											(IsSecondaryWeapon(1<<lWeaponID) && HasSecondary() == current_weapon.iId) )
+										{
+											FakeClientCommand(pEdict,"drop");
+											Action.lAction &=~BA_PICKUP;
+										}
+										else if(IsShieldWeapon(1<<lWeaponID)){
+											Action.lAction &=~BA_PICKUP;
+										}
+									}
+									return true;
 								}
 							}
 						}
@@ -399,27 +391,40 @@ bool CBotCS :: HeadTowardSpEnt(void){
 				return true;
 			}
 			else if(!HasPrimary()){
-				if(FStrEq("models/w_mp5navy.mdl",STRING(pEnt->v.model))
-					|| FStrEq("models/w_tmp.mdl",STRING(pEnt->v.model))
-					|| FStrEq("models/w_p90.mdl",STRING(pEnt->v.model))
-					|| FStrEq("models/w_mac10.mdl",STRING(pEnt->v.model))
-					|| FStrEq("models/w_ump45.mdl",STRING(pEnt->v.model))
-					|| FStrEq("models/w_xm1014.mdl",STRING(pEnt->v.model))
-					|| FStrEq("models/w_m3.mdl",STRING(pEnt->v.model))
-					|| FStrEq("models/w_ak47.mdl",STRING(pEnt->v.model))
-					|| FStrEq("models/w_sg552.mdl",STRING(pEnt->v.model))
-					|| FStrEq("models/w_m4a1.mdl",STRING(pEnt->v.model))
-					|| FStrEq("models/w_aug.mdl",STRING(pEnt->v.model))
-					|| FStrEq("models/w_scout.mdl",STRING(pEnt->v.model))
-					|| FStrEq("models/w_awp.mdl",STRING(pEnt->v.model))
-					|| FStrEq("models/w_g3sg1.mdl",STRING(pEnt->v.model))
-					|| FStrEq("models/w_sg550.mdl",STRING(pEnt->v.model))
-					|| FStrEq("models/w_m249.mdl",STRING(pEnt->v.model))
-					|| FStrEq("models/w_galil.mdl",STRING(pEnt->v.model))
-					|| FStrEq("models/w_famas.mdl",STRING(pEnt->v.model))
-					|| FStrEq("models/w_shield.mdl",STRING(pEnt->v.model))){
-					Goto(pEnt->v.origin);
-					return true;
+				if (HasShield()){ // opt for the weapon instead of the shield
+					// primary weapons that cost 2500 or more
+					if(FStrEq("models/w_xm1014.mdl",STRING(pEnt->v.model))
+						|| FStrEq("models/w_ak47.mdl",STRING(pEnt->v.model))
+						|| FStrEq("models/w_m4a1.mdl",STRING(pEnt->v.model))
+						|| FStrEq("models/w_aug.mdl",STRING(pEnt->v.model))
+						|| FStrEq("models/w_scout.mdl",STRING(pEnt->v.model))
+						|| FStrEq("models/w_awp.mdl",STRING(pEnt->v.model))
+						|| FStrEq("models/w_sg552.mdl",STRING(pEnt->v.model))
+						|| FStrEq("models/w_g3sg1.mdl",STRING(pEnt->v.model))
+						|| FStrEq("models/w_sg550.mdl",STRING(pEnt->v.model))
+						|| FStrEq("models/w_m249.mdl",STRING(pEnt->v.model))
+						)
+					{
+						Goto(pEnt->v.origin);
+						return true;
+					}
+				}
+				else {
+					// primary weapons that cost less than 2500
+					if(!HasShield() // get the weapon if we don't have the shield
+						|| FStrEq("models/w_mp5navy.mdl",STRING(pEnt->v.model))
+						|| FStrEq("models/w_m3.mdl",STRING(pEnt->v.model))
+						|| FStrEq("models/w_tmp.mdl",STRING(pEnt->v.model))
+						|| FStrEq("models/w_mac10.mdl",STRING(pEnt->v.model))
+						|| FStrEq("models/w_ump45.mdl",STRING(pEnt->v.model))
+						|| FStrEq("models/w_galil.mdl",STRING(pEnt->v.model))
+						|| FStrEq("models/w_famas.mdl",STRING(pEnt->v.model))
+						|| FStrEq("models/w_p90.mdl",STRING(pEnt->v.model))
+						)
+					{
+						Goto(pEnt->v.origin);
+						return true;
+					}
 				}
 			}
 		}	// endif cmp szclassname
@@ -444,72 +449,68 @@ bool CBotCS :: DistanceSight(void){
 		// to copy to every blabla  -> fDistance = Vector(pEnt->v.origin - pEdict->v.origin).Length2D();
 		strcpy( szClassname , STRING(pEnt->v.classname) );
 		
-		if(!strncmp(szClassname,"weapon_",strlen("weapon_"))){
-			if(pEnt->v.owner){
-				if(FStrEq(STRING(pEnt->v.owner->v.classname),"weaponbox")
-					&& FVisible(pEnt->v.owner->v.origin+Vector(0,0,20),pEdict)){
-					fRDistance = (pEnt->v.owner->v.origin - pEdict->v.origin).Length();
-					
-					//TraceResult tr;
-					//UTIL_TraceLine(pEnt->v.owner->v.origin + Vector(0,0,10),pEnt->v.owner->v.origin + Vector(0,0,75),ignore_monsters,pEnt,&tr);
-					if(1/*||tr.flFraction > .99f*/){
-						long lWeaponID = WeaponClass2ID(szClassname);
-						
-						if(lWeaponID == CS_WEAPON_C4){
-							if(bot_teamnm == CS_TEAM_TE){		//te
+		if(!strncmp(szClassname,"weaponbox",strlen("weaponbox")) ||
+			!strncmp(szClassname,"weapon_shield",strlen("weapon_shield")))
+		{
+			if (pEnt->v.effects & EF_NODRAW) // spectator or not drawn?
+				continue;
+
+			if(FVisible(pEnt->v.origin,pEdict)){
+				long lWeaponID = strncmp(szClassname, "weapon_shield", 13) ? WeaponClass2ID(szClassname) : CS_WEAPON_SHIELD;
+				
+				if(lWeaponID == CS_WEAPON_C4){
+					if(bot_teamnm == CS_TEAM_TE){		//te
+						lDestination = WaypointFindNearest(pEnt->v.owner,500,bot_teamnm,fN,true,false);
+						if(lDestination != -1
+							&& Task.SearchT(BT_PICKUP) == -1){
+							Task.AddTask(BT_GOTO|BT_PICKUP,gpGlobals->time + 15.0f,lDestination,0,0);
+							f_Aggressivity += 3.0;
+							ResetWPlanning();
+						}
+						return true;
+					}
+					else{							// ct
+						if(f_noCamp < gpGlobals->time				// is it allowed to sniper
+							&& pNearP
+							&& fPDistance > 300.0f){					// is there already another ct
+							if(f_noCamp < gpGlobals->time){
+								if(Task.SearchT(BT_GUARD) == -1){
+									Task.AddTask(BT_GUARD,gpGlobals->time + 15.0f,0,0,0);
+									if(Task.current)
+										Task.current->VT = pEnt->v.owner->v.origin + Vector(0,0,10);
+									ResetWPlanning();
+								}
+							}
+							return false;
+						}
+					}
+				}
+				else{	// other weapons than c4
+					if(lWeaponID != -1
+						&&IsPrimaryWeapon(1<<lWeaponID)){	// only 'see' primaries
+						if(!m_bIsVIP){
+							if(!HasPrimary()){				// bot has no primary weapon
 								lDestination = WaypointFindNearest(pEnt->v.owner,500,bot_teamnm,fN,true,false);
 								if(lDestination != -1
 									&& Task.SearchT(BT_PICKUP) == -1){
 									Task.AddTask(BT_GOTO|BT_PICKUP,gpGlobals->time + 15.0f,lDestination,0,0);
-									f_Aggressivity += 3.0;
 									ResetWPlanning();
 								}
 								return true;
 							}
-							else{							// ct
-								if(f_noCamp < gpGlobals->time				// is it allowed to sniper
-									&& pNearP
-									&& fPDistance > 300.0f){					// is there already another ct
-									if(f_noCamp < gpGlobals->time){
-										if(Task.SearchT(BT_GUARD) == -1){
-											Task.AddTask(BT_GUARD,gpGlobals->time + 15.0f,0,0,0);
-											if(Task.current)
-												Task.current->VT = pEnt->v.owner->v.origin + Vector(0,0,10);
-											ResetWPlanning();
-										}
-									}
-									return false;
-								}
-							}
-						}
-						else{	// other weapons than c4
-							if(lWeaponID != -1
-								&&IsPrimaryWeapon(1<<lWeaponID)){	// only 'see' primaries
-								if(!bot_vip){
-									if(!HasPrimary()){				// bot has no primary weapon
+							else{		// only drop and pickup weapons when not fighting ...
+								if(f_LastFight+6.0f < gpGlobals->time){
+									if(IsWeaponBetterCurrent(lWeaponID)){			// current weapon is not the favourite one
 										lDestination = WaypointFindNearest(pEnt->v.owner,500,bot_teamnm,fN,true,false);
 										if(lDestination != -1
 											&& Task.SearchT(BT_PICKUP) == -1){
 											Task.AddTask(BT_GOTO|BT_PICKUP,gpGlobals->time + 15.0f,lDestination,0,0);
+											if(!HasPrimary()){
+												f_Aggressivity += 3.0;
+											}
 											ResetWPlanning();
 										}
 										return true;
-									}
-									else{		// only drop and pickup weapons when not fighting ...
-										if(f_LastFight+6.0f < gpGlobals->time){
-											if(IsWeaponBetterCurrent(lWeaponID)){			// current weapon is not the favourite one
-												lDestination = WaypointFindNearest(pEnt->v.owner,500,bot_teamnm,fN,true,false);
-												if(lDestination != -1
-													&& Task.SearchT(BT_PICKUP) == -1){
-													Task.AddTask(BT_GOTO|BT_PICKUP,gpGlobals->time + 15.0f,lDestination,0,0);
-													if(!HasPrimary()){
-														f_Aggressivity += 3.0;
-													}
-													ResetWPlanning();
-												}
-												return true;
-											}
-										}
 									}
 								}
 							}
@@ -523,7 +524,7 @@ bool CBotCS :: DistanceSight(void){
 				if(fDistance > 400 &&						// don't 'steal' hostages
 					fPDistance > 400 &&
 					GetHosVel(pEnt) < 1.f&&
-					i_UsedHostages < _MAXHOSTAGES		// don't take more than _MAXHOSTAGES
+					m_iHostagesUsed < _MAXHOSTAGES		// don't take more than _MAXHOSTAGES
 					&& IsAlive(pEnt)						// fix of rescue point bug ???
 					&& FVisible(pEnt->v.origin,pEdict)){	// visible
 					
@@ -542,17 +543,17 @@ bool CBotCS :: DistanceSight(void){
 			}
 		}
 		/*else if(FStrEq(szClassname,"item_thighpack")){
-		if(bot_teamnm == CS_TEAM_CT
-		&& FVisible(pEnt->v.origin,pEdict)
-		&& !(Action.lAction & BA_DEFKIT)){
-		fN = 0;
-		lDestination = WaypointFindNearest(pEnt,500,bot_teamnm,fN,true,false);
-		if(lDestination != -1
-		&& Task.SearchT(BT_PICKUP) == -1){
-		Task.AddTask(BT_GOTO|BT_PICKUP,0,lDestination,0);
-		ResetWPlanning();
-		}
-		}
+			if(bot_teamnm == CS_TEAM_CT
+			&& FVisible(pEnt->v.origin,pEdict)
+			&& !(Action.lAction & BA_DEFKIT)){
+				fN = 0;
+				lDestination = WaypointFindNearest(pEnt,500,bot_teamnm,fN,true,false);
+				if(lDestination != -1
+					&& Task.SearchT(BT_PICKUP) == -1){
+					Task.AddTask(BT_GOTO|BT_PICKUP,0,lDestination,0);
+					ResetWPlanning();
+				}
+			}
 		}*/
 		else if(FStrEq(szClassname,"grenade")){
 			if(bot_teamnm == CS_TEAM_CT){
@@ -647,7 +648,7 @@ bool CBotCS :: Bored(void){
 							Vector VAim=entity_origin-pEdict->v.origin;
 							FireWeapon(VAim);
 							//BotFireWeapon(entity_origin,pBot);
-							//FakeClientCommand(pEdict,"say bored");
+							//DEBUG_CLIENTCOMMAND(pEdict,"say bored");
 							return true;
 						}
 					}
@@ -694,7 +695,7 @@ bool CBotCS :: Bored(void){
 		}
 		else if(i_BorA == 6){			// Bot is bored, so why not throw a flashbang at the base ?
 			if(RANDOM_LONG(0,100) < 10
-				&& f_timesrs < 20.f
+				&& g_fRoundTime < 20.f
 				&& bot_weapons&(1<<CS_WEAPON_FLASHBANG)){
 				GOrder.Attack(pEdict->v.origin,CS_WEAPON_FLASHBANG);
 				
@@ -730,7 +731,7 @@ bool CBotCS :: HandleNearWP(int iNearWP, bool &bReturn){
 							f_Pause = gpGlobals->time + 3.0f;
 							f_move_speed = 0;
 							f_dont_check_stuck= gpGlobals->time + 1.0;
-							//FakeClientCommand(pEdict,"say_team planting bomb");
+							//DEBUG_CLIENTCOMMAND(pEdict,"say_team planting bomb");
 							//UTIL_HostSay(pEdict,1,"planting bomb");
 							bReturn = true;
 							return true;
@@ -779,12 +780,12 @@ bool CBotCS :: HandleNearWP(int iNearWP, bool &bReturn){
 		}// end W_FL_FLAG
 		
 		if(waypoints[iNearWP].flags & W_FL_FLAG_GOAL){			// just say, no hostage
-			if(i_UsedHostages
+			if(m_iHostagesUsed
 				&& bot_teamnm == CS_TEAM_CT){
 				Task.AddTask(BT_CAMP, gpGlobals->time + 5.0,0,0,0);
 				if(RANDOM_LONG(0,100) < 70)
 					Jump();
-				i_UsedHostages = 0;
+				m_iHostagesUsed = 0;
 				ResetWPlanning();
 				
 				bReturn = false;
@@ -823,7 +824,7 @@ bool CBotCS :: HeadTowardWaypoint( void ){
 	
 	// to have some time without going to WPs
 	if(f_noWP > gpGlobals->time){
-		//FakeClientCommand(pEdict,"say not using wp");
+		//DEBUG_CLIENTCOMMAND(pEdict,"say not using wp");
 		return false;
 	}
 	
@@ -861,9 +862,7 @@ bool CBotCS :: HeadTowardWaypoint( void ){
 		if(iOnLadder == 0){			// only when not on ladder
 			HeadToward(waypoints[i_CurrWP].origin);	
 			VRunningTo = waypoints[i_CurrWP].origin; //should have been copied when next wp
-#ifdef DEBUGMESSAGES
-			//WaypointDrawBeam(listenserver_edict,pEdict->v.origin,waypoints[i_CurrWP].origin,10,10,200,0,0,200,10);
-#endif
+			//DEBUG_DRAWBEAM(listenserver_edict,pEdict->v.origin,waypoints[i_CurrWP].origin,10,10,200,0,0,200,10);
 		}
 		
 		if(g_b5th)
@@ -896,7 +895,7 @@ bool CBotCS :: HeadTowardWaypoint( void ){
 						if(f_noCamp < gpGlobals->time){
 							//cout << "reached campatgoal" << endl;
 							Task.AddTask(BT_CAMP,fDuration,0,0,0);
-							//FakeClientCommand(pEdict,"say %f",Task.current->fAdd);
+							//DEBUG_CLIENTCOMMAND(pEdict,"say %f",Task.current->fAdd);
 							//InitCamp();
 							if(CVAR_BOOL(jb_msgradio) && Task.current->p){
 								SendRadioCommand(RADIO_IM_IN_POSITION);
@@ -936,7 +935,7 @@ bool CBotCS :: HeadTowardWaypoint( void ){
 				if(fCDistance < 50){
 					//lNextWP = IsInWay(FW_Cur,i_CurrWP);		// look where this near wp is in the calced way
 					
-					//FakeClientCommand(pEdict,"say %f",fCDistance-f_D2C);
+					//DEBUG_CLIENTCOMMAND(pEdict,"say %f",fCDistance-f_D2C);
 					iNextWP = GoNextWPOnPath();
 					
 					if(waypoints[iNearWP].flags & W_FL_JUMP && !bReplay){
@@ -972,18 +971,14 @@ bool CBotCS :: HeadTowardWaypoint( void ){
 									}
 								}
 								fStartADVM += pWPAMPlay->Rec[iMin].fTime;
-#ifdef DEBUGMESSAGES
-								FakeClientCommand(pEdict,"say %f",pWPAMPlay->Rec[iMin].fTime);
-#endif
+								DEBUG_CLIENTCOMMAND(pEdict,UTIL_VarArgs("say %f",pWPAMPlay->Rec[iMin].fTime));
 							}
 							else{
 								f_Pause = gpGlobals->time + 1.5f;
 								f_noWP = gpGlobals->time + 1.5f;
 								f_move_speed = 0;
 								lButton &= ~IN_JUMP;
-#ifdef DEBUGMESSAGES
-								FakeClientCommand(pEdict,"say waiting because there is already a motherfucker in the way");
-#endif
+								DEBUG_CLIENTCOMMAND(pEdict,"say waiting because there is already a motherfucker in the way");
 								f_D2C1 = 1000;
 								return false;
 							}
@@ -996,9 +991,7 @@ bool CBotCS :: HeadTowardWaypoint( void ){
 					if(iNextWP == WAYPOINT_UNREACHABLE
 						|| iNextWP == iNearWP
 						|| iNextWP > WAYPOINT_UNREACHABLE/2){
-#ifdef DEBUGMESSAGES
-						//FakeClientCommand(pEdict,"say lost way");
-#endif
+						//DEBUG_CLIENTCOMMAND(pEdict,"say lost way");
 						//cout << "unreachable" << endl;
 						ResetWPlanning();
 						
@@ -1010,11 +1003,9 @@ bool CBotCS :: HeadTowardWaypoint( void ){
 						
 						return false;
 					}
-#ifdef DEBUGMESSAGES
 					else{
-						WaypointDrawBeam(listenserver_edict,pEdict->v.origin+Vector(0,0,30),waypoints[iNextWP].origin+Vector(0,0,30),20,0,200,200,200,100,20);
+						DEBUG_DRAWBEAM(listenserver_edict,pEdict->v.origin+Vector(0,0,30),waypoints[iNextWP].origin+Vector(0,0,30),20,0,200,200,200,100,20);
 					}
-#endif
 					
 					i_LastWP = i_CurrWP;
 					i_CurrWP = iNextWP; 
@@ -1033,11 +1024,11 @@ bool CBotCS :: HeadTowardWaypoint( void ){
 					// there for some time, wait for the enemy and maybe throw a grenade
 					if(	  !g_bBombPlanted
 						&& fM[bot_teamnm]<0.0
-						&& f_timesrs < 60.0 && f_timesrs > 15.0
+						&& g_fRoundTime < 60.0 && g_fRoundTime > 15.0
 						&& f_noCamp < gpGlobals->time
 						&& iNearWP != -1
 						&&!HasSniper()
-						&&!bot_vip
+						&&!m_bIsVIP
 						&&!(waypoints[iNearWP].flags & W_FL_LADDER)
 						&& f_LastFight < gpGlobals->time - 5.0){		// look if it's good to camp here
 						if(RANDOM_LONG(0,100)<30){
@@ -1088,7 +1079,7 @@ bool CBotCS :: HeadTowardWaypoint( void ){
 									bTTime = false;
 									for(i1=0;i1<MAX_TIMES_PWP;i1++){
 										if(WPStat[i].fpKilledTime[i1]>1.f
-											&&(TEq(f_timesrs+5.f,WPStat[i].fpKilledTime[i1],7.f))){
+											&&(TEq(g_fRoundTime+5.f,WPStat[i].fpKilledTime[i1],7.f))){
 											bTTime = true;
 											break;
 										}
@@ -1096,7 +1087,7 @@ bool CBotCS :: HeadTowardWaypoint( void ){
 									if(!bTTime){
 										for(i1=0;i1<MAX_TIMES_PWP;i1++){
 											if(WPStat[i].fpKillTime[i1]>1.f
-												&&(TEq(f_timesrs+5.f,WPStat[i].fpKillTime[i1],7.f))){
+												&&(TEq(g_fRoundTime+5.f,WPStat[i].fpKillTime[i1],7.f))){
 												bTTime = true;
 												break;
 											}
@@ -1180,7 +1171,7 @@ bool CBotCS :: HeadTowardWaypoint( void ){
 				}
 			}
 		}
-		//FakeClientCommand(pEdict,"say -");
+		//DEBUG_CLIENTCOMMAND(pEdict,"say -");
 		i_CurrWP = WaypointFindNearest(pEdict,100,bot_teamnm,0,true,true,true);
 		if(i_CurrWP == -1){
 			i_CurrWP = WaypointFindNearest(pEdict,200,bot_teamnm,0,true,false,true);
@@ -1195,7 +1186,7 @@ bool CBotCS :: HeadTowardWaypoint( void ){
 		iFarGoal = iGoal = i_CurrWP;
 		VRunningTo = waypoints[i_CurrWP].origin;
 		
-		//FakeClientCommand(pEdict,"say heading to");
+		//DEBUG_CLIENTCOMMAND(pEdict,"say heading to");
 		//if( (pEdict->v.origin - waypoints[i_CurrWP].origin).Length() < _NEAR ){
 		//if( WaypointFindNearest(pEdict,_NEAR,bot_teamnm) != -1 ){
 		if( (waypoints[i_CurrWP].origin - pEdict->v.origin).Length() < _NEAR*2 ){
@@ -1336,7 +1327,7 @@ void CBotCS :: FindRoute(int iNearWP){
 						count ++;
 					}
 					else{
-						iStore = RANDOM_LONG(1,_MAXTEMPDIV) - 1;
+						iStore = RANDOM_LONG(0,_MAXTEMPDIV - 1);
 					}
 	
 					indexes[iStore].index = preindexes[index];				
@@ -1370,7 +1361,7 @@ void CBotCS :: FindRoute(int iNearWP){
 				if(indexes[index].Way1.iNum > 3		// sackgasse ?
 					&& indexes[index].Way2.iNum > 3){
 					if(indexes[index].Way1.iIndices[indexes[index].Way1.iNum-1] == indexes[index].Way2.iIndices[1]){
-						//FakeClientCommand(pEdict,"say going back - we don't really want that, are we ?");
+						//DEBUG_CLIENTCOMMAND(pEdict,"say going back - we don't really want that, are we ?");
 						indexes[index].index = -1;
 					}
 				}
@@ -1380,7 +1371,7 @@ void CBotCS :: FindRoute(int iNearWP){
 			
 			// end remove near wps
 			// if hostages test on hostageability
-			if(i_UsedHostages){
+			if(m_iHostagesUsed){
 				for(index=0;index < count;index++){
 					if(!indexes[index].wayinfo1.bHostageable){
 						indexes[index].index = -1;
@@ -1459,13 +1450,13 @@ void CBotCS :: FindRoute(int iNearWP){
 			//cout << count << endl;
 			
 			if(count){
-				lSelection = RANDOM_LONG(1, count) - 1;
+				lSelection = RANDOM_LONG(0, count - 1);
 				iGoal = indexes[lSelection].index;
 			}
 			else{
-				if(i_UsedHostages){
+				if(m_iHostagesUsed){
 					iFarGoal = -1;
-					//FakeClientCommand(pEdict,"say no way for hostages");
+					//DEBUG_CLIENTCOMMAND(pEdict,"say no way for hostages");
 				}
 				else{
 					iGoal = iFarGoal;
@@ -1486,17 +1477,17 @@ void CBotCS :: FindRoute(int iNearWP){
 					//&&Task.SearchT(BT_GOBUTTON) == -1){
 					Task.AddTask(BT_GOTO|BT_GOBUTTON|BT_TMP,-1,iDest,pToUse,0);
 				}
-				//FakeClientCommand(pEdict,"say wanting to go where pressing a button is needed");
+				//DEBUG_CLIENTCOMMAND(pEdict,"say wanting to go where pressing a button is needed");
 			}
 	}
 	else{
 		// no divisions wanted, just make the final goal the current one
 		// but beforehand test if there are hostages or buttons
 		if(WaypointDistanceFromTo(iNearWP,iFarGoal,bot_teamnm) > 650
-			||i_UsedHostages){
+			||m_iHostagesUsed){
 			CWay *pWay = new CWay;
 			ConvertFloyd2Way(bot_teamnm,iNearWP,iFarGoal,pWay);
-			if(i_UsedHostages){
+			if(m_iHostagesUsed){
 				if(!Hostagable(pWay)){
 					iGoal = -1;
 					iWantedDiv++;
@@ -1520,7 +1511,7 @@ void CBotCS :: FindRoute(int iNearWP){
 						//&&Task.SearchT(BT_GOBUTTON) == -1){
 						Task.AddTask(BT_GOTO|BT_GOBUTTON|BT_TMP,-1,iDest,pToUse,0);
 					}
-					//FakeClientCommand(pEdict,"say wanting to go where pressing a button is needed");
+					//DEBUG_CLIENTCOMMAND(pEdict,"say wanting to go where pressing a button is needed");
 				}
 			}
 			delete pWay;
@@ -1533,7 +1524,7 @@ void CBotCS :: FindRoute(int iNearWP){
 bool CBotCS :: DecideOnWay(void){
 	int iNearest = WaypointFindNearest(pEdict,300,bot_teamnm);
 	
-	//FakeClientCommand(pEdict,"say generating new way");
+	//DEBUG_CLIENTCOMMAND(pEdict,"say generating new way");
 	
 	iWantedDiv = 0;		// by default the are no wanted divisions
 	
@@ -1550,7 +1541,7 @@ bool CBotCS :: DecideOnWay(void){
 		lTypeOWW = WW_VDEF;
 	}
 	
-	if(bot_vip){		// vip's way should be safe
+	if(m_bIsVIP){		// vip's way should be safe
 		lTypeOWW = WW_DEF;
 	}
 	
@@ -1599,10 +1590,10 @@ bool CBotCS :: DecideOnWay(void){
 			}
 		}
 		
-		if (g_iTypeoM == MT_CS){		// cs
-			//FakeClientCommand(pEdict,"say cs");
+		if (g_iMapType == MT_CS){		// cs
+			//DEBUG_CLIENTCOMMAND(pEdict,"say cs");
 			if(bot_teamnm == CS_TEAM_TE){								// te
-				if(f_timesrs < 20
+				if(g_fRoundTime < 20
 					&& RANDOM_LONG(0,100) < 20
 					&&!HasSniper()){
 					lDestination = WPStat.Search(bot_teamnm,iNearest,WPS_SEARCH_ENEMYESPTT,400,2000,50,5);
@@ -1656,10 +1647,10 @@ bool CBotCS :: DecideOnWay(void){
 				return true;
 			}
 			else{														// ct
-				if(i_UsedHostages>0){		// bring hostages back home
+				if(m_iHostagesUsed>0){		// bring hostages back home
 					lDestination = WaypointFindRandomGoal(pEdict->v.origin,pEdict,100000,bot_teamnm,W_FL_RESCUE);
 					iWantedDiv = 1;
-					//FakeClientCommand(pEdict,"say cs-ct-wf");
+					//DEBUG_CLIENTCOMMAND(pEdict,"say cs-ct-wf");
 				}
 				else if(HasSniper()			// go to sniper point, if ya've a good sniper weapon
 					&& RANDOM_LONG(0,100) < 50){
@@ -1709,8 +1700,8 @@ bool CBotCS :: DecideOnWay(void){
 				return true;
 			}
 		}
-		else if (g_iTypeoM == MT_DE){	// de
-			//FakeClientCommand(pEdict,"say de");
+		else if (g_iMapType == MT_DE){	// de
+			//DEBUG_CLIENTCOMMAND(pEdict,"say de");
 			if(bot_teamnm == CS_TEAM_TE){								// te
 				if(HasSniper()			// go to sniper point, if ya've a good sniper weapon
 					&& RANDOM_LONG(0,100) < 50
@@ -1740,12 +1731,12 @@ bool CBotCS :: DecideOnWay(void){
 					iWantedDiv = 0;
 				}
 				else if(bot_weapons & 1<<CS_WEAPON_C4					// if ya've c4 and U#ve already played some time ...
-					&&f_timesrs > 60.0f){
+					&&g_fRoundTime > 60.0f){
 					lDestination = WaypointFindNearestGoal(pEdict->v.origin,pEdict,100000,bot_teamnm,W_FL_FLAG);
 					iWantedDiv = 0;
 				}
 				else if(RANDOM_LONG(0,100)>50
-					&&f_timesrs < 60.f){	// new
+					&&g_fRoundTime < 60.f){	// new
 					lDestination = WPStat.Search(bot_teamnm,iNearest,WPS_SEARCH_ENEMYESPTT,400,20000,60,10);
 					iWantedDiv = 1;
 				}
@@ -1798,7 +1789,7 @@ bool CBotCS :: DecideOnWay(void){
 						return true;
 					}
 				}
-				if(f_timesrs < 20
+				if(g_fRoundTime < 20
 					&& RANDOM_LONG(0,100) < 30
 					&&!HasSniper()){
 					lDestination = WPStat.Search(bot_teamnm,iNearest,WPS_SEARCH_ENEMYESPTT,400,2000,50,5);
@@ -1835,7 +1826,7 @@ bool CBotCS :: DecideOnWay(void){
 					}
 				}
 				else if(RANDOM_LONG(0,100)>60
-					&&f_timesrs < 60.f){	// new
+					&&g_fRoundTime < 60.f){	// new
 					lDestination = WPStat.Search(bot_teamnm,iNearest,WPS_SEARCH_ENEMYESPTT,400,20000,60,10);
 					iWantedDiv = 1;
 				}
@@ -1850,7 +1841,7 @@ bool CBotCS :: DecideOnWay(void){
 				else{
 					if(RANDOM_LONG(0,100) < 85){
 						if(waypoints[iNearest].flags & W_FL_FLAG){
-							if(RANDOM_LONG(0,100) < 50 || (RANDOM_LONG(0,100)<80&&f_timesrs < 30.0f)){
+							if(RANDOM_LONG(0,100) < 50 || (RANDOM_LONG(0,100)<80&&g_fRoundTime < 30.0f)){
 								lDestination = WaypointFindRandomGoal(pEdict->v.origin,pEdict,100000,bot_teamnm,W_FL_FLAG);
 								iWantedDiv = 1;
 							}
@@ -1876,13 +1867,13 @@ bool CBotCS :: DecideOnWay(void){
 				return true;
 			}
 	}
-	else if(g_iTypeoM == MT_AS){
-		//if(RANDOM_LONG(0,100) < 10)FakeClientCommand(pEdict,"say ---------------");
+	else if(g_iMapType == MT_AS){
+		//if(RANDOM_LONG(0,100) < 10){DEBUG_CLIENTCOMMAND(pEdict,"say ---------------");}
 		if(bot_teamnm == CS_TEAM_CT){
-			if(bot_vip){
+			if(m_bIsVIP){
 				lDestination = WaypointFindRandomGoal(pEdict->v.origin,pEdict,100000,bot_teamnm,W_FL_VIP_RESCUE);
 				iWantedDiv = 1;
-				//FakeClientCommand(pEdict,"say vip");
+				//DEBUG_CLIENTCOMMAND(pEdict,"say vip");
 				if(lDestination != -1){
 					Task.AddTask(BT_GOTO,0,lDestination,(void *) iWantedDiv,0);
 					return true;
@@ -1959,7 +1950,7 @@ bool CBotCS :: DecideOnWay(void){
 	}
 	}
 	
-	/*FakeClientCommand(pEdict,"say This type of map is not yet implementated");
+	/*DEBUG_CLIENTCOMMAND(pEdict,"say This type of map is not yet implementated");
 	ResetWPlanning();*/
 	return false;
 }
@@ -2000,10 +1991,9 @@ bool CBotCS :: IsWeaponBetterCurrent(long lWeaponID){
 	else
 		return false;*/
 	
-	int iMyPGun = HasPrimary();
-	
 	if(IsPrimaryWeapon(1<<lWeaponID)){
-		if(iMyPGun == -1)
+		int iMyPGun = HasPrimary();
+		if(!iMyPGun)
 			return true;
 		if(iMyPGun != lPWeapon
 			&& lWeaponID == lPWeapon){
@@ -2025,12 +2015,18 @@ bool CBotCS :: IsWeaponBetterCurrent(long lWeaponID){
 	}
 	else if(IsSecondaryWeapon(1<<lWeaponID)){
 		int iMySGun = HasSecondary();
-		if(iMySGun == -1)
+		if(!iMySGun)
 			return true;
-		if(!IsKnifeWeapon(1<<lWeaponID)){
+		if(!IsKnifeWeapon(1<<lWeaponID) && !HasShield()){
 			if(Personality.iWeaponPriority[iMySGun] < Personality.iWeaponPriority[lWeaponID]){
 				return true;
 			}
+		}
+	}
+	else if(IsShieldWeapon(1<<lWeaponID)){
+		if (!HasPrimary() && !HasShield()){
+			if (HasSecondary() != CS_WEAPON_ELITE)
+				return true;
 		}
 	}
 	return false;
