@@ -63,7 +63,7 @@ void CBotCS :: Fight( void ){
 		if(index!=-1
 			&&index<32){
 			if(f_ES[index] + _ESTIME < gpGlobals->time){		// i.e. not seen for a while
-				if(bool(jb_msgradio->value))
+				if(CVAR_BOOL(jb_msgradio))
 					SendRadioCommand(RADIO_ENEMY_SPOTTED);
 				int iETeam = UTIL_GetTeam(pBotEnemy);
 
@@ -176,14 +176,14 @@ void CBotCS :: Fight( void ){
 			if((m_rgAmmo[weapon_defs[current_weapon.iId].iAmmo1]+current_weapon.iClip) == 0){//  if ya clip  and ya reserve is empty
 				ChangeToLWeapon();
 				if(f_UsedRadio < gpGlobals->time - _RADIO_FREQ
-					&&bool(jb_msgradio->value)){
+					&&CVAR_BOOL(jb_msgradio)){
 					SendRadioCommand(RADIO_NEED_BACKUP);
 				}
 			}
 			else if(current_weapon.iClip == 0){		// only ya clip is empty, so you can propably reload, if the en is far away
 				ChangeToLWeapon();							// use another weapon, worst case the knife - no special decisions concerning distance of en
 				if(f_UsedRadio < gpGlobals->time - _RADIO_FREQ
-					&& bool(jb_msgradio->value)){
+					&& CVAR_BOOL(jb_msgradio)){
 					SendRadioCommand(RADIO_NEED_BACKUP);
 				}
 			}
@@ -418,7 +418,7 @@ void CBotCS :: Fight( void ){
 			}
 			
 			// shoot at aim
-			if(bool(jb_shoot->value)){		// the friendly mode
+			if(CVAR_BOOL(jb_shoot)){		// the friendly mode
 				if(IsCWeaponKnife()){
 					if(dCombatNNIn[IDistance] < -.5){
 						ShootAtEnemy();			// attack enemy with knife only when near

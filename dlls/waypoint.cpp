@@ -1434,7 +1434,7 @@ int WaypointAdd(edict_t *pEntity)
 	// draw a blue waypoint
 	WaypointDrawBeam(pEntity, start, end, 30, 0, 0, 0, 255, 250, 5);
 	
-	if(bool(jb_wpsound->value))
+	if(CVAR_BOOL(jb_wpsound))
 		EMIT_SOUND_DYN2(pEntity, CHAN_WEAPON, "weapons/xbow_hit1.wav", 1.0,	ATTN_NORM, 0, 100);
 	
 	// increment total number of waypoints if adding at end of array...
@@ -1445,7 +1445,7 @@ int WaypointAdd(edict_t *pEntity)
 	if(waypoints[index].flags & W_FL_LADDER)	// dont add to ladders
 		return index;
 	
-	if(bool(jb_wpautopath->value)){
+	if(CVAR_BOOL(jb_wpautopath)){
 		for (int i=0; i < num_waypoints; i++)
 		{
 			if (i == index)
@@ -1570,7 +1570,7 @@ void WaypointAddAiming(edict_t *pEntity)
 	// draw a blue waypoint
 	WaypointDrawBeam(pEntity, start, end, 30, 0, 0, 0, 255, 250, 5);
 	
-	if(bool(jb_wpsound->value))
+	if(CVAR_BOOL(jb_wpsound))
 		EMIT_SOUND_DYN2(pEntity, CHAN_WEAPON, "weapons/xbow_hit1.wav", 1.0,ATTN_NORM, 0, 100);
 	
 	// increment total number of waypoints if adding at end of array...
@@ -1721,7 +1721,7 @@ void WaypointDelete(int index,edict_t *pEntity){
 	
 	wp_display_time[index] = 0.0;
 	
-	if(bool(jb_wpsound->value))
+	if(CVAR_BOOL(jb_wpsound))
 		if(pEntity)
 			EMIT_SOUND_DYN2(pEntity, CHAN_WEAPON, "weapons/mine_activate.wav", 1.0,ATTN_NORM, 0, 100);
 		
@@ -1745,14 +1745,14 @@ void WaypointCreatePath(edict_t *pEntity, int cmd)
 		if (waypoint1 == -1)
 		{
 			// play "cancelled" sound...
-			if(bool(jb_wpsound->value))
+			if(CVAR_BOOL(jb_wpsound))
 				EMIT_SOUND_DYN2(pEntity, CHAN_WEAPON, "common/wpn_moveselect.wav", 1.0,ATTN_NORM, 0, 100);
 			
 			return;
 		}
 		
 		// play "start" sound...
-		if(bool(jb_wpsound->value))
+		if(CVAR_BOOL(jb_wpsound))
 			EMIT_SOUND_DYN2(pEntity, CHAN_WEAPON, "common/wpn_hudoff.wav", 1.0,ATTN_NORM, 0, 100);
 		
 		return;
@@ -1765,7 +1765,7 @@ void WaypointCreatePath(edict_t *pEntity, int cmd)
 		if ((waypoint1 == -1) || (waypoint2 == -1))
 		{
 			// play "error" sound...
-			if(bool(jb_wpsound->value))
+			if(CVAR_BOOL(jb_wpsound))
 				EMIT_SOUND_DYN2(pEntity, CHAN_WEAPON, "common/wpn_denyselect.wav", 1.0,ATTN_NORM, 0, 100);
 			
 			return;
@@ -1774,7 +1774,7 @@ void WaypointCreatePath(edict_t *pEntity, int cmd)
 		WaypointAddPath(waypoint1, waypoint2);
 		
 		// play "done" sound...
-		if(bool(jb_wpsound->value))
+		if(CVAR_BOOL(jb_wpsound))
 			EMIT_SOUND_DYN2(pEntity, CHAN_WEAPON, "common/wpn_hudon.wav", 1.0,ATTN_NORM, 0, 100);
 	}
 }
@@ -1793,14 +1793,14 @@ void WaypointRemovePath(edict_t *pEntity, int cmd)
 		if (waypoint1 == -1)
 		{
 			// play "cancelled" sound...
-			if(bool(jb_wpsound->value))
+			if(CVAR_BOOL(jb_wpsound))
 				EMIT_SOUND_DYN2(pEntity, CHAN_WEAPON, "common/wpn_moveselect.wav", 1.0,ATTN_NORM, 0, 100);
 			
 			return;
 		}
 		
 		// play "start" sound...
-		if(bool(jb_wpsound->value))
+		if(CVAR_BOOL(jb_wpsound))
 			EMIT_SOUND_DYN2(pEntity, CHAN_WEAPON, "common/wpn_hudoff.wav", 1.0,ATTN_NORM, 0, 100);
 		
 		return;
@@ -1813,7 +1813,7 @@ void WaypointRemovePath(edict_t *pEntity, int cmd)
 		if ((waypoint1 == -1) || (waypoint2 == -1))
 		{
 			// play "error" sound...
-			if(bool(jb_wpsound->value))
+			if(CVAR_BOOL(jb_wpsound))
 				EMIT_SOUND_DYN2(pEntity, CHAN_WEAPON, "common/wpn_denyselect.wav", 1.0,ATTN_NORM, 0, 100);
 			
 			return;
@@ -1822,14 +1822,14 @@ void WaypointRemovePath(edict_t *pEntity, int cmd)
 		WaypointDeletePath(waypoint1, waypoint2);
 		
 		// play "done" sound...
-		if(bool(jb_wpsound->value))
+		if(CVAR_BOOL(jb_wpsound))
 			EMIT_SOUND_DYN2(pEntity, CHAN_WEAPON, "common/wpn_hudon.wav", 1.0,ATTN_NORM, 0, 100);
 	}
 }
 
 bool WaypointLoad(edict_t *pEntity, const char *szDir)
 {
-	if(pEntity&&bool(jb_wpsound->value))
+	if(pEntity&&CVAR_BOOL(jb_wpsound))
 		CLIENT_COMMAND(pEntity,"speak \"loading\"\n");
 	
 	char mapname[64];
@@ -2155,7 +2155,7 @@ bool WaypointSave(edict_t *pEntity,const char *szDir)
 		fclose(bfp);
 
 		if(pEntity
-			&&bool(jb_wpsound->value))
+			&&CVAR_BOOL(jb_wpsound))
 			CLIENT_COMMAND(pEntity,"speak \"save\"\n");
 		return true;
 	}
@@ -2863,7 +2863,7 @@ void WaypointThink(edict_t *pEntity)
 	int p;
 	static bool bwpon;
 	
-	if (bool(jb_wpauto->value))  // is auto waypoint on?
+	if (CVAR_BOOL(jb_wpauto))  // is auto waypoint on?
 	{
 		edict_t *pEnt;
 		int iNearL,iNear,iAdd=-1;
@@ -2872,7 +2872,7 @@ void WaypointThink(edict_t *pEntity)
 		for (i = gpGlobals->maxClients; i ; i--){
 			pEnt = INDEXENT(i);
 			
-			if(!bool(jb_wpautobots->value)){		// only humans can autowaypoint
+			if(!CVAR_BOOL(jb_wpautobots)){		// only humans can autowaypoint
 				if(UTIL_GetBotIndex(pEnt) == -1){
 					continue;
 				}
@@ -2902,7 +2902,7 @@ void WaypointThink(edict_t *pEntity)
 							iAdd = WaypointAdd(pEnt);
 					}
 				}
-				if(pEnt->v.button & IN_JUMP && bool(jb_wpautojump->value) && !bRec[i]){
+				if(pEnt->v.button & IN_JUMP && CVAR_BOOL(jb_wpautojump) && !bRec[i]){
 					AWP_ED[i].fLJumpTime = gpGlobals->time;
 					iNearL = WaypointFindNearestGoal(pEnt->v.origin,pEnt,50,UTIL_GetTeam(pEnt),W_FL_JUMP);
 
@@ -2965,7 +2965,7 @@ void WaypointThink(edict_t *pEntity)
 						VEnd = pEnt -> v.origin - Vector(0,0,24);
 					}
 					UTIL_TraceLine(VStart,VEnd,ignore_monsters,dont_ignore_glass,pEnt,&tr);
-					if(!bool(jb_wpautojumptest->value)
+					if(!CVAR_BOOL(jb_wpautojumptest)
 						|| tr.flFraction != 1.0
 						|| !WaypointReachable(AWP_ED[i].VLastJumpStartOrigin,pEnt->v.origin,pEnt)){		// i.e. line is fract and there is the need of using a jump wp or the location isn't reachable
 						// add wp at start
@@ -3011,7 +3011,7 @@ void WaypointThink(edict_t *pEntity)
 						
 						ADVL[i].iIndexEndWP = iNearL;
 						
-						if(bool(jb_wpautoadvanced->value))
+						if(CVAR_BOOL(jb_wpautoadvanced))
 							WaypointAddADV(ADVL[i].iIndexStartWP,ADVL[i].iIndexEndWP,&ADVL[i]);
 					}
 					else{
@@ -3089,12 +3089,12 @@ void WaypointThink(edict_t *pEntity)
 	PATH *ppath;
 	bool b1ND;
 	
-	if(bwpon != bool(jb_wp->value)){
+	if(bwpon != CVAR_BOOL(jb_wp)){
 		for (i=0; i < num_waypoints; i++)
 			wp_display_time[i] = 0;
 	}
 	
-	if (bool(jb_wp->value) && g_b5th)  // display the waypoints if turned on...
+	if (CVAR_BOOL(jb_wp) && g_b5th)  // display the waypoints if turned on...
 	{
 		// display information :
 		if(listenserver_edict && listenserver_edict == pEntity){
@@ -3125,7 +3125,7 @@ void WaypointThink(edict_t *pEntity)
 			UTIL_ShowText(listenserver_edict,message_params,szWPInfo);
 		}
 		//bool bnot;
-		bwpon = bool(jb_wp->value);
+		bwpon = CVAR_BOOL(jb_wp);
 		b1ND = 0;
 		if(pEntity == pEdictPlayer)
 			for (i=0; i < num_waypoints; i++)
@@ -3286,7 +3286,7 @@ void WaypointThink(edict_t *pEntity)
 							b1ND |= WaypointDrawBeam(pEntity, start, eend, iWidth, 2, 0,255,0, 250, 5);
 						}
 #ifdef DEBUGMESSAGES
-						if(bool(jb_wpstats->value)){
+						if(CVAR_BOOL(jb_wpstats)){
 							start = waypoints[i].origin + Vector(20,0,-20);
 							eend = waypoints[i].origin + Vector(20,0,0);
 							b1ND |= WaypointDrawBeam(pEntity, start, eend, iWidth/2, 2, 0,255,0, 50, 5);
@@ -3424,7 +3424,7 @@ void WaypointThink(edict_t *pEntity)
       }
 	  
       // check if path waypointing is on...
-      if (bool(jb_wppath->value))
+      if (CVAR_BOOL(jb_wppath))
       {
 		  // check if player is close enough to a waypoint and time to draw path...
 		  if ((min_distance <= 50) && (f_path_time <= gpGlobals->time))

@@ -44,7 +44,7 @@
 void BotBuy_CS_WEAPON_P228(CBotBase *pBot){
 	edict_t *pEdict = pBot->pEdict;
 	
-	if (bool(jb_cstrike15->value))
+	if (CVAR_BOOL(jb_cstrike15))
 		FakeClientCommand(pEdict,"buy;menuselect 1;menuselect 4");
 	else
 		FakeClientCommand(pEdict,"buy;menuselect 1;menuselect 3");
@@ -53,7 +53,7 @@ void BotBuy_CS_WEAPON_P228(CBotBase *pBot){
 void BotBuy_CS_WEAPON_SCOUT(CBotBase *pBot){
 	edict_t *pEdict = pBot->pEdict;
 	
-	if (bool(jb_cstrike15->value))
+	if (CVAR_BOOL(jb_cstrike15))
 		FakeClientCommand(pEdict,"buy;menuselect 4;menuselect 5");
 	else
 	{
@@ -84,7 +84,7 @@ void BotBuy_CS_WEAPON_XM1014(CBotBase *pBot){
 void BotBuy_CS_WEAPON_MAC10(CBotBase *pBot){
 	edict_t *pEdict = pBot->pEdict;
 	
-	if (bool(jb_cstrike15->value))
+	if (CVAR_BOOL(jb_cstrike15))
 		FakeClientCommand(pEdict,"buy;menuselect 3;menuselect 4");
 	else
 		FakeClientCommand(pEdict,"buy;menuselect 3;menuselect 1");
@@ -111,7 +111,7 @@ void BotBuy_CS_WEAPON_ELITE(CBotBase *pBot){
 void BotBuy_CS_WEAPON_FIVESEVEN(CBotBase *pBot){
 	edict_t *pEdict = pBot->pEdict;
 	
-	if (bool(jb_cstrike15->value))
+	if (CVAR_BOOL(jb_cstrike15))
 		FakeClientCommand(pEdict,"buy;menuselect 1;menuselect 6");
 	else
 		FakeClientCommand(pEdict,"buy;menuselect 1;menuselect 5");
@@ -120,7 +120,7 @@ void BotBuy_CS_WEAPON_FIVESEVEN(CBotBase *pBot){
 void BotBuy_CS_WEAPON_UMP45(CBotBase *pBot){
 	edict_t *pEdict = pBot->pEdict;
 	
-	if (bool(jb_cstrike15->value))
+	if (CVAR_BOOL(jb_cstrike15))
 		FakeClientCommand(pEdict,"buy;menuselect 3;menuselect 5");
 	else
 		FakeClientCommand(pEdict,"buy;menuselect 3;menuselect 3");
@@ -129,7 +129,7 @@ void BotBuy_CS_WEAPON_UMP45(CBotBase *pBot){
 void BotBuy_CS_WEAPON_SG550(CBotBase *pBot){
 	edict_t *pEdict = pBot->pEdict;
 	
-	if (bool(jb_cstrike15->value))
+	if (CVAR_BOOL(jb_cstrike15))
 		FakeClientCommand(pEdict,"buy;menuselect 4;menuselect 8");
 	else
 		FakeClientCommand(pEdict,"buy;menuselect 4;menuselect 5");
@@ -162,7 +162,7 @@ void BotBuy_CS_WEAPON_GLOCK18(CBotBase *pBot){
 void BotBuy_CS_WEAPON_AWP(CBotBase *pBot){
 	edict_t *pEdict = pBot->pEdict;
 	
-	if (bool(jb_cstrike15->value))
+	if (CVAR_BOOL(jb_cstrike15))
 		FakeClientCommand(pEdict,"buy;menuselect 4;menuselect 6");
 	else
 	{
@@ -181,7 +181,7 @@ void BotBuy_CS_WEAPON_AWP(CBotBase *pBot){
 void BotBuy_CS_WEAPON_MP5NAVY(CBotBase *pBot){
 	edict_t *pEdict = pBot->pEdict;
 	
-	if (bool(jb_cstrike15->value))
+	if (CVAR_BOOL(jb_cstrike15))
 		FakeClientCommand(pEdict,"buy;menuselect 3;menuselect 1");
 	else
 		FakeClientCommand(pEdict,"buy;menuselect 3;menuselect 2");
@@ -208,7 +208,7 @@ void BotBuy_CS_WEAPON_M4A1(CBotBase *pBot){
 void BotBuy_CS_WEAPON_TMP(CBotBase *pBot){
 	edict_t *pEdict = pBot->pEdict;
 	
-	if (bool(jb_cstrike15->value))
+	if (CVAR_BOOL(jb_cstrike15))
 		FakeClientCommand(pEdict,"buy;menuselect 3;menuselect 2");
 	else
 		FakeClientCommand(pEdict,"buy;menuselect 3;menuselect 1");
@@ -217,7 +217,7 @@ void BotBuy_CS_WEAPON_TMP(CBotBase *pBot){
 void BotBuy_CS_WEAPON_G3SG1(CBotBase *pBot){
 	edict_t *pEdict = pBot->pEdict;
 	
-	if (bool(jb_cstrike15->value))
+	if (CVAR_BOOL(jb_cstrike15))
 		FakeClientCommand(pEdict,"buy;menuselect 4;menuselect 7");
 	else
 		FakeClientCommand(pEdict,"buy;menuselect 4;menuselect 6");
@@ -232,7 +232,7 @@ void BotBuy_CS_WEAPON_FLASHBANG(CBotBase *pBot){
 void BotBuy_CS_WEAPON_DEAGLE(CBotBase *pBot){
 	edict_t *pEdict = pBot->pEdict;
 	
-	if (bool(jb_cstrike15->value))
+	if (CVAR_BOOL(jb_cstrike15))
 		FakeClientCommand(pEdict,"buy;menuselect 1;menuselect 3");
 	else
 		FakeClientCommand(pEdict,"buy;menuselect 1;menuselect 4");
@@ -241,7 +241,7 @@ void BotBuy_CS_WEAPON_DEAGLE(CBotBase *pBot){
 void BotBuy_CS_WEAPON_SG552(CBotBase *pBot){
 	edict_t *pEdict = pBot->pEdict;
 	
-	if (bool(jb_cstrike15->value))
+	if (CVAR_BOOL(jb_cstrike15))
 		FakeClientCommand(pEdict,"buy;menuselect 4;menuselect 2");
 	else
 		FakeClientCommand(pEdict,"buy;menuselect 4;menuselect 4");
@@ -250,7 +250,7 @@ void BotBuy_CS_WEAPON_SG552(CBotBase *pBot){
 void BotBuy_CS_WEAPON_AK47(CBotBase *pBot){
 	edict_t *pEdict = pBot->pEdict;
 	
-	if (bool(jb_cstrike15->value))
+	if (CVAR_BOOL(jb_cstrike15))
 		FakeClientCommand(pEdict,"buy;menuselect 4;menuselect 1");
 	else
 		FakeClientCommand(pEdict,"buy;menuselect 4;menuselect 2");
@@ -259,7 +259,7 @@ void BotBuy_CS_WEAPON_AK47(CBotBase *pBot){
 void BotBuy_CS_WEAPON_P90(CBotBase *pBot){
 	edict_t *pEdict = pBot->pEdict;
 	
-	if (bool(jb_cstrike15->value))
+	if (CVAR_BOOL(jb_cstrike15))
 		FakeClientCommand(pEdict,"buy;menuselect 3;menuselect 3");
 	else
 		FakeClientCommand(pEdict,"buy;menuselect 3;menuselect 4");
@@ -298,7 +298,7 @@ void BotBuy_CS_WEAPON_Defuse(CBotBase *pBot){
 void BotBuy_CS_WEAPON_NightVision(CBotBase *pBot){
 	edict_t *pEdict = pBot->pEdict;
 	
-	if (bool(jb_cstrike15->value))
+	if (CVAR_BOOL(jb_cstrike15))
 		FakeClientCommand(pEdict,"buyequip;menuselect 7");
 	else
 	{

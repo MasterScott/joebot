@@ -237,7 +237,7 @@ bool CBotDOD :: HeadTowardWaypoint(void){
 							Task.AddTask(BT_CAMP,fDuration,0,0,0);
 							//FakeClientCommand(pEdict,"say %f",Task.current->fAdd);
 							InitCamp();
-							if(bool(jb_msgradio->value) && Task.current->p){
+							if(CVAR_BOOL(jb_msgradio) && Task.current->p){
 								SendRadioCommand(RADIO_IM_IN_POSITION);
 							}
 							if(f_RWKnife > gpGlobals->time)

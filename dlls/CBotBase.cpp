@@ -2159,7 +2159,7 @@ void CBotBase :: InstantTurn(void){
 }
 
 void CBotBase :: MakeName(char *szName,const char *szBotName,int iSkill,float fAgg){
-	if(bool(jb_prefixaggression->value)){
+	if(CVAR_BOOL(jb_prefixaggression)){
 		if(fAgg < -.5){
 			sprintf(szName,"%s%s",jb_prefixdefensive->string,szBotName);
 		}
@@ -2174,7 +2174,7 @@ void CBotBase :: MakeName(char *szName,const char *szBotName,int iSkill,float fA
 		sprintf(szName,"%s",szBotName);
 	}
 	
-	if(bool(jb_suffixskill->value)){
+	if(CVAR_BOOL(jb_suffixskill)){
 		char szSkill[10];
 		sprintf(szSkill,"(%i)",iSkill);
 		strcat(szName,szSkill);
@@ -2439,7 +2439,7 @@ bool CBotBase :: HandleNearWP(int iNearWP, bool &bReturn){
 							ResetWPlanning();
 							Task.AddTask(BT_CAMP,gpGlobals->time + _CAMPTIME * RANDOM_FLOAT(.5,2),0,0,0);
 							InitCamp();
-							if(bool(jb_msgradio->value))
+							if(CVAR_BOOL(jb_msgradio))
 								FakeClientCommand(pEdict,"radio3;menuselect 5");
 							if(f_RWKnife > gpGlobals->time)
 								f_RWKnife = gpGlobals->time;
@@ -2858,7 +2858,7 @@ bool CBotBase :: Camp(void){
 		}
 		if(f_UsedRadio < gpGlobals->time - 2.0){
 			if(Ordered.lAction & BO_AFF
-				&& bool(jb_msgradio->value)){
+				&& CVAR_BOOL(jb_msgradio)){
 				SendRadioCommand(RADIO_YOU_TAKE_THE_POINT);
 				Ordered.lAction=0;
 			}

@@ -268,7 +268,7 @@ void NNWeapon :: Init(void){
 	fPBuyProb[CSTRIKE_DLL][CS_WEAPON_AUG]			= 20;
 	fPBuyProb[CSTRIKE_DLL][CS_WEAPON_UMP45]			= 15;
 	fPBuyProb[CSTRIKE_DLL][CS_WEAPON_SG550]			= 5;
-	//if (!bool(jb_cstrike15->value))
+	//if (!CVAR_BOOL(jb_cstrike15))
 	//{
 		fPBuyProb[CSTRIKE_DLL][CS_WEAPON_GALIL]		= 10;
 		fPBuyProb[CSTRIKE_DLL][CS_WEAPON_FAMAS]		= 10;
@@ -290,7 +290,7 @@ void NNWeapon :: Init(void){
 	fPBuyProb[CSTRIKE_DLL][CS_WEAPON_AUG]			= 10;
 	fPBuyProb[CSTRIKE_DLL][CS_WEAPON_UMP45]			= 10;
 	fPBuyProb[CSTRIKE_DLL][CS_WEAPON_SG550]			= 10;
-	if (!bool(jb_cstrike15->value))
+	if (!CVAR_BOOL(jb_cstrike15))
 	{
 		fPBuyProb[CSTRIKE_DLL][CS_WEAPON_GALIL]		= 10;
 		fPBuyProb[CSTRIKE_DLL][CS_WEAPON_FAMAS]		= 10;

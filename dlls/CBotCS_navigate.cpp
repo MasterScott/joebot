@@ -660,7 +660,7 @@ bool CBotCS :: Bored(void){
 		}
 		else if(i_BorA == 3
 			||  i_BorA == 4){		// spray
-			if(bool(jb_spraypaint->value)){
+			if(CVAR_BOOL(jb_spraypaint)){
 				TraceResult tr;
 				Vector v1,v2;
 				v1 = pEdict -> v.origin + pEdict -> v.view_ofs;
@@ -769,7 +769,7 @@ bool CBotCS :: HandleNearWP(int iNearWP, bool &bReturn){
 						if(!bBomb
 							&&f_UsedRadio+5.0 < gpGlobals->time
 							&& f_LastRadio + 3.0f < gpGlobals->time
-							&& bool(jb_msgradio->value)){
+							&& CVAR_BOOL(jb_msgradio)){
 							SendRadioCommand(RADIO_SECTOR_CLEAR);
 						}
 					}
@@ -897,7 +897,7 @@ bool CBotCS :: HeadTowardWaypoint( void ){
 							Task.AddTask(BT_CAMP,fDuration,0,0,0);
 							//FakeClientCommand(pEdict,"say %f",Task.current->fAdd);
 							//InitCamp();
-							if(bool(jb_msgradio->value) && Task.current->p){
+							if(CVAR_BOOL(jb_msgradio) && Task.current->p){
 								SendRadioCommand(RADIO_IM_IN_POSITION);
 							}
 							if(f_RWKnife > gpGlobals->time)

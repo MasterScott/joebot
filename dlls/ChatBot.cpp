@@ -58,7 +58,7 @@ int CChatBot :: Talk(CBotBase *pBBot){
 	int iSentence;
 	edict_t *pEdict = pBBot->pEdict;
 
-	if(!bool(jb_chat->value) || bLoadFailed)
+	if(!CVAR_BOOL(jb_chat) || bLoadFailed)
 		return false;
 
 	if(!pChat && !bLoadFailed)

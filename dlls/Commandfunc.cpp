@@ -527,7 +527,7 @@ bool bc_mix_names(edict_t *pEntity,int iType,const char *arg1,const char *arg2,c
 		if (IS_DEDICATED_SERVER())UTIL_ConsoleMessage(pEntity, "NOTE: This command only takes effect before adding bots\n");
 		CVAR_SET_FLOAT("jb_mixnames", 0);
 	}
-	if ( bool(jb_mixnames->value) ){
+	if ( CVAR_BOOL(jb_mixnames) ){
 		if (IS_DEDICATED_SERVER())UTIL_ConsoleMessage(pEntity, "Bot names order is random\n");
 	}
 	else{
@@ -543,7 +543,7 @@ bool bc_welcome(edict_t *pEntity,int iType,const char *arg1,const char *arg2,con
 	else if (FStrEq(arg1, "off")){
 		CVAR_SET_FLOAT("jb_msgwelcome", 0);
 	}
-	if(bool(jb_msgwelcome->value)){
+	if(CVAR_BOOL(jb_msgwelcome)){
 		if(IS_DEDICATED_SERVER()){
 			UTIL_ConsoleMessage(pEntity, "Welcome messages are ON\n");
 		}
@@ -569,7 +569,7 @@ bool bc_extjoe(edict_t *pEntity,int iType,const char *arg1,const char *arg2,cons
 	else if (FStrEq(arg1, "off")){
 		CVAR_SET_FLOAT("jb_prefixaggression", 0);
 	}
-	if(bool(jb_prefixaggression->value)){
+	if(CVAR_BOOL(jb_prefixaggression)){
 		UTIL_ConsoleMessage(pEntity, "Bot name aggression prefix is ON (%s, %s or %s)\n",jb_prefixaggressive->string,jb_prefixnormal->string,jb_prefixdefensive->string);
 	}
 	else{
@@ -585,7 +585,7 @@ bool bc_extskill(edict_t *pEntity,int iType,const char *arg1,const char *arg2,co
 	else if (FStrEq(arg1, "off")){
 		CVAR_SET_FLOAT("jb_suffixskill", 0);
 	}
-	if(bool(jb_suffixskill->value)){
+	if(CVAR_BOOL(jb_suffixskill)){
 		UTIL_ConsoleMessage(pEntity, "Bot name skill suffix is ON\n");
 	}
 	else{
@@ -665,7 +665,7 @@ bool bc_botchat(edict_t *pEntity,int iType,const char *arg1,const char *arg2,con
 		CVAR_SET_FLOAT("jb_chatfreq", chatfreq);
 		CVAR_SET_FLOAT("jb_chat", 1);
 	}
-	if(bool(jb_chat->value)){
+	if(CVAR_BOOL(jb_chat)){
 		UTIL_ConsoleMessage(pEntity, "Bot chat frequenty set @ %fs\n",jb_chatfreq->value);
 		/*if(listenserver_edict);
 			CLIENT_COMMAND(listenserver_edict,"speak \"talk system is on\"\n");*/
@@ -721,7 +721,7 @@ bool bc_botuseradio(edict_t *pEntity,int iType,const char *arg1,const char *arg2
 	else if (FStrEq(arg1, "off")){
 		CVAR_SET_FLOAT("jb_msgradio", 0);
 	}
-	if(bool(jb_msgradio->value)){
+	if(CVAR_BOOL(jb_msgradio)){
 		UTIL_ConsoleMessage(pEntity, "Bots use radio commands\n");
 	}
 	else{
@@ -966,7 +966,7 @@ bool bc_edown(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const
 	else if (FStrEq(arg1, "off")){
 		CVAR_SET_FLOAT("jb_msgenemydown", 0);
 	}
-	if(bool(jb_msgenemydown->value)){
+	if(CVAR_BOOL(jb_msgenemydown)){
 		UTIL_ConsoleMessage(pEntity, "Bots report \"Enemy down\"\n");
 	}
 	else{
@@ -1060,7 +1060,7 @@ bool bc_botshoot(edict_t *pEntity,int iType,const char *arg1,const char *arg2,co
 	{
 		CVAR_SET_FLOAT("jb_shoot", 0);
 	}
-	if (bool(jb_shoot->value)){
+	if (CVAR_BOOL(jb_shoot)){
 		UTIL_ConsoleMessage(pEntity, "Bots shoot is ON (they aren't friendly)\n");
 	}
 	else{
@@ -1079,7 +1079,7 @@ bool bc_bottkpunish(edict_t *pEntity,int iType,const char *arg1,const char *arg2
 	{
 		CVAR_SET_FLOAT("jb_tkpunish", 0);
 	}
-	if (bool(jb_tkpunish->value)){
+	if (CVAR_BOOL(jb_tkpunish)){
 		UTIL_ConsoleMessage(pEntity, "Bots tkpunish is ON (they sometimes shoot at a teamm8 after a tk)\n");
 	}
 	else{
@@ -1187,11 +1187,11 @@ bool bc_menuselect(edict_t *pEntity,int iType,const char *arg1,const char *arg2,
 		else if (g_menu_state == MENU_2)  // wp - menu
 		{
 			if (FStrEq(arg1, "1")){			// toggle waypoints on/off
-				CVAR_SET_FLOAT("jb_wp", bool(jb_wp->value) ? 0 : 1);
+				CVAR_SET_FLOAT("jb_wp", CVAR_BOOL(jb_wp) ? 0 : 1);
 			}
 			else if (FStrEq(arg1, "2")){	// toggle auto waypoint on/off
-				CVAR_SET_FLOAT("jb_wpauto", bool(jb_wpauto->value) ? 0 : 1);
-				if(bool(jb_wpauto->value)){
+				CVAR_SET_FLOAT("jb_wpauto", CVAR_BOOL(jb_wpauto) ? 0 : 1);
+				if(CVAR_BOOL(jb_wpauto)){
 					if(listenserver_edict)
 						CLIENT_COMMAND(listenserver_edict,"speak \"automatic observation system engaged\"\n");
 				}
@@ -1207,13 +1207,13 @@ bool bc_menuselect(edict_t *pEntity,int iType,const char *arg1,const char *arg2,
 				CVAR_SET_FLOAT("jb_wpautopath", jb_wpautopath->value ? 0 : 1);
 			}
 			else if (FStrEq(arg1, "4")){
-				if (!bool(jb_wp->value))
+				if (!CVAR_BOOL(jb_wp))
 					CVAR_SET_FLOAT("jb_wp", 1);  // turn waypoints on if off
 				
 				WaypointAdd(pEntity);
 			}
 			else if (FStrEq(arg1, "5")){
-				if (!bool(jb_wp->value))
+				if (!CVAR_BOOL(jb_wp))
 					CVAR_SET_FLOAT("jb_wp", 1);  // turn waypoints on if off
 				
 				WaypointDelete(pEntity);
@@ -1501,14 +1501,14 @@ bool bc_waypoint(edict_t *pEntity,int iType,const char *arg1,const char *arg2,co
 		  }
 		  else if (FStrEq(arg1, "add"))
 		  {
-			  if (!bool(jb_wp->value))
+			  if (!CVAR_BOOL(jb_wp))
 				  CVAR_SET_FLOAT("jb_wp", 1);  // turn waypoints on if off
 			  
 			  WaypointAdd(pEntity);
 		  }
 		  else if (FStrEq(arg1, "delete"))
 		  {
-			  if (!bool(jb_wp->value))
+			  if (!CVAR_BOOL(jb_wp))
 				  CVAR_SET_FLOAT("jb_wp", 1);  // turn waypoints on if off
 			  
 			  WaypointDelete(pEntity);
@@ -1658,7 +1658,7 @@ bool bc_waypoint(edict_t *pEntity,int iType,const char *arg1,const char *arg2,co
 				  UTIL_ConsoleMessage( pEntity,  "Statistics are recalculated on changes\n");
 			  }
 			  else{
-				  if(!bool(jb_wprecalc->value)){
+				  if(!CVAR_BOOL(jb_wprecalc)){
 					  UTIL_ConsoleMessage( pEntity,  "Statistics are NOT recalculated on changes\n");
 				  }
 				  else{
@@ -1680,7 +1680,7 @@ bool bc_waypoint(edict_t *pEntity,int iType,const char *arg1,const char *arg2,co
 				  UTIL_ConsoleMessage( pEntity,  "Sound messages for waypointing are OFF\n");
 			  }
 			  else{
-				  if(bool(jb_wpsound->value)){
+				  if(CVAR_BOOL(jb_wpsound)){
 					  UTIL_ConsoleMessage( pEntity,  "Sound messages for waypointing are ON\n");
 				  }
 				  else{
@@ -1733,7 +1733,7 @@ bool bc_autowaypoint(edict_t *pEntity,int iType,const char *arg1,const char *arg
 			UTIL_ConsoleMessage( pEntity,  "Testing Jump wp while autowaypoint is OFF\n");
 		}
 		else{
-			if(bool(jb_wpautojumptest->value)){
+			if(CVAR_BOOL(jb_wpautojumptest)){
 				UTIL_ConsoleMessage( pEntity,  "Testing Jump wp while autowaypoint is ON\n");
 			}
 			else{
@@ -1741,22 +1741,22 @@ bool bc_autowaypoint(edict_t *pEntity,int iType,const char *arg1,const char *arg
 			}
 		}
 	}
-	if(!bool(jb_wpautobots->value)){
-		if (bool(jb_wpauto->value))
+	if(!CVAR_BOOL(jb_wpautobots)){
+		if (CVAR_BOOL(jb_wpauto))
 			UTIL_ConsoleMessage(pEntity,  "Autowaypoint (by humans) is ON\n");
 		else
 			UTIL_ConsoleMessage(pEntity,  "Autowaypoint (by humans) is OFF\n");
 	}
 	else{
-		if (bool(jb_wpauto->value))
+		if (CVAR_BOOL(jb_wpauto))
 			UTIL_ConsoleMessage(pEntity,  "Autowaypoint (by players) is ON\n");
 		else
 			UTIL_ConsoleMessage(pEntity,  "Autowaypoint (by players) is OFF\n");
 	}
 	
-	if (bool(jb_wpauto->value)){
+	if (CVAR_BOOL(jb_wpauto)){
 		if(listenserver_edict)
-			if(!bool(jb_wpautobots->value)){
+			if(!CVAR_BOOL(jb_wpautobots)){
 				CLIENT_COMMAND(listenserver_edict,"speak \"automatic observation system engaged with one authorized inspector\"\n");
 			}else{
 				CLIENT_COMMAND(listenserver_edict,"speak \"automatic observation system engaged with all\"\n");
@@ -1780,7 +1780,7 @@ bool bc_autowaypointaddjump(edict_t *pEntity,int iType,const char *arg1,const ch
 		CVAR_SET_FLOAT("jb_wpautojump", 0);
 	}
 	
-	if (bool(jb_wpautojump->value))
+	if (CVAR_BOOL(jb_wpautojump))
 		UTIL_ConsoleMessage(pEntity,  "jb_wpautojump is ON -> a jump waypoint is added while autowaypointing for human players\n");
 	else
 		UTIL_ConsoleMessage(pEntity,  "jb_wpautojump is OFF -> a jump waypoint is NOT added while autowaypointing for human players\n");
@@ -1798,7 +1798,7 @@ bool bc_advancedmovements(edict_t *pEntity,int iType,const char *arg1,const char
 		CVAR_SET_FLOAT("jb_wpautoadvanced", 0);
 	}
 	
-	if (bool(jb_wpautoadvanced->value))
+	if (CVAR_BOOL(jb_wpautoadvanced))
 		UTIL_ConsoleMessage(pEntity,  "jb_wpautoadvanced is ON -> advanced movement system is used\n");
 	else
 		UTIL_ConsoleMessage(pEntity,  "jb_wpautoadvanced is OFF -> advanced movement system is NOT used\n");
@@ -1816,7 +1816,7 @@ bool bc_autopath(edict_t *pEntity,int iType,const char *arg1,const char *arg2,co
 		CVAR_SET_FLOAT("jb_wpautopath", 0);
 	}
 	
-	if (bool(jb_wpautopath->value))
+	if (CVAR_BOOL(jb_wpautopath))
 		UTIL_ConsoleMessage(pEntity,  "jb_wpautopath is ON\n");
 	else
 		UTIL_ConsoleMessage(pEntity,  "jb_wpautopath is OFF\n");
@@ -1888,7 +1888,7 @@ bool bc_pistolonly(edict_t *pEntity,int iType,const char *arg1,const char *arg2,
 	else if (FStrEq(arg1, "off")){
 		CVAR_SET_FLOAT("jb_pistolonly", 0);
 	}
-	if(bool(jb_pistolonly->value)){
+	if(CVAR_BOOL(jb_pistolonly)){
 		UTIL_ConsoleMessage(pEntity, "Bots only buy pistols\n");
 		if(listenserver_edict)
 			CLIENT_COMMAND(listenserver_edict,"speak \"some weapon are locked\"\n");
@@ -2026,7 +2026,7 @@ bool bc_bot_spraying(edict_t *pEntity,int iType,const char *arg1,const char *arg
 	else if(FStrEq(arg1,"off")){
 		CVAR_SET_FLOAT("jb_spraypaint", 0);
 	}
-	if(bool(jb_spraypaint->value)){
+	if(CVAR_BOOL(jb_spraypaint)){
 		UTIL_ConsoleMessage( pEntity, "Bots use spraypaints\n");
 	}
 	else{
@@ -2046,7 +2046,7 @@ bool bc_joinwhumanmax(edict_t *pEntity,int iType,const char *arg1,const char *ar
 	else if(FStrEq(arg1,"off")){
 		CVAR_SET_FLOAT("jb_entergame", 1);
 	}
-	if(bool(jb_entergame->value)){
+	if(CVAR_BOOL(jb_entergame)){
 		UTIL_ConsoleMessage( pEntity, "Bots will join even if there are no human on the server ( max_bots )\n");
 	}
 	else{
@@ -2066,7 +2066,7 @@ bool bc_joinwhumanres(edict_t *pEntity,int iType,const char *arg1,const char *ar
 	else if(FStrEq(arg1,"off")){
 		CVAR_SET_FLOAT("jb_jointeam", 1);
 	}
-	if(bool(jb_jointeam->value)){
+	if(CVAR_BOOL(jb_jointeam)){
 		UTIL_ConsoleMessage( pEntity, "Bots will respawn even if there are no human players on the server\n");
 	}
 	else{
@@ -2085,7 +2085,7 @@ bool bc_randomwpload(edict_t *pEntity,int iType,const char *arg1,const char *arg
 	else if(FStrEq(arg1,"off")){
 		CVAR_SET_FLOAT("jb_wploadrandom", 0);
 	}
-	if (bool(jb_wploadrandom->value))
+	if (CVAR_BOOL(jb_wploadrandom))
 	{
 		WPStat.Save();
 		g_WPDir.MixIt();
