@@ -22,6 +22,7 @@ Current Developer on Sourceforge/joebot
 ----------------------------------------------------------------------------------------------
 
 - fixed : crash with too long waypoint file paths+names. thx to Watz
+- fixed : crash on exit with some linux+win98 installations
 - number of names in bot_names.txt is now unlimited.
 
 JoeBOT 1.6.2
