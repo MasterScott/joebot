@@ -1686,8 +1686,7 @@ void StartFrame( void )
 										WaypointGetDir(mapname,szFileName);
 										
 										sprintf(szOut1,"JoeBOT %s using waypoint file:\n%s%s\n",_JOEBOTVERSIONWOOS,szFileName,mapname);
-										sprintf(szTemp,"( %li waypoints / stat:%li/%li )",num_waypoints,WPStat.d.lKill,WPStat.lKillMax);
-										strcat(szOut1,szTemp);
+										strcat(szOut1,UTIL_VarArgs("( %li waypoints / stat:%li/%li )",num_waypoints,WPStat.d.lKill,WPStat.lKillMax));
 										
 										strcat(szFileName,STRING(gpGlobals->mapname));
 										strcat(szFileName,".txt");
