@@ -587,7 +587,7 @@ void UTIL_TraceHull(const Vector &vecStart, const Vector &vecEnd, IGNORE_MONSTER
 void UTIL_HostSay( edict_t *pEntity, int teamonly, char *message );
 void UTIL_ShowMenu( edict_t *pEdict, int slots, int displaytime, bool needmore, char *pText );
 void UTIL_ShowText( edict_t *pEntity, const hudtextparms_t &textparms, const char *pMessage );
-void UTIL_BuildFileName(char *filename, const char *arg1, const char *arg2);
+int UTIL_BuildFileName(char *str, size_t size, const char *format, ...);
 
 edict_t	*UTIL_FindEntityInSphere(edict_t *pStartEntity, const Vector &vecCenter, float flRadius);
 edict_t	*UTIL_FindEntityByString(edict_t *pStartEntity, const char *szKeyword, const char *szValue );
@@ -634,12 +634,30 @@ void UTIL_ConsoleMessage(edict_t *pEdict, const char *fmt, ...);
 qboolean UTIL_CallGameEntity(const char *entStr, entvars_t *pev);
 
 #ifndef USE_METAMOD
+
 #define PLID NULL
 #define LOG_MESSAGE UTIL_LogMessage
 #define CALL_GAME_ENTITY(plid, entStr, pev) UTIL_CallGameEntity(entStr, pev)
+
 #ifdef _WIN32
+#define snprintf _snprintf
 #define vsnprintf _vsnprintf
 #endif
+
 #endif /* USE_METAMOD */
+
+// Adapted from metamod
+#ifdef __linux__
+#define UTIL_normalize_pathname(s)
+#elif defined(_WIN32)
+inline void UTIL_normalize_pathname(char *path) {
+	char *cp;
+
+	for (cp = path; *cp; cp++) {
+		if (isupper(*cp)) *cp=tolower(*cp);
+		if (*cp == '\\') *cp = '/';
+	}
+}
+#endif
 
 #endif //__UTIL_H
