@@ -345,7 +345,7 @@ void BotCreate( edict_t *pPlayer, const char *szTeam, const char *szClass,const 
 		ClientPutInServer( BotEnt ); // Pieter van Dijk - use instead of DispatchSpawn() - Hip Hip Hurray!
 #endif
 		
-		BotEnt->v.flags |= FL_THIRDPARTYBOT;
+		BotEnt->v.flags |= FL_FAKECLIENT;
 
 		// initialize all the variables for this bot...
 		SBInfo[clientIndex - 1].respawn_state = RESPAWN_IDLE;

@@ -1820,7 +1820,7 @@ void CBotCS :: Think(void){
 	//TraceResult tr2;
 	bool found_waypoint;
 	
-	pEdict->v.flags |= FL_THIRDPARTYBOT;
+	pEdict->v.flags |= FL_FAKECLIENT;
 	
 	/*if (name[0] == 0)  // name filled in yet?
 	strcpy(name, STRING(pEdict->v.netname));*/

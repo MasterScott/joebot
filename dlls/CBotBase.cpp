@@ -851,7 +851,7 @@ bool CBotBase :: AvoidStuck(void){
 						Vector VDiffBothN = VDiffBoth.Normalize();
 						// is it not a bot ? then go back
 						// is the number of the other bot higher than mine ? then go back
-						if(!(pNearestPT->v.flags & FL_THIRDPARTYBOT)
+						if(!(pNearestPT->v.flags & FL_FAKECLIENT)
 							|| ENTINDEX(pEdict)<ENTINDEX(pNearestPT)){
 							if(iNearWP == -1){
 								iNearWP = WaypointFindNearest(pEdict,1000,bot_teamnm,0,false,false,false);

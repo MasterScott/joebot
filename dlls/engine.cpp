@@ -284,7 +284,7 @@ void pfnClientCommand(edict_t* pEdict, char* szFmt, ...)
 {
 	BOT_LOG("pfnClientCommand", UTIL_VarArgs("szFmt=%s", szFmt));
 	
-	if ( !(pEdict->v.flags & (FL_FAKECLIENT | FL_THIRDPARTYBOT)) )
+	if ( !(pEdict->v.flags & FL_FAKECLIENT) )
 	{
 		char tempFmt[256];
 		va_list argp;
@@ -337,7 +337,7 @@ void pfnMessageBegin(int msg_dest, int msg_type, const float *pOrigin, edict_t *
 			botMsgIndex = UTIL_GetBotIndex(ed);
 
          	// is this message for a bot?
-			if (ed->v.flags & FL_THIRDPARTYBOT || botMsgIndex > -1)
+			if (ed->v.flags & FL_FAKECLIENT || botMsgIndex > -1)
 				botMsgFunction = botmsgs[msg_type];
 		}
 		else
@@ -756,7 +756,7 @@ const char *pfnNameForFunction( uint32 function )
 void pfnClientPrintf( edict_t* pEdict, PRINT_TYPE ptype, const char *szMsg )
 {
 	BOT_LOG("pfnClientPrintf", "");
-	if ( pEdict->v.flags & (FL_FAKECLIENT | FL_THIRDPARTYBOT) )
+	if ( pEdict->v.flags & FL_FAKECLIENT )
 #ifdef USE_METAMOD
 		RETURN_META(MRES_SUPERCEDE);
 
@@ -1157,7 +1157,7 @@ qboolean pfnVoice_SetClientListening(int iReceiver, int iSender, qboolean bListe
 // hl1109
 const char *pfnGetPlayerAuthId(edict_t *e)
 {
-	if (e->v.flags & (FL_FAKECLIENT | FL_THIRDPARTYBOT))
+	if (e->v.flags & FL_FAKECLIENT)
 #ifdef USE_METAMOD
 		RETURN_META_VALUE(MRES_SUPERCEDE, "0");
 #else /* not USE_METAMOD */

@@ -821,7 +821,7 @@ void ClientPutInServer( edict_t *pEntity )
 	int i = ENTINDEX(pEntity) - 1;
 	clients[i] = pEntity;  // store this clients edict in the clients array
 	
-	if ( !(pEntity->v.flags & (FL_FAKECLIENT | FL_THIRDPARTYBOT)) )
+	if ( !(pEntity->v.flags & FL_FAKECLIENT) )
 	{
 		int count = 0;
 		for (i=0; i < 32; i++)
@@ -1614,7 +1614,7 @@ void StartFrame( void )
 										welcome_time[i] = gpGlobals->time + _PAUSE_TIME;  // welcome in 5 seconds
 										continue;
 									}
-									if(pEnt->v.flags & FL_THIRDPARTYBOT){
+									if(pEnt->v.flags & FL_FAKECLIENT){
 										bWelcome[i] = true;
 										continue;
 									}

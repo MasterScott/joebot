@@ -608,7 +608,7 @@ int UTIL_HumansInGame( void )
         if ( FStrEq( STRING( pPlayer->v.netname ), "" ) )
             continue;
 
-        if ( pPlayer->v.flags & (FL_FAKECLIENT | FL_THIRDPARTYBOT) )
+        if ( pPlayer->v.flags & FL_FAKECLIENT )
             continue;
 
         iCount++;

@@ -1304,7 +1304,7 @@ void CBotDOD :: Think(void){
 	TraceResult tr2;
 	bool found_waypoint;
 	
-	pEdict->v.flags |= FL_THIRDPARTYBOT;
+	pEdict->v.flags |= FL_FAKECLIENT;
 	
 	/*if (name[0] == 0)  // name filled in yet?
 	strcpy(name, STRING(pEdict->v.netname));*/
@@ -1851,7 +1851,7 @@ TraceResult tr;
 TraceResult tr2;
 bool found_waypoint;
 
-pEdict->v.flags |= FL_THIRDPARTYBOT;
+pEdict->v.flags |= FL_FAKECLIENT;
 
 if(bNNInitError){
 FakeClientCommand(pEdict,"say NNs couldn't be loaded correctly, i.e. nn.br2 and/or nnc.br2");
