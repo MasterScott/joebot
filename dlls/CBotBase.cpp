@@ -610,10 +610,10 @@ void CBotBase :: PreprocessTasks(void){
 				else{
 					int iWP=-1/*,iWPN,ischl*/;
 					ResetWPlanning();
-					int i = UTIL_GetBotIndex((edict_t*)Task.current->p);
-					if(i != -1){
-						//if(((CBotCS*)bots[i])->Task.SearchT( BT_ROAMTEAM|BT_COVER) != -1){	// just to make it easy ... although i don't like this
-						if(((CBotBase*)bots[i])->Task.SearchP( pEdict) != -1){	// just to make it easy ... although i don't like this
+					CBotBase *pB = UTIL_GetBotPointer((edict_t*)Task.current->p);
+					if(pB){
+						//if(((CBotCS*)pB)->Task.SearchT( BT_ROAMTEAM|BT_COVER) != -1){	// just to make it easy ... although i don't like this
+						if(pB->Task.SearchP( pEdict ) !=1){	// just to make it easy ... although i don't like this
 							//Task.NextTask();
 							//cout << "--------------------------------------------------------------------testing this " << endl;
 							//return false;
@@ -2486,13 +2486,12 @@ bool CBotBase :: HandleNearWP(int iNearWP, bool &bReturn){
 						edict_t *pEnt = 0,
 							*pNearestEdict;
 						float fLDistance;
-						int i;
 						
 						float fDNear = 100000000;
 						Vector VLadderOrigin = (pELadder->v.absmin + pELadder->v.absmax)/2.0;
 						
-						for (i = gpGlobals->maxClients; i ; i--){
-							pEnt = INDEXENT(i);
+						for (int i = 0; i < gpGlobals->maxClients; i++){
+							pEnt = INDEXENT(i + 1);
 							
 							// skip invalid players
 							if ((pEnt) && (!pEnt->free) && (pEnt != pEdict))
