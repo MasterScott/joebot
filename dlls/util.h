@@ -1,26 +1,6 @@
-/******************************************************************************
-
-    JoeBOT - a bot for Counter-Strike
-    Copyright (C) 2000-2002  Johannes Lampel
-
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-******************************************************************************/
 /***
 *
-*	Copyright (c) 1999, 2000 Valve LLC. All rights reserved.
+*	Copyright (c) 1996-2002, Valve LLC. All rights reserved.
 *	
 *	This product contains software technology licensed from Id 
 *	Software, Inc. ("Id Technology").  Id Technology (c) 1996 Id Software, Inc. 
@@ -37,6 +17,8 @@
 //
 #ifndef __UTIL_H
 #define __UTIL_H
+
+#include <string.h>
 
 #ifndef ACTIVITY_H
 #include "activity.h"
@@ -74,8 +56,7 @@ inline edict_t *FIND_ENTITY_BY_TARGET(edict_t *entStart, const char *pszName)
 }	
 
 // Keeps clutter down a bit, when writing key-value pairs
-#define WRITEKEY_INT(pf, szKeyName, iKeyValue)									\
-		ENGINE_FPRINTF(pf, "\"%s\" \"%d\"\n", szKeyName, iKeyValue)
+#define WRITEKEY_INT(pf, szKeyName, iKeyValue) ENGINE_FPRINTF(pf, "\"%s\" \"%d\"\n", szKeyName, iKeyValue)
 #define WRITEKEY_FLOAT(pf, szKeyName, flKeyValue)								\
 		ENGINE_FPRINTF(pf, "\"%s\" \"%f\"\n", szKeyName, flKeyValue)
 #define WRITEKEY_STRING(pf, szKeyName, szKeyValue)								\
@@ -106,16 +87,19 @@ typedef int BOOL;
 #define M_PI			3.14159265358979323846
 
 // Keeps clutter down a bit, when declaring external entity/global method prototypes
-#define DECLARE_GLOBAL_METHOD(MethodName) \
-		extern void DLLEXPORT MethodName( void )
+#define DECLARE_GLOBAL_METHOD(MethodName)  extern void DLLEXPORT MethodName( void )
 #define GLOBAL_METHOD(funcname)					void DLLEXPORT funcname(void)
 
 // This is the glue that hooks .MAP entity class names to our CPP classes
 // The _declspec forces them to be exported by name so we can do a lookup with GetProcAddress()
 // The function is used to intialize / allocate the object for the entity
+#ifdef _WIN32
 #define LINK_ENTITY_TO_CLASS(mapClassName,DLLClassName) \
-	extern "C" EXPORT void mapClassName( entvars_t *pev ); \
+	extern "C" _declspec( dllexport ) void mapClassName( entvars_t *pev ); \
 	void mapClassName( entvars_t *pev ) { GetClassPtr( (DLLClassName *)pev ); }
+#else
+#define LINK_ENTITY_TO_CLASS(mapClassName,DLLClassName) extern "C" void mapClassName( entvars_t *pev ); void mapClassName( entvars_t *pev ) { GetClassPtr( (DLLClassName *)pev ); }
+#endif
 
 
 //
@@ -237,12 +221,6 @@ extern CBaseEntity	*UTIL_FindEntityByClassname(CBaseEntity *pStartEntity, const 
 extern CBaseEntity	*UTIL_FindEntityByTargetname(CBaseEntity *pStartEntity, const char *szName );
 extern CBaseEntity	*UTIL_FindEntityGeneric(const char *szName, Vector &vecSrc, float flRadius );*/
 
-extern edict_t	*UTIL_FindEntityInSphere(edict_t *pStartEntity, const Vector &vecCenter, float flRadius);
-extern edict_t	*UTIL_FindEntityByString(edict_t *pStartEntity, const char *szKeyword, const char *szValue );
-extern edict_t	*UTIL_FindEntityByClassname(edict_t *pStartEntity, const char *szName );
-extern edict_t	*UTIL_FindEntityByTargetname(edict_t *pStartEntity, const char *szName );
-extern edict_t	*UTIL_FindEntityGeneric(const char *szName, Vector &vecSrc, float flRadius );
-
 // returns a CBaseEntity pointer to a player by index.  Only returns if the player is spawned and connected
 // otherwise returns NULL
 // Index is 1 based
@@ -277,7 +255,7 @@ typedef enum { ignore_monsters=1, dont_ignore_monsters=0, missile=2 } IGNORE_MON
 typedef enum { ignore_glass=1, dont_ignore_glass=0 } IGNORE_GLASS;
 extern void			UTIL_TraceLine			(const Vector &vecStart, const Vector &vecEnd, IGNORE_MONSTERS igmon, edict_t *pentIgnore, TraceResult *ptr);
 extern void			UTIL_TraceLine			(const Vector &vecStart, const Vector &vecEnd, IGNORE_MONSTERS igmon, IGNORE_GLASS ignoreGlass, edict_t *pentIgnore, TraceResult *ptr);
-enum { point_hull=0, human_hull=1, large_hull=2, head_hull=3 };
+typedef enum { point_hull=0, human_hull=1, large_hull=2, head_hull=3 } HULLTYPE;
 extern void			UTIL_TraceHull			(const Vector &vecStart, const Vector &vecEnd, IGNORE_MONSTERS igmon, int hullNumber, edict_t *pentIgnore, TraceResult *ptr);
 extern void			UTIL_TraceHull			(const Vector &vecStart, const Vector &vecEnd, IGNORE_MONSTERS igmon, IGNORE_GLASS ignoreGlass,int hullNumber, edict_t *pentIgnore, TraceResult *ptr);
 extern TraceResult	UTIL_GetGlobalTrace		(void);
@@ -292,7 +270,7 @@ extern Vector		UTIL_RandomBloodVector( void );
 extern BOOL			UTIL_ShouldShowBlood( int bloodColor );
 extern void			UTIL_BloodDecalTrace( TraceResult *pTrace, int bloodColor );
 extern void			UTIL_DecalTrace( TraceResult *pTrace, int decalNumber );
-//extern void			UTIL_PlayerDecalTrace( TraceResult *pTrace, int playernum, int decalNumber, BOOL bIsCustom );
+extern void			UTIL_PlayerDecalTrace( TraceResult *pTrace, int playernum, int decalNumber, BOOL bIsCustom );
 extern void			UTIL_GunshotDecalTrace( TraceResult *pTrace, int decalNumber );
 extern void			UTIL_Sparks( const Vector &position );
 extern void			UTIL_Ricochet( const Vector &position, float scale );
@@ -332,8 +310,11 @@ extern BOOL UTIL_GetNextBestWeapon( CBasePlayer *pPlayer, CBasePlayerItem *pCurr
 
 // prints messages through the HUD
 extern void ClientPrint( entvars_t *client, int msg_dest, const char *msg_name, const char *param1 = NULL, const char *param2 = NULL, const char *param3 = NULL, const char *param4 = NULL );
-extern void ClientPrintEx( entvars_t *client, int msg_dest, const char *msg_name, const char *param1 = NULL, const char *param2 = NULL, const char *param3 = NULL, const char *param4 = NULL );
-//void ClientPrint( edict_t *pEntity, int msg_dest, const char *msg_name);
+
+// prints a message to the HUD say (chat)
+extern void			UTIL_SayText( const char *pText, CBaseEntity *pEntity );
+extern void			UTIL_SayTextAll( const char *pText, CBaseEntity *pEntity );
+
 
 typedef struct hudtextparms_s
 {
@@ -349,9 +330,6 @@ typedef struct hudtextparms_s
 	int			channel;
 } hudtextparms_t;
 
-// prints a message to the HUD say (chat)
-extern void			UTIL_SayText( const char *pText, CBaseEntity *pEntity );
-extern void			UTIL_SayTextAll( const char *pText, CBaseEntity *pEntity );
 void UTIL_HostSay( edict_t *pEntity, int teamonly, char *message );
 void UTIL_ShowMenu( edict_t *pEdict, int slots, int displaytime, bool needmore, char *pText );
 void UTIL_ShowText( edict_t *pEntity, const hudtextparms_t &textparms, const char *pMessage );
@@ -460,6 +438,9 @@ extern DLL_GLOBAL int			g_Language;
 #define SVC_CDTRACK			32
 #define SVC_WEAPONANIM		35
 #define SVC_ROOMTYPE		37
+#define SVC_DIRECTOR		51
+
+
 
 // triggers
 #define	SF_TRIGGER_ALLOWMONSTERS	1// monsters allowed to fire this trigger
@@ -515,20 +496,6 @@ void TEXTURETYPE_Init();
 char TEXTURETYPE_Find(char *name);
 float TEXTURETYPE_PlaySound(TraceResult *ptr,  Vector vecSrc, Vector vecEnd, int iBulletType);
 
-#define CBTEXTURENAMEMAX	13			// only load first n chars of name
-
-#define CHAR_TEX_CONCRETE	'C'			// texture types
-#define CHAR_TEX_METAL		'M'
-#define CHAR_TEX_DIRT		'D'
-#define CHAR_TEX_VENT		'V'
-#define CHAR_TEX_GRATE		'G'
-#define CHAR_TEX_TILE		'T'
-#define CHAR_TEX_SLOSH		'S'
-#define CHAR_TEX_WOOD		'W'
-#define CHAR_TEX_COMPUTER	'P'
-#define CHAR_TEX_GLASS		'Y'
-#define CHAR_TEX_FLESH		'F'
-
 // NOTE: use EMIT_SOUND_DYN to set the pitch of a sound. Pitch of 100
 // is no pitch shift.  Pitch > 100 up to 255 is a higher pitch, pitch < 100
 // down to 1 is a lower pitch.   150 to 70 is the realistic range.
@@ -561,7 +528,6 @@ void EMIT_GROUPNAME_SUIT(edict_t *entity, const char *groupname);
 
 #define RANDOM_SOUND_ARRAY( array ) (array) [ RANDOM_LONG(0,ARRAYSIZE( (array) )-1) ]
 
-
 #define PLAYBACK_EVENT( flags, who, index ) PLAYBACK_EVENT_FULL( flags, who, index, 0, (float *)&g_vecZero, (float *)&g_vecZero, 0.0, 0.0, 0, 0, 0, 0 );
 #define PLAYBACK_EVENT_DELAY( flags, who, index, delay ) PLAYBACK_EVENT_FULL( flags, who, index, delay, (float *)&g_vecZero, (float *)&g_vecZero, 0.0, 0.0, 0, 0, 0, 0 );
 
@@ -587,10 +553,17 @@ void UTIL_UnsetGroupTrace( void );
 int UTIL_SharedRandomLong( unsigned int seed, int low, int high );
 float UTIL_SharedRandomFloat( unsigned int seed, float low, float high );
 
-//float UTIL_WeaponTimeBase( void );
+float UTIL_WeaponTimeBase( void );
 
+// Misc. non-Valve defines and prototypes
+edict_t	*UTIL_FindEntityInSphere(edict_t *pStartEntity, const Vector &vecCenter, float flRadius);
+edict_t	*UTIL_FindEntityByString(edict_t *pStartEntity, const char *szKeyword, const char *szValue );
+edict_t	*UTIL_FindEntityByClassname(edict_t *pStartEntity, const char *szName );
+edict_t	*UTIL_FindEntityByTargetname(edict_t *pStartEntity, const char *szName );
+edict_t	*UTIL_FindEntityGeneric(const char *szName, Vector &vecSrc, float flRadius );
+
+void UTIL_SayText(const char *pText, edict_t *pEdict);
 long UTIL_ClientIndex(edict_t *pEdict);
-Vector GetGunPosition(edict_t *pEdict);
 int UTIL_GetTeam(edict_t *pEntity);
 bool UTIL_IsVIP(edict_t *pEntity);
 int UTIL_GetBotIndex(const edict_t *pEdict);
@@ -602,13 +575,15 @@ int UTIL_ClientsInGame( void );
 int UTIL_HumansInGame( void );
 long UTIL_FightingAgainst(edict_t *pEdictToBeSeen,int iTeam,edict_t **pNearest,bool bDuckOnly=false);
 Vector GetGunPosition(edict_t *pEdict);
+Vector VecBModelOrigin(edict_t *pEdict);
+void UTIL_SelectItem(edict_t *pEdict, char *item_name);
 edict_t *GetNearestPlayer(edict_t *pEdict,int iTeam,float &fMin,bool bVisible=false,bool bIVC=false,float fMax = 100000);
 edict_t *GetNearestPlayer(Vector VOrigin,int iTeam,float &fMin,float fMax=100000,edict_t *pNot=0);
 edict_t *GetRandomPlayer(edict_t *pNot,int iTeam,int iAlive);
 edict_t *GetRandomPlayerWO(edict_t *pNot,int iTeam,int iAlive, long lWithout,edict_t *pEdict);
 
-bool UTIL_PlayerDecalTrace( TraceResult *pTrace, int playernum, int decalNumber, BOOL bIsCustom );
-
+bool IsAlive(edict_t *pEdict);
+bool FVisible( const Vector &vecOrigin, edict_t *pEdict );
 bool FVisibleEx(Vector v_start, Vector v_end, bool bignore_doors, bool bignore_breakables, bool bignore_monsters, bool bignore_glass,edict_t *pEdictIgnore);
 bool FVisibleMT( const Vector &vecOrigin,const Vector &VAim,float fSQ,edict_t *pEdict2I);
 
@@ -620,4 +595,4 @@ edict_t *UTIL_BestPlayer(void);
 float GetHosVel(edict_t *pEdict);
 void UTIL_strlwr(char *p);
 
-#endif __UTIL_H
+#endif //__UTIL_H

@@ -1,6 +1,6 @@
 /***
 *
-*	Copyright (c) 1999, 2000 Valve LLC. All rights reserved.
+*	Copyright (c) 1996-2002, Valve LLC. All rights reserved.
 *	
 *	This product contains software technology licensed from Id 
 *	Software, Inc. ("Id Technology").  Id Technology (c) 1996 Id Software, Inc. 
@@ -26,5 +26,6 @@
 #define bits_COND_HEAVY_DAMAGE			( 1 << 9 ) // hurt a lot
 #define bits_COND_SEE_CLIENT			( 1 << 21) // see a client
 #define bits_COND_SEE_NEMESIS			( 1 << 22) // see my nemesis
+
 
 #endif	// SCHEDULE_H
