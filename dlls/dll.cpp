@@ -245,6 +245,9 @@ bool g_bIsSteam = false;
 
 CCommands Commands;
 
+cvar_t *g_sv_maxspeed;		// sv_maxspeed cvar
+cvar_t *g_mp_freezetime;	// mp_freezetime cvar
+
 float gf_5th=0.0;
 float gf_5thd = 0;
 bool g_b5th;
@@ -295,7 +298,6 @@ extern bool bNNInitError;
 bool g_bMyBirthday;
 long g_lAge;
 
-void BotNameInit(void);
 #ifndef USE_METAMOD
 void UpdateClientData(const struct edict_s *ent, int sendweapons, struct clientdata_s *cd);
 #endif /* USE_METAMOD */
@@ -553,6 +555,9 @@ int DispatchSpawn( edict_t *pent )
 		{
 			g_bMyBirthday = MyBirthday();		// check if it is my birthday :D
 			
+			g_sv_maxspeed = CVAR_GET_POINTER("sv_maxspeed");
+			g_mp_freezetime = CVAR_GET_POINTER("mp_freezetime");
+
 			// do level initialization stuff here...
 			WaypointInit();
 			WaypointLoad(NULL);

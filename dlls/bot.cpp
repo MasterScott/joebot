@@ -94,9 +94,6 @@ SOMPattern SP(6);
 bool bNNInit = false;
 bool bNNInitError;
 
-cvar_t *g_sv_maxspeed;		// sv_maxspeed cvar
-cvar_t *g_mp_freezetime;	// mp_freezetime cvar
-
 SInfo SBInfo[32];
 CBotBase *bots[32];   // max of 32 bots in a game
 
@@ -234,9 +231,6 @@ void BotCreate( edict_t *pPlayer, const char *szTeam, const char *szClass,const 
 		//memset(bots, 0, sizeof(bots));
 		for(long l=0;l<32;l++){
 		}
-
-		g_sv_maxspeed = CVAR_GET_POINTER("sv_maxspeed");
-		g_mp_freezetime = CVAR_GET_POINTER("mp_freezetime");
 	}
 	
 	const CBotNamesItem *pName = NULL;
