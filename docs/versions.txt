@@ -22,6 +22,7 @@ Current Developer on Sourceforge/joebot
 ----------------------------------------------------------------------------------------------
 
 - Fixed problems with min_bots
+- some little perfomance issues
 
 JoeBOT 1.6.1 - october 15th, 2002
 - FIXED problems with
