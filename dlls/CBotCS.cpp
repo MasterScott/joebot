@@ -39,96 +39,44 @@ CBotCS :: ~CBotCS(){
 
 void CBotCS :: HandleMenu( void )
 {
-	char c_team[32];
-	char c_class[32];
+	char c_arg[32] = "";
 	
 	// handle Counter-Strike stuff here...
 	
-	if (start_action == MSG_CS_TEAM_SELECT)
+	switch (start_action)
 	{
-		start_action = MSG_CS_IDLE;  // switch back to idle
-		
-		if ((bot_team != 1) && (bot_team != 2) &&
-			(bot_team != 5))
-			bot_team = -1;
-		
-		if (bot_team == -1)
-			//bot_team = RANDOM_LONG(1, 2);
-			bot_team = 5;
-		
-		// select the team the bot wishes to join...
-		if (bot_team == 1)
-			strcpy(c_team, "1");
-		else if (bot_team == 2)
-			strcpy(c_team, "2");
-		else
-			strcpy(c_team, "5");
-		
-		FakeClientCommand(pEdict, "menuselect", c_team, NULL);
-		
-		return;
-	}
-	
-	if (start_action == MSG_CS_CT_SELECT)  // counter terrorist
-	{
-		start_action = MSG_CS_IDLE;  // switch back to idle
-		
-		if ((bot_class < 1) || (bot_class > 4))
-			bot_class = -1;  // use random if invalid
-		
-		if (bot_class == -1)
-			//bot_class = RANDOM_LONG(1, 4);
-			bot_class = 5;
-		
-		// select the class the bot wishes to use...
-		if (bot_class == 1)
-			strcpy(c_class, "1");
-		else if (bot_class == 2)
-			strcpy(c_class, "2");
-		else if (bot_class == 3)
-			strcpy(c_class, "3");
-		else if (bot_class == 4)
-			strcpy(c_class, "4");
-		else
-			strcpy(c_class, "5");  // random
-		
-		FakeClientCommand(pEdict, "menuselect", c_class, NULL);
-		
-		// bot has now joined the game (doesn't need to be started)
-		not_started = 0;
-		
-		return;
-	}
-	
-	if (start_action == MSG_CS_T_SELECT)  // terrorist select
-	{
-		start_action = MSG_CS_IDLE;  // switch back to idle
-		
-		if ((bot_class < 1) || (bot_class > 4))
-			bot_class = -1;  // use random if invalid
-		
-		if (bot_class == -1)
-			//bot_class = RANDOM_LONG(1, 4);
-			bot_class = 5;
-		
-		// select the class the bot wishes to use...
-		if (bot_class == 1)
-			strcpy(c_class, "1");
-		else if (bot_class == 2)
-			strcpy(c_class, "2");
-		else if (bot_class == 3)
-			strcpy(c_class, "3");
-		else if (bot_class == 4)
-			strcpy(c_class, "4");
-		else
-			strcpy(c_class, "5");  // random
-		
-		FakeClientCommand(pEdict, "menuselect", c_class, NULL);
-		
-		// bot has now joined the game (doesn't need to be started)
-		not_started = 0;
-		
-		return;
+		case MSG_CS_IDLE:
+			if (bot_team == 6 && UTIL_HumansInGame())
+				FakeClientCommand(pEdict, "chooseteam", NULL, NULL);
+			break;
+
+		case MSG_CS_TEAM_SELECT:
+			if ((bot_team != 1) && (bot_team != 2) && (bot_team != 5))
+			{
+				if (g_bJoinWHumanRES)
+				{
+					bot_team = UTIL_HumansInGame() ? 5 : 6;
+				}
+				else
+					bot_team = 5; // auto-assign if invalid
+			}
+			sprintf(c_arg, "%d", bot_team);
+			start_action = MSG_CS_IDLE; // switch back to idle
+			not_started = 0;
+			FakeClientCommand(pEdict, "menuselect", c_arg, NULL);
+			break;
+
+		case MSG_CS_CT_SELECT: // counter terrorist
+		case MSG_CS_T_SELECT:  // terrorist
+			if ((bot_class < 1) || (bot_class > 4)) bot_class = 5;  // auto-select if invalid
+			sprintf(c_arg, "%d", bot_class);
+			start_action = MSG_CS_IDLE;  // switch back to idle
+			not_started = 0; // bot has now joined the game (doesn't need to be started)
+			FakeClientCommand(pEdict, "menuselect", c_arg, NULL);
+			break;
+
+		default:
+			;
 	}
 }
 
@@ -1861,7 +1809,7 @@ void CBotCS :: Think(void){
 	if (not_started)
 	{
 		HandleMenu();
-		
+			
 		g_engfuncs.pfnRunPlayerMove( pEdict, pEdict->v.v_angle, 0.0,
 			0, 0, pEdict->v.button, 0, g_msecval);
 		
