@@ -51,6 +51,11 @@
 #include "util.h"
 #include "engine.h"
 
+#ifdef USE_METAMOD
+#define SDK_UTIL_H  // util.h already included
+#include "meta_api.h"
+#endif /* USE_METAMOD */
+
 #include "bot.h"
 #include "bot_func.h"
 #include "bot_modid.h"
@@ -227,7 +232,7 @@ void UTIL_HostSay( edict_t *pEntity, int teamonly, char *message )
 			if(mod_id != CSTRIKE_DLL)
 				sprintf( text, "%c(TEAM) %s : ", 2, STRING( pEntity->v.netname ) );
 			else{
-				if(UTIL_GetTeam(pEntity) == CT){
+				if(UTIL_GetTeam(pEntity) == CS_TEAM_CT){
 					sprintf( text, "%c(Counter-Terrorist) %s : ", 2, STRING( pEntity->v.netname ) );
 				}
 				else
@@ -240,7 +245,7 @@ void UTIL_HostSay( edict_t *pEntity, int teamonly, char *message )
 			if(mod_id != CSTRIKE_DLL)
 				sprintf( text, "%c*DEAD* (TEAM) %s : ", 2, STRING( pEntity->v.netname ) );
 			else{
-				if(UTIL_GetTeam(pEntity) == CT){
+				if(UTIL_GetTeam(pEntity) == CS_TEAM_CT){
 					sprintf( text, "%c*DEAD* (Counter-Terrorist) %s : ", 2, STRING( pEntity->v.netname ) );
 				}
 				else{
@@ -358,7 +363,7 @@ edict_t *DBG_EntOfVars( const entvars_t *pev )
 	if (pev->pContainingEntity != NULL)
 		return pev->pContainingEntity;
 	ALERT(at_console, "entvars_t pContainingEntity is NULL, calling into engine");
-	edict_t* pent = (*g_engfuncs.pfnFindEntityByVars)((entvars_t*)pev);
+	edict_t* pent = FIND_ENTITY_BY_VARS((entvars_t*)pev);
 	if (pent == NULL)
 		ALERT(at_console, "DAMN!  Even the engine couldn't FindEntityByVars!");
 	((entvars_t *)pev)->pContainingEntity = pent;
@@ -375,8 +380,8 @@ int UTIL_GetTeam(edict_t *pEntity)
 		char *infobuffer;
 		char model_name[32];
 		
-		infobuffer = (*g_engfuncs.pfnGetInfoKeyBuffer)( pEntity );
-		strcpy(model_name, (g_engfuncs.pfnInfoKeyValue(infobuffer, "model")));
+		infobuffer = GET_INFOKEYBUFFER( pEntity );
+		strcpy(model_name, INFOKEY_VALUE(infobuffer, "model"));
 		
 		/*if ((FStrEq(model_name, "terror")) ||  // Phoenix Connektion
 			(FStrEq(model_name, "arab")) ||    // L337 Krew
@@ -391,7 +396,7 @@ int UTIL_GetTeam(edict_t *pEntity)
 			(FStrEq(model_name, "gign")) ||   // French GIGN
 			(FStrEq(model_name, "vip")))      // VIP
 		{
-			return CT;
+			return CS_TEAM_CT;
 		}
 
 		/*if ( (*(int *)model_name == ('r'<<24+'r'<<16+'e'<<8+'t')) ||
@@ -400,7 +405,7 @@ int UTIL_GetTeam(edict_t *pEntity)
 			(*(int *)model_name == ('r'<<24+'e'<<16+'u'<<8+'g')) )    
 			return 0;		// it's a terror
 		else
-			return CT;*/
+			return CS_TEAM_CT;*/
 
 			/*
 
@@ -408,11 +413,11 @@ int UTIL_GetTeam(edict_t *pEntity)
 			(*(int *)model_name == ('b'<<24+'a'<<16+'r'<<8+'a')) ||
 			(*(int *)model_name == ('i'<<24+'t'<<16+'r'<<8+'a')) ||
 			(*(int *)model_name == ('r'<<24+'e'<<16+'u'<<8+'g')) )    
-			return TE;		// it's a terror
+			return CS_TEAM_TE;		// it's a terror
 			
 			*/
 		
-		return TE;  // return TE otherwise
+		return CS_TEAM_TE;  // return TE otherwise
 	}
 	else
 	{
@@ -431,8 +436,8 @@ bool UTIL_IsVIP(edict_t *pEntity){
 		char *infobuffer;
 		char model_name[32];
 		
-		infobuffer = (*g_engfuncs.pfnGetInfoKeyBuffer)( pEntity );
-		strcpy(model_name, (g_engfuncs.pfnInfoKeyValue(infobuffer, "model")));
+		infobuffer = GET_INFOKEYBUFFER( pEntity );
+		strcpy(model_name, INFOKEY_VALUE(infobuffer, "model"));
 		return FStrEq(model_name, "vip");
 	}
 	else
@@ -821,7 +826,7 @@ void UTIL_BuildFileName(char *filename, const char *arg1, const char *arg2)
 	else if (mod_id == GEARBOX_DLL)
 		strcpy(filename, "gearbox");	
 	else{
-		*filename = 0;
+		strcpy(filename, "");
 		return;
 	}
 
@@ -1174,6 +1179,64 @@ void UTIL_strlwr(char *p){
 		*p=tolower(*p);
 		p ++;
 	}
+}
+
+char *UTIL_VarArgs( char *format, ... )
+{
+	va_list		argptr;
+	static char		string[1024];
+
+	va_start ( argptr, format );
+	vsnprintf ( string, sizeof(string), format, argptr );
+	va_end   ( argptr );
+
+	return string;
+}
+
+void UTIL_LogPrintf( const char *fmt, ... )
+{
+	// this function is from Will Day's metamod
+	va_list		argptr;
+	static char		string[1024];
+
+	va_start ( argptr, fmt );
+	vsnprintf ( string, sizeof(string), fmt, argptr );
+	va_end   ( argptr );
+
+	// Print to server console
+	ALERT( at_logged, "%s", string );
+}
+
+void UTIL_LogMessage( const char* plid, const char *fmt, ... )
+{
+	// this function is from Will Day's metamod
+	va_list ap;
+	char buf[1024];
+
+	va_start(ap, fmt);
+	vsnprintf(buf, sizeof(buf), fmt, ap);
+	va_end(ap);
+	if (plid)
+		ALERT( at_logged, "[%s] %s\n", buf );
+	else
+		ALERT( at_logged, "[JOEBOT] %s\n", buf );
+}
+
+void UTIL_ConsoleMessage( edict_t *pEdict, const char* fmt, ... )
+{
+	va_list		argptr;
+	static char		string[1024];
+
+	va_start ( argptr, fmt );
+	vsnprintf ( string, sizeof(string), fmt, argptr );
+	va_end   ( argptr );
+
+	if (pEdict)
+		CLIENT_PRINTF( pEdict, print_console, string );
+	else if (listenserver_edict)
+		CLIENT_PRINTF( listenserver_edict, print_console, string );
+	else if (IS_DEDICATED_SERVER())
+		SERVER_PRINT( string );
 }
 
 #ifdef DEBUGENGINE
