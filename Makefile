@@ -9,12 +9,28 @@ include Config.mk
 all: release
 
 release:
-	$(MAKE) -C dlls release_mm
-	$(MAKE) -C dlls release_std
+	$(MAKE) -C dlls OPT=release DLLTYPE=mm
+	$(MAKE) -C dlls OPT=release DLLTYPE=std
 
 debug:
-	$(MAKE) -C dlls debug_mm
-	$(MAKE) -C dlls debug_std
+	$(MAKE) -C dlls OPT=debug DLLTYPE=mm
+	$(MAKE) -C dlls OPT=debug DLLTYPE=std
+
+release_clean:
+	$(MAKE) clean OPT=release DLLTYPE=mm
+	$(MAKE) clean OPT=release DLLTYPE=std
+
+debug_clean:
+	$(MAKE) clean OPT=debug DLLTYPE=mm
+	$(MAKE) clean OPT=debug DLLTYPE=std
+
+release_rebuild:
+	$(MAKE) rebuild OPT=debug DLLTYPE=mm
+	$(MAKE) rebuild OPT=debug DLLTYPE=std
+
+debug_rebuild::
+	$(MAKE) rebuild OPT=debug DLLTYPE=mm
+	$(MAKE) rebuild OPT=debug DLLTYPE=std
 
 clean:
 	$(MAKE) -C dlls $@
