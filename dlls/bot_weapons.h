@@ -160,6 +160,9 @@
 #define DOD_WEAPON_SPADE			19
 #define DOD_WEAPON_M1CARBINE		20
 #define DOD_WEAPON_MG34				21
+#define DOD_WEAPON_GREASEGUN		22
+#define DOD_WEAPON_FG42				23
+#define DOD_WEAPON_K43				24
 
 typedef struct
 {
