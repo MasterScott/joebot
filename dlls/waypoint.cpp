@@ -364,6 +364,10 @@ void WaypointAddADV(short int origin_index, short int aim_index, ADV_WPRecMove *
 	int count = 0;
 	bool bBreak;
 	
+	// check if paths index is out of range
+	if (origin_index > MAX_PATH_INDEX)
+		return;
+
 	p = paths[origin_index];
 	prev = NULL;
 	
@@ -3934,7 +3938,7 @@ unsigned short WaypointRouteFromTo(int src, int dest, int team)
 		unsigned short *pFromTo;
 		
 		if ((team < -1) || (team > 3))
-			return -1;
+			return WAYPOINT_UNREACHABLE;
 		
 		if (team == -1)  // -1 means non-team play
 			team = 0;
@@ -3943,7 +3947,7 @@ unsigned short WaypointRouteFromTo(int src, int dest, int team)
 			team = 0;
 		
 		if (from_to[team] == NULL)  // if no route information just return
-			return -1;
+			return WAYPOINT_UNREACHABLE;
 		
 		pFromTo = from_to[team];
 
