@@ -229,7 +229,7 @@ void WaypointDebug(void)
 #ifdef DEBUGENGINE
 	int y = 1, x = 1;
 	
-	BOT_LOG("WaypointDebug", ("LINKED LIST ERROR!!!"));
+	BOT_LOG("WaypointDebug", "LINKED LIST ERROR!!!");
 	
 	x = x - 1;  // x is zero
 	y = y / x;  // cause an divide by zero exception
@@ -2004,7 +2004,7 @@ bool WaypointLoad(edict_t *pEntity, const char *szDir)
 			LOG_MESSAGE(PLID, "waypoint file %s not found!", filename);
 		
 #ifdef DEBUGENGINE
-		BOT_LOG("WaypointLoad", ("joebot waypoint file \"%s\" not found", filename));
+		BOT_LOG("WaypointLoad", UTIL_VarArgs("joebot waypoint file \"%s\" not found", filename));
 #endif
 		return FALSE;
 	}

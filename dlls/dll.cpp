@@ -70,9 +70,6 @@ CWorldGnome CWG;
 extern GETENTITYAPI other_GetEntityAPI;
 extern GETNEWDLLFUNCTIONS other_GetNewDLLFunctions;
 #endif /* not USE_METAMOD */
-#ifdef DEBUGENGINE
-extern int debug_engine;
-#endif
 extern globalvars_t  *gpGlobals;
 
 #ifdef USE_METAMOD
@@ -550,7 +547,7 @@ int DispatchSpawn( edict_t *pent )
 	{
 		char *pClassname = (char *)STRING(pent->v.classname);
 		
-		BOT_LOG("DispatchSpawn", ("pent=%x, classname=%s, model=%s", pent, pClassname, pent->v.model ? STRING(pent->v.model) : ""));
+		BOT_LOG("DispatchSpawn", UTIL_VarArgs("pent=%x, classname=%s, model=%s", pent, pClassname, pent->v.model ? STRING(pent->v.model) : ""));
 		
 		if (FStrEq(pClassname, "worldspawn"))
 		{
@@ -666,7 +663,7 @@ void DispatchBlocked( edict_t *pentBlocked, edict_t *pentOther )
 
 void DispatchKeyValue( edict_t *pentKeyvalue, KeyValueData *pkvd )
 {
-	//BOT_LOG("DispatchKeyValue", ("pentKeyvalue=%x, %s=%s", pentKeyvalue, pkvd->szKeyName, pkvd->szValue));
+	//BOT_LOG("DispatchKeyValue", UTIL_VarArgs("pentKeyvalue=%x, %s=%s", pentKeyvalue, pkvd->szKeyName, pkvd->szValue));
 	(*other_gFunctionTable.pfnKeyValue)(pentKeyvalue, pkvd);
 }
 
@@ -718,7 +715,7 @@ BOOL ClientConnect( edict_t *pEntity, const char *pszName, const char *pszAddres
 		int i;
 		int count = 0;
 		
-		BOT_LOG("ClientConnect", ("pEntity=%x, pszName=%s", pEntity, pszName));
+		BOT_LOG("ClientConnect", UTIL_VarArgs("pEntity=%x, pszName=%s", pEntity, pszName));
 		
 		// check if this client is the listen server client
 		if (FStrEq(pszAddress, "loopback"))
@@ -783,7 +780,7 @@ void ClientDisconnect( edict_t *pEntity )
 	if (gpGlobals->deathmatch)
 	{
 		int i;
-		BOT_LOG("ClientDisconnect", ("pEntity=%x", pEntity));
+		BOT_LOG("ClientDisconnect", UTIL_VarArgs("pEntity=%x", pEntity));
 		
 		i = 0;
 		while ((i < 32) && (clients[i] != pEntity))
@@ -831,14 +828,14 @@ void ClientDisconnect( edict_t *pEntity )
 #ifndef USE_METAMOD
 void ClientKill( edict_t *pEntity )
 {
-	BOT_LOG("ClientKill", ("pEntity=%x", pEntity));
+	BOT_LOG("ClientKill", UTIL_VarArgs("pEntity=%x", pEntity));
 	(*other_gFunctionTable.pfnClientKill)(pEntity);
 }
 #endif /* not USE_METAMOD */
 
 void ClientPutInServer( edict_t *pEntity )
 {
-	BOT_LOG("ClientPutInServer", ("pEntity=%x", pEntity));
+	BOT_LOG("ClientPutInServer", UTIL_VarArgs("pEntity=%x", pEntity));
 	
 	int i = 0;
 	
@@ -1086,7 +1083,7 @@ void ClientCommand( edict_t *pEntity )
 	if ((gpGlobals->deathmatch) && (!IS_DEDICATED_SERVER()) &&
 		(pEntity == listenserver_edict))
 	{
-		BOT_LOG("ClientCommand", ("g_argv=%s", g_argv));
+		BOT_LOG("ClientCommand", UTIL_VarArgs("g_argv=%s", g_argv));
 		if (Commands.Exec(pEntity, CM_CONSOLE, CMD_ARGV(0), CMD_ARGV(1), CMD_ARGV(2), CMD_ARGV(3), CMD_ARGV(4)))
 #ifdef USE_METAMOD
 			RETURN_META(MRES_SUPERCEDE);
@@ -1105,7 +1102,7 @@ void ClientCommand( edict_t *pEntity )
 #ifndef USE_METAMOD
 void ClientUserInfoChanged( edict_t *pEntity, char *infobuffer )
 {
-	BOT_LOG("ClientUserInfoChanged", ("pEntity=%x, infobuffer=%s", pEntity, infobuffer));
+	BOT_LOG("ClientUserInfoChanged", UTIL_VarArgs("pEntity=%x, infobuffer=%s", pEntity, infobuffer));
 	(*other_gFunctionTable.pfnClientUserInfoChanged)(pEntity, infobuffer);
 }
 
@@ -2092,7 +2089,7 @@ const char *GetGameDescription( void )
 
 void PlayerCustomization( edict_t *pEntity, customization_t *pCust )
 {
-	BOT_LOG("PlayerCustomization", ("pEntity=%x", pEntity));
+	BOT_LOG("PlayerCustomization", UTIL_VarArgs("pEntity=%x", pEntity));
 	(*other_gFunctionTable.pfnPlayerCustomization)(pEntity, pCust);
 }
 
@@ -2188,7 +2185,7 @@ void CreateInstancedBaselines( void )
 
 int InconsistentFile( const edict_t *player, const char *filename, char *disconnect_message )
 {
-	BOT_LOG("InconsistentFile", ("player=%x, filename=%s", player, filename));
+	BOT_LOG("InconsistentFile", UTIL_VarArgs("player=%x, filename=%s", player, filename));
 	return (*other_gFunctionTable.pfnInconsistentFile)(player, filename, disconnect_message);
 }
 

@@ -51,46 +51,44 @@ extern enginefuncs_t g_engfuncs;
 //extern bot_t bots[32];
 extern int mod_id;
 
-int debug_engine = 0;
-
 void (*botMsgFunction)(void *, int, int) = NULL;
 int botMsgIndex;
 
 #ifndef USE_METAMOD
 int pfnPrecacheModel(char* s)
 {
-	BOT_LOG("pfnPrecacheModel", ("s=%s", s));
+	BOT_LOG("pfnPrecacheModel", UTIL_VarArgs("s=%s", s));
 	return (*g_engfuncs.pfnPrecacheModel)(s);
 }
 int pfnPrecacheSound(char* s)
 {
-	BOT_LOG("pfnPrecacheSound", ("s=%s",s));
+	BOT_LOG("pfnPrecacheSound", UTIL_VarArgs("s=%s", s));
 	return (*g_engfuncs.pfnPrecacheSound)(s);
 }
 void pfnSetModel(edict_t *e, const char *m)
 {
-	BOT_LOG("pfnSetModel", ("e=%x, m=%s", e, m));
+	BOT_LOG("pfnSetModel", UTIL_VarArgs("e=%x, m=%s", e, m));
 	(*g_engfuncs.pfnSetModel)(e, m);
 }
 int pfnModelIndex(const char *m)
 {
-	//BOT_LOG("pfnModelIndex", ("m=%s", m));
+	//BOT_LOG("pfnModelIndex", UTIL_VarArgs("m=%s", m));
 	return (*g_engfuncs.pfnModelIndex)(m);
 }
 int pfnModelFrames(int modelIndex)
 {
-	BOT_LOG("pfnModelFrames", (""));
+	BOT_LOG("pfnModelFrames", "");
 	return (*g_engfuncs.pfnModelFrames)(modelIndex);
 }
 void pfnSetSize(edict_t *e, const float *rgflMin, const float *rgflMax)
 {
-	BOT_LOG("pfnSetSize", ("e=%x", e));
+	BOT_LOG("pfnSetSize", UTIL_VarArgs("e=%x", e));
 	(*g_engfuncs.pfnSetSize)(e, rgflMin, rgflMax);
 }
 #endif /* not USE_METAMOD */
 void pfnChangeLevel(char* s1, char* s2)
 {
-	BOT_LOG("pfnChangeLevel", (""));
+	BOT_LOG("pfnChangeLevel", "");
 	
 	// kick any bot off of the server after time/frag limit...
 	for (int index = 0; index < 32; index++)
@@ -112,37 +110,37 @@ void pfnChangeLevel(char* s1, char* s2)
 #ifndef USE_METAMOD
 void pfnGetSpawnParms(edict_t *ent)
 {
-	BOT_LOG("pfnGetSpawnParms", (""));
+	BOT_LOG("pfnGetSpawnParms", "");
 	(*g_engfuncs.pfnGetSpawnParms)(ent);
 }
 void pfnSaveSpawnParms(edict_t *ent)
 {
-	BOT_LOG("pfnSaveSpawnParms", (""));
+	BOT_LOG("pfnSaveSpawnParms", "");
 	(*g_engfuncs.pfnSaveSpawnParms)(ent);
 }
 float pfnVecToYaw(const float *rgflVector)
 {
-	//BOT_LOG("pfnVecToYaw", (""));
+	//BOT_LOG("pfnVecToYaw", "");
 	return (*g_engfuncs.pfnVecToYaw)(rgflVector);
 }
 void pfnVecToAngles(const float *rgflVectorIn, float *rgflVectorOut)
 {
-	//BOT_LOG("pfnVecToAngles", (""));
+	//BOT_LOG("pfnVecToAngles", "");
 	(*g_engfuncs.pfnVecToAngles)(rgflVectorIn, rgflVectorOut);
 }
 void pfnMoveToOrigin(edict_t *ent, const float *pflGoal, float dist, int iMoveType)
 {
-	BOT_LOG("pfnMoveToOrigin", (""));
+	BOT_LOG("pfnMoveToOrigin", "");
 	(*g_engfuncs.pfnMoveToOrigin)(ent, pflGoal, dist, iMoveType);
 }
 void pfnChangeYaw(edict_t* ent)
 {
-	//BOT_LOG("pfnChangeYaw", (""));
+	//BOT_LOG("pfnChangeYaw", "");
 	(*g_engfuncs.pfnChangeYaw)(ent);
 }
 void pfnChangePitch(edict_t* ent)
 {
-	//BOT_LOG("pfnChangePitch", (""));
+	//BOT_LOG("pfnChangePitch", "");
 	(*g_engfuncs.pfnChangePitch)(ent);
 }
 #endif /* not USE_METAMOD */
@@ -186,7 +184,7 @@ edict_t* pfnFindEntityByString(edict_t *pEdictStartSearchAfter, const char *pszF
 		};
 	}
 	
-	//BOT_LOG("pfnFindEntityByString", ("pszValue=%s", pszValue));
+	//BOT_LOG("pfnFindEntityByString", UTIL_VarArgs("pszValue=%s", pszValue));
 #ifdef USE_METAMOD
 	RETURN_META_VALUE(MRES_IGNORED, NULL);
 #else /* not USE_METAMOD */
@@ -196,141 +194,141 @@ edict_t* pfnFindEntityByString(edict_t *pEdictStartSearchAfter, const char *pszF
 #ifndef USE_METAMOD
 int pfnGetEntityIllum(edict_t* pEnt)
 {
-	BOT_LOG("pfnGetEntityIllum", (""));
+	BOT_LOG("pfnGetEntityIllum", "");
 	return (*g_engfuncs.pfnGetEntityIllum)(pEnt);
 }
 edict_t* pfnFindEntityInSphere(edict_t *pEdictStartSearchAfter, const float *org, float rad)
 {
-	BOT_LOG("pfnFindEntityInSphere", (""));
+	BOT_LOG("pfnFindEntityInSphere", "");
 	return (*g_engfuncs.pfnFindEntityInSphere)(pEdictStartSearchAfter, org, rad);
 }
 edict_t* pfnFindClientInPVS(edict_t *pEdict)
 {
-	BOT_LOG("pfnFindClientInPVS", (""));
+	BOT_LOG("pfnFindClientInPVS", "");
 	return (*g_engfuncs.pfnFindClientInPVS)(pEdict);
 }
 edict_t* pfnEntitiesInPVS(edict_t *pplayer)
 {
-	BOT_LOG("pfnEntitiesInPVS", (""));
+	BOT_LOG("pfnEntitiesInPVS", "");
 	return (*g_engfuncs.pfnEntitiesInPVS)(pplayer);
 }
 void pfnMakeVectors(const float *rgflVector)
 {
-	//BOT_LOG("pfnMakeVectors", (""));
+	//BOT_LOG("pfnMakeVectors", "");
 	(*g_engfuncs.pfnMakeVectors)(rgflVector);
 }
 void pfnAngleVectors(const float *rgflVector, float *forward, float *right, float *up)
 {
-	//BOT_LOG("pfnAngleVectors", (""));
+	//BOT_LOG("pfnAngleVectors", "");
 	(*g_engfuncs.pfnAngleVectors)(rgflVector, forward, right, up);
 }
 edict_t* pfnCreateEntity(void)
 {
 	edict_t *pent = (*g_engfuncs.pfnCreateEntity)();
-	BOT_LOG("pfnCreateEntity", ("pent=%x", pent));
+	BOT_LOG("pfnCreateEntity", UTIL_VarArgs("pent=%x", pent));
 	return pent;
 }
 void pfnRemoveEntity(edict_t* e)
 {
-	//BOT_LOG("pfnRemoveEntity", ("e=%x",e));
-	BOT_LOG("pfnRemoveEntity", ("e=%x, e->v.model=%s", e, e ? STRING(e->v.model) : ""));
+	//BOT_LOG("pfnRemoveEntity", UTIL_VarArgs("e=%x", e));
+	BOT_LOG("pfnRemoveEntity", UTIL_VarArgs("e=%x, e->v.model=%s", e, e ? STRING(e->v.model) : ""));
 	(*g_engfuncs.pfnRemoveEntity)(e);
 }
 edict_t* pfnCreateNamedEntity(int className)
 {
 	edict_t *pent = (*g_engfuncs.pfnCreateNamedEntity)(className);
-	BOT_LOG("pfnCreateNamedEntity", ("pent=%x, name=%s", pent, STRING(className)));
+	BOT_LOG("pfnCreateNamedEntity", UTIL_VarArgs("pent=%x, name=%s", pent, STRING(className)));
 	return pent;
 }
 void pfnMakeStatic(edict_t *ent)
 {
-	BOT_LOG("pfnMakeStatic", (""));
+	BOT_LOG("pfnMakeStatic", "");
 	(*g_engfuncs.pfnMakeStatic)(ent);
 }
 int pfnEntIsOnFloor(edict_t *e)
 {
-	BOT_LOG("pfnEntIsOnFloor", (""));
+	BOT_LOG("pfnEntIsOnFloor", "");
 	return (*g_engfuncs.pfnEntIsOnFloor)(e);
 }
 int pfnDropToFloor(edict_t* e)
 {
-	BOT_LOG("pfnDropToFloor", (""));
+	BOT_LOG("pfnDropToFloor", "");
 	return (*g_engfuncs.pfnDropToFloor)(e);
 }
 int pfnWalkMove(edict_t *ent, float yaw, float dist, int iMode)
 {
-	BOT_LOG("pfnWalkMove", (""));
+	BOT_LOG("pfnWalkMove", "");
 	return (*g_engfuncs.pfnWalkMove)(ent, yaw, dist, iMode);
 }
 void pfnSetOrigin(edict_t *e, const float *rgflOrigin)
 {
-	BOT_LOG("pfnSetOrigin", (""));
+	BOT_LOG("pfnSetOrigin", "");
 	(*g_engfuncs.pfnSetOrigin)(e, rgflOrigin);
 }
 void pfnEmitSound(edict_t *entity, int channel, const char *sample, /*int*/float volume, float attenuation, int fFlags, int pitch)
 {
-	BOT_LOG("pfnEmitSound", ("channel=%d, sample=%s", channel, sample));
+	BOT_LOG("pfnEmitSound", UTIL_VarArgs("channel=%d, sample=%s", channel, sample));
 	(*g_engfuncs.pfnEmitSound)(entity, channel, sample, volume, attenuation, fFlags, pitch);
 }
 void pfnEmitAmbientSound(edict_t *entity, float *pos, const char *samp, float vol, float attenuation, int fFlags, int pitch)
 {
-	BOT_LOG("pfnEmitAmbientSound", (""));
+	BOT_LOG("pfnEmitAmbientSound", "");
 	(*g_engfuncs.pfnEmitAmbientSound)(entity, pos, samp, vol, attenuation, fFlags, pitch);
 }
 void pfnTraceLine(const float *v1, const float *v2, int fNoMonsters, edict_t *pentToSkip, TraceResult *ptr)
 {
-	//BOT_LOG("pfnTraceLine", (""));
+	//BOT_LOG("pfnTraceLine", "");
 	(*g_engfuncs.pfnTraceLine)(v1, v2, fNoMonsters, pentToSkip, ptr);
 }
 void pfnTraceToss(edict_t* pent, edict_t* pentToIgnore, TraceResult *ptr)
 {
-	//BOT_LOG("pfnTraceToss", (""));
+	//BOT_LOG("pfnTraceToss", "");
 	(*g_engfuncs.pfnTraceToss)(pent, pentToIgnore, ptr);
 }
 int pfnTraceMonsterHull(edict_t *pEdict, const float *v1, const float *v2, int fNoMonsters, edict_t *pentToSkip, TraceResult *ptr)
 {
-	//BOT_LOG("pfnTraceMonsterHull", (""));
+	//BOT_LOG("pfnTraceMonsterHull", "");
 	return (*g_engfuncs.pfnTraceMonsterHull)(pEdict, v1, v2, fNoMonsters, pentToSkip, ptr);
 }
 void pfnTraceHull(const float *v1, const float *v2, int fNoMonsters, int hullNumber, edict_t *pentToSkip, TraceResult *ptr)
 {
-	//BOT_LOG("pfnTraceHull", (""));
+	//BOT_LOG("pfnTraceHull", "");
 	(*g_engfuncs.pfnTraceHull)(v1, v2, fNoMonsters, hullNumber, pentToSkip, ptr);
 }
 void pfnTraceModel(const float *v1, const float *v2, int hullNumber, edict_t *pent, TraceResult *ptr)
 {
-	//BOT_LOG("pfnTraceModel", (""));
+	//BOT_LOG("pfnTraceModel", "");
 	(*g_engfuncs.pfnTraceModel)(v1, v2, hullNumber, pent, ptr);
 }
 const char *pfnTraceTexture(edict_t *pTextureEntity, const float *v1, const float *v2 )
 {
-	//BOT_LOG("pfnTraceTexture", (""));
+	//BOT_LOG("pfnTraceTexture", "");
 	return (*g_engfuncs.pfnTraceTexture)(pTextureEntity, v1, v2);
 }
 void pfnTraceSphere(const float *v1, const float *v2, int fNoMonsters, float radius, edict_t *pentToSkip, TraceResult *ptr)
 {
-	//BOT_LOG("pfnTraceSphere", (""));
+	//BOT_LOG("pfnTraceSphere", "");
 	(*g_engfuncs.pfnTraceSphere)(v1, v2, fNoMonsters, radius, pentToSkip, ptr);
 }
 void pfnGetAimVector(edict_t* ent, float speed, float *rgflReturn)
 {
-	//BOT_LOG("pfnGetAimVector", (""));
+	//BOT_LOG("pfnGetAimVector", "");
 	(*g_engfuncs.pfnGetAimVector)(ent, speed, rgflReturn);
 }
 void pfnServerCommand(char* str)
 {
-	BOT_LOG("pfnServerCommand", ("str=%s", str));
+	BOT_LOG("pfnServerCommand", UTIL_VarArgs("str=%s", str));
 	(*g_engfuncs.pfnServerCommand)(str);
 }
 void pfnServerExecute(void)
 {
-	BOT_LOG("pfnServerExecute", (""));
+	BOT_LOG("pfnServerExecute", "");
 	(*g_engfuncs.pfnServerExecute)();
 }
 #endif /* not USE_METAMOD */
 void pfnClientCommand(edict_t* pEdict, char* szFmt, ...)
 {
-	BOT_LOG("pfnClientCommand", ("szFmt=%s", szFmt));
+	BOT_LOG("pfnClientCommand", UTIL_VarArgs("szFmt=%s", szFmt));
 	
 	if ( !(pEdict->v.flags & (FL_FAKECLIENT | FL_THIRDPARTYBOT)) )
 	{
@@ -350,22 +348,22 @@ void pfnClientCommand(edict_t* pEdict, char* szFmt, ...)
 #ifndef USE_METAMOD
 void pfnParticleEffect(const float *org, const float *dir, float color, float count)
 {
-	//BOT_LOG("pfnParticleEffect", (""));
+	//BOT_LOG("pfnParticleEffect", "");
 	(*g_engfuncs.pfnParticleEffect)(org, dir, color, count);
 }
 void pfnLightStyle(int style, char* val)
 {
-	//BOT_LOG("pfnLightStyle", (""));
+	//BOT_LOG("pfnLightStyle", "");
 	(*g_engfuncs.pfnLightStyle)(style, val);
 }
 int pfnDecalIndex(const char *name)
 {
-	//BOT_LOG("pfnDecalIndex", (""));
+	//BOT_LOG("pfnDecalIndex", "");
 	return (*g_engfuncs.pfnDecalIndex)(name);
 }
 int pfnPointContents(const float *rgflVector)
 {
-	//BOT_LOG("pfnPointContents", (""));
+	//BOT_LOG("pfnPointContents", "");
 	return (*g_engfuncs.pfnPointContents)(rgflVector);
 }
 #endif /* not USE_METAMOD */
@@ -373,8 +371,8 @@ void pfnMessageBegin(int msg_dest, int msg_type, const float *pOrigin, edict_t *
 {
 	if (gpGlobals->deathmatch)
 	{
-		//BOT_LOG("pfnMessageBegin", ("ed=%x, msg_dest=%d, msg_type=%d", ed, msg_dest, msg_type));
-		BOT_LOG("pfnMessageBegin", ("ed=%x, msg_dest=%d, msg_type=%s(%d)", ed, msg_dest, GET_USER_MSG_NAME(PLID, msg_type, NULL), msg_type));
+		//BOT_LOG("pfnMessageBegin", UTIL_VarArgs("ed=%x, msg_dest=%d, msg_type=%d", ed, msg_dest, msg_type));
+		BOT_LOG("pfnMessageBegin", UTIL_VarArgs("ed=%x, msg_dest=%d, msg_type=%s(%d)", ed, msg_dest, GET_USER_MSG_NAME(PLID, msg_type, NULL), msg_type));
 
 		JBRegMsgs();
 		msg_state = 0; // reset state on message begin
@@ -418,7 +416,7 @@ void pfnMessageEnd(void)
 {
 	if (gpGlobals->deathmatch)
 	{
-		BOT_LOG("pfnMessageEnd", (""));
+		BOT_LOG("pfnMessageEnd", "");
 		
 		// if this message is for a bot, call the client message function...
 		if (botMsgFunction)
@@ -441,7 +439,7 @@ void pfnWriteByte(int iValue)
 {
 	if (gpGlobals->deathmatch)
 	{
-		BOT_LOG("pfnWriteByte", ("iValue=%d", iValue));
+		BOT_LOG("pfnWriteByte", UTIL_VarArgs("iValue=%d", iValue));
 		
 		// if this message is for a bot, call the client message function...
 		if (botMsgFunction)
@@ -460,7 +458,7 @@ void pfnWriteChar(int iValue)
 {
 	if (gpGlobals->deathmatch)
 	{
-		BOT_LOG("pfnWriteChar", ("iValue=%d", iValue));
+		BOT_LOG("pfnWriteChar", UTIL_VarArgs("iValue=%d", iValue));
 		
 		// if this message is for a bot, call the client message function...
 		if (botMsgFunction)
@@ -479,7 +477,7 @@ void pfnWriteShort(int iValue)
 {
 	if (gpGlobals->deathmatch)
 	{
-		BOT_LOG("prnWriteShort", ("iValue=%d", iValue));
+		BOT_LOG("prnWriteShort", UTIL_VarArgs("iValue=%d", iValue));
 		
 		// if this message is for a bot, call the client message function...
 		if (botMsgFunction)
@@ -498,7 +496,7 @@ void pfnWriteLong(int iValue)
 {
 	if (gpGlobals->deathmatch)
 	{
-		BOT_LOG("pfnWriteLong", ("iValue=%d", iValue));
+		BOT_LOG("pfnWriteLong", UTIL_VarArgs("iValue=%d", iValue));
 		
 		// if this message is for a bot, call the client message function...
 		if (botMsgFunction)
@@ -517,7 +515,7 @@ void pfnWriteAngle(float flValue)
 {
 	if (gpGlobals->deathmatch)
 	{
-		BOT_LOG("pfnWriteAngle", ("flValue=%f",flValue));
+		BOT_LOG("pfnWriteAngle", UTIL_VarArgs("flValue=%f", flValue));
 		
 		// if this message is for a bot, call the client message function...
 		if (botMsgFunction)
@@ -536,7 +534,7 @@ void pfnWriteCoord(float flValue)
 {
 	if (gpGlobals->deathmatch)
 	{
-		BOT_LOG("pfnWriteCoord", ("flValue=%f", flValue));
+		BOT_LOG("pfnWriteCoord", UTIL_VarArgs("flValue=%f", flValue));
 		
 		// if this message is for a bot, call the client message function...
 		if (botMsgFunction)
@@ -555,7 +553,7 @@ void pfnWriteString(const char *sz)
 {
 	if (gpGlobals->deathmatch)
 	{
-		BOT_LOG("pfnWriteString", ("sz=%s", sz));
+		BOT_LOG("pfnWriteString", UTIL_VarArgs("sz=%s", sz));
 		
 		// if this message is for a bot, call the client message function...
 		if (botMsgFunction)
@@ -574,7 +572,7 @@ void pfnWriteEntity(int iValue)
 {
 	if (gpGlobals->deathmatch)
 	{
-		BOT_LOG("pfnWriteEntity", ("iValue=%d", iValue));
+		BOT_LOG("pfnWriteEntity", UTIL_VarArgs("iValue=%d", iValue));
 		
 		// if this message is for a bot, call the client message function...
 		if (botMsgFunction)
@@ -592,32 +590,32 @@ void pfnWriteEntity(int iValue)
 #ifndef USE_METAMOD
 void pfnCVarRegister(cvar_t *pCvar)
 {
-	BOT_LOG("pfnCVarRegister", (""));
+	BOT_LOG("pfnCVarRegister", "");
 	(*g_engfuncs.pfnCVarRegister)(pCvar);
 }
 float pfnCVarGetFloat(const char *szVarName)
 {
-	//BOT_LOG("pfnCVarGetFloat", ("szVarName=%s", szVarName));
+	//BOT_LOG("pfnCVarGetFloat", UTIL_VarArgs("szVarName=%s", szVarName));
 	return (*g_engfuncs.pfnCVarGetFloat)(szVarName);
 }
 const char* pfnCVarGetString(const char *szVarName)
 {
-	//BOT_LOG("pfnCVarGetString", (""));
+	//BOT_LOG("pfnCVarGetString", "");
 	return (*g_engfuncs.pfnCVarGetString)(szVarName);
 }
 void pfnCVarSetFloat(const char *szVarName, float flValue)
 {
-	//BOT_LOG("pfnCVarSetFloat", (""));
+	//BOT_LOG("pfnCVarSetFloat", "");
 	(*g_engfuncs.pfnCVarSetFloat)(szVarName, flValue);
 }
 void pfnCVarSetString(const char *szVarName, const char *szValue)
 {
-	//BOT_LOG("pfnCVarSetString", (""));
+	//BOT_LOG("pfnCVarSetString", "");
 	(*g_engfuncs.pfnCVarSetString)(szVarName, szValue);
 }
 void pfnAlertMessage(ALERT_TYPE atype, char *szFmt, ...)
 {
-	BOT_LOG("pfnAlertMessage", (""));
+	BOT_LOG("pfnAlertMessage", "");
 	va_list		argptr;
 	static char		string[1024];
 
@@ -629,7 +627,7 @@ void pfnAlertMessage(ALERT_TYPE atype, char *szFmt, ...)
 }
 void pfnEngineFprintf(FILE *pfile, char *szFmt, ...)
 {
-	BOT_LOG("pfnEngineFprintf", (""));
+	BOT_LOG("pfnEngineFprintf", "");
 	va_list		argptr;
 	static char		string[1024];
 
@@ -641,62 +639,62 @@ void pfnEngineFprintf(FILE *pfile, char *szFmt, ...)
 }
 void* pfnPvAllocEntPrivateData(edict_t *pEdict, int32 cb)
 {
-	BOT_LOG("pfnPvAllocEntPrivateData", (""));
+	BOT_LOG("pfnPvAllocEntPrivateData", "");
 	return (*g_engfuncs.pfnPvAllocEntPrivateData)(pEdict, cb);
 }
 void* pfnPvEntPrivateData(edict_t *pEdict)
 {
-	BOT_LOG("pfnPvEntPrivateData", (""));
+	BOT_LOG("pfnPvEntPrivateData", "");
 	return (*g_engfuncs.pfnPvEntPrivateData)(pEdict);
 }
 void pfnFreeEntPrivateData(edict_t *pEdict)
 {
-	BOT_LOG("pfnFreeEntPrivateData", (""));
+	BOT_LOG("pfnFreeEntPrivateData", "");
 	(*g_engfuncs.pfnFreeEntPrivateData)(pEdict);
 }
 const char* pfnSzFromIndex(int iString)
 {
-	BOT_LOG("pfnSzFromIndex", (""));
+	BOT_LOG("pfnSzFromIndex", "");
 	return (*g_engfuncs.pfnSzFromIndex)(iString);
 }
 int pfnAllocString(const char *szValue)
 {
-	BOT_LOG("pfnAllocString", (""));
+	BOT_LOG("pfnAllocString", "");
 	return (*g_engfuncs.pfnAllocString)(szValue);
 }
 entvars_t* pfnGetVarsOfEnt(edict_t *pEdict)
 {
-	BOT_LOG("pfnGetVarsOfEnt", (""));
+	BOT_LOG("pfnGetVarsOfEnt", "");
 	return (*g_engfuncs.pfnGetVarsOfEnt)(pEdict);
 }
 edict_t* pfnPEntityOfEntOffset(int iEntOffset)
 {
-	//BOT_LOG("pfnPEntityOfEntOffset", (""));
+	//BOT_LOG("pfnPEntityOfEntOffset", "");
 	return (*g_engfuncs.pfnPEntityOfEntOffset)(iEntOffset);
 }
 int pfnEntOffsetOfPEntity(const edict_t *pEdict)
 {
-	//BOT_LOG("pfnEntOffsetOfPEntity", ("pEdict=%x", pEdict));
+	//BOT_LOG("pfnEntOffsetOfPEntity", UTIL_VarArgs("pEdict=%x", pEdict));
 	return (*g_engfuncs.pfnEntOffsetOfPEntity)(pEdict);
 }
 int pfnIndexOfEdict(const edict_t *pEdict)
 {
-	//BOT_LOG("pfnIndexOfEdict", ("pEdict=%x", pEdict));
+	//BOT_LOG("pfnIndexOfEdict", UTIL_VarArgs("pEdict=%x", pEdict));
 	return (*g_engfuncs.pfnIndexOfEdict)(pEdict);
 }
 edict_t* pfnPEntityOfEntIndex(int iEntIndex)
 {
-	//BOT_LOG("pfnPEntityOfEntIndex", (""));
+	//BOT_LOG("pfnPEntityOfEntIndex", "");
 	return (*g_engfuncs.pfnPEntityOfEntIndex)(iEntIndex);
 }
 edict_t* pfnFindEntityByVars(entvars_t* pvars)
 {
-	//BOT_LOG("pfnFindEntityByVars", (""));
+	//BOT_LOG("pfnFindEntityByVars", "");
 	return (*g_engfuncs.pfnFindEntityByVars)(pvars);
 }
 void* pfnGetModelPtr(edict_t* pEdict)
 {
-	//BOT_LOG("pfnGetModelPtr", ("pEdict=%x", pEdict));
+	//BOT_LOG("pfnGetModelPtr", UTIL_VarArgs("pEdict=%x", pEdict));
 	return (*g_engfuncs.pfnGetModelPtr)(pEdict);
 }
 int pfnRegUserMsg(const char *pszName, int iSize)
@@ -705,7 +703,7 @@ int pfnRegUserMsg(const char *pszName, int iSize)
 	{
 		int msg = REG_USER_MSG(pszName, iSize);
 #ifdef DEBUGMESSAGES
-		BOT_LOG("pfnRegUserMsg", ("pszName=%s, msg_id=%d", pszName, msg));
+		BOT_LOG("pfnRegUserMsg", UTIL_VarArgs("pszName=%s, msg_id=%d", pszName, msg));
 #endif
 		AddUserMsg(pszName, msg, iSize);
 
@@ -716,29 +714,29 @@ int pfnRegUserMsg(const char *pszName, int iSize)
 }
 void pfnAnimationAutomove(const edict_t* pEdict, float flTime)
 {
-	//BOT_LOG("pfnAnimationAutomove", (""));
+	//BOT_LOG("pfnAnimationAutomove", "");
 	(*g_engfuncs.pfnAnimationAutomove)(pEdict, flTime);
 }
 void pfnGetBonePosition(const edict_t* pEdict, int iBone, float *rgflOrigin, float *rgflAngles )
 {
-	//BOT_LOG("pfnGetBonePosition", (""));
+	//BOT_LOG("pfnGetBonePosition", "");
 	(*g_engfuncs.pfnGetBonePosition)(pEdict, iBone, rgflOrigin, rgflAngles);
 }
 uint32 pfnFunctionFromName( const char *pName )
 {
-	BOT_LOG("pfnFunctionFromName", (""));
+	BOT_LOG("pfnFunctionFromName", "");
 	return (*g_engfuncs.pfnFunctionFromName)(pName);
 }
 const char *pfnNameForFunction( uint32 function )
 {
-	BOT_LOG("pfnNameForFunction", (""));
+	BOT_LOG("pfnNameForFunction", "");
 	return (*g_engfuncs.pfnNameForFunction)(function);
 }
 #endif /* not USE_METAMOD */
 
 void pfnClientPrintf( edict_t* pEdict, PRINT_TYPE ptype, const char *szMsg )
 {
-	BOT_LOG("pfnClientPrintf", (""));
+	BOT_LOG("pfnClientPrintf", "");
 	if ( pEdict->v.flags & (FL_FAKECLIENT | FL_THIRDPARTYBOT) )
 #ifdef USE_METAMOD
 		RETURN_META(MRES_SUPERCEDE);
@@ -754,12 +752,12 @@ void pfnClientPrintf( edict_t* pEdict, PRINT_TYPE ptype, const char *szMsg )
 #ifndef USE_METAMOD
 void pfnServerPrint( const char *szMsg )
 {
-	BOT_LOG("pfnServerPrint", (""));
+	BOT_LOG("pfnServerPrint", "");
 	(*g_engfuncs.pfnServerPrint)(szMsg);
 }
 void pfnGetAttachment(const edict_t *pEdict, int iAttachment, float *rgflOrigin, float *rgflAngles )
 {
-	//BOT_LOG("pfnGetAttachment", (""));
+	//BOT_LOG("pfnGetAttachment", "");
 	(*g_engfuncs.pfnGetAttachment)(pEdict, iAttachment, rgflOrigin, rgflAngles);
 }
 #endif /* not USE_METAMOD */
@@ -809,82 +807,82 @@ int pfnCmd_Argc( void )
 #ifndef USE_METAMOD
 void pfnCRC32_Init(CRC32_t *pulCRC)
 {
-	BOT_LOG("pfnCRC32_Init", (""));
+	BOT_LOG("pfnCRC32_Init", "");
 	(*g_engfuncs.pfnCRC32_Init)(pulCRC);
 }
 void pfnCRC32_ProcessBuffer(CRC32_t *pulCRC, void *p, int len)
 {
-	BOT_LOG("pfnCRC32_ProcessBuffer", (""));
+	BOT_LOG("pfnCRC32_ProcessBuffer", "");
 	(*g_engfuncs.pfnCRC32_ProcessBuffer)(pulCRC, p, len);
 }
 void pfnCRC32_ProcessByte(CRC32_t *pulCRC, unsigned char ch)
 {
-	BOT_LOG("pfnCRC32_ProcessByte", (""));
+	BOT_LOG("pfnCRC32_ProcessByte", "");
 	(*g_engfuncs.pfnCRC32_ProcessByte)(pulCRC, ch);
 }
 CRC32_t pfnCRC32_Final(CRC32_t pulCRC)
 {
-	BOT_LOG("pfnCRC32_Final", (""));
+	BOT_LOG("pfnCRC32_Final", "");
 	return (*g_engfuncs.pfnCRC32_Final)(pulCRC);
 }
 int32 pfnRandomLong(int32 lLow, int32 lHigh)
 {
-	//BOT_LOG("pfnRandomLong", ("lLow=%d, lHigh=%d", lLow, lHigh));
+	//BOT_LOG("pfnRandomLong", UTIL_VarArgs("lLow=%d, lHigh=%d", lLow, lHigh));
 	return (*g_engfuncs.pfnRandomLong)(lLow, lHigh);
 }
 float pfnRandomFloat(float flLow, float flHigh)
 {
-	//BOT_LOG("pfnRandomFloat", (""));
+	//BOT_LOG("pfnRandomFloat", "");
 	return (*g_engfuncs.pfnRandomFloat)(flLow, flHigh);
 }
 void pfnSetView(const edict_t *pClient, const edict_t *pViewent )
 {
-	BOT_LOG("pfnSetView", (""));
+	BOT_LOG("pfnSetView", "");
 	(*g_engfuncs.pfnSetView)(pClient, pViewent);
 }
 float pfnTime( void )
 {
-	BOT_LOG("pfnTime", (""));
+	BOT_LOG("pfnTime", "");
 	return (*g_engfuncs.pfnTime)();
 }
 void pfnCrosshairAngle(const edict_t *pClient, float pitch, float yaw)
 {
-	BOT_LOG("pfnCrosshairAngle", (""));
+	BOT_LOG("pfnCrosshairAngle", "");
 	(*g_engfuncs.pfnCrosshairAngle)(pClient, pitch, yaw);
 }
 byte *pfnLoadFileForMe(char *filename, int *pLength)
 {
-	BOT_LOG("pfnLoadFileForMe", ("filename=%s", filename));
+	BOT_LOG("pfnLoadFileForMe", UTIL_VarArgs("filename=%s", filename));
 	return (*g_engfuncs.pfnLoadFileForMe)(filename, pLength);
 }
 void pfnFreeFile(void *buffer)
 {
-	BOT_LOG("pfnFreeFile", (""));
+	BOT_LOG("pfnFreeFile", "");
 	(*g_engfuncs.pfnFreeFile)(buffer);
 }
 void pfnEndSection(const char *pszSectionName)
 {
-	BOT_LOG("pfnEndSection", (""));
+	BOT_LOG("pfnEndSection", "");
 	(*g_engfuncs.pfnEndSection)(pszSectionName);
 }
 int pfnCompareFileTime(char *filename1, char *filename2, int *iCompare)
 {
-	BOT_LOG("pfnCompareFileTime", (""));
+	BOT_LOG("pfnCompareFileTime", "");
 	return (*g_engfuncs.pfnCompareFileTime)(filename1, filename2, iCompare);
 }
 void pfnGetGameDir(char *szGetGameDir)
 {
-	BOT_LOG("pfnGetGameDir", (""));
+	BOT_LOG("pfnGetGameDir", "");
 	(*g_engfuncs.pfnGetGameDir)(szGetGameDir);
 }
 void pfnCvar_RegisterVariable(cvar_t *variable)
 {
-	BOT_LOG("pfnCvar_RegisterVariable", (""));
+	BOT_LOG("pfnCvar_RegisterVariable", "");
 	(*g_engfuncs.pfnCvar_RegisterVariable)(variable);
 }
 void pfnFadeClientVolume(const edict_t *pEdict, int fadePercent, int fadeOutSeconds, int holdTime, int fadeInSeconds)
 {
-	BOT_LOG("pfnFadeClientVolume", (""));
+	BOT_LOG("pfnFadeClientVolume", "");
 	(*g_engfuncs.pfnFadeClientVolume)(pEdict, fadePercent, fadeOutSeconds, holdTime, fadeInSeconds);
 }
 #endif /* not USE_METAMOD */
@@ -900,7 +898,7 @@ void pfnSetClientMaxspeed(const edict_t *pEdict, float fNewMaxspeed)
 		}
 	}
 	
-	BOT_LOG("pfnSetClientMaxspeed", ("pEdict=%x, fNewMaxspeed=%f", pEdict, fNewMaxspeed));
+	BOT_LOG("pfnSetClientMaxspeed", UTIL_VarArgs("pEdict=%x, fNewMaxspeed=%f", pEdict, fNewMaxspeed));
 #ifdef USE_METAMOD
 	RETURN_META(MRES_IGNORED);
 #else /* not USE_METAMOD */
@@ -911,52 +909,52 @@ void pfnSetClientMaxspeed(const edict_t *pEdict, float fNewMaxspeed)
 #ifndef USE_METAMOD
 edict_t * pfnCreateFakeClient(const char *netname)
 {
-	BOT_LOG("pfnCreateFakeClient", (""));
+	BOT_LOG("pfnCreateFakeClient", "");
 	return (*g_engfuncs.pfnCreateFakeClient)(netname);
 }
 void pfnRunPlayerMove(edict_t *fakeclient, const float *viewangles, float forwardmove, float sidemove, float upmove, unsigned short buttons, byte impulse, byte msec )
 {
-	BOT_LOG("pfnRunPlayerMove", (""));
+	BOT_LOG("pfnRunPlayerMove", "");
 	(*g_engfuncs.pfnRunPlayerMove)(fakeclient, viewangles, forwardmove, sidemove, upmove, buttons, impulse, msec);
 }
 int pfnNumberOfEntities(void)
 {
-	BOT_LOG("pfnNumberOfEntities", (""));
+	BOT_LOG("pfnNumberOfEntities", "");
 	return (*g_engfuncs.pfnNumberOfEntities)();
 }
 char* pfnGetInfoKeyBuffer(edict_t *e)
 {
-	BOT_LOG("pfnGetInfoKeyBuffer", (""));
+	BOT_LOG("pfnGetInfoKeyBuffer", "");
 	return (*g_engfuncs.pfnGetInfoKeyBuffer)(e);
 }
 char* pfnInfoKeyValue(char *infobuffer, char *key)
 {
-	BOT_LOG("pfnInfoKeyValue", ("infobuffer=%s, key=%s", infobuffer, key));
+	BOT_LOG("pfnInfoKeyValue", UTIL_VarArgs("infobuffer=%s, key=%s", infobuffer, key));
 	return (*g_engfuncs.pfnInfoKeyValue)(infobuffer, key);
 }
 void pfnSetKeyValue(char *infobuffer, char *key, char *value)
 {
-	BOT_LOG("pfnSetKeyValue", ("infobuffer=%s, key=%s", key, value));
+	BOT_LOG("pfnSetKeyValue", UTIL_VarArgs("infobuffer=%s, key=%s", key, value));
 	(*g_engfuncs.pfnSetKeyValue)(infobuffer, key, value);
 }
 void pfnSetClientKeyValue(int clientIndex, char *infobuffer, char *key, char *value)
 {
-	BOT_LOG("pfnSetClientKeyValue", ("key=%s, value=%s", key, value));
+	BOT_LOG("pfnSetClientKeyValue", UTIL_VarArgs("key=%s, value=%s", key, value));
 	(*g_engfuncs.pfnSetClientKeyValue)(clientIndex, infobuffer, key, value);
 }
 int pfnIsMapValid(char *filename)
 {
-	BOT_LOG("pfnIsMapValid", (""));
+	BOT_LOG("pfnIsMapValid", "");
 	return (*g_engfuncs.pfnIsMapValid)(filename);
 }
 void pfnStaticDecal( const float *origin, int decalIndex, int entityIndex, int modelIndex )
 {
-	BOT_LOG("pfnStaticDecal", (""));
+	BOT_LOG("pfnStaticDecal", "");
 	(*g_engfuncs.pfnStaticDecal)(origin, decalIndex, entityIndex, modelIndex);
 }
 int pfnPrecacheGeneric(char* s)
 {
-	BOT_LOG("pfnPrecacheGeneric", ("s=%s", s));
+	BOT_LOG("pfnPrecacheGeneric", UTIL_VarArgs("s=%s", s));
 	return (*g_engfuncs.pfnPrecacheGeneric)(s);
 }
 #endif /* not USE_METAMOD */
@@ -965,7 +963,7 @@ int pfnGetPlayerUserId(edict_t *e )
 {
 	if (gpGlobals->deathmatch)
 	{
-		BOT_LOG("pfnGetPlayerUserId", ("e=%x", e));
+		BOT_LOG("pfnGetPlayerUserId", UTIL_VarArgs("e=%x", e));
 		
 		if (mod_id == GEARBOX_DLL)
 		{
@@ -989,22 +987,22 @@ int pfnGetPlayerUserId(edict_t *e )
 #ifndef USE_METAMOD
 void pfnBuildSoundMsg(edict_t *entity, int channel, const char *sample, /*int*/float volume, float attenuation, int fFlags, int pitch, int msg_dest, int msg_type, const float *pOrigin, edict_t *ed)
 {
-	BOT_LOG("pfnBuildSoundMsg", (""));
+	BOT_LOG("pfnBuildSoundMsg", "");
 	(*g_engfuncs.pfnBuildSoundMsg)(entity, channel, sample, volume, attenuation, fFlags, pitch, msg_dest, msg_type, pOrigin, ed);
 }
 int pfnIsDedicatedServer(void)
 {
-	BOT_LOG("pfnIsDedicatedServer", (""));
+	BOT_LOG("pfnIsDedicatedServer", "");
 	return (*g_engfuncs.pfnIsDedicatedServer)();
 }
 cvar_t* pfnCVarGetPointer(const char *szVarName)
 {
-	BOT_LOG("pfnCVarGetPointer", ("szVarName=%s", szVarName));
+	BOT_LOG("pfnCVarGetPointer", UTIL_VarArgs("szVarName=%s", szVarName));
 	return (*g_engfuncs.pfnCVarGetPointer)(szVarName);
 }
 unsigned int pfnGetPlayerWONId(edict_t *e)
 {
-	BOT_LOG("pfnGetPlayerWONId", ("e=%x", e));
+	BOT_LOG("pfnGetPlayerWONId", UTIL_VarArgs("e=%x", e));
 	return (*g_engfuncs.pfnGetPlayerWONId)(e);
 }
 
@@ -1012,118 +1010,118 @@ unsigned int pfnGetPlayerWONId(edict_t *e)
 
 void pfnInfo_RemoveKey(char *s, const char *key)
 {
-	BOT_LOG("pfnInfo_RemoveKey", (""));
+	BOT_LOG("pfnInfo_RemoveKey", "");
 	(*g_engfuncs.pfnInfo_RemoveKey)(s, key);
 }
 const char *pfnGetPhysicsKeyValue(const edict_t *pClient, const char *key)
 {
-	BOT_LOG("pfnGetPhysicsKeyValue", (""));
+	BOT_LOG("pfnGetPhysicsKeyValue", "");
 	return (*g_engfuncs.pfnGetPhysicsKeyValue)(pClient, key);
 }
 void pfnSetPhysicsKeyValue(const edict_t *pClient, const char *key, const char *value)
 {
-	BOT_LOG("pfnSetPhysicsKeyValue", (""));
+	BOT_LOG("pfnSetPhysicsKeyValue", "");
 	(*g_engfuncs.pfnSetPhysicsKeyValue)(pClient, key, value);
 }
 const char *pfnGetPhysicsInfoString(const edict_t *pClient)
 {
-	BOT_LOG("pfnGetPhysicsInfoString", (""));
+	BOT_LOG("pfnGetPhysicsInfoString", "");
 	return (*g_engfuncs.pfnGetPhysicsInfoString)(pClient);
 }
 unsigned short pfnPrecacheEvent(int type, const char *psz)
 {
-	BOT_LOG("pfnPrecacheEvent", (""));
+	BOT_LOG("pfnPrecacheEvent", "");
 	return (*g_engfuncs.pfnPrecacheEvent)(type, psz);
 }
 void pfnPlaybackEvent(int flags, const edict_t *pInvoker, unsigned short eventindex, float delay,
 					  float *origin, float *angles, float fparam1,float fparam2, int iparam1, int iparam2, int bparam1, int bparam2)
 {
-	BOT_LOG("pfnPlaybackEvent", (""));
+	BOT_LOG("pfnPlaybackEvent", "");
 	(*g_engfuncs.pfnPlaybackEvent)(flags, pInvoker, eventindex, delay, origin, angles, fparam1, fparam2, iparam1, iparam2, bparam1, bparam2);
 }
 unsigned char *pfnSetFatPVS(float *org)
 {
-	BOT_LOG("pfnSetFatPVS", (""));
+	BOT_LOG("pfnSetFatPVS", "");
 	return (*g_engfuncs.pfnSetFatPVS)(org);
 }
 unsigned char *pfnSetFatPAS(float *org)
 {
-	BOT_LOG("pfnSetFatPAS", (""));
+	BOT_LOG("pfnSetFatPAS", "");
 	return (*g_engfuncs.pfnSetFatPAS)(org);
 }
 int pfnCheckVisibility(const edict_t *entity, unsigned char *pset)
 {
-	//BOT_LOG("pfnCheckVisibility", (""));
+	//BOT_LOG("pfnCheckVisibility", "");
 	return (*g_engfuncs.pfnCheckVisibility)(entity, pset);
 }
 void pfnDeltaSetField(struct delta_s *pFields, const char *fieldname)
 {
-	//BOT_LOG("pfnDeltaSetField", (""));
+	//BOT_LOG("pfnDeltaSetField", "");
 	(*g_engfuncs.pfnDeltaSetField)(pFields, fieldname);
 }
 void pfnDeltaUnsetField(struct delta_s *pFields, const char *fieldname)
 {
-	//BOT_LOG("pfnDeltaUnsetField", (""));
+	//BOT_LOG("pfnDeltaUnsetField", "");
 	(*g_engfuncs.pfnDeltaUnsetField)(pFields, fieldname);
 }
 void pfnDeltaAddEncoder(char *name, void (*conditionalencode)( struct delta_s *pFields, const unsigned char *from, const unsigned char *to))
 {
-	//BOT_LOG("pfnDeltaAddEncoder", (""));
+	//BOT_LOG("pfnDeltaAddEncoder", "");
 	(*g_engfuncs.pfnDeltaAddEncoder)(name, conditionalencode);
 }
 int pfnGetCurrentPlayer(void)
 {
-	BOT_LOG("pfnGetCurrentPlayer", (""));
+	BOT_LOG("pfnGetCurrentPlayer", "");
 	return (*g_engfuncs.pfnGetCurrentPlayer)();
 }
 int pfnCanSkipPlayer(const edict_t *player)
 {
-	BOT_LOG("pfnCanSkipPlayer", (""));
+	BOT_LOG("pfnCanSkipPlayer", "");
 	return (*g_engfuncs.pfnCanSkipPlayer)(player);
 }
 int pfnDeltaFindField(struct delta_s *pFields, const char *fieldname)
 {
-	//BOT_LOG("pfnDeltaFindField", (""));
+	//BOT_LOG("pfnDeltaFindField", "");
 	return (*g_engfuncs.pfnDeltaFindField)(pFields, fieldname);
 }
 void pfnDeltaSetFieldByIndex(struct delta_s *pFields, int fieldNumber)
 {
-	BOT_LOG("pfnDeltaSetFieldByIndex", (""));
+	BOT_LOG("pfnDeltaSetFieldByIndex", "");
 	(*g_engfuncs.pfnDeltaSetFieldByIndex)(pFields, fieldNumber);
 }
 void pfnDeltaUnsetFieldByIndex(struct delta_s *pFields, int fieldNumber)
 {
-	//BOT_LOG("pfnDeltaUnsetFieldByIndex", (""));
+	//BOT_LOG("pfnDeltaUnsetFieldByIndex", "");
 	(*g_engfuncs.pfnDeltaUnsetFieldByIndex)(pFields, fieldNumber);
 }
 void pfnSetGroupMask(int mask, int op)
 {
-	BOT_LOG("pfnSetGroupMask", (""));
+	BOT_LOG("pfnSetGroupMask", "");
 	(*g_engfuncs.pfnSetGroupMask)(mask, op);
 }
 int pfnCreateInstancedBaseline(int classname, struct entity_state_s *baseline)
 {
-	BOT_LOG("pfnCreateInstancedBaseline", (""));
+	BOT_LOG("pfnCreateInstancedBaseline", "");
 	return (*g_engfuncs.pfnCreateInstancedBaseline)(classname, baseline);
 }
 void pfnCvar_DirectSet(struct cvar_s *var, char *value)
 {
-	BOT_LOG("pfnCvar_DirectSet", (""));
+	BOT_LOG("pfnCvar_DirectSet", "");
 	(*g_engfuncs.pfnCvar_DirectSet)(var, value);
 }
 void pfnForceUnmodified(FORCE_TYPE type, float *mins, float *maxs, const char *filename)
 {
-	BOT_LOG("pfnForceUnmodified", (""));
+	BOT_LOG("pfnForceUnmodified", "");
 	(*g_engfuncs.pfnForceUnmodified)(type, mins, maxs, filename);
 }
 void pfnGetPlayerStats(const edict_t *pClient, int *ping, int *packet_loss)
 {
-	BOT_LOG("pfnGetPlayerStats", (""));
+	BOT_LOG("pfnGetPlayerStats", "");
 	(*g_engfuncs.pfnGetPlayerStats)(pClient, ping, packet_loss);
 }
 void pfnAddServerCommand(char *cmd_name, void (*function)(void))
 {
-   BOT_LOG("pfnAddServerCommand", ("cmd_name=%s, function=%x", cmd_name, function));
+   BOT_LOG("pfnAddServerCommand", UTIL_VarArgs("cmd_name=%s, function=%x", cmd_name, function));
    (*g_engfuncs.pfnAddServerCommand)(cmd_name, function);
 }
 

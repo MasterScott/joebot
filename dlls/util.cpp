@@ -1258,25 +1258,15 @@ qboolean UTIL_CallGameEntity( const char *entStr, entvars_t *pev)
 }
 
 #ifdef DEBUGENGINE
-int UTIL_BotLog(const char *fnName, const char *fmt, ...)
+void UTIL_BotLog(const char *fnName, const char *str)
 {
 	static FILE *fp;
-	va_list argptr;
-	int n = 0;
 
-	if (debug_engine)
+	if (CVAR_BOOL(jb_debugengine))
 	{
 		fp = fopen("bot.txt","a");
-
-		n += fprintf(fp, "%s: ", fnName);
-		va_start (argptr, fmt);
-		n += vfprintf (fp, fmt, argptr);
-		va_end (argptr);
-		n += fprintf(fp, "\n");
-		
+		fprintf(fp, "%s: %s\n", fnName, str);
 		fclose(fp);
 	}
-
-	return n;
 }
 #endif

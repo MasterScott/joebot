@@ -1103,9 +1103,18 @@ bool bc_showen(edict_t *pEntity,int iType,const char *arg1,const char *arg2,cons
 }
 
 bool bc_debug_engine(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4){
-	debug_engine = 1;
-	
-	UTIL_ConsoleMessage( pEntity,  "debug_engine enabled!\n");
+	if (FStrEq(arg1, "on")) {
+		CVAR_SET_FLOAT("jb_debugengine", 1);
+	}
+	else if (FStrEq(arg1, "off")) {
+		CVAR_SET_FLOAT("jb_debugengine", 0);
+	}
+	if (CVAR_BOOL(jb_debugengine)) {
+		UTIL_ConsoleMessage(pEntity,  "Debug engine ON\n");
+	}
+	else {
+		UTIL_ConsoleMessage(pEntity,  "Debug engine OFF\n");
+	}
 	
 	return true;
 }
