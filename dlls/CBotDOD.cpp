@@ -380,7 +380,7 @@ void CBotDOD :: SpawnInit(void)
 	bot_armor = 0;
 	bot_weapons = 0;
 	
-	//f_max_speed = g_sv_maxspeed->value;
+	//f_max_speed = pEdict->v.maxspeed
 	
 	prev_speed = 0.0;  // fake "paused" since bot is NOT stuck
 	
@@ -983,7 +983,7 @@ void CBotDOD :: Think5th(void){
 		&& f_UsedRadio < gpGlobals->time - 5.0f	// don't do that too often
 		&& f_LastRadio<gpGlobals->time - 4.0				// don't enerve others
 		&& f_noCamp < gpGlobals->time			// don't do that just after capming
-		&& f_timesrs > 3.0
+		&& g_fRoundTime > 3.0
 		&& RANDOM_LONG(0,100) < 50){						// not every time hackhack for double radio mess per frame
 		if(HasPrimary()){
 			if(!IsCWeaponPrimary()){
@@ -1030,7 +1030,7 @@ void CBotDOD :: Think5th(void){
 		g_bBombPlanted?Action.lAction|=BA_BOMBPL:Action.lAction&=~BA_BOMBPL;
 		
 		if(g_bBombPlanted){
-			//FakeClientCommand(pEdict,"say noticed it");
+			//DEBUG_CLIENTCOMMAND(pEdict,"say noticed it");
 			Chat.l_ChatEvent |= E_BombPl;
 			Task.RemoveT(BT_CAMP);
 			ResetWPlanning();
@@ -1151,7 +1151,7 @@ void CBotDOD :: Think1(void){
 	//			DistanceSight();
 	
 	if(bSlowed){
-		//FakeClientCommand(pEdict,"say stamina prone");
+		//DEBUG_CLIENTCOMMAND(pEdict,"say stamina prone");
 		GoProne(true,5);
 		Task.AddTask(BT_CAMP, gpGlobals->time + 2.0,0,0,0);
 		InitCamp();
@@ -1167,7 +1167,7 @@ void CBotDOD :: Think1(void){
 	float fDistance;
 	for(long lschl = 0;lschl < _MAX_LTMEM;lschl++){
 		if(LTMem.FMItem[lschl].bUsed){
-			//FakeClientCommand(pEdict,"say ltmprone");
+			//DEBUG_CLIENTCOMMAND(pEdict,"say ltmprone");
 			if(LTMem.FMItem[lschl].lType == LTM_KILLED){
 				fDistance = (LTMem.FMItem[lschl].VAddI2 - pEdict->v.origin).Length();
 				if ( fDistance < 200 ){
@@ -1192,7 +1192,7 @@ void CBotDOD :: Think1(void){
 			if(iDest != -1&&Task.SearchT(BT_GOBUTTON) == -1){
 				Task.AddTask(BT_GOTO|BT_GOBUTTON,-1,iDest,pToUse,0);
 			}
-			//FakeClientCommand(pEdict,"say wanting to go where pressing a button is needed");
+			//DEBUG_CLIENTCOMMAND(pEdict,"say wanting to go where pressing a button is needed");
 		}
 	}
 	
@@ -1201,12 +1201,12 @@ void CBotDOD :: Think1(void){
 		if( IsProne(pEdict) && f_pronetill < gpGlobals->time){
 			FakeClientCommand(pEdict,"prone");
 			f_changedprone = gpGlobals->time;
-			//FakeClientCommand(pEdict,"say a prone +");
+			//DEBUG_CLIENTCOMMAND(pEdict,"say a prone +");
 		}
 		else if( !IsProne(pEdict) && f_pronetill > gpGlobals->time){
 			FakeClientCommand(pEdict,"prone");
 			f_changedprone = gpGlobals->time;
-			//FakeClientCommand(pEdict,"say a prone -");
+			//DEBUG_CLIENTCOMMAND(pEdict,"say a prone -");
 		}
 	}
 	
@@ -1258,7 +1258,7 @@ void CBotDOD :: Think1(void){
 			}
 			if(!Task.Important()
 				&& f_noCamp < gpGlobals->time - 5.0
-				&&((f_timesrs < 30.0&&f_timesrs > 10.0) || RANDOM_LONG(0,100) < 20)
+				&&((g_fRoundTime < 30.0&&g_fRoundTime > 10.0) || RANDOM_LONG(0,100) < 20)
 				&&d_Manner<0){
 				float fMin = 200;
 				pent = GetNearestPlayer(pEdict,bot_teamnm,fMin,false,false);
@@ -1266,7 +1266,7 @@ void CBotDOD :: Think1(void){
 					&&(pent->v.origin-pEdict->v.origin).Length() < 600.0
 					&& pent->v.velocity.Length() > 100.0){
 					Task.AddTask(BT_WAIT4TM8,gpGlobals->time + 10.0,0,0,0);
-					//FakeClientCommand(pEdict,"say dangerous area");
+					//DEBUG_CLIENTCOMMAND(pEdict,"say dangerous area");
 				}
 			}
 		}
@@ -1283,7 +1283,7 @@ void CBotDOD :: Think1(void){
 			
 			Jump();		// if the bot is longer time blocked it should jump to get of fuckin ladders at least sometimes - although it may hurt :)
 			
-			//FakeClientCommand(pEdict,"say resetting wpstuff");
+			//DEBUG_CLIENTCOMMAND(pEdict,"say resetting wpstuff");
 		}
 	}
 	
@@ -1348,14 +1348,12 @@ void CBotDOD :: Think(void){
 	if(bRSInit){		// delete ways at and other vars at start of round
 		Init();
 		
-		iGlobalRSCount --;
-		
 		g_bBombPlanted = false;
-		g_iBombExplode = -1;
+		g_fBombExplode = -1;
 		
 		ResetWPlanning();
 		
-		//FakeClientCommand(pEdict,"say inited");
+		//DEBUG_CLIENTCOMMAND(pEdict,"say inited");
 		bRSInit = false;		// don't process this a second time this round
 		
 		for(int i = 0;i < 32;i++){
@@ -1366,7 +1364,7 @@ void CBotDOD :: Think(void){
 	// set this for the next time the bot dies so it will initialize stuff
 	need_to_initialize = TRUE;
 	
-	f_move_speed = f_max_speed;
+	f_move_speed = pEdict->v.maxspeed;
 	
 	if (g_b5th){								// this is every .2 s the case
 		Think5th();
@@ -1447,16 +1445,14 @@ void CBotDOD :: Think(void){
 				
 				
 				if(!iOnLadder){
-#ifdef DEBUGMESSAGES
-					WaypointDrawBeam(listenserver_edict,pEdict->v.origin,pEdict->v.origin + Vector(0,50,50),10,0,00,200,000,200,10);
-#endif
+					DEBUG_DRAWBEAM(listenserver_edict,pEdict->v.origin,pEdict->v.origin + Vector(0,50,50),10,0,00,200,000,200,10);
 					VLookTo = pBotEnemy -> v.origin;
 					f_LookTo = gpGlobals->time + 2.0;
 					//f_GoBack =
 				}
 				
 				lButton &=~ (IN_DUCK|IN_JUMP);
-				f_move_speed = f_max_speed;
+				f_move_speed = pEdict->v.maxspeed;
 				f_ducktill = 0;
 				f_strafe = 0;
 				if(i_CurrWP != -1)
@@ -1594,9 +1590,7 @@ void CBotDOD :: Think(void){
 				&& (Task.current && !(Task.current->lType&BT_IGNOREENEMY))
 				&& f_shootbox > gpGlobals->time 
 				&& !STMem[0].bSolid){
-#ifdef DEBUGMESSAGES
-				WaypointDrawBeam(listenserver_edict,pEdict->v.origin,pEdict->v.origin + Vector(0,50,0),10,0,0,000,200,200,10);
-#endif
+				DEBUG_DRAWBEAM(listenserver_edict,pEdict->v.origin,pEdict->v.origin + Vector(0,50,0),10,0,0,000,200,200,10);
 				VATurnTo(STMem[0].VCalcedOrigin - pEdict->v.origin);
 				
 				UTIL_TraceLine(pEdict->v.origin+pEdict->v.view_ofs,STMem[0].VCalcedOrigin,dont_ignore_monsters,pEdict,&tr);
@@ -1609,7 +1603,7 @@ void CBotDOD :: Think(void){
 				else{
 					FireWeapon(STMem[0].VCalcedOrigin);
 					f_noWP = gpGlobals->time + .2;
-					//FakeClientCommand(pEdict,"say shooting throught");
+					//DEBUG_CLIENTCOMMAND(pEdict,"say shooting throught");
 				}
 			}
 			
@@ -1918,16 +1912,9 @@ return;
 }
 // search ents
 
-#ifdef __LOG
-if(HasSecondary() && !HasPrimary() &&RANDOM_LONG(0,100) < 20){
-
-FILE *fhd;
-fhd=fopen("money.txt","a");
-if(fhd){
-fprintf(fhd,"%s\t%i\n\0",STRING(pEdict->v.netname),bot_money);
-fclose(fhd);
-}
-}
+#ifdef _DEBUG
+if(HasSecondary() && !HasPrimary() &&RANDOM_LONG(0,100) < 20)
+LOG_MONEY(UTIL_VarArgs("%s\t%i\n\0",STRING(pEdict->v.netname),m_iBotMoney));
 #endif
 
 if(bRSInit){		// delete ways at and other vars at start of round
@@ -1938,7 +1925,7 @@ iFarGoal = -1;
 // don't forget the freezetime !! -> freezetime is done by setmaxspeed
 //f_pause_time  = gpGlobals->time + g_mp_freezetime->value;
 
-//FakeClientCommand(pEdict,"say inited");
+//DEBUG_CLIENTCOMMAND(pEdict,"say inited");
 bRSInit = false;		// don't process this a second time this round
 
 for(int i = 0;i < 32;i++){
@@ -1949,7 +1936,7 @@ f_ES[i] = gpGlobals->time;
 // set this for the next time the bot dies so it will initialize stuff
 need_to_initialize = TRUE;
 
-f_move_speed = f_max_speed;
+f_move_speed = pEdict->v.maxspeed;
 
 if (g_b5th){								// this is every .2 s the case
 
@@ -2000,12 +1987,12 @@ if(f_pronetill > 0 && f_changedprone < gpGlobals->time - 2.0){
 if( IsProne(pEdict) && f_pronetill < gpGlobals->time){
 FakeClientCommand(pEdict,"prone");
 f_changedprone = gpGlobals->time;
-//FakeClientCommand(pEdict,"say a prone +");
+//DEBUG_CLIENTCOMMAND(pEdict,"say a prone +");
 }
 else if( !IsProne(pEdict) && f_pronetill > gpGlobals->time){
 FakeClientCommand(pEdict,"prone");
 f_changedprone = gpGlobals->time;
-//FakeClientCommand(pEdict,"say a prone -");
+//DEBUG_CLIENTCOMMAND(pEdict,"say a prone -");
 }
 }
 
@@ -2080,7 +2067,7 @@ Ordered.pREdict = 0;				// reset pointer
 }
 
 if(bSlowed){
-//FakeClientCommand(pEdict,"say stamina prone");
+//DEBUG_CLIENTCOMMAND(pEdict,"say stamina prone");
 GoProne(true,5);
 Task.AddTask(BT_CAMP, gpGlobals->time + 2.0,0,0,0);
 InitCamp();
@@ -2104,7 +2091,7 @@ f_PauseShoot = 0.0;
 float fDistance;
 for(long lschl = 0;lschl < _MAX_LTMEM;lschl++){
 if(LTMem.FMItem[lschl].bUsed){
-//FakeClientCommand(pEdict,"say ltmprone");
+//DEBUG_CLIENTCOMMAND(pEdict,"say ltmprone");
 if(LTMem.FMItem[lschl].lType == LTM_KILLED){
 fDistance = (LTMem.FMItem[lschl].VAddI2 - pEdict->v.origin).Length();
 if ( fDistance < 200 ){
@@ -2298,7 +2285,7 @@ f_strafe = 50;
 else{
 FireWeapon(STMem[0].VCalcedOrigin);
 f_noWP = gpGlobals->time + .2;
-//FakeClientCommand(pEdict,"say shooting throught");
+//DEBUG_CLIENTCOMMAND(pEdict,"say shooting throught");
 }
 }
 
@@ -2337,8 +2324,8 @@ if(tr.flFraction == 1.0
 && tr2.flFraction == 1.0){				// i.e. visible
 VLookTo = VSuspEn;
 f_LookTo = gpGlobals->time +1.0;
-//FakeClientCommand(pEdict,"say susp");
-//FakeClientCommand(pEdict,"say looking to susp look");
+//DEBUG_CLIENTCOMMAND(pEdict,"say susp");
+//DEBUG_CLIENTCOMMAND(pEdict,"say looking to susp look");
 if(FInViewCone(&VSuspEn,pEdict))
 //bSawSuspLoc = true;
 Action.lAction &= ~BA_SUSPLOC;			// del susploc flag
@@ -2398,12 +2385,12 @@ if((moved_distance < 1.0)
 && (f_dont_check_stuck < gpGlobals->time)
 && f_Pause < gpGlobals->time-.5){// running against wall etc.
 //f_old_direction = (pEdict->v.angles.y - v_diff_angles.y - 8);
-//FakeClientCommand(pEdict,"say muh die kuh");
+//DEBUG_CLIENTCOMMAND(pEdict,"say muh die kuh");
 if(l_cState==0){		// crashed into wall for the first time ...
 l_cState ++;
 
 if(RANDOM_LONG(0,100) < 80){		// .. so jump
-//FakeClientCommand(pEdict,"say no waypoint found and jumping cause of wall");
+//DEBUG_CLIENTCOMMAND(pEdict,"say no waypoint found and jumping cause of wall");
 lButton |= IN_JUMP;
 lButton |= IN_DUCK;
 }
@@ -2483,7 +2470,7 @@ else{
 HeadToward(VRunningTo);
 }
 
-//FakeClientCommand(pEdict,"say -| %f ; %f",f_newspeed,f_newstrafe);
+//DEBUG_CLIENTCOMMAND(pEdict,"say -| %f ; %f",f_newspeed,f_newstrafe);
 }
 else{
 f_LookTo = gpGlobals->time;
@@ -2549,9 +2536,9 @@ while(i < pWPAMPlay->iNum){
 if(pWPAMPlay->Rec[i].fTime > fOffset){		// i.e. that's the last recorded item
 // copy stuff from recorded data to bot
 if(pWPAMPlay->Rec[i].lButton&IN_DUCK){
-FakeClientCommand(pEdict,"say duckin from advm");
+DEBUG_CLIENTCOMMAND(pEdict,"say duckin from advm");
 }
-//FakeClientCommand(pEdict,"say -");
+//DEBUG_CLIENTCOMMAND(pEdict,"say -");
 lButton = pWPAMPlay->Rec[i].lButton;
 pEdict->v.origin = pWPAMPlay->Rec[i].v_origin;
 pEdict->v.angles = pWPAMPlay->Rec[i].v_angles;
@@ -2583,7 +2570,7 @@ break;
 i++;
 }
 if(!(i < pWPAMPlay->iNum)){
-FakeClientCommand(pEdict,"say stoppin advm");
+DEBUG_CLIENTCOMMAND(pEdict,"say stoppin advm");
 bReplay = false;
 }
 }

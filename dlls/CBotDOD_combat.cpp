@@ -37,9 +37,7 @@
 #include "NeuralNet.h"
 
 void CBotDOD :: Fight(void){
-#ifdef DEBUGMESSAGES
-	WaypointDrawBeam(listenserver_edict,pEdict->v.origin,pEdict->v.origin + Vector(0,0,50),10,0,200,000,000,200,10);
-#endif
+	DEBUG_DRAWBEAM(listenserver_edict,pEdict->v.origin,pEdict->v.origin + Vector(0,0,50),10,0,200,000,000,200,10);
 	bool bDefensive = false;
 	edict_t *pFlashbang=0;
 	Vector v_enemy = pBotEnemy->v.origin - pEdict->v.origin;	// difference vector from en and bot
@@ -193,7 +191,7 @@ void CBotDOD :: Fight(void){
 		// OJump
 		//cout << dCombatNNOut[OJump] << endl;
 		if(dCombatNNOut[OJump] > 0.75){
-			//FakeClientCommand(pEdict,"say NNJUMP");
+			//DEBUG_CLIENTCOMMAND(pEdict,"say NNJUMP");
 			if(!(pEdict->v.button & IN_JUMP)
 				&& RANDOM_LONG(0,100) > 50
 				&& f_move_speed > 1.0)
@@ -229,7 +227,7 @@ void CBotDOD :: Fight(void){
 		}
 		
 		// ct bots shouldn't hide when the VIP is near to them
-		if(bDefensive && g_iTypeoM == MT_AS){
+		if(bDefensive && g_iMapType == MT_AS){
 			if(g_pVIP){
 				if((pEdict->v.origin-g_pVIP->v.origin).Length() < 400.0)
 					bDefensive = false;
@@ -264,7 +262,7 @@ void CBotDOD :: Fight(void){
 		if(Task.current&&Task.current->lType & BT_HIDE){
 			// copy point to edict hiding from to bot_t.pHidefrom;
 			//if(pEdictPlayer)WaypointDrawBeam(pEdictPlayer,pEdict->v.origin,VHidingPlace,100,10,255,255,255,100,50);
-			//FakeClientCommand(pEdict,"say hiding ...");
+			//DEBUG_CLIENTCOMMAND(pEdict,"say hiding ...");
 			// sometimes jump
 			if(RANDOM_LONG(0,100) < 8
 				&&moved_distance > 8.0f
@@ -301,7 +299,7 @@ void CBotDOD :: Fight(void){
 					ResetWPlanning();
 				}
 				//					pHidefrom = pBotEnemy;
-				//FakeClientCommand(pEdict,"say hiding cause of shitty circumstances ....");
+				//DEBUG_CLIENTCOMMAND(pEdict,"say hiding cause of shitty circumstances ....");
 			}
 			}
 		}
@@ -326,7 +324,7 @@ void CBotDOD :: Fight(void){
 				f_AimHead += gpGlobals->frametime;
 			}
 			f_move_speed /= 2.0f;						// slow down to be less obvious ...
-			//FakeClientCommand(pEdict,"say aiming");
+			//DEBUG_CLIENTCOMMAND(pEdict,"say aiming");
 		}
 		else
 			if(bMeIVC){
@@ -354,20 +352,20 @@ void CBotDOD :: Fight(void){
 						f_LastFight = gpGlobals->time;
 					}
 					else{
-						//FakeClientCommand(pEdict,"say Paused weapon");		// sometimes the bots don't shoot after a map change - Why ??
+						//DEBUG_CLIENTCOMMAND(pEdict,"say Paused weapon");		// sometimes the bots don't shoot after a map change - Why ??
 					}
 				}
 			}
 			else{
-				//FakeClientCommand(pEdict,"say bots are friendly");
+				//DEBUG_CLIENTCOMMAND(pEdict,"say bots are friendly");
 			}
 			
 			/*FILE *fhd = fopen("punchangle.txt","a");fprintf(fhd,"%s\t%f\n",STRING(pEdict->v.netname),(pEdict->v.punchangle).Length());fclose(fhd);
 			if ((pEdict->v.punchangle).Length() > .1)
-			FakeClientCommand(pEdict,"say %f",(pEdict->v.punchangle).Length());*/
+			DEBUG_CLIENTCOMMAND(pEdict,"say %f",(pEdict->v.punchangle).Length());*/
 			/*	}
 			catch(...){
-			FakeClientCommand(pEdict,"say asdlkjglkjjljkglkjgljk");
+			DEBUG_CLIENTCOMMAND(pEdict,"say asdlkjglkjjljkglkjgljk");
 			FILE *fhd = fopen("scheisse.txt","a");fprintf(fhd,"scheisse in combat\n");fclose(fhd);
 	}*/
 }
@@ -399,9 +397,9 @@ bool CBotDOD :: FireWeapon( Vector &v_enemy )
 	if(// tr.flFraction < .9
 		UTIL_ClientIndex(tr.pHit) != -1
 		&& (tr.pHit != pBotEnemy)){// line is probably fract by enemy
-		f_strafe += i_avoidstrafe * f_max_speed;
+		f_strafe += i_avoidstrafe * pEdict->v.maxspeed;
 		Action.lAction |= BA_TKAVOID;			// set flag for only short hiding or stop hiding when no teamm8 is in sight
-		//FakeClientCommand(pEdict,"say tk avoid");
+		//DEBUG_CLIENTCOMMAND(pEdict,"say tk avoid");
 		return FALSE;
 	}
 	else{

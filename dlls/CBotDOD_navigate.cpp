@@ -158,7 +158,7 @@ bool CBotDOD :: HeadTowardWaypoint(void){
 	
 	// to have some time without going to WPs
 	if(f_noWP > gpGlobals->time){
-		//FakeClientCommand(pEdict,"say not using wp");
+		//DEBUG_CLIENTCOMMAND(pEdict,"say not using wp");
 		return false;
 	}
 	
@@ -235,7 +235,7 @@ bool CBotDOD :: HeadTowardWaypoint(void){
 						if(f_noCamp < gpGlobals->time){
 							//cout << "reached campatgoal" << endl;
 							Task.AddTask(BT_CAMP,fDuration,0,0,0);
-							//FakeClientCommand(pEdict,"say %f",Task.current->fAdd);
+							//DEBUG_CLIENTCOMMAND(pEdict,"say %f",Task.current->fAdd);
 							InitCamp();
 							if(CVAR_BOOL(jb_msgradio) && Task.current->p){
 								SendRadioCommand(RADIO_IM_IN_POSITION);
@@ -275,7 +275,7 @@ bool CBotDOD :: HeadTowardWaypoint(void){
 				if(fCDistance < 50){
 					//lNextWP = IsInWay(FW_Cur,i_CurrWP);		// look where this near wp is in the calced way
 					
-					//FakeClientCommand(pEdict,"say %f",fCDistance-f_D2C);
+					//DEBUG_CLIENTCOMMAND(pEdict,"say %f",fCDistance-f_D2C);
 					iNextWP = WaypointRouteFromTo(iNearWP,iGoal,bot_teamnm);
 					
 					if(waypoints[iNearWP].flags & W_FL_JUMP){
@@ -306,7 +306,7 @@ bool CBotDOD :: HeadTowardWaypoint(void){
 								f_noWP = gpGlobals->time + 1.f;
 								f_move_speed = 0;
 								lButton &= ~IN_JUMP;
-								FakeClientCommand(pEdict,"say waiting because there is already a motherfucker in the way");
+								DEBUG_CLIENTCOMMAND(pEdict,"say waiting because there is already a motherfucker in the way");
 
 								f_D2C1 = 1000;
 								return false;
@@ -320,9 +320,7 @@ bool CBotDOD :: HeadTowardWaypoint(void){
 					if(iNextWP == WAYPOINT_UNREACHABLE
 						|| iNextWP == iNearWP
 						|| iNextWP > WAYPOINT_UNREACHABLE/2){
-#ifdef DEBUGMESSAGES
-						FakeClientCommand(pEdict,"say lost way");
-#endif
+						DEBUG_CLIENTCOMMAND(pEdict,"say lost way");
 						//cout << "unreachable" << endl;
 						ResetWPlanning();
 						
@@ -334,11 +332,9 @@ bool CBotDOD :: HeadTowardWaypoint(void){
 						
 						return false;
 					}
-#ifdef DEBUGMESSAGES
 					else{
-						WaypointDrawBeam(listenserver_edict,pEdict->v.origin+Vector(0,0,30),waypoints[iNextWP].origin+Vector(0,0,30),20,0,200,200,200,100,20);
+						DEBUG_DRAWBEAM(listenserver_edict,pEdict->v.origin+Vector(0,0,30),waypoints[iNextWP].origin+Vector(0,0,30),20,0,200,200,200,100,20);
 					}
-#endif
 					
 					i_LastWP = i_CurrWP;
 					i_CurrWP = iNextWP; 
@@ -355,8 +351,8 @@ bool CBotDOD :: HeadTowardWaypoint(void){
 					
 					if(	  !g_bBombPlanted
 						&& fM[bot_teamnm]<0.0
-						&& f_timesrs < 60.0
-						&& f_timesrs > 15.0
+						&& g_fRoundTime < 60.0
+						&& g_fRoundTime > 15.0
 						&& f_noCamp < gpGlobals->time
 						&& iNearWP != -1
 						&&!HasSniper()
@@ -407,7 +403,7 @@ bool CBotDOD :: HeadTowardWaypoint(void){
 									bTTime = false;
 									for(i1=0;i1<_MAX_LTMEM;i1++){
 										if(WPStat[i].fpKilledTime[i1]>1.0
-											&&(TEq(f_timesrs+5,WPStat[i].fpKilledTime[i1],7.0))){
+											&&(TEq(g_fRoundTime+5,WPStat[i].fpKilledTime[i1],7.0))){
 											bTTime = true;
 											break;
 										}
@@ -415,7 +411,7 @@ bool CBotDOD :: HeadTowardWaypoint(void){
 									if(!bTTime){
 										for(i1=0;i1<_MAX_LTMEM;i1++){
 											if(WPStat[i].fpKillTime[i1]>1.0
-												&&(TEq(f_timesrs+5,WPStat[i].fpKillTime[i1],7.0))){
+												&&(TEq(g_fRoundTime+5,WPStat[i].fpKillTime[i1],7.0))){
 												bTTime = true;
 												break;
 											}
@@ -495,7 +491,7 @@ bool CBotDOD :: HeadTowardWaypoint(void){
 				}
 			}
 		}
-		//FakeClientCommand(pEdict,"say -");
+		//DEBUG_CLIENTCOMMAND(pEdict,"say -");
 		i_CurrWP = WaypointFindNearest(pEdict,100,bot_teamnm,0,true,true,true);
 		if(i_CurrWP == -1){
 			i_CurrWP = WaypointFindNearest(pEdict,200,bot_teamnm,0,true,false,true);
@@ -510,7 +506,7 @@ bool CBotDOD :: HeadTowardWaypoint(void){
 		iFarGoal = iGoal = i_CurrWP;
 		VRunningTo = waypoints[i_CurrWP].origin;
 		
-		//FakeClientCommand(pEdict,"say heading to");
+		//DEBUG_CLIENTCOMMAND(pEdict,"say heading to");
 		//if( (pEdict->v.origin - waypoints[i_CurrWP].origin).Length() < _NEAR ){
 		//if( WaypointFindNearest(pEdict,_NEAR,bot_teamnm) != -1 ){
 		if( (waypoints[i_CurrWP].origin - pEdict->v.origin).Length() < _NEAR*2 ){
@@ -650,7 +646,7 @@ void CBotDOD :: FindRoute(int iNearWP){
 						count ++;
 					}
 					else{
-						iStore = RANDOM_LONG(1,_MAXTEMPDIV) - 1;
+						iStore = RANDOM_LONG(0,_MAXTEMPDIV - 1);
 					}
 	
 					indexes[iStore].index = preindexes[index];				
@@ -684,7 +680,7 @@ void CBotDOD :: FindRoute(int iNearWP){
 				if(indexes[index].Way1.iNum > 3		// sackgasse ?
 					&& indexes[index].Way2.iNum > 3){
 					if(indexes[index].Way1.iIndices[indexes[index].Way1.iNum-2] == indexes[index].Way2.iIndices[1]){
-						//FakeClientCommand(pEdict,"say going back - we don't really want that, are we ?");
+						//DEBUG_CLIENTCOMMAND(pEdict,"say going back - we don't really want that, are we ?");
 						indexes[index].index = -1;
 					}
 				}
@@ -764,7 +760,7 @@ void CBotDOD :: FindRoute(int iNearWP){
 			//cout << count << endl;
 			
 			if(count){
-				iGoal = indexes[RANDOM_LONG(1, count) - 1].index;
+				iGoal = indexes[RANDOM_LONG(0, count - 1)].index;
 			}
 			else{
 					iGoal = iFarGoal;
@@ -783,7 +779,7 @@ void CBotDOD :: FindRoute(int iNearWP){
 					&&Task.SearchT(BT_GOBUTTON) == -1){
 					Task.AddTask(BT_GOTO|BT_GOBUTTON,-1,iDest,pToUse,0);
 				}
-				//FakeClientCommand(pEdict,"say wanting to go where pressing a button is needed");
+				//DEBUG_CLIENTCOMMAND(pEdict,"say wanting to go where pressing a button is needed");
 			}
 	}
 	else{
@@ -847,7 +843,7 @@ bool CBotDOD :: Bored(void){
 							
 							lButton |= IN_ATTACK;
 							//BotFireWeapon(entity_origin,pBot);
-							//FakeClientCommand(pEdict,"say bored");
+							//DEBUG_CLIENTCOMMAND(pEdict,"say bored");
 							return true;
 						}
 					}
@@ -874,7 +870,7 @@ bool CBotDOD :: Bored(void){
 bool CBotDOD :: DecideOnWay(void){
 	int iNearest = WaypointFindNearest(pEdict,300,bot_teamnm);
 	
-	//FakeClientCommand(pEdict,"say generating new way");
+	//DEBUG_CLIENTCOMMAND(pEdict,"say generating new way");
 	
 	iWantedDiv = 0;		// by default the are no wanted divisions
 	
@@ -1022,7 +1018,7 @@ void CBotDOD :: UpdateFlags(void){
 	ischl = 0;
 	edict_t *pEnt;
 	pEnt = 0;
-	//if(listenserver_edict)FakeClientCommand(listenserver_edict,"say updating flags");
+	//if(listenserver_edict){DEBUG_CLIENTCOMMAND(listenserver_edict,"say updating flags");}
 
 	while(pEnt = UTIL_FindEntityByClassname(pEnt,"dod_control_point")){
 		if(FStrEq(STRING(pEnt->v.model),"models/w_gflag.mdl")){
