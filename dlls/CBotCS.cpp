@@ -79,7 +79,7 @@ void CBotCS :: HandleMenu( void )
 
 		case MSG_CS_CT_SELECT: // counter terrorist
 		case MSG_CS_T_SELECT:  // terrorist
-			if ((bot_class < 1) || (bot_class > 4)) bot_class = 5;  // auto-select if invalid
+			if ((bot_class < 1) || (bot_class > 4)) bot_class = RANDOM_LONG(1, 4);  // random if invalid
 			start_action = MSG_CS_IDLE;  // switch back to idle
 			not_started = false; // bot has now joined the game (doesn't need to be started)
 			FakeClientCommand(pEdict, "menuselect %d", bot_class);
