@@ -587,7 +587,7 @@ void UTIL_TraceHull(const Vector &vecStart, const Vector &vecEnd, IGNORE_MONSTER
 void UTIL_HostSay( edict_t *pEntity, int teamonly, char *message );
 void UTIL_ShowMenu( edict_t *pEdict, int slots, int displaytime, bool needmore, char *pText );
 void UTIL_ShowText( edict_t *pEntity, const hudtextparms_t &textparms, const char *pMessage );
-int UTIL_BuildFileName(char *str, size_t size, const char *format, ...);
+void UTIL_BuildFileName(char *str, size_t size, const char *format, ...);
 
 edict_t	*UTIL_FindEntityInSphere(edict_t *pStartEntity, const Vector &vecCenter, float flRadius);
 edict_t	*UTIL_FindEntityByString(edict_t *pStartEntity, const char *szKeyword, const char *szValue );

@@ -818,7 +818,7 @@ Vector VecBModelOrigin(entvars_s *v)
 	return v->absmin + (v->size * 0.5);
 }
 
-int UTIL_BuildFileName(char *str, size_t size, const char *format, ...)
+void UTIL_BuildFileName(char *str, size_t size, const char *format, ...)
 {
 	va_list		argptr;
 
