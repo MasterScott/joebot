@@ -163,7 +163,7 @@ CChatITextElem *CChatIElem :: GetRandomText(void){
 		lNum++;
 		p = p->next;
 	}
-	lRandom = RANDOM_LONG(1,lNum)-1;
+	lRandom = RANDOM_LONG(0,lNum-1);
 	
 	p = pTexts;
 	lNum = 0;
@@ -246,7 +246,7 @@ char *CChat :: Associate(const char *szP){
 			}
 			else{
 				pCITE = p->GetRandomText();
-				lChoice = RANDOM_LONG(1,_MAXAP)-1;
+				lChoice = RANDOM_LONG(0,_MAXAP-1);
 				szPoss[lChoice] = pCITE->szText;
 				pfTime[lChoice] = &(pCITE->fTime);
 			}
@@ -254,7 +254,7 @@ char *CChat :: Associate(const char *szP){
 		p = p->next;
 	}
 	if(lNum){
-		lChoice = RANDOM_LONG(1,lNum)-1;
+		lChoice = RANDOM_LONG(0,lNum-1);
 		if(!TEq(*pfTime[lChoice],gpGlobals->time,_SCHATTIME)){
 			szReturn = szPoss[lChoice];
 			if(pfTime[lChoice])
@@ -442,7 +442,7 @@ int CChat :: ProcessChatString(CBotBase *pBBot,char *szChatText){
 			strncat(szTemp,szChatText,szFound-szChatText);
 			// get time to end of round
 			char szTime[80];
-			snprintf(szTime,sizeof(szTime),"%i seconds",int(CVAR_GET_FLOAT("mp_roundtime")*60.0 - f_timesrs));
+			snprintf(szTime,sizeof(szTime),"%i seconds",int(CVAR_GET_FLOAT("mp_roundtime")*60.0 - g_fRoundTime));
 			strcat(szTemp,szTime);
 			strcat(szTemp,szFound + strlen(szTIMERE));
 			strcpy(szChatText,szTemp);
@@ -689,7 +689,7 @@ int CChat :: LoadFile(const char *szFileNameP){
 			}*/
 			
 			szELine = strstr(szAct,"\n");
-#ifdef DEBUGMESSAGES
+#ifdef _DEBUG
 			cout << "Keys : ";cout.flush();
 #endif
 			while(szComma = strstr(szAct,",")){
@@ -719,7 +719,7 @@ int CChat :: LoadFile(const char *szFileNameP){
 					
 					pIElem->AddKey(szKey);
 					iKCount ++;
-#ifdef DEBUGMESSAGES
+#ifdef _DEBUG
 					cout <<"\""<< szKey << "\"|";
 #endif
 				}
@@ -734,7 +734,7 @@ int CChat :: LoadFile(const char *szFileNameP){
 			
 			pIElem->AddKey(szKey);
 			
-#ifdef DEBUGMESSAGES
+#ifdef _DEBUG
 			cout << szKey << "\n";
 #endif
 			
@@ -756,7 +756,7 @@ int CChat :: LoadFile(const char *szFileNameP){
 					strncpy(szAdd,szAct,sizeof(char) * (strchr(szAct,'\n') - szAct));
 					pIElem->AddText(szAdd);
 					iCCount ++;
-#ifdef DEBUGMESSAGES
+#ifdef _DEBUG
 					cout << " - "<<szAdd << endl;
 #endif
 					szAct = strchr(szAct,'\n');
