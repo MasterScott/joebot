@@ -406,15 +406,15 @@ void pfnClientCommand(edict_t* pEdict, char* szFmt, ...)
 	if (debug_engine) { fp=fopen("bot.txt","a"); fprintf(fp,"pfnClientCommand=%s\n",szFmt); fclose(fp); }
 #endif
 	
-	/*if (!(pEdict->v.flags & FL_FAKECLIENT))
+	if (!(pEdict->v.flags & FL_FAKECLIENT))
 	{
-	char tempFmt[256];
-	va_list argp;
-	va_start(argp, szFmt);
-	vsprintf(tempFmt, szFmt, argp);
-	(*g_engfuncs.pfnClientCommand)(pEdict, tempFmt);
-	va_end(argp);
-}*/
+		char tempFmt[256];
+		va_list argp;
+		va_start(argp, szFmt);
+		vsprintf(tempFmt, szFmt, argp);
+		(*g_engfuncs.pfnClientCommand)(pEdict, tempFmt);
+		va_end(argp);
+	}
 	return;
 }
 void pfnParticleEffect(const float *org, const float *dir, float color, float count)
