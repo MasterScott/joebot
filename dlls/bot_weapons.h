@@ -80,7 +80,7 @@
 
 // weapon ID values for Counter-Strike
 #define CS_WEAPON_P228           1
-#define CS_WEAPON_UNKNOWN2       2
+#define CS_WEAPON_SHIELD         2
 #define CS_WEAPON_SCOUT          3
 #define CS_WEAPON_HEGRENADE      4
 #define CS_WEAPON_XM1014         5
