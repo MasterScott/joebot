@@ -1,6 +1,6 @@
 /***
 *
-*	Copyright (c) 1999, Valve LLC. All rights reserved.
+*	Copyright (c) 1996-2002, Valve LLC. All rights reserved.
 *	
 *	This product contains software technology licensed from Id 
 *	Software, Inc. ("Id Technology").  Id Technology (c) 1996 Id Software, Inc. 
@@ -20,6 +20,8 @@
 #pragma once
 #endif
 
+#include "const.h"
+
 #define MAX_QPATH 64    // Must match value in quakedefs.h
 
 /////////////////
@@ -33,11 +35,10 @@ typedef enum
 	t_model,
 	t_decal,
 	t_generic,
-	t_eventscript
+	t_eventscript,
+	t_world,		// Fake type for world, is really t_model
 } resourcetype_t;
 
-// Fake type for world
-#define t_world 6
 
 typedef struct
 {
@@ -46,7 +47,7 @@ typedef struct
 
 typedef struct resourceinfo_s
 {
-	_resourceinfo_t info[ 7 ];
+	_resourceinfo_t info[ 8 ];
 } resourceinfo_t;
 
 #define RES_FATALIFMISSING (1<<0)   // Disconnect if we can't get this file.
@@ -54,6 +55,7 @@ typedef struct resourceinfo_s
 #define RES_CUSTOM         (1<<2)   // Is this resource one that corresponds to another player's customization
 								    //  or is it a server startup resource.
 #define RES_REQUESTED	   (1<<3)	// Already requested a download of this one
+#define RES_PRECACHED	   (1<<4)	// Already precached
 
 #include "crc.h"
 

@@ -1,6 +1,6 @@
 /***
 *
-*	Copyright (c) 1999, 2000 Valve LLC. All rights reserved.
+*	Copyright (c) 1996-2002, Valve LLC. All rights reserved.
 *	
 *	This product contains software technology licensed from Id 
 *	Software, Inc. ("Id Technology").  Id Technology (c) 1996 Id Software, Inc. 
@@ -43,13 +43,14 @@
 #define	FL_IMMUNE_SLIME			(1<<18)
 #define FL_IMMUNE_LAVA			(1<<19)
 
-//#define FL_ARCHIVE_OVERRIDE		(1<<20)	// NOT USED
+#define FL_PROXY				(1<<20)	// This is a spectator proxy
 #define FL_ALWAYSTHINK			(1<<21)	// Brush model flag -- call think every frame regardless of nextthink - ltime (for constantly changing velocity/path)
 #define FL_BASEVELOCITY			(1<<22)	// Base velocity has been applied this frame (used to convert base velocity into momentum)
 #define FL_MONSTERCLIP			(1<<23)	// Only collide in with monsters who have FL_MONSTERCLIP set
 #define FL_ONTRAIN				(1<<24) // Player is _controlling_ a train, so movement commands should be ignored on client during prediction.
 #define FL_WORLDBRUSH			(1<<25)	// Not moveable/removeable brush entity (really part of the world, but represented as an entity for transparency or something)
 #define FL_SPECTATOR            (1<<26) // This client is a spectator, don't run touch functions, etc.
+#define FL_THIRDPARTYBOT		(1<<27) // Used in place of FL_FAKECLIENT to avoid conflict with official cs1.6 bots
 #define FL_CUSTOMENTITY			(1<<29)	// This is a custom entity
 #define FL_KILLME				(1<<30)	// This entity is marked for death -- This allows the engine to kill ents at the appropriate time
 #define FL_DORMANT				(1<<31)	// Entity is dormant, no updates to client
@@ -347,7 +348,17 @@
 // ushort 8.8 hold time
 // optional ushort 8.8 fxtime	(time the highlight lags behing the leading text in effect 2)
 // string text message		(512 chars max sz string)
+#define TE_LINE				30
+// coord, coord, coord		startpos
+// coord, coord, coord		endpos
+// short life in 0.1 s
+// 3 bytes r, g, b
 
+#define TE_BOX				31
+// coord, coord, coord		boxmins
+// coord, coord, coord		boxmaxs
+// short life in 0.1 s
+// 3 bytes r, g, b
 
 #define TE_KILLBEAM			99		// kill all beams attached to entity
 // short (entity)
@@ -550,6 +561,8 @@
 // byte ( color ) this is an index into an array of color vectors in the engine. (0 - )
 // byte ( length * 10 )
 
+
+
 #define	MSG_BROADCAST		0		// unreliable to all
 #define	MSG_ONE				1		// reliable to one (msg_entity)
 #define	MSG_ALL				2		// reliable to all
@@ -559,6 +572,7 @@
 #define MSG_PVS_R			6		// Reliable to PVS
 #define MSG_PAS_R			7		// Reliable to PAS
 #define MSG_ONE_UNRELIABLE	8		// Send to one client, but don't put in reliable stream, put in unreliable datagram ( could be dropped )
+#define	MSG_SPEC			9		// Sends to all spectator proxies
 
 // contents of a spot in the world
 #define	CONTENTS_EMPTY		-1
@@ -581,6 +595,10 @@
 */
 #define	CONTENTS_LADDER		-16
 
+#define	CONTENT_FLYFIELD			-17
+#define	CONTENT_GRAVITY_FLYFIELD	-18
+#define	CONTENT_FOG					-19
+
 #define CONTENT_EMPTY	-1
 #define CONTENT_SOLID	-2
 #define	CONTENT_WATER	-3
@@ -596,7 +614,8 @@
 #define	CHAN_BODY			4
 #define CHAN_STREAM			5		// allocate stream channel from the static or dynamic area
 #define CHAN_STATIC			6		// allocate channel from the static area 
-
+#define CHAN_NETWORKVOICE_BASE	7		// voice data coming across the network
+#define CHAN_NETWORKVOICE_END	500		// network voice data reserves slots (CHAN_NETWORKVOICE_BASE through CHAN_NETWORKVOICE_END).
 
 // attenuation values
 #define ATTN_NONE		0
@@ -617,6 +636,7 @@
 
 // Trains
 #define	SF_TRAIN_WAIT_RETRIGGER	1
+#define SF_TRAIN_START_ON		4		// Train is initially moving
 #define SF_TRAIN_PASSABLE		8		// Train is not solid -- used to make water trains
 
 // buttons

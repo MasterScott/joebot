@@ -1,6 +1,6 @@
 /***
 *
-*	Copyright (c) 1999, Valve LLC. All rights reserved.
+*	Copyright (c) 1996-2002, Valve LLC. All rights reserved.
 *	
 *	This product contains software technology licensed from Id 
 *	Software, Inc. ("Id Technology").  Id Technology (c) 1996 Id Software, Inc. 
@@ -34,11 +34,7 @@
 //
 
 #ifdef _WIN32
-	#ifndef _GCC
-	#define DLLEXPORT __stdcall
-	#else
-	#define DLLEXPORT /* */
-	#endif
+#define DLLEXPORT __stdcall
 #else
 #define DLLEXPORT /* */
 #endif
@@ -263,9 +259,7 @@ typedef struct enginefuncs_s
 	qboolean	(*pfnVoice_GetClientListening)(int iReceiver, int iSender);
 	qboolean	(*pfnVoice_SetClientListening)(int iReceiver, int iSender, qboolean bListen);
 
-	// Added for HL 1109 (no SDK update): 
-    const char * (*pfnGetPlayerAuthID) (edict_t *e); 
-
+	const char *(*pfnGetPlayerAuthId)		( edict_t *e );
 } enginefuncs_t;
 // ONLY ADD NEW FUNCTIONS TO THE END OF THIS STRUCT.  INTERFACE VERSION IS FROZEN AT 138
 
