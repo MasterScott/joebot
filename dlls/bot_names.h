@@ -19,10 +19,10 @@
 
 ******************************************************************************/
 
-#if !defined(__NAMES_H)
+#ifndef __NAMES_H
 #define __NAMES_H
 
-#include <list>
+#include <list.h>
 
 #include "CParser.h"
 
@@ -62,4 +62,4 @@ public:
 	std::list<CBotNamesItem>::iterator m_ICName;		// iterator for m_LNames, so you can go thru the names
 };
 
-#endif // !defined(__NAMES_H)
+#endif //__NAMES_H
