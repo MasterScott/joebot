@@ -5,6 +5,8 @@
 #include "Genom.h"
 #include "GenomToken.h"
 
+#include <iostream.h>
+
 //#define __GENOM_COUT_LOG
 
 //////////////////////////////////////////////////////////////////////
