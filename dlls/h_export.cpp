@@ -145,11 +145,13 @@ extern "C" DLLEXPORT void GiveFnptrsToDll( enginefuncs_t* pengfuncsFromEngine, g
    char game_name[32];
    char game_dll[256];
 
+   // get the engine functions from the engine...
+   
+   // check if we're running under Steam
    struct stat buf;
    if (stat("valve/steam.inf", &buf) == 0 || stat("FileSystem_Steam.dll", &buf) == 0)
       g_bIsSteam = true;
 
-   // get the engine functions from the engine...
    if (g_bIsSteam)
       memcpy(&g_engfuncs, pengfuncsFromEngine, sizeof(enginefuncs_t));
    else
@@ -157,7 +159,6 @@ extern "C" DLLEXPORT void GiveFnptrsToDll( enginefuncs_t* pengfuncsFromEngine, g
   		 
    gpGlobals = pGlobals;
    
-   // check if we're running under Steam
    // find the directory name of the currently running MOD...
    GET_GAME_DIR(game_dir);
    UTIL_normalize_pathname(game_dir);
@@ -392,9 +393,9 @@ extern "C" DLLEXPORT void GiveFnptrsToDll( enginefuncs_t* pengfuncsFromEngine, g
    // 2003/11/10
    pengfuncsFromEngine->pfnSequenceGet = pfnSequenceGet;
    pengfuncsFromEngine->pfnSequencePickSentence = pfnSequencePickSentence;
-   pengfuncsFromEngine->pfnGetFileSize = pfnGetFileSize;
+//   pengfuncsFromEngine->pfnGetFileSize = pfnGetFileSize;
    pengfuncsFromEngine->pfnGetApproxWavePlayLen = pfnGetApproxWavePlayLen;
-   pengfuncsFromEngine->pfnIsCareerMatch = pfnIsCareerMatch;
+//   pengfuncsFromEngine->pfnIsCareerMatch = pfnIsCareerMatch;
    pengfuncsFromEngine->pfnGetLocalizedStringLength = pfnGetLocalizedStringLength;
    pengfuncsFromEngine->pfnRegisterTutorMessageShown = pfnRegisterTutorMessageShown;
    pengfuncsFromEngine->pfnGetTimesTutorMessageShown = pfnGetTimesTutorMessageShown;
