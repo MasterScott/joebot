@@ -23,9 +23,14 @@
 // Johannes.Lampel@gmx.de
 // http://joebot.counter-strike.de
 
-#include "CBotBase.h"
-#include "CCommand.h"
+//#include <iostream.h>
 #include <string.h>
+
+#include "extdll.h"
+#include "util.h"
+
+#include "CCommand.h"
+#include "Commandfunc.h"
 
 CLListElem *CCommand :: AllocNewItem(void){
 	return new CCommand;
@@ -161,9 +166,9 @@ bool CCommands ::Exec(edict_t *pEntity,int iType,const char *cmd,const char *arg
 	while(p){
 		//cout << p->szName << endl;
 		if((strlen(p->szName)
-				&&!strcmp(p->szName,cmd))
+				&&FStrEq(p->szName,cmd))
 			||(strlen(p->sz2Name)
-				&&!strcmp(p->sz2Name,cmd))){
+				&&FStrEq(p->sz2Name,cmd))){
 			if(p->iType & iType){
 				return p->pFunc(pEntity,iType,arg1,arg2,arg3,arg4);
 			}
