@@ -20,11 +20,11 @@
 ******************************************************************************/
 /***
 *
-*  Copyright (c) 1999, Valve LLC. All rights reserved.
-*
-*  This product contains software technology licensed from Id 
-*  Software, Inc. ("Id Technology").  Id Technology (c) 1996 Id Software, Inc. 
-*  All Rights Reserved.
+*	Copyright (c) 1996-2002, Valve LLC. All rights reserved.
+*	
+*	This product contains software technology licensed from Id 
+*	Software, Inc. ("Id Technology").  Id Technology (c) 1996 Id Software, Inc. 
+*	All Rights Reserved.
 *
 *   Use, distribution, and modification of this source code and/or resulting
 *   object code is restricted to non-commercial enhancements to products from
@@ -44,6 +44,13 @@
 //
 // util.cpp
 //
+/*
+
+===== util.cpp ========================================================
+
+  Utility code.  Really not optional after all.
+
+*/
 
 #include <ctype.h>
 
@@ -77,6 +84,21 @@ int gmsgShowMenu = 0;
 
 #define _GTOSSHEIGHT 300
 
+#ifdef	DEBUG
+edict_t *DBG_EntOfVars( const entvars_t *pev )
+{
+	if (pev->pContainingEntity != NULL)
+		return pev->pContainingEntity;
+	ALERT(at_console, "entvars_t pContainingEntity is NULL, calling into engine");
+	edict_t* pent = FIND_ENTITY_BY_VARS((entvars_t*)pev);
+	if (pent == NULL)
+		ALERT(at_console, "DAMN!  Even the engine couldn't FindEntityByVars!");
+	((entvars_t *)pev)->pContainingEntity = pent;
+	return pent;
+}
+#endif //DEBUG
+
+
 Vector UTIL_VecToAngles( const Vector &vec )
 {
 	float rgflVecOut[3];
@@ -84,6 +106,118 @@ Vector UTIL_VecToAngles( const Vector &vec )
 	return Vector(rgflVecOut);
 }
 
+
+edict_t *UTIL_FindEntityInSphere( edict_t *pentStart, const Vector &vecCenter, float flRadius )
+{
+	edict_t *pentEntity = FIND_ENTITY_IN_SPHERE( pentStart, vecCenter, flRadius);
+	return ( FNullEnt(pentEntity) ? NULL : pentEntity );
+}
+
+
+edict_t *UTIL_FindEntityByString( edict_t *pentStart, const char *szKeyword, const char *szValue )
+{
+	edict_t	*pentEntity = FIND_ENTITY_BY_STRING( pentStart, szKeyword, szValue );
+	return ( FNullEnt(pentEntity) ? NULL : pentEntity );
+}
+
+edict_t *UTIL_FindEntityByClassname( edict_t *pentStart, const char *szName )
+{
+	return UTIL_FindEntityByString( pentStart, "classname", szName );
+}
+
+edict_t *UTIL_FindEntityByTargetname( edict_t *pentStart, const char *szName )
+{
+	return UTIL_FindEntityByString( pentStart, "targetname", szName );
+}
+
+
+void UTIL_MakeVectors( const Vector &vecAngles )
+{
+	MAKE_VECTORS( vecAngles );
+}
+
+
+static unsigned short FixedUnsigned16( float value, float scale )
+{
+	int output;
+
+	output = value * scale;
+	if ( output < 0 )
+		output = 0;
+	if ( output > 0xFFFF )
+		output = 0xFFFF;
+
+	return (unsigned short)output;
+}
+
+static short FixedSigned16( float value, float scale )
+{
+	int output;
+
+	output = value * scale;
+
+	if ( output > 32767 )
+		output = 32767;
+
+	if ( output < -32768 )
+		output = -32768;
+
+	return (short)output;
+}
+
+
+void UTIL_ClientPrintAll( int msg_dest, const char *msg_name, const char *param1, const char *param2, const char *param3, const char *param4 )
+{
+	if (gmsgTextMsg == 0)
+		gmsgTextMsg = REG_USER_MSG( "TextMsg", -1 );
+	
+	MESSAGE_BEGIN( MSG_ALL, gmsgTextMsg );
+		WRITE_BYTE( msg_dest );
+		WRITE_STRING( msg_name );
+	
+		if ( param1 )
+			WRITE_STRING( param1 );
+		if ( param2 )
+			WRITE_STRING( param2 );
+		if ( param3 )
+			WRITE_STRING( param3 );
+		if ( param4 )
+			WRITE_STRING( param4 );
+	
+	MESSAGE_END();
+}
+
+void ClientPrint( entvars_t *client, int msg_dest, const char *msg_name, const char *param1, const char *param2, const char *param3, const char *param4 )
+{
+	if (gmsgTextMsg == 0)
+		gmsgTextMsg = REG_USER_MSG( "TextMsg", -1 );
+	
+	MESSAGE_BEGIN( MSG_ONE, gmsgTextMsg, NULL, client );
+		WRITE_BYTE( msg_dest );
+		WRITE_STRING( msg_name );
+	
+		if ( param1 )
+			WRITE_STRING( param1 );
+		if ( param2 )
+			WRITE_STRING( param2 );
+		if ( param3 )
+			WRITE_STRING( param3 );
+		if ( param4 )
+			WRITE_STRING( param4 );
+	
+	MESSAGE_END();
+}
+
+void UTIL_SayText( const char *pText, edict_t *pEdict )
+{
+	if (gmsgSayText == 0)
+		gmsgSayText = REG_USER_MSG( "SayText", -1 );
+	
+	MESSAGE_BEGIN( MSG_ONE, gmsgSayText, NULL, pEdict );
+		WRITE_BYTE( ENTINDEX(pEdict) );
+		WRITE_STRING( pText );
+	MESSAGE_END();
+}
 
 // Overloaded to add IGNORE_GLASS
 void UTIL_TraceLine( const Vector &vecStart, const Vector &vecEnd, IGNORE_MONSTERS igmon, IGNORE_GLASS ignoreGlass, edict_t *pentIgnore, TraceResult *ptr )
@@ -107,52 +241,6 @@ void UTIL_TraceHull( const Vector &vecStart, const Vector &vecEnd, IGNORE_MONSTE
 	TRACE_HULL( vecStart, vecEnd, (igmon == ignore_monsters ? TRUE : FALSE) | (ignoreGlass?0x100:0),iHullNumber, pentIgnore, ptr );
 }
 
-void UTIL_MakeVectors( const Vector &vecAngles )
-{
-	MAKE_VECTORS( vecAngles );
-}
-
-
-edict_t *UTIL_FindEntityInSphere( edict_t *pentStart, const Vector &vecCenter, float flRadius )
-{
-	edict_t  *pentEntity;
-	
-	pentEntity = FIND_ENTITY_IN_SPHERE( pentStart, vecCenter, flRadius);
-	
-	if (!FNullEnt(pentEntity))
-		return pentEntity;
-	
-	return NULL;
-}
-
-
-edict_t *UTIL_FindEntityByString( edict_t *pentStart, const char *szKeyword, const char *szValue )
-{
-	edict_t	*pentEntity;
-	
-	pentEntity = FIND_ENTITY_BY_STRING( pentStart, szKeyword, szValue );
-	
-	if (!FNullEnt(pentEntity))
-		return pentEntity;
-	return NULL;
-}
-
-edict_t *UTIL_FindEntityByClassname( edict_t *pentStart, const char *szName )
-{
-	return UTIL_FindEntityByString( pentStart, "classname", szName );
-}
-
-edict_t *UTIL_FindEntityByTargetname( edict_t *pentStart, const char *szName )
-{
-	return UTIL_FindEntityByString( pentStart, "targetname", szName );
-}
-
-
-int UTIL_PointContents( const Vector &vec )
-{
-	return POINT_CONTENTS(vec);
-}
-
 
 void UTIL_SetSize( entvars_t *pev, const Vector &vecMin, const Vector &vecMax )
 {
@@ -166,46 +254,77 @@ void UTIL_SetOrigin( entvars_t *pev, const Vector &vecOrigin )
 }
 
 
-void ClientPrint( entvars_t *client, int msg_dest, const char *msg_name, const char *param1, const char *param2, const char *param3, const char *param4 )
+char *UTIL_VarArgs( char *format, ... )
 {
-	if (gmsgTextMsg == 0)
-		gmsgTextMsg = REG_USER_MSG( "TextMsg", -1 );
-	
-	MESSAGE_BEGIN( MSG_ONE, gmsgTextMsg, NULL, client );
-		WRITE_BYTE( msg_dest );
-		WRITE_STRING( msg_name );
-	
-		if ( param1 )
-			WRITE_STRING( param1 );
-		if ( param2 )
-			WRITE_STRING( param2 );
-		if ( param3 )
-			WRITE_STRING( param3 );
-		if ( param4 )
-			WRITE_STRING( param4 );
-	
+	va_list		argptr;
+	static char		string[1024];
+
+	va_start ( argptr, format );
+	vsnprintf ( string, sizeof(string), format, argptr );
+	va_end   ( argptr );
+
+	return string;
+}
+
+int UTIL_PointContents( const Vector &vec )
+{
+	return POINT_CONTENTS(vec);
+}
+
+/*
+==============
+UTIL_PlayerDecalTrace
+
+A player is trying to apply his custom decal for the spray can.
+Tell connected clients to display it, or use the default spray can decal
+if the custom can't be loaded.
+==============
+*/
+void UTIL_PlayerDecalTrace( TraceResult *pTrace, int playernum, int decalNumber, BOOL bIsCustom )
+{
+	int index;
+
+	/*if (!bIsCustom)
+	{
+		if ( decalNumber < 0 )
+			return;
+
+		index = gDecals[ decalNumber ].index;
+		if ( index < 0 )
+			return;
+	}
+	else*/
+		index = decalNumber;
+
+	if (pTrace->flFraction == 1.0)
+		return;
+
+	MESSAGE_BEGIN( MSG_BROADCAST, SVC_TEMPENTITY );
+		WRITE_BYTE( TE_PLAYERDECAL );
+		WRITE_BYTE ( playernum );
+		WRITE_COORD( pTrace->vecEndPos.x );
+		WRITE_COORD( pTrace->vecEndPos.y );
+		WRITE_COORD( pTrace->vecEndPos.z );
+		WRITE_SHORT( (short)ENTINDEX(pTrace->pHit) );
+		WRITE_BYTE( index );
 	MESSAGE_END();
 }
 
-void UTIL_ClientPrintAll( int msg_dest, const char *msg_name, const char *param1, const char *param2, const char *param3, const char *param4 )
+//=========================================================
+// UTIL_LogPrintf - Prints a logged message to console.
+// Preceded by LOG: ( timestamp ) < message >
+//=========================================================
+void UTIL_LogPrintf( const char *fmt, ... )
 {
-	if (gmsgTextMsg == 0)
-		gmsgTextMsg = REG_USER_MSG( "TextMsg", -1 );
-	
-	MESSAGE_BEGIN( MSG_ALL, gmsgTextMsg );
-		WRITE_BYTE( msg_dest );
-		WRITE_STRING( msg_name );
-	
-		if ( param1 )
-			WRITE_STRING( param1 );
-		if ( param2 )
-			WRITE_STRING( param2 );
-		if ( param3 )
-			WRITE_STRING( param3 );
-		if ( param4 )
-			WRITE_STRING( param4 );
-	
-	MESSAGE_END();
+	va_list		argptr;
+	static char		string[1024];
+
+	va_start ( argptr, fmt );
+	vsnprintf ( string, sizeof(string), fmt, argptr );
+	va_end   ( argptr );
+
+	// Print to server console
+	ALERT( at_logged, "%s", string );
 }
 
 void UTIL_HostSay( edict_t *pEntity, int teamonly, char *message )
@@ -272,8 +391,8 @@ void UTIL_HostSay( edict_t *pEntity, int teamonly, char *message )
 	// This may return the world in single player if the client types something between levels or during spawn
 	// so check it, or it will infinite loop
 	
-	if (gmsgSayText == 0)
-		gmsgSayText = REG_USER_MSG( "SayText", -1 );
+	/*if (gmsgSayText == 0)
+		gmsgSayText = REG_USER_MSG( "SayText", -1 );*/
 	
 	sender_team = UTIL_GetTeam(pEntity);
 	
@@ -292,28 +411,19 @@ void UTIL_HostSay( edict_t *pEntity, int teamonly, char *message )
 		if ( teamonly && (sender_team != player_team) )
 			continue;
 		
-		MESSAGE_BEGIN( MSG_ONE, gmsgSayText, NULL, client );
+		/*MESSAGE_BEGIN( MSG_ONE, gmsgSayText, NULL, client );
 			WRITE_BYTE( ENTINDEX(pEntity) );
 			WRITE_STRING( text );
-		MESSAGE_END();
+		MESSAGE_END();*/
+		UTIL_SayText(text, client);
 	}
 	
 	// print to the sending client
-	MESSAGE_BEGIN( MSG_ONE, gmsgSayText, NULL, pEntity );
+	/*MESSAGE_BEGIN( MSG_ONE, gmsgSayText, NULL, pEntity );
 		WRITE_BYTE( ENTINDEX(pEntity) );
 		WRITE_STRING( text );
-	MESSAGE_END();
-}
-
-void UTIL_SayText( const char *pText, edict_t *pEdict )
-{
-	if (gmsgSayText == 0)
-		gmsgSayText = REG_USER_MSG( "SayText", -1 );
-	
-	MESSAGE_BEGIN( MSG_ONE, gmsgSayText, NULL, pEdict );
-		WRITE_BYTE( ENTINDEX(pEdict) );
-		WRITE_STRING( pText );
-	MESSAGE_END();
+	MESSAGE_END();*/
+	UTIL_SayText(text, pEntity);
 }
 
 int UTIL_ClientIndex(edict_t *pEdict){
@@ -328,51 +438,6 @@ int UTIL_ClientIndex(edict_t *pEdict){
 
 	return -1;
 }
-
-void UTIL_PlayerDecalTrace( TraceResult *pTrace, int playernum, int decalNumber, BOOL bIsCustom )
-{
-	int index;
-
-	/*if (!bIsCustom)
-	{
-		if ( decalNumber < 0 )
-			return;
-
-		index = gDecals[ decalNumber ].index;
-		if ( index < 0 )
-			return;
-	}
-	else*/
-		index = decalNumber;
-
-	if (pTrace->flFraction == 1.0)
-		return;
-
-	MESSAGE_BEGIN( MSG_BROADCAST, SVC_TEMPENTITY );
-		WRITE_BYTE( TE_PLAYERDECAL );
-		WRITE_BYTE ( playernum );
-		WRITE_COORD( pTrace->vecEndPos.x );
-		WRITE_COORD( pTrace->vecEndPos.y );
-		WRITE_COORD( pTrace->vecEndPos.z );
-		WRITE_SHORT( (short)ENTINDEX(pTrace->pHit) );
-		WRITE_BYTE( index );
-	MESSAGE_END();
-}
-
-#ifdef	DEBUG
-edict_t *DBG_EntOfVars( const entvars_t *pev )
-{
-	if (pev->pContainingEntity != NULL)
-		return pev->pContainingEntity;
-	ALERT(at_console, "entvars_t pContainingEntity is NULL, calling into engine");
-	edict_t* pent = FIND_ENTITY_BY_VARS((entvars_t*)pev);
-	if (pent == NULL)
-		ALERT(at_console, "DAMN!  Even the engine couldn't FindEntityByVars!");
-	((entvars_t *)pev)->pContainingEntity = pent;
-	return pent;
-}
-#endif //DEBUG
-
 
 // return team number 0 through 3 based what MOD uses for team numbers
 int UTIL_GetTeam(edict_t *pEntity)
@@ -479,34 +544,6 @@ void UTIL_ShowMenu( edict_t *pEdict, int slots, int displaytime, bool needmore, 
 	   WRITE_BYTE( needmore );
 	   WRITE_STRING( pText );
    MESSAGE_END();
-}
-
-static unsigned short FixedUnsigned16( float value, float scale )
-{
-	int output;
-
-	output = value * scale;
-	if ( output < 0 )
-		output = 0;
-	if ( output > 0xFFFF )
-		output = 0xFFFF;
-
-	return (unsigned short)output;
-}
-
-static short FixedSigned16( float value, float scale )
-{
-	int output;
-
-	output = value * scale;
-
-	if ( output > 32767 )
-		output = 32767;
-
-	if ( output < -32768 )
-		output = -32768;
-
-	return (short)output;
 }
 
 void UTIL_ShowText( edict_t *pEntity, const hudtextparms_t &textparms, const char *pMessage )
@@ -703,9 +740,7 @@ bool FVisibleMT( const Vector &vecOrigin,const Vector &VAim,float fSQ,edict_t *p
 			v_offset = ix * v_right * fSQ + iy * v_up * fSQ ;
 			
 			UTIL_TraceLine(vecOrigin+v_offset+Vector(RANDOM_LONG(-_RO,_RO),RANDOM_LONG(-_RO,_RO),RANDOM_LONG(-_RO,_RO)), VAim+v_offset+Vector(RANDOM_LONG(-_RO,_RO),RANDOM_LONG(-_RO,_RO),RANDOM_LONG(-_RO,_RO)), ignore_monsters, ignore_glass, pEdict2I, &tr);
-#ifdef DEBUGMESSAGES
-			WaypointDrawBeam(listenserver_edict,vecOrigin+v_offset, VAim+v_offset,3,0,250,250,250,250,10);
-#endif
+			DEBUG_DRAWBEAM(listenserver_edict,vecOrigin+v_offset, VAim+v_offset,3,0,250,250,250,250,10);
 			
 			if (tr.flFraction != 1.0){
 				// couldn't be established
@@ -911,7 +946,7 @@ edict_t *GetRandomPlayer(edict_t *pNot,int iTeam,int iAlive){
 	}
 	
 	if(lCount){
-		lreturn=RANDOM_LONG(1,lCount)-1;
+		lreturn=RANDOM_LONG(0,lCount-1);
 		return pFE[lreturn];
 	}
 	else
@@ -950,7 +985,7 @@ edict_t *GetRandomPlayerWO(edict_t *pNot,int iTeam,int iAlive, long lWithout,edi
 	}
 	
 	if(lCount){
-		lreturn=RANDOM_LONG(1,lCount)-1;
+		lreturn=RANDOM_LONG(0,lCount-1);
 		return pFE[lreturn];
 	}
 	else
@@ -991,9 +1026,7 @@ Vector VecCheckToss ( entvars_t *pev, const Vector &vecSpot1, Vector vecSpot2, f
 	// get a rough idea of how high it can be thrown
 	vecMidPoint = vecSpot1 + (vecSpot2 - vecSpot1) * 0.5;
 	UTIL_TraceLine(vecMidPoint, vecMidPoint + Vector(0,0,_GTOSSHEIGHT), ignore_monsters, ENT(pev), &tr);
-#ifdef DEBUGMESSAGES
-	WaypointDrawBeamDebug(listenserver_edict,vecMidPoint,vecMidPoint + Vector(0,0,_GTOSSHEIGHT),10,10,0,200,200,200,10);
-#endif
+	DEBUG_DRAWBEAM(listenserver_edict,vecMidPoint,vecMidPoint + Vector(0,0,_GTOSSHEIGHT),10,10,0,200,200,200,10);
 	vecMidPoint = tr.vecEndPos;
 	// (subtract 15 so the grenade doesn't hit the ceiling)
 	vecMidPoint.z -= 15;
@@ -1028,9 +1061,7 @@ Vector VecCheckToss ( entvars_t *pev, const Vector &vecSpot1, Vector vecSpot2, f
 	vecApex.z = vecMidPoint.z;
 	
 	UTIL_TraceLine(vecSpot1, vecApex, dont_ignore_monsters, ENT(pev), &tr);
-#ifdef DEBUGMESSAGES
-	WaypointDrawBeamDebug(listenserver_edict,vecSpot1, vecApex,10,10,0,200,200,200,10);
-#endif
+	DEBUG_DRAWBEAM(listenserver_edict,vecSpot1, vecApex,10,10,0,200,200,200,10);
 	if (tr.flFraction != 1.0)
 	{
 		// fail!
@@ -1039,9 +1070,7 @@ Vector VecCheckToss ( entvars_t *pev, const Vector &vecSpot1, Vector vecSpot2, f
 	
 	// UNDONE: either ignore monsters or change it to not care if we hit our enemy
 	UTIL_TraceLine(vecSpot2, vecApex, ignore_monsters, ENT(pev), &tr); 
-#ifdef DEBUGMESSAGES
-	WaypointDrawBeamDebug(listenserver_edict,vecSpot2, vecApex,10,10,0,200,200,200,10);
-#endif
+	DEBUG_DRAWBEAM(listenserver_edict,vecSpot2, vecApex,10,10,0,200,200,200,10);
 	if (tr.flFraction != 1.0)
 	{
 		// fail!
@@ -1074,9 +1103,7 @@ Vector VecCheckThrow ( entvars_t *pev, const Vector &vecSpot1, Vector vecSpot2, 
 	
 	TraceResult tr;
 	UTIL_TraceLine(vecSpot1, vecApex, dont_ignore_monsters, ENT(pev), &tr);
-#ifdef DEBUGMESSAGES
-	WaypointDrawBeamDebug(listenserver_edict,vecSpot1, vecApex,10,10,100,200,200,200,10);
-#endif
+	DEBUG_DRAWBEAM(listenserver_edict,vecSpot1, vecApex,10,10,100,200,200,200,10);
 
 	if (tr.flFraction != 1.0)
 	{
@@ -1085,9 +1112,7 @@ Vector VecCheckThrow ( entvars_t *pev, const Vector &vecSpot1, Vector vecSpot2, 
 	}
 	
 	UTIL_TraceLine(vecSpot2, vecApex, ignore_monsters, ENT(pev), &tr);
-#ifdef DEBUGMESSAGES
-	WaypointDrawBeamDebug(listenserver_edict,vecSpot2, vecApex,10,10,100,200,200,200,10);
-#endif
+	DEBUG_DRAWBEAM(listenserver_edict,vecSpot2, vecApex,10,10,100,200,200,200,10);
 	if (tr.flFraction != 1.0)
 	{
 		// fail!
@@ -1112,32 +1137,6 @@ void UTIL_strlwr(char *p){
 		*p=tolower(*p);
 		p ++;
 	}
-}
-
-char *UTIL_VarArgs( char *format, ... )
-{
-	va_list		argptr;
-	static char		string[1024];
-
-	va_start ( argptr, format );
-	vsnprintf ( string, sizeof(string), format, argptr );
-	va_end   ( argptr );
-
-	return string;
-}
-
-void UTIL_LogPrintf( const char *fmt, ... )
-{
-	// Adapted from Will Day's metamod
-	va_list		argptr;
-	static char		string[1024];
-
-	va_start ( argptr, fmt );
-	vsnprintf ( string, sizeof(string), fmt, argptr );
-	va_end   ( argptr );
-
-	// Print to server console
-	ALERT( at_logged, "%s", string );
 }
 
 void UTIL_LogMessage( const char* plid, const char *fmt, ... )
@@ -1184,15 +1183,17 @@ qboolean UTIL_CallGameEntity( const char *entStr, entvars_t *pev)
 	return true;
 }
 
-#ifdef DEBUGENGINE
-void UTIL_BotLog(const char *fnName, const char *str)
+#ifdef _DEBUG
+void UTIL_LogFile(const char* szFilename, const char *szLogMsg)
 {
 	static FILE *fp;
 
-	if (CVAR_BOOL(jb_debugengine))
+	if (FStrEq(szFilename, "engine.log") && !CVAR_BOOL(jb_debugengine))
+		return;
+
+	if (fp = fopen(szFilename, "a"))
 	{
-		fp = fopen("bot.txt","a");
-		fprintf(fp, "%s: %s\n", fnName, str);
+		fprintf(fp, "%s\n", szLogMsg);
 		fclose(fp);
 	}
 }
