@@ -592,7 +592,7 @@ bool CBotCS :: Bored(void){
 		&& f_Bored < fbias){// only do 'boring attacks' every ~30s
 		f_BoredTill = gpGlobals->time + TIMEBEINGBORED;
 		f_Bored = gpGlobals->time + RANDOM_FLOAT(-10.0,10.0);
-		i_BorA = RANDOM_FLOAT(0,7);
+		i_BorA = int(RANDOM_FLOAT(0,7));
 	}
 	
 	if(f_BoredTill > gpGlobals->time){// still bored ??
@@ -671,11 +671,11 @@ bool CBotCS :: Bored(void){
 					long itndex = ENTINDEX(tr.pHit);
 					char *szDecal = SDecals.GetRandomDecal();
 					//cout << szDecal << endl;
-					long idndex = (*g_engfuncs.pfnDecalIndex)(szDecal);
+					long idndex = DECAL_INDEX(szDecal);
 					
 					if(idndex != -1 && tr.flFraction != 1.0){
 						UTIL_PlayerDecalTrace(&tr,ENTINDEX(pEdict),idndex,true);
-						(*g_engfuncs.pfnEmitSound)(pEdict,CHAN_VOICE,"player/sprayer.wav",1,ATTN_NORM,0,100);
+						EMIT_SOUND_DYN2(pEdict,CHAN_VOICE,"player/sprayer.wav",1,ATTN_NORM,0,100);
 					}
 				}
 			}
