@@ -16,7 +16,9 @@
 #ifndef CRC_H
 #define CRC_H
 #ifdef _WIN32
+#ifndef __MINGW32__
 #pragma once
+#endif /* not __MINGW32__ */
 #endif
 
 // MD5 Hash
