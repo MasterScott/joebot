@@ -33,4 +33,4 @@
 #define CSCLASSIC_DLL	8
 
 #define MAX_MOD 9
-#endif
+#endif //__MODID_H
