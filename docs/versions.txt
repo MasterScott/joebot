@@ -8,7 +8,7 @@
 -                                               -
 -------------------------------------------------
 
-Current Lead Developer on Sourceforge/joebot
+Current Leading Developer on Sourceforge/joebot
 
 - @$3.1415rin
 
@@ -21,7 +21,7 @@ Current Developer on Sourceforge/joebot
 -- This Bot is based on botman's HPB_bot - template code - http://planethalflife.com/botman --
 ----------------------------------------------------------------------------------------------
 
-JoeBOT 1.6.1
+JoeBOT 1.6.1 - october 15th, 2002
 - FIXED problems with
 - - joinwhuman_res on/off
 - - compensating recoil

@@ -60,7 +60,7 @@ ProjDir=.
 TargetPath=.\Release\JoeBot.dll
 SOURCE="$(InputPath)"
 PostBuild_Desc=Compressing and copying DLL
-PostBuild_Cmds=copy                                   $(TargetPath)                                   c:\spiele\half-life\joebot	copy                                   $(TargetPath)                                   h:\CJoeBot\joebot	copy                                    $(ProjDir)\..\docs\versions.txt                          h:\CJoeBot\joebot\       	copy                                    $(ProjDir)\..\docs\readme.html                          h:\CJoeBot\joebot
+PostBuild_Cmds=copy                                   $(TargetPath)                                   c:\spiele\half-life\joebot	copy                                   $(TargetPath)                                   h:\CJoeBot\joebot	copy                                    $(ProjDir)\..\docs\versions.txt                          h:\CJoeBot\joebot\       	copy                                    $(ProjDir)\..\docs\readme.html                          h:\CJoeBot\joebot	copy                                   $(TargetPath)                                   m:\half-life\joebot
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "JoeBot - Win32 Debug"
@@ -93,7 +93,7 @@ LINK32=link.exe
 ProjDir=.
 TargetPath=.\Debug\JoeBot.dll
 SOURCE="$(InputPath)"
-PostBuild_Cmds=copy                                   $(TargetPath)                                   c:\spiele\half-life\joebot	copy                                   $(TargetPath)                                   h:\CJoeBot\joebot	copy                                    $(ProjDir)\..\docs\versions.txt                          h:\CJoeBot\joebot       	copy                                    $(ProjDir)\..\docs\readme.html                          h:\CJoeBot\joebot
+PostBuild_Cmds=copy                                   $(TargetPath)                                   c:\spiele\half-life\joebot	copy                                   $(TargetPath)                                   h:\CJoeBot\joebot	copy                                    $(ProjDir)\..\docs\versions.txt                          h:\CJoeBot\joebot       	copy                                    $(ProjDir)\..\docs\readme.html                          h:\CJoeBot\joebot	copy                                   $(TargetPath)                                   m:\half-life\joebot
 # End Special Build Tool
 
 !ENDIF 

@@ -978,13 +978,25 @@ void ClientPutInServer( edict_t *pEntity )
 	
 	if (!FBitSet( pEntity->v.flags, FL_FAKECLIENT ))
 	{
-		for (i = 0; i < 32; i++)
+		int count = 0;
+		for (i=0; i < 32; i++)
 		{
-			if (bots[i])
-			{
-				sprintf(szTemp, "kick \"%s\"\n", STRING(bots[i]->pEdict->v.netname));
-				SERVER_COMMAND(szTemp);  // kick the bot using (kick "name")
-				break;
+			if (bots[i])  // count the number of bots in use
+				count++;
+		}
+		
+		// if there are currently more than the minimum number of bots running
+		// then kick one of the bots off the server...
+		if ((count > min_bots) && (min_bots != -1))
+		{
+			for (i=0; i < 32; i++){
+				if (bots[i]){  // is this slot used?
+					sprintf(szTemp, "kick \"%s\"\n", STRING(bots[i]->pEdict->v.netname));
+					
+					SERVER_COMMAND(szTemp);  // kick the bot using (kick "name")
+					
+					break;
+				}
 			}
 		}
 	}
