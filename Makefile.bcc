@@ -155,7 +155,7 @@ OBJ = $(OBJ_DLLS) $(OBJ_NNSIM) $(OBJ_SOM)
 # ---------------------------------------------------------------------------
 # Targets
 # ---------------------------------------------------------------------------
-all: $(DLL)
+all: $(OBJDIR) $(DLL)
  
 release: release_mm release_std
 
@@ -191,7 +191,7 @@ clean:
 # ---------------------------------------------------------------------------
 # Rules
 # ---------------------------------------------------------------------------
-$(DLL): $(OBJDIR) $(OBJ) $(OBJDIR)\linkfunc.obj $(OBJDIR)\$(DLLNAME).res
+$(DLL): $(OBJ) $(OBJDIR)\linkfunc.obj $(OBJDIR)\$(DLLNAME).res
 	$(LD) -L$(LIB) $(LDFLAGS) c0d32.obj $(OBJ) $(OBJDIR)\linkfunc.obj, \
 	$@, $(OBJDIR)\$(DLLNAME).map, import32.lib cw32mt.lib, \
 	$(DLLNAME)_bcc.def, $(OBJDIR)\$(DLLNAME).res
