@@ -3225,9 +3225,9 @@ void WaypointThink(edict_t *pEntity)
 						endteam = end + Vector(0,0,15);
 						
 						// draw a waypoint
-						b1ND |= WaypointDrawBeam(pEntity, start, end, iWidth, 0, 0, fAddProp, fAddProp2, 250, 5);
+						b1ND |= WaypointDrawBeam(pEntity, start, end, iWidth, 0, 0, int(fAddProp), int(fAddProp2), 250, 5);
 						
-						b1ND |= WaypointDrawBeam(pEntity, end, endteam, iWidth, 0, fTeamr, fTeamg, 255, 250, 5);
+						b1ND |= WaypointDrawBeam(pEntity, end, endteam, iWidth, 0, int(fTeamr), int(fTeamg), 255, 250, 5);
 						
 						if(waypoints[i].flags & W_FL_FLAG){				// red cross on top
 							start = waypoints[i].origin + Vector(15,0,44);
@@ -3436,12 +3436,12 @@ void WaypointThink(edict_t *pEntity)
 									}
 									
 									// draw a path
-									b1ND |= WaypointDrawBeam(pEntity, start, end, iWidth/3, 2, 255, fDirC, 0, 250, 40);
+									b1ND |= WaypointDrawBeam(pEntity, start, end, iWidth/3, 2, 255, int(fDirC), 0, 250, 40);
 									
 									if (WaypointGetADV(i,ppath->index[p])){
 										start = start + Vector(0,0,20);
 										end = end + Vector(0,0,20);
-										b1ND |= WaypointDrawBeam(pEntity, start, end, iWidth/3, 2, 255, fDirC, 250, 250, 40);
+										b1ND |= WaypointDrawBeam(pEntity, start, end, iWidth/3, 2, 255, int(fDirC), 250, 250, 40);
 									}
 									
 								};
