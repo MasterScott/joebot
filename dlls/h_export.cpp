@@ -399,7 +399,7 @@ extern "C" DLLEXPORT void GiveFnptrsToDll( enginefuncs_t* pengfuncsFromEngine, g
    pengfuncsFromEngine->pfnCvar_DirectSet = pfnCvar_DirectSet;
    pengfuncsFromEngine->pfnForceUnmodified = pfnForceUnmodified;
    pengfuncsFromEngine->pfnGetPlayerStats = pfnGetPlayerStats;
-   //pengfuncsFromEngine->pfnAddServerCommand = pfnAddServerCommand;
+   pengfuncsFromEngine->pfnAddServerCommand = pfnAddServerCommand;
 
    // give the engine functions to the other DLL...
    (*other_GiveFnptrsToDll)(pengfuncsFromEngine, pGlobals);
