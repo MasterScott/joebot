@@ -366,6 +366,8 @@ void BotClient_Valve_SayText(void *p, int bot_index,int iAdd){
 			index = *(short *)p;
 		}
 		else if (state == 1){
+			state = 0;
+
 			char *szDP;
 			szText = (char *)p;
 
@@ -382,6 +384,12 @@ void BotClient_Valve_SayText(void *p, int bot_index,int iAdd){
 				iDeadLastSayClient = index;
 			}
 
+			if(strstr(szText,"(Counter-Terrorist)")		// just ignore this message if it's team specific
+				||strstr(szText,"(Terrorist)")			// NOTE : This neednt be mod independant. This is just for cs/hldm
+				||strstr(szText,"(TEAM)")){
+				return;
+			}
+
 			strcpy(szSayText,szText);
 
 			szDP = strchr(szSayText,':');
@@ -393,8 +401,6 @@ void BotClient_Valve_SayText(void *p, int bot_index,int iAdd){
 			UTIL_strlwr(szSayText);
 			
 			//cout << szSayText;
-			
-			state = 0;
 		}
 	}
 }
