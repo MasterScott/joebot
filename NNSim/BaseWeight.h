@@ -21,7 +21,6 @@ public:
 	virtual ~CBaseWeight();
 	virtual void Init(netvar_t,netvar_t) = 0;
 
-	virtual const CBaseWeight & operator = (const CBaseWeight &);
 	long lUsed;
 };
 

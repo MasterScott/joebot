@@ -24,7 +24,6 @@ public:
 	void SetWeight(netvar_t &d);
 	netvar_t GetWeight(void);
 
-	virtual const CBaseWeightFF & operator = (const CBaseWeightFF &);
 protected:
 	netvar_t m_dWeight;
 };

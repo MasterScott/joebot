@@ -18,10 +18,6 @@ CBaseWeightFF::~CBaseWeightFF()
 
 }
 
-const CBaseWeightFF &CBaseWeightFF ::  operator = (const CBaseWeightFF &){
-	return ((const CBaseWeightFF &)(*this));
-}
-
 void CBaseWeightFF::Load(FILE *fhd)
 {
 	CBaseWeight::Load(fhd);
