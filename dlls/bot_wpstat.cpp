@@ -575,7 +575,7 @@ void CWPStat ::CalcSlice(void){
 							&&lschl < (lNWPfWPV+1)*lNWPfWPV
 						;	lschl++){
 		while(lPercent<lschl){
-			LOG_MESSAGE( PLID, "JoeBOT %3.0f percent visibility table complete\n",100.*float(lPercent)/float(((lNWPfWPV+1)*lNWPfWPV)));
+			LOG_MESSAGE( PLID, "JoeBOT %3.0f percent visibility table complete",100.*float(lPercent)/float(((lNWPfWPV+1)*lNWPfWPV)));
 			lPercent += (lNWPfWPV+1)*lNWPfWPV/10;
 		}
 		lWP = lschl / lNWPfWPV;
@@ -592,7 +592,7 @@ void CWPStat ::CalcSlice(void){
 	lWPSlice += _WPSTAT_SLICE_SIZE;
 
 	if(lWPSlice > (lNWPfWPV+1)*lNWPfWPV){
-		LOG_MESSAGE( PLID, "JoeBOT %li/%li visibility table complete\n",lNWPfWPV,lNWPfWPV);
+		LOG_MESSAGE( PLID, "JoeBOT %li/%li visibility table complete",lNWPfWPV,lNWPfWPV);
 		bRecalcWPV = false;
 
 		// divide sums to get average values
