@@ -63,7 +63,7 @@ int iDeadLastSayClient;
 
 bot_weapon_t weapon_defs[MAX_WEAPONS]; // array of weapon definitions
 
-void (*botmsgs[MAX_REG_MSGS])(void *, int, int);
+botmsg_t botmsgs[MAX_REG_MSGS];
 #ifndef USE_METAMOD
 usermsg_t usermsgs[MAX_REG_MSGS];
 int usermsgs_count = 0;
@@ -71,8 +71,8 @@ int usermsgs_count = 0;
 int msg_state = 0;
 
 // This message is sent when the Counter-Strike VGUI menu is displayed.
-void BotClient_CS_VGUIMenu(void *p, int bot_index,int iAdd){
-	if(iAdd != _CLIENT_END){
+void BotClient_CS_VGUIMenu(void *p, int bot_index){
+	if (msg_state == 0){
 		if ((*(int *)p) == 2)  // is it a team select menu?
 			bots[bot_index]->start_action = MSG_CS_TEAM_SELECT;
 		else if ((*(int *)p) == 26)  // is it a terrorist model select menu?
@@ -82,407 +82,309 @@ void BotClient_CS_VGUIMenu(void *p, int bot_index,int iAdd){
 	}
 }
 
-void BotClient_DOD_VGUIMenu(void *p, int bot_index,int iAdd)
+void BotClient_DOD_VGUIMenu(void *p, int bot_index)
 {
-	if(iAdd != _CLIENT_END){
+	if (msg_state == 0){
 		if ((*(int *)p) == 2)  // is it a team select menu?
 			bots[bot_index]->start_action = MSG_DOD_TEAM_SELECT;
-		
 		else if ((*(int *)p) == 10)  // is is a class selection axis menu?
 			bots[bot_index]->start_action = MSG_DOD_CLASS_SELECT_AX;
-		
 		else if ((*(int *)p) == 9)  // is is a class selection allies menu?
 			bots[bot_index]->start_action = MSG_DOD_CLASS_SELECT_AL;
-
 		else if ((*(int *)p) == 21)  // is is a class selection allies menu?	// para
 			bots[bot_index]->start_action = MSG_DOD_CLASS_SELECT_AL_PARA;	
 		else if ((*(int *)p) == 22)  // is is a class selection axis menu?		// para
 			bots[bot_index]->start_action = MSG_DOD_CLASS_SELECT_AX_PARA;
-		
 		else if ((*(int *)p) == 19)  // is is a class selection allies menu of the sergeant?
 			bots[bot_index]->start_action = MSG_DOD_WPN_SELECT_SERGEANT;
-
 		else if ((*(int *)p) == 20)  // is is a class selection axis menu for machinegunners ?
 			bots[bot_index]->start_action = MSG_DOD_WPN_SELECT_MACHINE;
-
 		else if ((*(int *)p) == 23)  // is is a class selection axis menu for fg42 ?
 			bots[bot_index]->start_action = MSG_DOD_WPN_SELECT_FG42;
-
 		else if ((*(int *)p) == 24)  // is is a class selection axis menu for riflemen ?
 			bots[bot_index]->start_action = MSG_DOD_WPN_SELECT_RIFLEMAN;
-
 		else if ((*(int *)p) == 25)  // is is a class selection axis menu for grenadiers ?
 			bots[bot_index]->start_action = MSG_DOD_WPN_SELECT_GRENADIER;
 	}
 }
 
 // This message is sent when a menu is being displayed in Counter-Strike.
-void BotClient_CS_ShowMenu(void *p, int bot_index,int iAdd){
-	static int state = 0;   // current state machine state
-	if(iAdd != _CLIENT_END){
-		if (state < 3){
-			state++;  // ignore first 3 fields of message
-			return;
-		}
-		
-		if (FStrEq((char *)p, "#Team_Select")){  // team select menu?
-			bots[bot_index]->start_action = MSG_CS_TEAM_SELECT;
-		}
-		else if (FStrEq((char *)p, "#Terrorist_Select")){  // T model select?
-			bots[bot_index]->start_action = MSG_CS_T_SELECT;
-		}
-		else if (FStrEq((char *)p, "#CT_Select")){  // CT model select menu?
-			bots[bot_index]->start_action = MSG_CS_CT_SELECT;
-		}
-		
-		state = 0;  // reset state machine
-	}
+void BotClient_CS_ShowMenu(void *p, int bot_index){
+	if (msg_state < 3)
+		return;  // ignore first 3 fields of message
+	
+	if (FStrEq((char *)p, "#Team_Select"))  // team select menu?
+		bots[bot_index]->start_action = MSG_CS_TEAM_SELECT;
+	else if (FStrEq((char *)p, "#Terrorist_Select"))  // T model select?
+		bots[bot_index]->start_action = MSG_CS_T_SELECT;
+	else if (FStrEq((char *)p, "#CT_Select"))  // CT model select menu?
+		bots[bot_index]->start_action = MSG_CS_CT_SELECT;
 }
 
 
 // This message is sent when a client joins the game.  All of the weapons
 // are sent with the weapon ID and information about what ammo is used.
-void BotClient_Valve_WeaponList(void *p, int bot_index,int iAdd){
-	static int state = 0;   // current state machine state
+void BotClient_Valve_WeaponList(void *p, int bot_index){
 	static bot_weapon_t bot_weapon;
 	
-	if(iAdd != _CLIENT_END){
-		if (state == 0){
-			bot_weapon.iAmmoClip = -1;		// just init
-			
-			state++;
-			strcpy(bot_weapon.szClassname, (char *)p);
-		}
-		else if (state == 1){
-			state++;
-			bot_weapon.iAmmo1 = *(int *)p;  // ammo index 1
-		}
-		else if (state == 2){
-			state++;
-			bot_weapon.iAmmo1Max = *(int *)p;  // max ammo1
-		}
-		else if (state == 3){
-			state++;
-			bot_weapon.iAmmo2 = *(int *)p;  // ammo index 2
-		}
-		else if (state == 4){
-			state++;
-			bot_weapon.iAmmo2Max = *(int *)p;  // max ammo2
-		}
-		else if (state == 5){
-			state++;
-			bot_weapon.iSlot = *(int *)p;  // slot for this weapon
-		}
-		else if (state == 6){
-			state++;
-			bot_weapon.iPosition = *(int *)p;  // position in slot
-		}
-		else if (state == 7){
-			state++;
-			bot_weapon.iId = *(int *)p;  // weapon ID
-		}
-		else if (state == 8){
-			bot_weapon.iFlags = *(int *)p;  // flags for weapon (WTF???)
-			
-			// store away this weapon with it's ammo information...
-			weapon_defs[bot_weapon.iId] = bot_weapon;
-			
-			state = 0;
-		}
+	if (msg_state == 0){
+		bot_weapon.iAmmoClip = -1;		// just init
+		strcpy(bot_weapon.szClassname, (char *)p);
+	}
+	else if (msg_state == 1)
+		bot_weapon.iAmmo1 = *(int *)p;  // ammo index 1
+	else if (msg_state == 2)
+		bot_weapon.iAmmo1Max = *(int *)p;  // max ammo1
+	else if (msg_state == 3)
+		bot_weapon.iAmmo2 = *(int *)p;  // ammo index 2
+	else if (msg_state == 4)
+		bot_weapon.iAmmo2Max = *(int *)p;  // max ammo2
+	else if (msg_state == 5)
+		bot_weapon.iSlot = *(int *)p;  // slot for this weapon
+	else if (msg_state == 6)
+		bot_weapon.iPosition = *(int *)p;  // position in slot
+	else if (msg_state == 7)
+		bot_weapon.iId = *(int *)p;  // weapon ID
+	else if (msg_state == 8){
+		bot_weapon.iFlags = *(int *)p;  // flags for weapon (WTF???)
+		
+		// store away this weapon with it's ammo information...
+		weapon_defs[bot_weapon.iId] = bot_weapon;
 	}
 }
 
-void BotClient_DOD_WeaponList(void *p, int bot_index, int iAdd)
+void BotClient_DOD_WeaponList(void *p, int bot_index)
 {
-	static int state = 0;   // current state machine state
 	static bot_weapon_t bot_weapon;
 	
-	if(iAdd != _CLIENT_END){
-		if (state == 0){
-			state++;
-			strcpy(bot_weapon.szClassname, (char *)p);
-		}
-		else if (state == 1){
-			state++;
-			bot_weapon.iAmmo1 = *(int *)p;  // ammo index 1
-		}
-		else if (state == 2){
-			state++;
-			bot_weapon.iAmmo1Max = *(int *)p;  // max ammo1
-		}
-		else if (state == 3){
-			state++;
-			bot_weapon.iAmmo2 = *(int *)p;  // ammo index 2
-		}
-		else if (state == 4){
-			state++;
-			bot_weapon.iAmmo2Max = *(int *)p;  // max ammo2
-		}
-		else if (state == 5){
-			state++;
-			bot_weapon.iSlot = *(int *)p;  // slot for this weapon
-		}
-		else if (state == 6){
-			state++;
-			bot_weapon.iPosition = *(int *)p;  // position in slot
-		}
-		else if (state == 7){
-			state++;
-			bot_weapon.iId = *(int *)p;  // weapon ID
-		}
-		else if (state == 8){
-			state ++;
-			bot_weapon.iFlags = *(int *)p;  // flags for weapon (WTF???)
-		}
-		else if (state == 9){
-			bot_weapon.iAmmoClip = *(int *)p;  // clip size
-			
-			// store away this weapon with it's ammo information...
-			weapon_defs[bot_weapon.iId] = bot_weapon;
-
-#ifdef DEBUGENGINE
-			FILE *fhd;
-			fhd = fopen("weapons.txt","a");
-			fprintf(fhd,"%i %s\n",bot_weapon.iId,bot_weapon.szClassname);
-			fclose(fhd);
-#endif
-			
-			state = 0;
-		}
+	if (msg_state == 0)
+		strcpy(bot_weapon.szClassname, (char *)p);
+	else if (msg_state == 1)
+		bot_weapon.iAmmo1 = *(int *)p;  // ammo index 1
+	else if (msg_state == 2)
+		bot_weapon.iAmmo1Max = *(int *)p;  // max ammo1
+	else if (msg_state == 3)
+		bot_weapon.iAmmo2 = *(int *)p;  // ammo index 2
+	else if (msg_state == 4)
+		bot_weapon.iAmmo2Max = *(int *)p;  // max ammo2
+	else if (msg_state == 5)
+		bot_weapon.iSlot = *(int *)p;  // slot for this weapon
+	else if (msg_state == 6)
+		bot_weapon.iPosition = *(int *)p;  // position in slot
+	else if (msg_state == 7)
+		bot_weapon.iId = *(int *)p;  // weapon ID
+	else if (msg_state == 8)
+		bot_weapon.iFlags = *(int *)p;  // flags for weapon (WTF???)
+	else if (msg_state == 9){
+		bot_weapon.iAmmoClip = *(int *)p;  // clip size
+		
+		// store away this weapon with it's ammo information...
+		weapon_defs[bot_weapon.iId] = bot_weapon;
+		LOG_WEAPONS(UTIL_VarArgs("%i %s\n",bot_weapon.iId,bot_weapon.szClassname));
 	}
 }
 
-void BotClient_CS_WeaponList(void *p, int bot_index,int iAdd){
+void BotClient_CS_WeaponList(void *p, int bot_index){
 	// this is just like the Valve Weapon List message
-	BotClient_Valve_WeaponList(p, bot_index,iAdd);
+	BotClient_Valve_WeaponList(p, bot_index);
 }
 
-void BotClient_Gearbox_WeaponList(void *p, int bot_index,int iAdd){
+void BotClient_Gearbox_WeaponList(void *p, int bot_index){
 	// this is just like the Valve Weapon List message
-	BotClient_Valve_WeaponList(p, bot_index,iAdd);
+	BotClient_Valve_WeaponList(p, bot_index);
 }
 
 
 // This message is sent when a weapon is selected (either by the bot chosing
 // a weapon or by the server auto assigning the bot a weapon).
-void BotClient_Valve_CurWeapon(void *p, int bot_index,int iAdd){
-	static int state = 0;   // current state machine state
+void BotClient_Valve_CurWeapon(void *p, int bot_index){
 	static int iState;
 	static int iId;
 	static int iClip;
 	
-	if(iAdd != _CLIENT_END){
-		if (state == 0){
-			state++;
-			iState = *(int *)p;  // state of the current weapon (WTF???)
-		}
-		else if (state == 1){
-			state++;
-			iId = *(int *)p;  // weapon ID of current weapon
-		}
-		else if (state == 2){
-			if (iId <= 31 && iState){			// &&iState added by @$3.1415rin
-				iClip = *(int *)p;  // ammo currently in the clip for this weapon
-				
-				bots[bot_index]->bot_weapons |= (1<<iId);  // set this weapon bit
-				
-				bots[bot_index]->current_weapon.iId = iId;
-				bots[bot_index]->current_weapon.iClip = iClip;
-				
-				// update the ammo counts for this weapon...
-				bots[bot_index]->current_weapon.iAmmo1 =
-					bots[bot_index]->m_rgAmmo[weapon_defs[iId].iAmmo1];
-				bots[bot_index]->current_weapon.iAmmo2 =
-					bots[bot_index]->m_rgAmmo[weapon_defs[iId].iAmmo2];
-			}
+	if (msg_state == 0)
+		iState = *(int *)p;  // state of the current weapon (WTF???)
+	else if (msg_state == 1)
+		iId = *(int *)p;  // weapon ID of current weapon
+	else if (msg_state == 2){
+		if (iId <= 31 && iState){			// &&iState added by @$3.1415rin
+			iClip = *(int *)p;  // ammo currently in the clip for this weapon
 			
-			state = 0;
+			bots[bot_index]->bot_weapons |= (1<<iId);  // set this weapon bit
+			
+			bots[bot_index]->current_weapon.iId = iId;
+			bots[bot_index]->current_weapon.iClip = iClip;
+			
+			// update the ammo counts for this weapon...
+			bots[bot_index]->current_weapon.iAmmo1 =
+				bots[bot_index]->m_rgAmmo[weapon_defs[iId].iAmmo1];
+			bots[bot_index]->current_weapon.iAmmo2 =
+				bots[bot_index]->m_rgAmmo[weapon_defs[iId].iAmmo2];
 		}
 	}
 }
 
-void BotClient_CS_CurWeapon(void *p, int bot_index,int iAdd){
+void BotClient_CS_CurWeapon(void *p, int bot_index){
 	// this is just like the Valve Current Weapon message
-	BotClient_Valve_CurWeapon(p, bot_index,iAdd);
+	BotClient_Valve_CurWeapon(p, bot_index);
 }
 
-void BotClient_Gearbox_CurWeapon(void *p, int bot_index,int iAdd){
+void BotClient_Gearbox_CurWeapon(void *p, int bot_index){
 	// this is just like the Valve Current Weapon message
-	BotClient_Valve_CurWeapon(p, bot_index,iAdd);
+	BotClient_Valve_CurWeapon(p, bot_index);
 }
 
-void BotClient_DOD_CurWeapon(void *p, int bot_index, int iAdd)
+void BotClient_DOD_CurWeapon(void *p, int bot_index)
 {
 	// this is just like the Valve Current Weapon message
-	BotClient_Valve_CurWeapon(p, bot_index,iAdd);
+	BotClient_Valve_CurWeapon(p, bot_index);
 }
 
 // This message is sent whenever ammo ammounts are adjusted (up or down).
-void BotClient_Valve_AmmoX(void *p, int bot_index,int iAdd){
-	static int state = 0;   // current state machine state
+void BotClient_Valve_AmmoX(void *p, int bot_index){
 	static int index;
 	static int ammount;
 	int ammo_index;
 	
-	if(iAdd != _CLIENT_END){
-		if (state == 0){
-			state++;
-			index = *(int *)p;  // ammo index (for type of ammo)
-		}
-		else if (state == 1){
-			ammount = *(int *)p;  // the ammount of ammo currently available
-			
-			bots[bot_index]->m_rgAmmo[index] = ammount;  // store it away
-			
-			ammo_index = bots[bot_index]->current_weapon.iId;
-			
-			// update the ammo counts for this weapon...
-			bots[bot_index]->current_weapon.iAmmo1 =
-				bots[bot_index]->m_rgAmmo[weapon_defs[ammo_index].iAmmo1];
-			bots[bot_index]->current_weapon.iAmmo2 =
-				bots[bot_index]->m_rgAmmo[weapon_defs[ammo_index].iAmmo2];
-			
-			state = 0;
-		}
+	if (msg_state == 0)
+		index = *(int *)p;  // ammo index (for type of ammo)
+	else if (msg_state == 1){
+		ammount = *(int *)p;  // the ammount of ammo currently available
+		
+		bots[bot_index]->m_rgAmmo[index] = ammount;  // store it away
+		
+		ammo_index = bots[bot_index]->current_weapon.iId;
+		
+		// update the ammo counts for this weapon...
+		bots[bot_index]->current_weapon.iAmmo1 =
+			bots[bot_index]->m_rgAmmo[weapon_defs[ammo_index].iAmmo1];
+		bots[bot_index]->current_weapon.iAmmo2 =
+			bots[bot_index]->m_rgAmmo[weapon_defs[ammo_index].iAmmo2];
 	}
 }
 
-void BotClient_CS_AmmoX(void *p, int bot_index,int iAdd){
+void BotClient_CS_AmmoX(void *p, int bot_index){
 	// this is just like the Valve AmmoX message
-	BotClient_Valve_AmmoX(p, bot_index,iAdd);
+	BotClient_Valve_AmmoX(p, bot_index);
 }
 
-void BotClient_Gearbox_AmmoX(void *p, int bot_index,int iAdd){
+void BotClient_Gearbox_AmmoX(void *p, int bot_index){
 	// this is just like the Valve AmmoX message
-	BotClient_Valve_AmmoX(p, bot_index,iAdd);
+	BotClient_Valve_AmmoX(p, bot_index);
 }
 
-void BotClient_DOD_AmmoX(void *p, int bot_index,int iAdd)
+void BotClient_DOD_AmmoX(void *p, int bot_index)
 {
 	// this is just like the Valve AmmoX message
-	BotClient_Valve_AmmoX(p, bot_index,iAdd);
+	BotClient_Valve_AmmoX(p, bot_index);
 }
 
-void BotClient_Valve_SayText(void *p, int bot_index,int iAdd){
-	static int state = 0;   // current state machine state
+void BotClient_Valve_SayText(void *p, int bot_index){
 	static short int index;
 	static char *szText;
 	
-	if(iAdd != _CLIENT_END){
-		if (state == 0){
-			state++;
-			index = *(short *)p;
+	if (msg_state == 0)
+		index = *(short *)p;
+	else if (msg_state == 1){
+		char *szDP;
+		szText = (char *)p;
+
+		char *szSayText;
+		edict_t *pSayEdict;
+
+		pSayEdict = INDEXENT(index);
+		if(pSayEdict && IsAlive(pSayEdict)){
+			szSayText = szLastSayText;
+			iLastSayClient = index;
 		}
-		else if (state == 1){
-			state = 0;
-
-			char *szDP;
-			szText = (char *)p;
-
-			char *szSayText;
-			edict_t *pSayEdict;
-
-			pSayEdict = INDEXENT(index);
-			if(pSayEdict && IsAlive(pSayEdict)){
-				szSayText = szLastSayText;
-				iLastSayClient = index;
-			}
-			else{
-				szSayText = szDeadLastSayText;
-				iDeadLastSayClient = index;
-			}
-
-			if(strstr(szText,"(Counter-Terrorist)")		// just ignore this message if it's team specific
-				||strstr(szText,"(Terrorist)")			// NOTE : This neednt be mod independant. This is just for cs/hldm
-				||strstr(szText,"(TEAM)")){
-				return;
-			}
-
-			strcpy(szSayText,szText);
-
-			szDP = strchr(szSayText,':');
-
-			if(szDP  < szSayText + sizeof(char) * 80 )
-				memset(szSayText,' ',szDP - szSayText);
-
-			// make it lowercase;
-			UTIL_strlwr(szSayText);
-			
-			//cout << szSayText;
+		else{
+			szSayText = szDeadLastSayText;
+			iDeadLastSayClient = index;
 		}
+
+		if(strstr(szText,"(Counter-Terrorist)")		// just ignore this message if it's team specific
+			||strstr(szText,"(Terrorist)")			// NOTE : This neednt be mod independant. This is just for cs/hldm
+			||strstr(szText,"(TEAM)")){
+			return;
+		}
+
+		strcpy(szSayText,szText);
+
+		szDP = strchr(szSayText,':');
+
+		if(szDP  < szSayText + sizeof(char) * 80 )
+			memset(szSayText,' ',szDP - szSayText);
+
+		// make it lowercase;
+		UTIL_strlwr(szSayText);
+		
+		//cout << szSayText;
 	}
 }
 
-void BotClient_CS_SayText(void *p, int bot_index,int iAdd){
+void BotClient_CS_SayText(void *p, int bot_index){
 	// this is just like the Valve SayText message
-	BotClient_Valve_SayText(p, bot_index,iAdd);
+	BotClient_Valve_SayText(p, bot_index);
 }
 
-void BotClient_Gearbox_SayText(void *p, int bot_index,int iAdd){
+void BotClient_Gearbox_SayText(void *p, int bot_index){
 	// this is just like the Valve SayText message
-	BotClient_Valve_SayText(p, bot_index,iAdd);
+	BotClient_Valve_SayText(p, bot_index);
 }
 
-void BotClient_DOD_SayText(void *p, int bot_index,int iAdd)
+void BotClient_DOD_SayText(void *p, int bot_index)
 {
 	// this is just like the Valve SayText message
-	BotClient_Valve_SayText(p, bot_index,iAdd);
+	BotClient_Valve_SayText(p, bot_index);
 }
 
 // This message is sent when the bot picks up some ammo (AmmoX messages are
 // also sent so this message is probably not really necessary except it
 // allows the HUD to draw pictures of ammo that have been picked up.  The
 // bots don't really need pictures since they don't have any eyes anyway.
-void BotClient_Valve_AmmoPickup(void *p, int bot_index,int iAdd){
-	static int state = 0;   // current state machine state
+void BotClient_Valve_AmmoPickup(void *p, int bot_index){
 	static int index;
 	static int ammount;
 	int ammo_index;
 	
-	if(iAdd != _CLIENT_END){
-		if (state == 0){
-			state++;
-			index = *(int *)p;
-		}
-		else if (state == 1){
-			ammount = *(int *)p;
-			
-			bots[bot_index]->m_rgAmmo[index] = ammount;
-			
-			ammo_index = bots[bot_index]->current_weapon.iId;
-			
-			// update the ammo counts for this weapon...
-			bots[bot_index]->current_weapon.iAmmo1 =
-				bots[bot_index]->m_rgAmmo[weapon_defs[ammo_index].iAmmo1];
-			bots[bot_index]->current_weapon.iAmmo2 =
-				bots[bot_index]->m_rgAmmo[weapon_defs[ammo_index].iAmmo2];
-			
-			state = 0;
-		}
+	if (msg_state == 0)
+		index = *(int *)p;
+	else if (msg_state == 1){
+		ammount = *(int *)p;
+		
+		bots[bot_index]->m_rgAmmo[index] = ammount;
+		
+		ammo_index = bots[bot_index]->current_weapon.iId;
+		
+		// update the ammo counts for this weapon...
+		bots[bot_index]->current_weapon.iAmmo1 =
+			bots[bot_index]->m_rgAmmo[weapon_defs[ammo_index].iAmmo1];
+		bots[bot_index]->current_weapon.iAmmo2 =
+			bots[bot_index]->m_rgAmmo[weapon_defs[ammo_index].iAmmo2];
 	}
 }
 
-void BotClient_CS_AmmoPickup(void *p, int bot_index,int iAdd){
+void BotClient_CS_AmmoPickup(void *p, int bot_index){
 	// this is just like the Valve Ammo Pickup message
-	BotClient_Valve_AmmoPickup(p, bot_index,iAdd);
+	BotClient_Valve_AmmoPickup(p, bot_index);
 }
 
-void BotClient_Gearbox_AmmoPickup(void *p, int bot_index,int iAdd){
+void BotClient_Gearbox_AmmoPickup(void *p, int bot_index){
 	// this is just like the Valve Ammo Pickup message
-	BotClient_Valve_AmmoPickup(p, bot_index,iAdd);
+	BotClient_Valve_AmmoPickup(p, bot_index);
 }
 
-void BotClient_DOD_AmmoPickup(void *p, int bot_index,int iAdd)
+void BotClient_DOD_AmmoPickup(void *p, int bot_index)
 {
 	// this is just like the Valve Ammo Pickup message
-	BotClient_Valve_AmmoPickup(p, bot_index,iAdd);
+	BotClient_Valve_AmmoPickup(p, bot_index);
 }
 
 // This message gets sent when the bot picks up a weapon.
-void BotClient_Valve_WeapPickup(void *p, int bot_index,int iAdd){
+void BotClient_Valve_WeapPickup(void *p, int bot_index){
 	int index;
 	
-	if(iAdd != _CLIENT_END){
+	if (msg_state == 0){
 		index = *(int *)p;
 		
 		// set this weapon bit to indicate that we are carrying this weapon
@@ -490,330 +392,250 @@ void BotClient_Valve_WeapPickup(void *p, int bot_index,int iAdd){
 	}
 }
 
-void BotClient_CS_WeapPickup(void *p, int bot_index,int iAdd){
+void BotClient_CS_WeapPickup(void *p, int bot_index){
 	// this is just like the Valve Weapon Pickup message
-	BotClient_Valve_WeapPickup(p, bot_index,iAdd);
+	BotClient_Valve_WeapPickup(p, bot_index);
 }
 
-void BotClient_Gearbox_WeapPickup(void *p, int bot_index,int iAdd){
+void BotClient_Gearbox_WeapPickup(void *p, int bot_index){
 	// this is just like the Valve Weapon Pickup message
-	BotClient_Valve_WeapPickup(p, bot_index,iAdd);
+	BotClient_Valve_WeapPickup(p, bot_index);
 }
 
-void BotClient_DOD_WeapPickup(void *p, int bot_index,int iAdd)
+void BotClient_DOD_WeapPickup(void *p, int bot_index)
 {
 	// this is just like the Valve Weapon Pickup message
-	BotClient_Valve_WeapPickup(p, bot_index,iAdd);
+	BotClient_Valve_WeapPickup(p, bot_index);
 }
 
 // This message gets sent when the bot picks up an item (like a battery
 // or a healthkit)
-void BotClient_Valve_ItemPickup(void *p, int bot_index,int iAdd){
-	if(iAdd != _CLIENT_END){
+void BotClient_Valve_ItemPickup(void *p, int bot_index){
+	if (msg_state == 0){
 	}
 }
 
-void BotClient_CS_ItemPickup(void *p, int bot_index,int iAdd){
+void BotClient_CS_ItemPickup(void *p, int bot_index){
 	// this is just like the Valve Item Pickup message
-	BotClient_Valve_ItemPickup(p, bot_index,iAdd);
+	BotClient_Valve_ItemPickup(p, bot_index);
 }
 
-void BotClient_Gearbox_ItemPickup(void *p, int bot_index,int iAdd){
+void BotClient_Gearbox_ItemPickup(void *p, int bot_index){
 	// this is just like the Valve Item Pickup message
-	BotClient_Valve_ItemPickup(p, bot_index,iAdd);
+	BotClient_Valve_ItemPickup(p, bot_index);
 }
 
-void BotClient_DOD_ItemPickup(void *p, int bot_index,int iAdd)
+void BotClient_DOD_ItemPickup(void *p, int bot_index)
 {
 	// this is just like the Valve Item Pickup message
-	BotClient_Valve_ItemPickup(p, bot_index,iAdd);
+	BotClient_Valve_ItemPickup(p, bot_index);
 }
 
 // This message gets sent when the bots health changes.
-void BotClient_Valve_Health(void *p, int bot_index,int iAdd){
-	if(iAdd != _CLIENT_END){
+void BotClient_Valve_Health(void *p, int bot_index){
+	if (msg_state == 0)
 		bots[bot_index]->bot_health = *(int *)p;  // health ammount
-	}
 }
 
-void BotClient_CS_Health(void *p, int bot_index,int iAdd){
+void BotClient_CS_Health(void *p, int bot_index){
 	// this is just like the Valve Health message
-	BotClient_Valve_Health(p, bot_index,iAdd);
+	BotClient_Valve_Health(p, bot_index);
 }
 
-void BotClient_Gearbox_Health(void *p, int bot_index,int iAdd){
+void BotClient_Gearbox_Health(void *p, int bot_index){
 	// this is just like the Valve Health message
-	BotClient_Valve_Health(p, bot_index,iAdd);
+	BotClient_Valve_Health(p, bot_index);
 }
 
-void BotClient_DOD_Health(void *p, int bot_index,int iAdd)
+void BotClient_DOD_Health(void *p, int bot_index)
 {
 	// this is just like the Valve Health message
-	BotClient_Valve_Health(p, bot_index,iAdd);
+	BotClient_Valve_Health(p, bot_index);
 }
 
 // This message gets sent when the bots armor changes.
-void BotClient_Valve_Battery(void *p, int bot_index,int iAdd){
-	if(iAdd != _CLIENT_END){
+void BotClient_Valve_Battery(void *p, int bot_index){
+	if (msg_state == 0)
 		bots[bot_index]->bot_armor = *(int *)p;  // armor ammount
-	}
 }
 
-void BotClient_CS_Battery(void *p, int bot_index,int iAdd){
+void BotClient_CS_Battery(void *p, int bot_index){
 	// this is just like the Valve Battery message
-	BotClient_Valve_Battery(p, bot_index,iAdd);
+	BotClient_Valve_Battery(p, bot_index);
 }
 
-void BotClient_Gearbox_Battery(void *p, int bot_index,int iAdd){
+void BotClient_Gearbox_Battery(void *p, int bot_index){
 	// this is just like the Valve Battery message
-	BotClient_Valve_Battery(p, bot_index,iAdd);
+	BotClient_Valve_Battery(p, bot_index);
 }
 
-void BotClient_DOD_Battery(void *p, int bot_index,int iAdd)
+void BotClient_DOD_Battery(void *p, int bot_index)
 {
 	// this is just like the Valve Battery message
-	BotClient_Valve_Battery(p, bot_index,iAdd);
+	BotClient_Valve_Battery(p, bot_index);
 }
 
 // This message gets sent when the bots are getting damaged.
-void BotClient_Valve_Damage(void *p, int bot_index,int iAdd){
-	static int state = 0;   // current state machine state
+void BotClient_Valve_Damage(void *p, int bot_index){
 	static int damage_armor;
 	static int damage_taken;
 	static int damage_bits;  // type of damage being done
 	static Vector damage_origin;
 	
-	if(iAdd != _CLIENT_END){
-		if (state == 0){
-			state++;
-			damage_armor = *(int *)p;
-		}
-		else if (state == 1){
-			state++;
-			damage_taken = *(int *)p;
-		}
-		else if (state == 2){
-			state++;
-			damage_bits = *(int *)p;
-		}
-		else if (state == 3){
-			state++;
-			damage_origin.x = *(float *)p;
-		}
-		else if (state == 4){
-			state++;
-			damage_origin.y = *(float *)p;
-		}
-		else if (state == 5){
-			damage_origin.z = *(float *)p;
+	if (msg_state == 0)
+		damage_armor = *(int *)p;
+	else if (msg_state == 1)
+		damage_taken = *(int *)p;
+	else if (msg_state == 2)
+		damage_bits = *(int *)p;
+	else if (msg_state == 3)
+		damage_origin.x = *(float *)p;
+	else if (msg_state == 4)
+		damage_origin.y = *(float *)p;
+	else if (msg_state == 5){
+		damage_origin.z = *(float *)p;
+		
+		if ((damage_armor > 0) || (damage_taken > 0))
+		{
+			// ignore certain types of damage...
+			if (damage_bits & IGNORE_DAMAGE)
+				return;
 			
-			if ((damage_armor > 0) || (damage_taken > 0))
+			// if the bot doesn't have an enemy and someone is shooting at it then
+			// turn in the attacker's direction...
+			if (bots[bot_index]->pBotEnemy == NULL)
 			{
-				// ignore certain types of damage...
-				if (damage_bits & IGNORE_DAMAGE)
-					return;
+				bots[bot_index]->VSuspEn = damage_origin;
+				bots[bot_index]->Action.lAction|=BA_SUSPLOC;
+				/*// face the attacker...
+				Vector v_enemy = damage_origin - bots[bot_index]->pEdict->v.origin;
+				Vector bot_angles = UTIL_VecToAngles( v_enemy );
 				
-				// if the bot doesn't have an enemy and someone is shooting at it then
-				// turn in the attacker's direction...
-				if (bots[bot_index]->pBotEnemy == NULL)
-				{
-					bots[bot_index]->VSuspEn = damage_origin;
-					bots[bot_index]->Action.lAction|=BA_SUSPLOC;
-					/*// face the attacker...
-					Vector v_enemy = damage_origin - bots[bot_index]->pEdict->v.origin;
-					Vector bot_angles = UTIL_VecToAngles( v_enemy );
-					
-					  bots[bot_index]->pEdict->v.ideal_yaw = bot_angles.y;
-					  
-					BotFixIdealYaw(bots[bot_index]->pEdict);*/
-				}
+				  bots[bot_index]->pEdict->v.ideal_yaw = bot_angles.y;
+				  
+				BotFixIdealYaw(bots[bot_index]->pEdict);*/
 			}
-			
-			state = 0;
 		}
 	}
 }
 
-void BotClient_CS_Damage(void *p, int bot_index,int iAdd)
+void BotClient_CS_Damage(void *p, int bot_index)
 {
 	// this is just like the Valve Battery message
-	BotClient_Valve_Damage(p, bot_index,iAdd);
+	BotClient_Valve_Damage(p, bot_index);
 }
 
-void BotClient_Gearbox_Damage(void *p, int bot_index,int iAdd)
+void BotClient_Gearbox_Damage(void *p, int bot_index)
 {
 	// this is just like the Valve Battery message
-	BotClient_Valve_Damage(p, bot_index,iAdd);
+	BotClient_Valve_Damage(p, bot_index);
 }
 
-void BotClient_DOD_Damage(void *p, int bot_index,int iAdd)
+void BotClient_DOD_Damage(void *p, int bot_index)
 {
 	// this is just like the Valve Battery message
-	BotClient_Valve_Damage(p, bot_index,iAdd);
+	BotClient_Valve_Damage(p, bot_index);
 }
 
 // This message gets sent when the bots money ammount changes (for CS)
-void BotClient_CS_Money(void *p, int bot_index,int iAdd)
+void BotClient_CS_Money(void *p, int bot_index)
 {
-	static int state = 0;   // current state machine state
-	if(iAdd != _CLIENT_END){
-		if (state == 0){
-			state ++;
-			
-			((CBotCS *)(bots[bot_index]))->bot_money = *(int *)p;  // amount of money
-		}
-		else{
-			state = 0;  // ingore this field
-		}
-	}
-	else{
-		state = 0;  // ingore this field
-	}
+	if (msg_state == 0)
+		((CBotCS *)(bots[bot_index]))->m_iBotMoney = *(int *)p;  // amount of money
 }
 
-void BotClient_CS_StatusIcon(void *p, int bot_index,int iAdd)
+void BotClient_CS_StatusIcon(void *p, int bot_index)
 {
-	static int state = 0;   // current state machine state
 	static bool btemp;
 	
-	if(iAdd != _CLIENT_END){
-		if(state == 0){
-			btemp = *(bool*)p;
-			state ++;
+	if(msg_state == 0)
+		btemp = *(bool*)p;
+	else if (msg_state == 1){
+		if(FStrEq((char *)p,"buyzone")){
+			btemp?bots[bot_index]->Action.lAction|=BA_BUYZONE:bots[bot_index]->Action.lAction&=~BA_BUYZONE;
 		}
-		else if (state == 1){
-			state ++;
-			
-			if(FStrEq((char *)p,"buyzone")){
-				btemp?bots[bot_index]->Action.lAction|=BA_BUYZONE:bots[bot_index]->Action.lAction&=~BA_BUYZONE;
-			}
-			if(FStrEq((char *)p,"defuser")){
-				btemp?bots[bot_index]->Action.lAction|=BA_DEFKIT:bots[bot_index]->Action.lAction&=~BA_DEFKIT;
-			}
+		if(FStrEq((char *)p,"defuser")){
+			btemp?bots[bot_index]->Action.lAction|=BA_DEFKIT:bots[bot_index]->Action.lAction&=~BA_DEFKIT;
 		}
 	}
-	else
-		state = 0;
 }
 
-void BotClient_CS_RoundTime(void *p, int bot_index,int iAdd)
+void BotClient_CS_RoundTime(void *p, int bot_index)
 {
-	static int state = 0;   // current state machine state
-	
-	if(iAdd != _CLIENT_END){
-		if (state == 0){
-			state ++;
-			
-			float f_round_time = *(short *)p;  // roundtime in seconds
+	if (msg_state == 0){
+		float fRoundTime = *(short *)p;  // roundtime in seconds
 
-			if (f_round_time <= g_mp_freezetime->value)
-				f_end_freezetime = g_mp_freezetime->value + gpGlobals->time;  // set end of freezetime
+		CBotCS* pBot = (CBotCS*)bots[bot_index];
+		pBot->f_round_time = fRoundTime;
 
-			bots[bot_index]->f_round_time = f_round_time;
+		if (fRoundTime <= g_mp_freezetime->value) // we're in freezetime, init for new round
+		{
+			pBot->m_bIsVIP = false;
+			pBot->bRSInit = true;
+			AWP_ED[bot_index].iLastWP = -1;
+			bRec[bot_index] = false;
+			bStopRec[bot_index] = false;
 		}
-		else{
-			state = 0;  // ingore this field
-		}
-	}
-	else{
-		state = 0;
 	}
 }
 
-void BotClient_CS_StatusValue(void *p, int bot_index,int iAdd)						// not yet impl
+void BotClient_CS_StatusValue(void *p, int bot_index)						// not yet impl
 {
-	static int state = 0;   // current state machine state
-	
-	if(iAdd != _CLIENT_END){
-		if (state == 0){
-			state ++;
-		}
-		else if (state == 1){
-			state ++;
-		}
-		else{
-			state = 0;  // ingore this field
-		}
+	if (msg_state == 0){
 	}
-	else{
-		state = 0;
+	else if (msg_state == 1){
 	}
 }
 
-void BotClient_CS_SetFOV(void *p, int bot_index,int iAdd)
+void BotClient_CS_SetFOV(void *p, int bot_index)
 {
-	static int state = 0;   // current state machine state
-	
-	if(iAdd != _CLIENT_END){
-		if (state == 0){
-			bots[bot_index]->i_FOV = *(int*)(p);
-			state ++;
-			//cout << bots[bot_index]->i_FOV << endl;
-		}
-		else{
-			state = 0;  // ingore this field
-		}
-	}
-	else{
-		state = 0;
+	if (msg_state == 0){
+		bots[bot_index]->i_FOV = *(int*)(p);
+		//cout << bots[bot_index]->i_FOV << endl;
 	}
 }
 
-void BotClient_CS_TextMsg(void *p, int bot_index,int iAdd){
-	static int state = 0;   // current state machine state
-	//static int sNumber = 0;
-	static char szStrings[10][32]={"","","","","","","","","",""};
+void BotClient_CS_TextMsg(void *p, int bot_index){
 	// assuming 10 is max sentences
-	if(iAdd != _CLIENT_END){
-		if (state == 0){
-			//sNumber = *(int*)p;
-			//sNumber++;
-			state ++;				// ignore this field
-		}
-		else{
-			strcpy(szStrings[state-1],(char*)p);		// copy string
-#ifdef __LOG
-			FILE *fhd;fhd=fopen("gotaradiomess.txt","a");fprintf(fhd,"%s\n",szStrings[state -1]);fclose(fhd);
-#endif
-			state ++;
-		}
-	}
-	else{
-#ifdef __LOG
-		FILE *fhd;fhd=fopen("gotaradiomess.txt","a");fprintf(fhd,"--------------------");fclose(fhd);
-#endif
-		if(FStrEq(szStrings[0],"#Switch_To_BurstFire")){
-			((CBotCS*)(bots[bot_index]))->bGlockBurst = true;
-		}
-		if(FStrEq(szStrings[0],"#Switch_To_SemiAuto")){
-			((CBotCS*)(bots[bot_index]))->bGlockBurst = false;
-		}
-		else if(FStrEq(szStrings[0],"#Bomb_Planted")){
+	static char szTextMsg[10][32]={"","","","","","","","","",""};
+
+	if (msg_state == 0)
+		return;
+
+	if ((msg_state - 1) < 10)
+		strcpy(szTextMsg[msg_state-1],(char*)p);		// copy string
+
+		LOG_RADIO(UTIL_VarArgs("%s\n",szTextMsg[msg_state-1]));
+
+	if (msg_state == 1){
+		LOG_RADIO(UTIL_VarArgs("--------------------"));
+		if(FStrEq(szTextMsg[msg_state-1],"#Switch_To_BurstFire"))
+			((CBotCS*)(bots[bot_index]))->m_bGlockBurst = true;
+		else if(FStrEq(szTextMsg[msg_state-1],"#Switch_To_SemiAuto"))
+			((CBotCS*)(bots[bot_index]))->m_bGlockBurst = false;
+		else if(FStrEq(szTextMsg[msg_state-1],"#Bomb_Planted")){
 			g_bBombPlanted = true;
-			g_iBombExplode = int(gpGlobals->time + CVAR_GET_FLOAT("mp_c4timer"));
+			g_fBombExplode = gpGlobals->time + CVAR_GET_FLOAT("mp_c4timer");
 		}
-		else if(FStrEq(szStrings[0],"#Game_bomb_drop")){
+		else if(FStrEq(szTextMsg[msg_state-1],"#Game_bomb_drop"))
 			g_bBombDropped = true;
-		}
-		else if(FStrEq(szStrings[0],"#Got_bomb")){
+		else if(FStrEq(szTextMsg[msg_state-1],"#Got_bomb"))
 			g_bBombDropped = false;
-		}
-		else if(FStrEq(szStrings[0],"#Terrorists_Win")){
+		else if(FStrEq(szTextMsg[msg_state-1],"#Terrorists_Win"))
 			g_bBombPlanted = false;
-		}
-		else if(FStrEq(szStrings[0],"#Bomb_Defused")){
+		else if(FStrEq(szTextMsg[msg_state-1],"#Bomb_Defused"))
 			g_bBombPlanted = false;
-		}
-		else if(FStrEq(szStrings[0],"#CTs_Win")){
+		else if(FStrEq(szTextMsg[msg_state-1],"#CTs_Win"))
 			g_bBombPlanted = false;
-		}
-		else if(FStrEq(szStrings[0],"#Game_Commencing")){
+		else if(FStrEq(szTextMsg[msg_state-1],"#Game_Commencing"))
 			g_fGameCommenced = gpGlobals->time;
-		}
-		else if(FStrEq(szStrings[0],"#Cant_buy")){
-			((CBotCS*)(bots[bot_index]))->f_buytime = gpGlobals->time + 60.0;			// just to avoid too many buy trials
-		}
-		else if(FStrEq(szStrings[0],"#Game_teammate_attack")){
+		else if(FStrEq(szTextMsg[msg_state-1],"#Cant_buy"))
+			((CBotCS*)(bots[bot_index]))->m_flBuyTime = gpGlobals->time + 60.0;			// just to avoid too many buy trials
+		else
+			strcpy(szTextMsg[msg_state-1],(char*)p);		// copy string
+	}
+	else if (msg_state == 2){
+		if(FStrEq(szTextMsg[0], "#Game_teammate_attack")) {
 			// get edict of radio using player
 			edict_t *pEnt = 0;
 			CBotCS *pBot = ((CBotCS*)(bots[bot_index]));
@@ -827,21 +649,23 @@ void BotClient_CS_TextMsg(void *p, int bot_index,int iAdd){
 				pEnt = INDEXENT(i + 1);
 				
 				// skip invalid players and skip self (i.e. this bot)
-				if ((pEnt) && (!pEnt->free) && (pEnt != pEdict))
-				{
+				if ((pEnt) && (!pEnt->free) && (pEnt != pEdict)) {
 					if(!IsAlive(pEnt))
 						continue;
-					if(FStrEq(szStrings[1],STRING(pEnt->v.netname))){// if found ent with that name
+
+					if(FStrEq(szTextMsg[msg_state-1],STRING(pEnt->v.netname))){// if found ent with that name
 						pBot->bot_IRadioM.pECalling = pEnt;					// copy pointer to ent
-						
 						pBot->bot_IRadioM.f_Time = gpGlobals->time + RANDOM_FLOAT(1.0,2.5);		// this random stuff for faking kind of reaction time to radio commands
-						
 						pBot->bot_IRadioM.lMessage = RC_TEAMATTACK;
 					}
 				}
 			}
 		}
-		else if(FStrEq(szStrings[0],"#Game_radio")){
+		else
+			strcpy(szTextMsg[msg_state-1],(char*)p);		// copy string
+	}
+	else if (msg_state == 3){
+		if(FStrEq(szTextMsg[0],"#Game_radio")){
 			// get edict of radio using player
 			edict_t *pEnt = 0;
 			CBotCS *pBot = ((CBotCS*)(bots[bot_index]));
@@ -861,150 +685,104 @@ void BotClient_CS_TextMsg(void *p, int bot_index,int iAdd){
 				{
 					if(!IsAlive(pEnt))
 						continue;
-					if(FStrEq(szStrings[1],STRING(pEnt->v.netname))){// if found ent with that name
+					if(FStrEq(szTextMsg[1],STRING(pEnt->v.netname))){// if found ent with that name
 						pBot->bot_IRadioM.pECalling = pEnt;					// copy pointer to ent
 						
 						pBot->bot_IRadioM.f_Time = gpGlobals->time + RANDOM_FLOAT(.75,2.0);		// this random stuff for faking kind of reaction time to radio commands
 						
-						if(FStrEq(szStrings[2],"#Cover_me")){
+						if(FStrEq(szTextMsg[msg_state-1],"#Cover_me"))
 							pBot->bot_IRadioM.lMessage = RC_COVER_ME;
-						}
-						else if(FStrEq(szStrings[2],"#You_take_the_point")){
+						else if(FStrEq(szTextMsg[msg_state-1],"#You_take_the_point"))
 							pBot->bot_IRadioM.lMessage = RC_YOU_TAKE_THE_POINT;
-						}
-						else if(FStrEq(szStrings[2],"#Hold_this_position")){
+						else if(FStrEq(szTextMsg[msg_state-1],"#Hold_this_position"))
 							pBot->bot_IRadioM.lMessage = RC_HOLD_THIS_POSITION;
-						}
-						else if(FStrEq(szStrings[2],"#Regroup_team")){
+						else if(FStrEq(szTextMsg[msg_state-1],"#Regroup_team"))
 							pBot->bot_IRadioM.lMessage = RC_REGROUP_TEAM;
-						}
-						else if(FStrEq(szStrings[2],"#Follow_me")){
+						else if(FStrEq(szTextMsg[msg_state-1],"#Follow_me"))
 							pBot->bot_IRadioM.lMessage = RC_FOLLOW_ME;
-						}
-						else if(FStrEq(szStrings[2],"#Taking_fire")){
+						else if(FStrEq(szTextMsg[msg_state-1],"#Taking_fire"))
 							pBot->bot_IRadioM.lMessage = RC_TAKING_FIRE;
-						}
-						else if(FStrEq(szStrings[2],"#Go_go_go")){
+						else if(FStrEq(szTextMsg[msg_state-1],"#Go_go_go"))
 							pBot->bot_IRadioM.lMessage = RC_GO_GO_GO;
-						}
-						else if(FStrEq(szStrings[2],"#Team_fall_back")){
+						else if(FStrEq(szTextMsg[msg_state-1],"#Team_fall_back"))
 							pBot->bot_IRadioM.lMessage = RC_TEAM_FALL_BACK;
-						}
-						else if(FStrEq(szStrings[2],"#Stick_together_team")){
+						else if(FStrEq(szTextMsg[msg_state-1],"#Stick_together_team"))
 							pBot->bot_IRadioM.lMessage = RC_STICK_TOGETHER_TEAM;
-						}
-						else if(FStrEq(szStrings[2],"#Get_in_position_and_wait")){
+						else if(FStrEq(szTextMsg[msg_state-1],"#Get_in_position_and_wait"))
 							pBot->bot_IRadioM.lMessage = RC_GET_IN_POSITION_AND_WAIT;
-						}
-						else if(FStrEq(szStrings[2],"#Storm_the_front")){
+						else if(FStrEq(szTextMsg[msg_state-1],"#Storm_the_front"))
 							pBot->bot_IRadioM.lMessage = RC_STORM_THE_FRONT;
-						}
-						else if(FStrEq(szStrings[2],"#Report_in_team")){
+						else if(FStrEq(szTextMsg[msg_state-1],"#Report_in_team"))
 							pBot->bot_IRadioM.lMessage = RC_REPORT_IN_TEAM;
-						}
-						else if(FStrEq(szStrings[2],"#Affirmative")||FStrEq(szStrings[2],"#Roger_that")){
+						else if(FStrEq(szTextMsg[msg_state-1],"#Affirmative")||FStrEq(szTextMsg[msg_state-1],"#Roger_that"))
 							pBot->bot_IRadioM.lMessage = RC_AFFIRMATIVE;
-						}
-						else if(FStrEq(szStrings[2],"#Enemy_spotted")){
+						else if(FStrEq(szTextMsg[msg_state-1],"#Enemy_spotted"))
 							pBot->bot_IRadioM.lMessage = RC_ENEMY_SPOTTED;
-						}
-						else if(FStrEq(szStrings[2],"#Need_backup")){
+						else if(FStrEq(szTextMsg[msg_state-1],"#Need_backup"))
 							pBot->bot_IRadioM.lMessage = RC_NEED_BACKUP;
-						}
-						else if(FStrEq(szStrings[2],"#Sector_clear")){
+						else if(FStrEq(szTextMsg[msg_state-1],"#Sector_clear"))
 							pBot->bot_IRadioM.lMessage = RC_SECTOR_CLEAR;
-						}
-						else if(FStrEq(szStrings[2],"#In_position")){
+						else if(FStrEq(szTextMsg[msg_state-1],"#In_position"))
 							pBot->bot_IRadioM.lMessage = RC_IN_POSITION;
-						}
-						else if(FStrEq(szStrings[2],"#Reporting_in")){
+						else if(FStrEq(szTextMsg[msg_state-1],"#Reporting_in"))
 							pBot->bot_IRadioM.lMessage = RC_REPORTING_IN;
-						}
-						else if(FStrEq(szStrings[2],"#Get_out_of_there")){
+						else if(FStrEq(szTextMsg[msg_state-1],"#Get_out_of_there"))
 							pBot->bot_IRadioM.lMessage = RC_GET_OUT_OF_THERE;
-						}
-						else if(FStrEq(szStrings[2],"#Negative")){
+						else if(FStrEq(szTextMsg[msg_state-1],"#Negative"))
 							pBot->bot_IRadioM.lMessage = RC_NEGATIVE;
-						}
-						else if(FStrEq(szStrings[2],"#Enemy_down")){
+						else if(FStrEq(szTextMsg[msg_state-1],"#Enemy_down"))
 							pBot->bot_IRadioM.lMessage = RC_ENEMY_DOWN;
+						else if(FStrEq(szTextMsg[msg_state-1],"#Fire_in_the_hole")){
+							// do nothing, this isn't important since it's handled by other funcs
 						}
-						else if(FStrEq(szStrings[2],"#Fire_in_the_hole")){
-							//pBot->bot_IRadioM.lMessage = RC_ENEMY_DOWN;
-							// do nothing, cause this isnt important cause it's handled by pther funcs
-						}
-						else if(FStrEq(szStrings[2],"#Hostage_down")){
+						else if(FStrEq(szTextMsg[msg_state-1],"#Hostage_down"))
 							pBot->bot_IRadioM.lMessage = RC_HOSTAGE_DOWN;
-						}
 						else{
 							pBot->bot_IRadioM.lMessage = 0;
-							FILE *fhd;fhd=fopen("gotaranunknowndiomess.txt","a");fprintf(fhd,"%s\n",szStrings[2]);fclose(fhd);
+							LOG_RADIO(UTIL_VarArgs("Unknown: %s\n",szTextMsg[msg_state-1]));
 						}
 						break;
 					}
 				}
 			}
 		}
-		state = 0;			// reset state machine state
-		memset(szStrings,0,sizeof(char) * 10 * 32);
-		return;
 	}
 }
 
-void BotClient_Valve_ScreenFade(void *p, int bot_index,int iAdd)
+void BotClient_Valve_ScreenFade(void *p, int bot_index)
 {
-	static int state = 0;   // current state machine state
 	static int duration;
 	static int hold_time;
 	static int fade_flags;
 	int length;
 	
-	if(iAdd != _CLIENT_END){
-		if (state == 0)
-		{
-			state++;
-			duration = *(int *)p;
-		}
-		else if (state == 1)
-		{
-			state++;
-			hold_time = *(int *)p;
-		}
-		else if (state == 2)
-		{
-			state++;
-			fade_flags = *(int *)p;
-		}
-		else if (state == 6)
-		{
-			state = 0;
-			
-			length = (duration + hold_time) / 4096;
-			bots[bot_index]->f_blinded_time = gpGlobals->time + length*2/3 - 1;
-		}
-		else
-		{
-			state++;
-		}
+	if (msg_state == 0)
+		duration = *(int *)p;
+	else if (msg_state == 1)
+		hold_time = *(int *)p;
+	else if (msg_state == 2)
+		fade_flags = *(int *)p;
+	else if (msg_state == 6) {
+		length = (duration + hold_time) / 4096;
+		bots[bot_index]->f_blinded_time = gpGlobals->time + length*2/3 - 1;
 	}
 }
 
-void BotClient_CS_ScreenFade(void *p, int bot_index,int iAdd)
+void BotClient_CS_ScreenFade(void *p, int bot_index)
 {
 	// this is just like the Valve ScreenFade message
-	BotClient_Valve_ScreenFade(p, bot_index,iAdd);
+	BotClient_Valve_ScreenFade(p, bot_index);
 }
 
-void BotClient_DOD_ScreenFade(void *p, int bot_index,int iAdd)
+void BotClient_DOD_ScreenFade(void *p, int bot_index)
 {
 	// this is just like the Valve ScreenFade message
-	BotClient_Valve_ScreenFade(p, bot_index,iAdd);
+	BotClient_Valve_ScreenFade(p, bot_index);
 }
 
 // This message gets sent when the bots get killed
-void BotClient_Valve_DeathMsg(void *p, int bot_index,int iAdd)
+void BotClient_Valve_DeathMsg(void *p, int bot_index)
 {
-	static int state = 0;   // current state machine state
 	static int killer_index;
 	static int victim_index;
 	static int iHeadShot;
@@ -1012,310 +790,225 @@ void BotClient_Valve_DeathMsg(void *p, int bot_index,int iAdd)
 		*killer_edict=0;
 	static int killer_bot_index,victim_bot_index;
 	
-	if(iAdd != _CLIENT_END){
-		if (state == 0)
-		{
-			state++;
-			killer_index = *(int *)p;  // ENTINDEX() of killer
-		}
-		else if (state == 1)
-		{
-			state++;
-			victim_index = *(int *)p;  // ENTINDEX() of victim
-		}
-		else if (state == 2)
-		{
-			state ++;
-			iHeadShot = *(int*)p;		// true when headshot
-		}
-		else if( state == 3){		// (char*)p would be name of weapon
-			//cout << (char*)p << endl;
-			char szWeaponclass[32];
-			long lKWeapon;
-			strcpy(szWeaponclass,"weapon_");
-			strcat(szWeaponclass,(char*)p);
-			lKWeapon = CBotBase::WeaponClass2ID(szWeaponclass);
+	if (msg_state == 0)
+		killer_index = *(int *)p;  // ENTINDEX() of killer
+	else if (msg_state == 1)
+		victim_index = *(int *)p;  // ENTINDEX() of victim
+	else if (msg_state == 2)
+		iHeadShot = *(int*)p;		// true when headshot
+	else if(msg_state == 3){		// (char*)p would be name of weapon
+		//cout << (char*)p << endl;
+		char szWeaponclass[32];
+		long lKWeapon;
+		strcpy(szWeaponclass,"weapon_");
+		strcat(szWeaponclass,(char*)p);
+		lKWeapon = CBotBase::WeaponClass2ID(szWeaponclass);
 
-			state = 0;
-			
-			if(victim_index >= 0 && victim_index < 32)victim_edict = INDEXENT(victim_index);
-			else victim_edict = 0;
-			if(victim_index >= 0 && victim_index < 32)killer_edict = INDEXENT(killer_index);
-			else killer_edict = 0;
+		if(victim_index >= 0 && victim_index < 32)victim_edict = INDEXENT(victim_index);
+		else victim_edict = 0;
+		if(victim_index >= 0 && victim_index < 32)killer_edict = INDEXENT(killer_index);
+		else killer_edict = 0;
 
-			victim_bot_index = UTIL_GetBotIndex(victim_edict);
-			killer_bot_index = UTIL_GetBotIndex(killer_edict);
-			
-			//index = UTIL_GetBotIndex(victim_edict);
+		victim_bot_index = UTIL_GetBotIndex(victim_edict);
+		killer_bot_index = UTIL_GetBotIndex(killer_edict);
+		
+		//index = UTIL_GetBotIndex(victim_edict);
 
-			// is this message about a bot being killed?
-			
-			if ((killer_index == 0) || (killer_index == victim_index))
-			{
-				// bot killed by world (worldspawn) or bot killed self...
-				if (victim_bot_index != -1){
-					bots[victim_bot_index]->killer_edict = NULL;
-				}
+		// is this message about a bot being killed?
+		
+		if ((killer_index == 0) || (killer_index == victim_index))
+		{
+			// bot killed by world (worldspawn) or bot killed self...
+			if (victim_bot_index != -1){
+				bots[victim_bot_index]->killer_edict = NULL;
 			}
-			else
-			{
-				// notice bot that has been killed
-				if (victim_bot_index != -1){
-					bots[victim_bot_index]->KilledBy(killer_edict,lKWeapon);
-				}
-				// store information to killer
-				
-				//index = killer_bot_index;
-				
-				if(killer_bot_index != -1
-					&&!FNullEnt(victim_index)){
-					bots[killer_bot_index]->KilledSO(victim_edict,lKWeapon);
-					//bots[killer_bot_index]->pEKilled = victim_edict;
+		}
+		else
+		{
+			// notice bot that has been killed
+			if (victim_bot_index != -1){
+				bots[victim_bot_index]->KilledBy(killer_edict,lKWeapon);
+			}
+			// store information to killer
+			
+			//index = killer_bot_index;
+			
+			if(killer_bot_index != -1
+				&&!FNullEnt(victim_index)){
+				bots[killer_bot_index]->KilledSO(victim_edict,lKWeapon);
+				//bots[killer_bot_index]->pEKilled = victim_edict;
+			}
+		}
+		
+		if(killer_edict != victim_edict){
+			int i;
+			for (i=0; i < 32; i++){
+				if (bots[i]){
+					bots[i]->pLastGlobalKill = killer_edict;
+					bots[i]->pLastGlobalKilled = victim_edict;
 				}
 			}
 			
-			if(killer_edict != victim_edict){
-				int i;
-				for (i=0; i < 32; i++){
-					if (bots[i]){
-						bots[i]->pLastGlobalKill = killer_edict;
-						bots[i]->pLastGlobalKilled = victim_edict;
-					}
-				}
-				
-				// do some stuff for statistics
-				WPStat.AddKill(killer_edict,victim_edict);
-			}
+			// do some stuff for statistics
+			WPStat.AddKill(killer_edict,victim_edict);
 		}
 	}
-	else
-		state = 0;	
 }
 
-void BotClient_CS_DeathMsg(void *p, int bot_index,int iAdd)
+void BotClient_CS_DeathMsg(void *p, int bot_index)
 {
 	// this is just like the Valve DeathMsg message
-	BotClient_Valve_DeathMsg(p, bot_index,iAdd);
+	BotClient_Valve_DeathMsg(p, bot_index);
 }
 
-void BotClient_DOD_DeathMsg(void *p, int bot_index,int iAdd)
+void BotClient_DOD_DeathMsg(void *p, int bot_index)
 {
 	//cout << "nak" << endl;
-   	static int state = 0;   // current state machine state
 	static int killer_index;
 	static int victim_index;
 	static edict_t *victim_edict,*killer_edict;
 	static int killer_bot_index,victim_bot_index,killer_team,victim_team;
 	
-	if(iAdd != _CLIENT_END){
-		if (state == 0)
-		{
-			state++;
-			killer_index = *(int *)p;  // ENTINDEX() of killer
-		}
-		else if (state == 1)
-		{
-			state++;
-			victim_index = *(int *)p;  // ENTINDEX() of victim
-		}
-		else if( state == 2){		// (char*)p would be name of weapon
-			//cout << (char*)p << endl;
-			char szWeaponclass[32];
-			long lKWeapon;
-			strcpy(szWeaponclass,"weapon_");
-			strcat(szWeaponclass,(char*)p);
-			lKWeapon = CBotBase::WeaponClass2ID(szWeaponclass);
+	if (msg_state == 0)
+		killer_index = *(int *)p;  // ENTINDEX() of killer
+	else if (msg_state == 1)
+		victim_index = *(int *)p;  // ENTINDEX() of victim
+	else if(msg_state == 2){		// (char*)p would be name of weapon
+		//cout << (char*)p << endl;
+		char szWeaponclass[32];
+		long lKWeapon;
+		strcpy(szWeaponclass,"weapon_");
+		strcat(szWeaponclass,(char*)p);
+		lKWeapon = CBotBase::WeaponClass2ID(szWeaponclass);
 
-			state = 0;
-			
-			victim_edict = INDEXENT(victim_index);
-			killer_edict = INDEXENT(killer_index);
-			victim_bot_index = UTIL_GetBotIndex(victim_edict);
-			killer_bot_index = UTIL_GetBotIndex(killer_edict);
-			
-			//index = UTIL_GetBotIndex(victim_edict);
-			
-			// is this message about a bot being killed?
-			
-			if ((killer_index == 0) || (killer_index == victim_index))
-			{
-				// bot killed by world (worldspawn) or bot killed self...
-				if (victim_bot_index != -1){
-					bots[victim_bot_index]->killer_edict = NULL;
+		victim_edict = INDEXENT(victim_index);
+		killer_edict = INDEXENT(killer_index);
+		victim_bot_index = UTIL_GetBotIndex(victim_edict);
+		killer_bot_index = UTIL_GetBotIndex(killer_edict);
+		
+		//index = UTIL_GetBotIndex(victim_edict);
+		
+		// is this message about a bot being killed?
+		
+		if ((killer_index == 0) || (killer_index == victim_index))
+		{
+			// bot killed by world (worldspawn) or bot killed self...
+			if (victim_bot_index != -1){
+				bots[victim_bot_index]->killer_edict = NULL;
+			}
+		}
+		else
+		{
+			// store edict of player that killed this bot...
+			if (victim_bot_index != -1){
+				bots[victim_bot_index]->killer_edict = killer_edict;
+
+				// store information with which weapon the bot has been killed
+				bots[victim_bot_index]->FLKW[bots[victim_bot_index]->iCLKW] = lKWeapon;
+				bots[victim_bot_index]->iCLKW ++;
+				if(bots[victim_bot_index]->iCLKW >= CBotBase::_MAXLKW){
+					bots[victim_bot_index]->iCLKW = 0;
 				}
 			}
-			else
-			{
-				// store edict of player that killed this bot...
-				if (victim_bot_index != -1){
-					bots[victim_bot_index]->killer_edict = killer_edict;
-
-					// store information with which weapon the bot has been killed
-					bots[victim_bot_index]->FLKW[bots[victim_bot_index]->iCLKW] = lKWeapon;
-					bots[victim_bot_index]->iCLKW ++;
-					if(bots[victim_bot_index]->iCLKW >= CBotBase::_MAXLKW){
-						bots[victim_bot_index]->iCLKW = 0;
+			// store information to killer
+			
+			//index = killer_bot_index;
+			
+			if(killer_bot_index != -1){
+				bots[killer_bot_index]->pEKilled = victim_edict;
+			}
+		}
+		
+		if(killer_edict != victim_edict){
+			if(victim_bot_index != -1 && killer_bot_index != -1){
+				// update LTM of bot
+				if(victim_edict&&killer_edict){
+					victim_team = UTIL_GetTeam(victim_edict); 
+					killer_team = UTIL_GetTeam(killer_edict);
+					if(killer_team != victim_team){		// no tk
+						if(victim_bot_index != -1)
+							bots[victim_bot_index]->LTMem.Add(LTM_KILLED,victim_edict,killer_edict->v.origin,victim_edict->v.origin);
+						
+						if(killer_bot_index != -1)
+							bots[killer_bot_index]->LTMem.Add(LTM_KILL,killer_edict,victim_edict->v.origin,killer_edict->v.origin);
 					}
-				}
-				// store information to killer
-				
-				//index = killer_bot_index;
-				
-				if(killer_bot_index != -1){
-					bots[killer_bot_index]->pEKilled = victim_edict;
-				}
-			}
-			
-			if(killer_edict != victim_edict){
-				if(victim_bot_index != -1 && killer_bot_index != -1){
-					// update LTM of bot
-					if(victim_edict&&killer_edict){
-						victim_team = UTIL_GetTeam(victim_edict); 
-						killer_team = UTIL_GetTeam(killer_edict);
-						if(killer_team != victim_team){		// no tk
-							if(victim_bot_index != -1)
-								bots[victim_bot_index]->LTMem.Add(LTM_KILLED,victim_edict,killer_edict->v.origin,victim_edict->v.origin);
-							
-							if(killer_bot_index != -1)
-								bots[killer_bot_index]->LTMem.Add(LTM_KILL,killer_edict,victim_edict->v.origin,killer_edict->v.origin);
-						}
-						else{
-							if(victim_bot_index!=-1){
-								Vector VTemp = Vector(0,0,0);
-								bots[victim_bot_index]->LTMem.Add(LTM_TKILL,killer_edict,killer_edict->v.origin,VTemp);
-							}
+					else{
+						if(victim_bot_index!=-1){
+							Vector VTemp = Vector(0,0,0);
+							bots[victim_bot_index]->LTMem.Add(LTM_TKILL,killer_edict,killer_edict->v.origin,VTemp);
 						}
 					}
 				}
-				
-				int i;
-				for (i=0; i < 32; i++){
-					if (bots[i]){
-						bots[i]->pLastGlobalKill = killer_edict;
-					}
+			}
+			
+			int i;
+			for (i=0; i < 32; i++){
+				if (bots[i]){
+					bots[i]->pLastGlobalKill = killer_edict;
 				}
-				
-				// do some stuff for statistics
-				//WPStat.AddKill(killer_edict,victim_edict);
 			}
-		}
-	}
-	else
-		state = 0;
-}
-
-void BotClient_DOD_Stamina(void *p, int bot_index,int iAdd)
-{
-	static int state = 0;   // current state machine state
-	if(iAdd != _CLIENT_END){
-		if (state == 0){
-			state ++;
 			
-			((CBotDOD * )(bots[bot_index]))->iStamina = *(int *)p;
-		}
-		else{
-			state = 0;  // ingore this field
+			// do some stuff for statistics
+			//WPStat.AddKill(killer_edict,victim_edict);
 		}
 	}
 }
 
-void BotClient_DOD_Speed(void *p, int bot_index,int iAdd)
+void BotClient_DOD_Stamina(void *p, int bot_index)
 {
-	static int state = 0;   // current state machine state
-	if(iAdd != _CLIENT_END){
-		if (state == 0){
-			state ++;
-			
-			//bots[bot_index]->f_max_speed = *(int *)p;
-		}
-		else{
-			state = 0;  // ingore this field
-		}
-	}
-	else{
-		state = 0;
+	if (msg_state == 0){
+		((CBotDOD * )(bots[bot_index]))->iStamina = *(int *)p;
 	}
 }
 
-void BotClient_DOD_Slowed(void *p, int bot_index,int iAdd)
+void BotClient_DOD_Speed(void *p, int bot_index)
 {
-	static int state = 0;   // current state machine state
-	if(iAdd != _CLIENT_END){
-		if (state == 0){
-			state ++;
-			
-			((CBotDOD * )(bots[bot_index]))->bSlowed = *(bool *)p;
-		}
-		else{
-			state = 0;  // ingore this field
-		}
-	}
-	else{
-		state = 0;
+	if (msg_state == 0){
+		//bots[bot_index]->f_max_speed = *(int *)p;
 	}
 }
 
-void BotClient_DOD_Bleeding(void *p, int bot_index,int iAdd)
+void BotClient_DOD_Slowed(void *p, int bot_index)
 {
-	static int state = 0;   // current state machine state
-	if(iAdd != _CLIENT_END){
-		if (state == 0){
-			state ++;
-			
-			((CBotDOD * )(bots[bot_index]))->bBleeding = *(bool *)p;
-		}
-		else{
-			state = 0;  // ingore this field
-		}
-	}
-	else{
-		state = 0;
+	if (msg_state == 0){
+		((CBotDOD * )(bots[bot_index]))->bSlowed = *(bool *)p;
 	}
 }
 
-void BotClient_DOD_Object(void *p, int bot_index,int iAdd)
+void BotClient_DOD_Bleeding(void *p, int bot_index)
 {
-	/*static int state = 0;   // current state machine state
-	static char szString[80];
-
-	if(iAdd != _CLIENT_END){
-		if (state == 0){
-			strcpy(szString,(char *)p);
-			if(FStrEq(szString,"sprites/obj_tnt.spr")){
-				((CBotDOD * )(bots[bot_index]))->bTNT = true;
-			}
-		}
+	if (msg_state == 0){
+		((CBotDOD * )(bots[bot_index]))->bBleeding = *(bool *)p;
 	}
-	else{
-		state = 0;
+}
+
+void BotClient_DOD_Object(void *p, int bot_index)
+{
+	/*static char szString[80];
+
+	if (msg_state == 0){
+		strcpy(szString,(char *)p);
+		if(FStrEq(szString,"sprites/obj_tnt.spr")){
+			((CBotDOD * )(bots[bot_index]))->bTNT = true;
+		}
 	}*/
 }
 
-void BotClient_CS_Flashlight(void *p, int bot_index,int iAdd)
+void BotClient_CS_Flashlight(void *p, int bot_index)
 {
-	static int state = 0;   // current state machine state
 	static bool bFlashlight;
 	static int iStrength;
-	if(iAdd != _CLIENT_END){
-		if (state == 0){
-			state ++;
-			
-			bFlashlight = *(bool*)p;
-		}
-		if (state == 1){
-			state ++;
-			
-			iStrength = *(int*)p;
-			
-			bots[bot_index]->bFlashlight = bFlashlight;
-		}
-	}
-	else{
-		state = 0;
+
+	if (msg_state == 0)
+		bFlashlight = *(bool*)p;
+	if (msg_state == 1){
+		iStrength = *(int*)p;
+		
+		bots[bot_index]->bFlashlight = bFlashlight;
 	}
 }
 
-void JBRegMsgs(void)
+void RegBotMsgs(void)
 {
 	static bool bInitDone = FALSE;
 
