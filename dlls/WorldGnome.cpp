@@ -22,9 +22,15 @@
 //
 //////////////////////////////////////////////////////////////////////
 
+#include "extdll.h"
+#include "util.h"
+
 #include "WorldGnome.h"
+
+#include "bot.h"
+#include "globalvars.h"
+
 void Garbage(void *p);
-void FakeClientCommand(edict_t *pBot, char *arg1, char *arg2, char *arg3);
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -70,9 +76,7 @@ void CWorldGnome::Think()
 	lGnomes = lGnomesTemp;
 	
 	if(lGnomes){
-		char szBuffer[100];
-		sprintf(szBuffer,"%li",lGnomes);
 		if(RANDOM_LONG(0,100) < 20)
-			if(pEdictPlayer)FakeClientCommand(pEdictPlayer,"say",szBuffer,0);
+			if(pEdictPlayer)FakeClientCommand(pEdictPlayer,"say %li",lGnomes);
 	}
 }
