@@ -21,6 +21,8 @@
 #ifndef __COMMANDFUNC_H
 #define __COMMANDFUNC_H
 
+void ClientPrintEx(entvars_t *client, int msg_dest, const char *msg_name, ...);
+
 bool bc_addbot(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4);
 bool bc_mix_names(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4);
 bool bc_welcome(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4);
@@ -85,4 +87,4 @@ bool bc_randomwpload(edict_t *pEntity,int iType,const char *arg1,const char *arg
 bool bc_test(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4);
 bool bc_botglow(edict_t *pEntity,int iType,const char *arg1,const char *arg2,const char *arg3,const char *arg4);
 
-#endif//__COMMANDFUNC_H
+#endif //__COMMANDFUNC_H
