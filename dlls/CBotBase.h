@@ -61,13 +61,6 @@ typedef void (*LINK_ENTITY_FUNC)(entvars_t *);
 
 #endif
 
-edict_t *CREATE_FAKE_CLIENT( const char *netname );
-char *GET_INFOBUFFER( edict_t *e );
-char *GET_INFO_KEY_VALUE( char *infobuffer, char *key );
-void SET_CLIENT_KEY_VALUE( int clientIndex, char *infobuffer,char *key, char *value );
-
-//edict_t *GetNearestPlayer(edict_t *pEdict,int iTeam,float &fMin,bool bVisible=false,bool bIVC=false);
-
 #define _PAUSE_TIME 1.0
 
 typedef struct{
@@ -389,7 +382,7 @@ public:
 	float f_Pause;			// pausing bot
 	float f_blinded_time;		// flashbang
 	float f_round_time;			// length of one round
-	//float f_start_round;		// time of roundstart
+	//float f_end_freezetime;		// end of freezetime
 	float f_end_use_ladder_time;		// end using ladder
 	float f_start_use_ladder_time;		// start using ladder
 	float f_use_button_time;
