@@ -1,30 +1,13 @@
-/******************************************************************************
-
-    JoeBOT - a bot for Counter-Strike
-    Copyright (C) 2000-2002  Johannes Lampel
-
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-******************************************************************************/
 // BaseNeuronFF.h: interface for the CBaseNeuronFF class.
 //
 //////////////////////////////////////////////////////////////////////
 
-#if !defined(__BASENEURONFF_H)
-#define __BASENEURONFF_H
+#if !defined(AFX_BASENEURONFF_H__F2218CE5_6870_431B_BE26_CBD27ABA4993__INCLUDED_)
+#define AFX_BASENEURONFF_H__F2218CE5_6870_431B_BE26_CBD27ABA4993__INCLUDED_
 
+#if _MSC_VER > 1000
+#pragma once
+#endif // _MSC_VER > 1000
 
 #include "BaseNeuron.h"
 #include "BaseLinkFF.h"
@@ -52,6 +35,8 @@ public:
 	virtual void CalcDelta(void) = 0;
 	virtual void InitWeights(netvar_t,netvar_t);
 	void SetBias(netvar_t &);
+
+	CBaseLink *getLinkTo(CBaseNeuron *);
 protected:
 	long lLToNum;
 	long lLToMax;
@@ -73,4 +58,4 @@ protected:
 	netvar_t (*m_pfActS)	(const netvar_t &);		// first derivative of activation function
 };
 
-#endif // !defined(__BASENEURONFF_H)
+#endif // !defined(AFX_BASENEURONFF_H__F2218CE5_6870_431B_BE26_CBD27ABA4993__INCLUDED_)

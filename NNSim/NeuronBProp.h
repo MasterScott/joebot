@@ -2,8 +2,13 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#if !defined(__NEURONBPROP_H)
-#define __NEURONBPROP_H
+#if !defined(AFX_NEURONBPROP_H__F9CAD8EF_D1CB_4617_9F78_DDC25CCD3763__INCLUDED_)
+#define AFX_NEURONBPROP_H__F9CAD8EF_D1CB_4617_9F78_DDC25CCD3763__INCLUDED_
+
+#if _MSC_VER > 1000
+#pragma once
+#endif // _MSC_VER > 1000
+
 #include "BaseNeuronFF.h"
 #include "LinkBProp.h"
 #include "WeightBProp.h"
@@ -24,4 +29,4 @@ public:
 protected:
 };
 
-#endif // !defined(__NEURONBPROP_H)
+#endif // !defined(AFX_NEURONBPROP_H__F9CAD8EF_D1CB_4617_9F78_DDC25CCD3763__INCLUDED_)

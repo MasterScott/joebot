@@ -1,29 +1,13 @@
-/******************************************************************************
-
-    JoeBOT - a bot for Counter-Strike
-    Copyright (C) 2000-2002  Johannes Lampel
-
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-******************************************************************************/
 // BaseNeuralNetFF.h: interface for the CBaseNeuralNetFF class.
 //
 //////////////////////////////////////////////////////////////////////
 
-#if !defined(__BASENEURALNETFF_H)
-#define __BASENEURALNETFF_H
+#if !defined(AFX_BASENEURALNETFF_H__E9D90CC8_2CE2_4656_8566_78FB6089E245__INCLUDED_)
+#define AFX_BASENEURALNETFF_H__E9D90CC8_2CE2_4656_8566_78FB6089E245__INCLUDED_
+
+#if _MSC_VER > 1000
+#pragma once
+#endif // _MSC_VER > 1000
 
 #include "BaseNeuralNet.h"
 #include "BaseNeuron.h"
@@ -46,6 +30,7 @@ public:
 	virtual long GetConnectionNum(void);
 	virtual long GetWeightNum(void);
 	virtual long GetOutputNum(void);
+	virtual long GetNeuronNum(void);
 	virtual long GetInputNum(void);
 	virtual bool ConnectNeurons(long,long,long,long,long);
 	virtual bool ConnectLayer(long,long);
@@ -59,6 +44,7 @@ public:
 	
 	void GetNPosition(CBaseNeuron *p, long &lL,long &lN);
 	CBaseNeuronFF *GetNeuron(long,long);
+	CBaseNeuronFF *GetNeuron(long);
 	void RecalcPositions(void);
 
 	virtual CBaseNeuron* NewNeuron(void) = 0;
@@ -79,4 +65,4 @@ public:
 };
 #define NT_BASENEURALNETFF 2
 
-#endif // !defined(__BASENEURALNETFF_H)
+#endif // !defined(AFX_BASENEURALNETFF_H__E9D90CC8_2CE2_4656_8566_78FB6089E245__INCLUDED_)

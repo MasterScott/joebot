@@ -1,30 +1,13 @@
-/******************************************************************************
-
-    JoeBOT - a bot for Counter-Strike
-    Copyright (C) 2000-2002  Johannes Lampel
-
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-******************************************************************************/
-
 // BaseLink.h: interface for the CBaseLink class.
 //
 //////////////////////////////////////////////////////////////////////
 
-#if !defined(__BASELINK_H)
-#define __BASELINK_H
+#if !defined(AFX_BASELINK_H__84232728_A1D0_4F08_B4AF_F2E9E4A48891__INCLUDED_)
+#define AFX_BASELINK_H__84232728_A1D0_4F08_B4AF_F2E9E4A48891__INCLUDED_
+
+#if _MSC_VER > 1000
+#pragma once
+#endif // _MSC_VER > 1000
 
 #include "BaseWeight.h"
 
@@ -40,4 +23,4 @@ public:
 	CBaseWeight *pW;			// just for speeding up
 };
 
-#endif // !defined(__BASELINK_H)
+#endif // !defined(AFX_BASELINK_H__84232728_A1D0_4F08_B4AF_F2E9E4A48891__INCLUDED_)

@@ -2,8 +2,8 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#if !defined(__BASENEURALNET_H)
-#define __BASENEURALNET_H
+#if !defined(AFX_BASENEURALNET_H__F35839F1_1A0E_49CC_B8B1_559F0886A887__INCLUDED_)
+#define AFX_BASENEURALNET_H__F35839F1_1A0E_49CC_B8B1_559F0886A887__INCLUDED_
 
 #if _MSC_VER > 1000
 #pragma once
@@ -52,4 +52,4 @@ protected:
 
 #define NT_BASENEURALNET 1
 
-#endif // !defined(__BASENEURALNET_H)
+#endif // !defined(AFX_BASENEURALNET_H__F35839F1_1A0E_49CC_B8B1_559F0886A887__INCLUDED_)

@@ -1,29 +1,13 @@
-/******************************************************************************
-
-    JoeBOT - a bot for Counter-Strike
-    Copyright (C) 2000-2002  Johannes Lampel
-
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
-******************************************************************************/
 // BaseWeight.h: interface for the CBaseWeight class.
 //
 //////////////////////////////////////////////////////////////////////
 
-#if !defined(__BASEWEIGHT_H)
-#define __BASEWEIGHT_H
+#if !defined(AFX_BASEWEIGHT_H__5D5E1E5D_AD6E_4803_8F86_2332BC7B10DE__INCLUDED_)
+#define AFX_BASEWEIGHT_H__5D5E1E5D_AD6E_4803_8F86_2332BC7B10DE__INCLUDED_
+
+#if _MSC_VER > 1000
+#pragma once
+#endif // _MSC_VER > 1000
 
 #include "NeuralNetDefs.h"
 #include <stdio.h>
@@ -41,4 +25,4 @@ public:
 	long lUsed;
 };
 
-#endif // !defined(__BASEWEIGHT_H)
+#endif // !defined(AFX_BASEWEIGHT_H__5D5E1E5D_AD6E_4803_8F86_2332BC7B10DE__INCLUDED_)
