@@ -1,0 +1,130 @@
+# ---------------------------------------------------------------------------
+# Definitions
+# ---------------------------------------------------------------------------
+#DLLNAME = joebot_mm
+DLLNAME = joebot
+DLL = $(DLLNAME).dll
+
+SDKDIR = U:\netgames\install\hl\sdk\multiplayer
+JOEBOTDIR = U:\netgames\install\hl\bots\joebot
+MMDIR = U:\netgames\install\hl\server\metamod-1.17
+
+BCCDIR = c:\tools\borland\bcc55
+LD = $(BCCDIR)\bin\ilink32
+CC = $(BCCDIR)\bin\bcc32
+RM = del
+
+# includes
+BASECFLAGS = -I$(JOEBOTDIR)\engine -I$(JOEBOTDIR)\common\
+ -I$(JOEBOTDIR)\pm_shared -I$(MMDIR)\metamod -I$(JOEBOTDIR)\NNSim\som\
+ -I$(JOEBOTDIR)\NNSim -I$(JOEBOTDIR)\dlls -I$(BCCDIR)\Include
+
+#BASEFLAGS = -DUSE_METAMOD
+#BASEFLAGS += -DCSTRIKE15
+#BASEFLAGS += -g -D_DEBUG -DDEBUGENGINE
+
+CFLAGS = -w- -4 $(BASECFLAGS)
+
+LIB = $(BCCDIR)\lib;$(BCCDIR)\lib\psdk
+
+SRC =\
+ dlls\basemem.cpp\
+ dlls\bot_client.cpp\
+ dlls\bot_cs.cpp\
+ dlls\bot_names.cpp\
+ dlls\bot.cpp\
+ dlls\bot_wpdir.cpp\
+ dlls\bot_wpstat.cpp\
+ dlls\CBotBase.cpp\
+ dlls\CBotCS_combat.cpp\
+ dlls\CBotCS_navigate.cpp\
+ dlls\CBotCS.cpp\
+ dlls\CBotDOD_combat.cpp\
+ dlls\CBotDOD_navigate.cpp\
+ dlls\CBotDOD.cpp\
+ dlls\CCommand.cpp\
+ dlls\ChatBot.cpp\
+ dlls\ChatHostData.cpp\
+ dlls\ChatHost.cpp\
+ dlls\Chat.cpp\
+ dlls\CLTMem.cpp\
+ dlls\Commandfunc.cpp\
+ dlls\CParser.cpp\
+ dlls\CPersonality.cpp\
+ dlls\CRadio.cpp\
+ dlls\CSDecals.cpp\
+ dlls\CSkill.cpp\
+ dlls\CState.cpp\
+ dlls\CSTMem.cpp\
+ dlls\CTask.cpp\
+ dlls\dll.cpp\
+ dlls\engine.cpp\
+ dlls\Gnome.cpp\
+ dlls\h_export.cpp\
+ dlls\LListElem.cpp\
+ dlls\namefunc.cpp\
+ dlls\NNWeapon.cpp\
+ dlls\util.cpp\
+ dlls\waypoint_advdataimpl.cpp\
+ dlls\waypoint.cpp\
+ dlls\WorldGnome.cpp\
+ NNSim\Activations.cpp\
+ NNSim\BaseLinkFF.cpp\
+ NNSim\BaseLink.cpp\
+ NNSim\BaseNeuralNetFF.cpp\
+ NNSim\BaseNeuralNet.cpp\
+ NNSim\BaseNeuronFF.cpp\
+ NNSim\BaseNeuron.cpp\
+ NNSim\BasePatternElemFF.cpp\
+ NNSim\BasePatternElem.cpp\
+ NNSim\BasePatternFF.cpp\
+ NNSim\BasePattern.cpp\
+ NNSim\BaseWeightFF.cpp\
+ NNSim\BaseWeight.cpp\
+ NNSim\LinkBPropM.cpp\
+ NNSim\LinkBProp.cpp\
+ NNSim\NeuralNetBPropM.cpp\
+ NNSim\NeuralNetBProp.cpp\
+ NNSim\NeuronBPropM.cpp\
+ NNSim\NeuronBProp.cpp\
+ NNSim\NNSimService.cpp\
+ NNSim\PatternBProp.cpp\
+ NNSim\PatternElemBProp.cpp\
+ NNSim\WeightBPropM.cpp\
+ NNSim\WeightBProp.cpp\
+ NNSim\som\CqSOM2d.cpp\
+ NNSim\som\fNBorKernel.cpp\
+ NNSim\som\nVec.cpp\
+ NNSim\som\SOMPatternElem.cpp\
+ NNSim\som\SOMPattern.cpp\
+
+OBJ = $(SRC:.cpp=.obj)
+
+# ---------------------------------------------------------------------------
+# Targets
+# ---------------------------------------------------------------------------
+all: $(DLL)
+ 
+clean:
+	-$(RM) $(DLL)
+	-$(RM) $(DLLNAME).map
+	-$(RM) $(DLLNAME).tds
+	-$(RM) dlls\*.obj
+	-$(RM) NNSim\*.obj
+	-$(RM) NNSim\som\*.obj
+
+# ---------------------------------------------------------------------------
+# Rules
+# ---------------------------------------------------------------------------
+$(DLL): $(OBJ) dlls\linkfunc.obj
+	$(LD) -L$(LIB) -c -aa -q -Gn -Tpd -m c0d32.obj $(OBJ) dlls\linkfunc.obj,\
+	$@, $(DLLNAME).map, import32.lib cw32mt.lib, $(DLLNAME)_bcc.def
+
+dlls\linkfunc.obj: dlls\linkfunc.cpp
+	$(CC) $(CFLAGS) -u- -o$@ -c dlls\linkfunc.cpp
+
+.cpp.obj:
+	$(CC) $(CFLAGS) -o$@ -c $<
+
+.c.obj:
+	$(CC) $(CFLAGS) -o$@ -c $<
