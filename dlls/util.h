@@ -20,6 +20,8 @@
 
 #include <string.h>
 
+#include "bot_globaldefs.h"
+
 #ifndef ACTIVITY_H
 #include "activity.h"
 #endif

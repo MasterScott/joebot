@@ -32,6 +32,8 @@
 #include "CCommand.h"
 #include "Commandfunc.h"
 
+#include "bot_globaldefs.h"
+
 CCommand :: CCommand(){
 	*szName = 0;
 	*sz2Name = 0;

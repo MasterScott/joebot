@@ -63,6 +63,7 @@
 #include "CBotCS.h"
 #include "Commandfunc.h"
 #include "globalvars.h"
+#include "bot_globaldefs.h"
 
 #ifdef _WIN32
 extern HINSTANCE h_Library;
