@@ -322,7 +322,7 @@ bool CBotCS :: BuyWeapon(void){
 			FakeClientCommand(pEdict,"menuselect 0");	//quit fuckin menues
 			if(RANDOM_LONG(0,100) > 90){
 				if(bot_teamnm == CS_TEAM_TE){
-					if(bot_money > 1100){
+					if(bot_money > 900){
 						Buy[CS_WEAPON_ELITE](this);
 					}
 					else
