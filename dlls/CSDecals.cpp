@@ -31,6 +31,8 @@
 #include "bot_globaldefs.h"
 #include "globalvars.h"
 
+#define SPRAYDECALFILE "spray.txt"
+
 CSDecals :: CSDecals (){
 	Init();
 }

@@ -263,8 +263,6 @@
 #define _CAA 35		// angles of each trace to middle
 #define _CAL 75		// length of traces
 
-#define SPRAYDECALFILE "spray.txt"
-
 #define _WPFILEDESC "Joe_bot"
 
 #endif //__BOT_GLOBALDEFS_H
