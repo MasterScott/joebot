@@ -55,10 +55,12 @@ void CBotCS :: HandleMenu( void )
 			{
 				if (g_bJoinWHumanRES)
 				{
-					if(CVAR_GET_FLOAT("allow_spectators")>0.f)
-						bot_team = UTIL_HumansInGame() ? 5 : 6;
-					else
+					if (UTIL_HumansInGame())
 						bot_team = 5;
+					else if (CVAR_GET_FLOAT("allow_spectators") > 0.f)
+						bot_team = 6;
+					else
+						break; // stay unassigned
 				}
 				else
 					bot_team = 5; // auto-assign if invalid
