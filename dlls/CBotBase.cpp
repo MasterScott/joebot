@@ -2018,7 +2018,7 @@ float CBotBase :: ChangeYaw( void ){
 #endif*/
 	
 	// find the difference in the current and ideal angle
-	fADiff = abs(current - ideal);
+	fADiff = fabsf(current - ideal);
 	
 	if(fADiff>180.0f){
 		if(ideal > 0){
@@ -2030,7 +2030,7 @@ float CBotBase :: ChangeYaw( void ){
 	}
 	float a=f_AMomentum,idealSpeed,c=1,aNow;
 	
-	fADiff = abs(current - ideal);
+	fADiff = fabsf(current - ideal);
 	
 	idealSpeed = (ideal - current);
 	idealSpeed = idealSpeed*c;
@@ -2081,7 +2081,7 @@ float CBotBase :: ChangeBodyYaw( void ){
 #endif*/
 	
 	// find the difference in the current and ideal angle
-	fADiff = abs(current - ideal);
+	fADiff = fabsf(current - ideal);
 	
 	if(fADiff>180.0f){
 		if(ideal > 0){
@@ -2094,7 +2094,7 @@ float CBotBase :: ChangeBodyYaw( void ){
 	
 	float a=f_AMomentum,idealSpeed,c=f_ASpeed,aNow;
 	
-	fADiff = abs(current - ideal);
+	fADiff = fabsf(current - ideal);
 	
 	idealSpeed = (ideal - current);
 	idealSpeed = idealSpeed*c;
@@ -2130,7 +2130,7 @@ void CBotBase :: UpdateSkill(void){
 	f_TPD				= temp.fTPD;
 	f_ProneInDistance	= temp.fProneInDistance;
 	f_ProneTPD			= temp.fProneTPD;
-	i_ITP				= temp.fITurnProb;
+	i_ITP				= int(temp.fITurnProb);
 	f_MaxRecoil			= temp.fMaxRecoil;
 
 	char *infobuffer;
