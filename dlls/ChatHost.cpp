@@ -51,7 +51,7 @@ CChatHost::~CChatHost()
 }
 
 CChat *CChatHost :: GetChat(const char *szNameP){
-	char szName[80];
+	char szName[256];
 
 #ifndef __linux__
 		UTIL_BuildFileName(szName,"joebot\\chat",szNameP);

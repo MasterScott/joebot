@@ -32,7 +32,7 @@ public:
 	void Load(char *);
 	void Save(char *);
 
-	char szChatfile[32];
+	char szChatfile[128];
 	char szPrefWeapon[32];
 	int iSkill;				// = -1 when nothing is set
 	float fAggressiveness;	// 0 is default

@@ -5,7 +5,10 @@
 <center>
   <p><font face="Verdana, Arial, Helvetica, sans-serif" size="5">JoeBOT <b><i>F</i></b>requently 
     <b><i>A</i></b>sked <b><i>Q</i></b>uestions</font> </p>
-  <p align="left"><font face="Verdana, Arial, Helvetica, sans-serif"><b><i>1. 
+  <p align="left"><font face="Verdana, Arial, Helvetica, sans-serif"><b><i>
+  
+  
+  1. 
     Everybody talks about the console ... how do I get there ?</i></b></font></p>
   <p align="left"><font face="Verdana, Arial, Helvetica, sans-serif">First you 
     should start Halflife with the parameter &quot;-console&quot;. If you have 
@@ -17,7 +20,9 @@
     it should then look like<i> &quot;c:\sierra\half-life\hl.exe -game cstrike 
     -console&quot;. </i>When all this is done, you can access the console from 
     within the game with the '^'-key, i.e. left of the &quot;1&quot;.</font></p>
-  <p align="left"><font face="Verdana, Arial, Helvetica, sans-serif"><i><b>2. 
+  <p align="left"><font face="Verdana, Arial, Helvetica, sans-serif"><i><b>
+  
+  2. 
     When I start a Multiplayer game all slots are filled up one after the other 
     by bots. But I want to have a free slot and they'll even come &quot;back&quot; 
     when I kick one !</b></i></font></p>
@@ -25,27 +30,35 @@
           look in your cstrike/joebot/bot.cfg file. There you'll find an entry 
           called &quot;max_bots&quot;. Set this value to 0 and no bot will appear 
           automatically.</font></p>
-        <p align="left"><font face="Verdana, Arial, Helvetica, sans-serif"><b><i>3. 
+        <p align="left"><font face="Verdana, Arial, Helvetica, sans-serif"><b><i>
+		
+		3. 
           I started a multiplayer game, but there are no other players ... what's 
           wrong ?</i></b></font></p>
         <p align="left"><font face="Verdana, Arial, Helvetica, sans-serif">When 
           no bots are added automatically, you have to add them manually by typing 
           &quot;addbot&quot; in the console. Then a bot will be added. For further 
           information take a look at the readme.</font></p>
-        <p align="left"><font face="Verdana, Arial, Helvetica, sans-serif"><i><b>4. 
+        <p align="left"><font face="Verdana, Arial, Helvetica, sans-serif"><i><b>
+		
+		4. 
           I already tried addbot, but then I always get the message that this 
           is an unknown command ?!</b></i></font></p>
         <p align="left"><font face="Verdana, Arial, Helvetica, sans-serif">This 
           looks like the installation hasn't been really successful. Have you 
           really selected your halflife directory for installing JoeBOT ?</font></p>
-        <p align="left"><font face="Verdana, Arial, Helvetica, sans-serif"><b><i>5. 
+        <p align="left"><font face="Verdana, Arial, Helvetica, sans-serif"><b><i>
+		
+		5. 
           The bots are running through the maps, but they seem to fly, the legs 
           are funny spread to the sides ! What did JoeBOT do to my beloved halflife 
           ?</i></b> </font></p>
         <p align="left"><font face="Verdana, Arial, Helvetica, sans-serif">JoeBOT 
           did nothing to your halflife. Just make sure you have the newest 
           version of Halflife, at least 1.1.0.4, for CS1.1 at least 1.1.0.6</font></p>
-        <p align="left"><font face="Verdana, Arial, Helvetica, sans-serif"><i><b>6. 
+        <p align="left"><font face="Verdana, Arial, Helvetica, sans-serif"><i><b>
+		
+		6. 
           I like to play as a counterterrorist against a whole team of terrorists. 
           I already managed it to add only terrorist bots (&quot;addbot 1&quot;) 
           , but after some rounds, some of them change to my team. What do I have 
@@ -56,7 +69,9 @@
           this variables in every game, you can also just add this 2 commands 
           to ur cstrike/autoexec.cfg</font></p>
 
-        <p align="left"><font face="Verdana, Arial, Helvetica, sans-serif"><i><b>7. 
+        <p align="left"><font face="Verdana, Arial, Helvetica, sans-serif"><i><b>
+		
+		7. 
 Do Flashbangs and Smokegrenades affect the bots ? ... and how ?</b></i></font></p>
         <p align="left"><font face="Verdana, Arial, Helvetica, sans-serif"> Yes, 
           the bots are affected by both types of grenades, flashbangs and smokegrenades. 
@@ -74,7 +89,9 @@ Do Flashbangs and Smokegrenades affect the bots ? ... and how ?</b></i></font></
           matter what direction. ( btw, this is the same with being prone in DoD, 
           but the time of not being detectable is configurable in bot_skill.txt 
           ) </font></p>
-        <p align="left"><font face="Verdana, Arial, Helvetica, sans-serif"><b><i>8. 
+        <p align="left"><font face="Verdana, Arial, Helvetica, sans-serif"><b><i>
+		
+		8. 
           How can I run <a href="http://www.metamod.org">metamod</a> with JoeBOT 
           ?</i></b></font></p>
         <p align="left"><font face="Verdana, Arial, Helvetica, sans-serif"><i>First 
@@ -91,7 +108,14 @@ Do Flashbangs and Smokegrenades affect the bots ? ... and how ?</b></i></font></
           of course without the quotes ). The same for the linux ppl, you only 
           have to replace the .dll with .so.<br>
           Easy, isn't it ?!</font></p>
-        <p align="left"><font face="Verdana, Arial, Helvetica, sans-serif"><b><i>9. 
+        <p align="left"><font face="Verdana, Arial, Helvetica, sans-serif">And 
+          if you still have problems, sometimes you need to move the .dll or .so 
+          from the hlds/joebot to the hlds/cstrike/joebot folder for example. 
+          Then you also need to remove the ../ in the commandline at the localinfo 
+          commandline command.</font></p>
+        <p align="left"><font face="Verdana, Arial, Helvetica, sans-serif"><b><i>
+		
+		9. 
           How to run JoeBOT with <a href="http://www.planethalflife.com/botman/">botman</a>'s 
           <a href="http://www.planethalflife.com/botman/botmixer.shtml">BotMixer5000</a> 
           ?</i></b></font></p>
