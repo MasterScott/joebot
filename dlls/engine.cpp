@@ -53,7 +53,7 @@ extern int mod_id;
 
 int debug_engine = 0;
 
-void (*botMsgFunction)(void *, int,int) = NULL;
+void (*botMsgFunction)(void *, int, int) = NULL;
 int botMsgIndex;
 
 #ifndef USE_METAMOD
@@ -235,18 +235,6 @@ edict_t* pfnCreateEntity(void)
 	BOT_LOG("pfnCreateEntity", "pent=%x", pent);
 	return pent;
 }
-#endif /* not USE_METAMOD */
-
-#ifdef USE_METAMOD
-edict_t* pfnCreateEntity_Post(void)
-{
-	edict_t *pent = META_RESULT_ORIG_RET(edict_t *);
-	BOT_LOG("pfnCreateEntity", "pent=%x", pent);
-	RETURN_META_VALUE(MRES_HANDLED, NULL);
-}
-#endif /* USE_METAMOD */
-
-#ifndef USE_METAMOD
 void pfnRemoveEntity(edict_t* e)
 {
 	//BOT_LOG("pfnRemoveEntity", "e=%x",e);
@@ -259,18 +247,6 @@ edict_t* pfnCreateNamedEntity(int className)
 	BOT_LOG("pfnCreateNamedEntity", "pent=%x, name=%s", pent, STRING(className));
 	return pent;
 }
-#endif /* not USE_METAMOD */
-
-#ifdef USE_METAMOD
-edict_t* pfnCreateNamedEntity_Post(int className)
-{
-	edict_t *pent = META_RESULT_ORIG_RET(edict_t *);
-	BOT_LOG("pfnCreateNamedEntity", "pent=%x, name=%s", pent, STRING(className));
-	RETURN_META_VALUE(MRES_HANDLED, NULL);
-}
-#endif /* USE_METAMOD */
-
-#ifndef USE_METAMOD
 void pfnMakeStatic(edict_t *ent)
 {
 	BOT_LOG("pfnMakeStatic", "");
@@ -748,9 +724,10 @@ void pfnClientPrintf( edict_t* pEdict, PRINT_TYPE ptype, const char *szMsg )
 #ifdef USE_METAMOD
 		RETURN_META(MRES_SUPERCEDE);
 
-	RETURN_META(MRES_HANDLED);
+	RETURN_META(MRES_IGNORED);
 #else
 		return;
+
 	(*g_engfuncs.pfnClientPrintf)(pEdict, ptype, szMsg);
 #endif
 }
@@ -984,7 +961,7 @@ int pfnGetPlayerUserId(edict_t *e )
 	}
 	
 #ifdef USE_METAMOD
-	RETURN_META_VALUE(MRES_HANDLED, 0);
+	RETURN_META_VALUE(MRES_IGNORED, 0);
 #else /* not USE_METAMOD */
 	return (*g_engfuncs.pfnGetPlayerUserId)(e);
 #endif /* USE_METAMOD */
@@ -1346,207 +1323,6 @@ int GetEngineFunctions(enginefuncs_t *pengfuncsFromEngine, int *interfaceVersion
 		return(FALSE);
 	}
 	memcpy(pengfuncsFromEngine, &meta_engfuncs, sizeof(enginefuncs_t));
-	return TRUE;
-}
-
-enginefuncs_t meta_engfuncs_post = {
-	NULL,			// pfnPrecacheModel()
-	NULL,			// pfnPrecacheSound()
-	NULL,			// pfnSetModel()
-	NULL,			// pfnModelIndex()
-	NULL,			// pfnModelFrames()
-
-	NULL,			// pfnSetSize()
-	NULL,			// pfnChangeLevel()
-	NULL,			// pfnGetSpawnParms()
-	NULL,			// pfnSaveSpawnParms()
-
-	NULL,			// pfnVecToYaw()
-	NULL,			// pfnVecToAngles()
-	NULL,			// pfnMoveToOrigin()
-	NULL,			// pfnChangeYaw()
-	NULL,			// pfnChangePitch()
-
-	NULL,			// pfnFindEntityByString()
-	NULL,			// pfnGetEntityIllum()
-	NULL,			// pfnFindEntityInSphere()
-	NULL,			// pfnFindClientInPVS()
-	NULL,			// pfnEntitiesInPVS()
-
-	NULL,			// pfnMakeVectors()
-	NULL,			// pfnAngleVectors()
-
-	pfnCreateEntity_Post,	// pfnCreateEntity()
-	NULL,			// pfnRemoveEntity()
-	pfnCreateNamedEntity_Post,	// pfnCreateNamedEntity()
-
-	NULL,			// pfnMakeStatic()
-	NULL,			// pfnEntIsOnFloor()
-	NULL,			// pfnDropToFloor()
-
-	NULL,			// pfnWalkMove()
-	NULL,			// pfnSetOrigin()
-
-	NULL,			// pfnEmitSound()
-	NULL,			// pfnEmitAmbientSound()
-
-	NULL,			// pfnTraceLine()
-	NULL,			// pfnTraceToss()
-	NULL,			// pfnTraceMonsterHull()
-	NULL,			// pfnTraceHull()
-	NULL,			// pfnTraceModel()
-	NULL,			// pfnTraceTexture()
-	NULL,			// pfnTraceSphere()
-	NULL,			// pfnGetAimVector()
-
-	NULL,			// pfnServerCommand()
-	NULL,			// pfnServerExecute()
-	NULL,			// pfnClientCommand()
-
-	NULL,			// pfnParticleEffect()
-	NULL,			// pfnLightStyle()
-	NULL,			// pfnDecalIndex()
-	NULL,			// pfnPointContents()
-
-	NULL,			// pfnMessageBegin()
-	NULL,			// pfnMessageEnd()
-
-	NULL,			// pfnWriteByte()
-	NULL,			// pfnWriteChar()
-	NULL,			// pfnWriteShort()
-	NULL,			// pfnWriteLong()
-	NULL,			// pfnWriteAngle()
-	NULL,			// pfnWriteCoord()
-	NULL,			// pfnWriteString()
-	NULL,			// pfnWriteEntity()
-
-	NULL,			// pfnCVarRegister()
-	NULL,			// pfnCVarGetFloat()
-	NULL,			// pfnCVarGetString()
-	NULL,			// pfnCVarSetFloat()
-	NULL,			// pfnCVarSetString()
-
-	NULL,			// pfnAlertMessage()
-	NULL,			// pfnEngineFprintf()
-
-	NULL,			// pfnPvAllocEntPrivateData()
-	NULL,			// pfnPvEntPrivateData()
-	NULL,			// pfnFreeEntPrivateData()
-
-	NULL,			// pfnSzFromIndex()
-	NULL,			// pfnAllocString()
-
-	NULL, 			// pfnGetVarsOfEnt()
-	NULL,			// pfnPEntityOfEntOffset()
-	NULL,			// pfnEntOffsetOfPEntity()
-	NULL,			// pfnIndexOfEdict()
-	NULL,			// pfnPEntityOfEntIndex()
-	NULL,			// pfnFindEntityByVars()
-	NULL,			// pfnGetModelPtr()
-
-	NULL,			// pfnRegUserMsg()
-
-	NULL,			// pfnAnimationAutomove()
-	NULL,			// pfnGetBonePosition()
-
-	NULL,			// pfnFunctionFromName()
-	NULL,			// pfnNameForFunction()
-
-	NULL,			// pfnClientPrintf()			//! JOHN: engine callbacks so game DLL can print messages to individual clients
-	NULL,			// pfnServerPrint()
-
-	NULL,			// pfnCmd_Args()	//! these 3 added 
-	NULL,			// pfnCmd_Argv()	//! so game DLL can easily 
-	NULL,			// pfnCmd_Argc()	//! access client 'cmd' strings
-
-	NULL,			// pfnGetAttachment()
-
-	NULL,			// pfnCRC32_Init()
-	NULL,			// pfnCRC32_ProcessBuffer()
-	NULL,			// pfnCRC32_ProcessByte()
-	NULL,			// pfnCRC32_Final()
-
-	NULL,			// pfnRandomLong()
-	NULL,			// pfnRandomFloat()
-
-	NULL,			// pfnSetView()
-	NULL,			// pfnTime()
-	NULL,			// pfnCrosshairAngle()
-
-	NULL,			// pfnLoadFileForMe()
-	NULL,			// pfnFreeFile()
-
-	NULL,			// pfnEndSection()				//! trigger_endsection
-	NULL,			// pfnCompareFileTime()
-	NULL,			// pfnGetGameDir()
-	NULL,			// pfnCvar_RegisterVariable()
-	NULL,			// pfnFadeClientVolume()
-	NULL,			// pfnSetClientMaxspeed()
-	NULL,			// pfnCreateFakeClient() 		//! returns NULL if fake client can't be created
-	NULL,			// pfnRunPlayerMove()
-	NULL,			// pfnNumberOfEntities()
-
-	NULL,			// pfnGetInfoKeyBuffer()		//! passing in NULL gets the serverinfo
-	NULL,			// pfnInfoKeyValue()
-	NULL,			// pfnSetKeyValue()
-	NULL,			// pfnSetClientKeyValue()
-
-	NULL,			// pfnIsMapValid()
-	NULL,			// pfnStaticDecal()
-	NULL,			// pfnPrecacheGeneric()
-	NULL, 			// pfnGetPlayerUserId()			//! returns the server assigned userid for this player.
-	NULL,			// pfnBuildSoundMsg()
-	NULL,			// pfnIsDedicatedServer()		//! is this a dedicated server?
-	NULL,			// pfnCVarGetPointer()
-	NULL,			// pfnGetPlayerWONId()			//! returns the server assigned WONid for this player.
-
-	//! YWB 8/1/99 TFF Physics additions
-	NULL,			// pfnInfo_RemoveKey()
-	NULL,			// pfnGetPhysicsKeyValue()
-	NULL,			// pfnSetPhysicsKeyValue()
-	NULL,			// pfnGetPhysicsInfoString()
-	NULL,			// pfnPrecacheEvent()
-	NULL,			// pfnPlaybackEvent()
-
-	NULL,			// pfnSetFatPVS()
-	NULL,			// pfnSetFatPAS()
-
-	NULL,			// pfnCheckVisibility()
-
-	NULL,			// pfnDeltaSetField()
-	NULL,			// pfnDeltaUnsetField()
-	NULL,			// pfnDeltaAddEncoder()
-	NULL,			// pfnGetCurrentPlayer()
-	NULL,			// pfnCanSkipPlayer()
-	NULL,			// pfnDeltaFindField()
-	NULL,			// pfnDeltaSetFieldByIndex()
-	NULL,			// pfnDeltaUnsetFieldByIndex()
-
-	NULL,			// pfnSetGroupMask()
-
-	NULL, 			// pfnCreateInstancedBaseline()		// d'oh, CreateInstancedBaseline in dllapi too
-	NULL,			// pfnCvar_DirectSet()
-
-	NULL,			// pfnForceUnmodified()
-
-	NULL,			// pfnGetPlayerStats()
-
-	NULL,			// pfnAddServerCommand()
-};
-
-int GetEngineFunctions_Post(enginefuncs_t *pengfuncsFromEngine, int *interfaceVersion ) 
-{
-	if(!pengfuncsFromEngine) {
-		LOG_ERROR(PLID, "GetEngineFunctions called with null pengfuncsFromEngine");
-		return(FALSE);
-	}
-	else if(*interfaceVersion != ENGINE_INTERFACE_VERSION) {
-		LOG_ERROR(PLID, "GetEngineFunctions version mismatch; requested=%d ours=%d", *interfaceVersion, ENGINE_INTERFACE_VERSION);
-		// Tell metamod what version we had, so it can figure out who is out of date.
-		*interfaceVersion = ENGINE_INTERFACE_VERSION;
-		return(FALSE);
-	}
-	memcpy(pengfuncsFromEngine, &meta_engfuncs_post, sizeof(enginefuncs_t));
 	return TRUE;
 }
 #endif /* USE_METAMOD */
