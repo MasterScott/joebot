@@ -1824,7 +1824,7 @@ void WaypointRemovePath(edict_t *pEntity, int cmd)
 bool WaypointLoad(edict_t *pEntity, const char *szDir)
 {
 	if(pEntity&&bool(jb_wpsound->value))
-		(*g_engfuncs.pfnClientCommand)(pEntity,"speak \"loading\"\n");
+		CLIENT_COMMAND(pEntity,"speak \"loading\"\n");
 	
 	char mapname[64];
 	char filename[256];
@@ -2162,7 +2162,7 @@ bool WaypointSave(edict_t *pEntity,const char *szDir)
 
 		if(pEntity
 			&&bool(jb_wpsound->value))
-			(*g_engfuncs.pfnClientCommand)(pEntity,"speak \"save\"\n");
+			CLIENT_COMMAND(pEntity,"speak \"save\"\n");
 		return true;
 	}
 	else{
