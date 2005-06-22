@@ -2822,7 +2822,7 @@ void WaypointThink(edict_t *pEntity)
 		for (i = 0; i < gpGlobals->maxClients; i++){
 			pEnt = INDEXENT(i + 1);
 			
-			if(!CVAR_BOOL(jb_wpautobots)){		// only humans can autowaypoint
+			if(CVAR_BOOL(jb_wpautobots)){		// only humans can autowaypoint
 				if(UTIL_GetBotIndex(pEnt) == -1){
 					continue;
 				}
