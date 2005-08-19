@@ -347,6 +347,10 @@ void BotCreate( edict_t *pPlayer, const char *szTeam, const char *szClass,const 
 			SET_CLIENT_KEYVALUE( clientIndex, infobuffer, "friends", "0");
 			SET_CLIENT_KEYVALUE( clientIndex, infobuffer, "dm", "0");
 			SET_CLIENT_KEYVALUE( clientIndex, infobuffer, "ah", "1");
+
+      // new since steam update, august 2005
+      SET_CLIENT_KEYVALUE (index + 1, infobuffer, "_ah", "0");
+      SET_CLIENT_KEYVALUE (index + 1, infobuffer, "_vgui_menus", "0");
 		}
 		
 #ifdef USE_METAMOD
